@@ -71,5 +71,4 @@ The Knowledge Base (Dataset) APIs enable users and SDK applications to programma
 ### Source File References
 
 - Python Dataset API Blueprint: [`api/apps/restful_apis/dataset_api.py`](file:///home/logan78/Desktop/ragflow/api/apps/restful_apis/dataset_api.py)
-- Go Dataset Handler: [`internal/handler/datasets.go`](file:///home/logan78/Desktop/ragflow/internal/handler/datasets.go)
 - Knowledgebase Service: [`api/db/services/knowledgebase_service.py`](file:///home/logan78/Desktop/ragflow/api/db/services/knowledgebase_service.py)

@@ -15,10 +15,8 @@ The deployment lifecycle governs how RAGFlow containers boot, initialize depende
    - `mysql` executes [`docker/init.sql`](file:///home/logan78/Desktop/ragflow/docker/init.sql) on first boot to create relational schemas (`user`, `tenant`, `knowledgebase`, `document`, `task`).
 2. **Environment Configuration Interpolation (`entrypoint.sh`)**:
    - [`docker/entrypoint.sh`](file:///home/logan78/Desktop/ragflow/docker/entrypoint.sh) parses template variables.
-   - Evaluates `.env` variables and substitutes placeholders in `/ragflow/conf/service_conf.yaml.template` to produce concrete runtime config `/ragflow/conf/service_conf.yaml`.
 3. **Daemon Subsystem Startup**:
    - Nginx starts in background: `nginx`.
-   - Go Server process launches: `/ragflow/bin/ragflow_server --config /ragflow/conf/service_conf.yaml`.
    - Python Web API launches: `python3 api/ragflow_server.py`.
    - Python Admin server launches (if `--enable-adminserver` flag is present).
 4. **Healthcheck Validation**:

@@ -35,5 +35,4 @@ graph TD
 - Chat Page Entry: [`web/src/pages/next-chats/index.tsx`](file:///home/logan78/Desktop/ragflow/web/src/pages/next-chats)
 - Public Shared Chat: [`web/src/pages/next-chats/share/index.tsx`](file:///home/logan78/Desktop/ragflow/web/src/pages/next-chats/share)
 - Message Item Component: [`web/src/components/message-item/index.tsx`](file:///home/logan78/Desktop/ragflow/web/src/components/message-item)
-- Message Input Component: [`web/src/components/message-input/index.tsx`](file:///home/logan78/Desktop/ragflow/web/src/components/message-input)
 - Chat Request Hook: [`web/src/hooks/use-chat-request.ts`](file:///home/logan78/Desktop/ragflow/web/src/hooks/use-chat-request.ts)

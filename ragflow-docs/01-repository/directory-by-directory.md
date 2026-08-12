@@ -9,20 +9,17 @@ This document presents an exhaustive breakdown of every major top-level director
 ## Level 2: Detailed Folder Analysis
 
 ### 1. `admin/`
-- **Role**: Administration dashboard server and management interface.
+- **Role**: Python-based administration client and server services.
 - **Contents**:
-  - `admin/client/`: React administration UI components.
-  - `admin/server/`: Go-based admin backend routes.
+  - `admin/client/`: Python CLI client and HTTP utilities.
+  - `admin/server/`: Python backend admin routes and services.
 
 ### 2. `agent/`
 - **Role**: Python agent workflow canvas execution framework.
 - **Contents**:
   - `agent/component/`: Visual canvas node implementations ([`agent/component/`](file:///home/logan78/Desktop/ragflow/agent/component)):
     - `llm.py`: Large Language Model node handler.
-    - `retrieval.py`: Hybrid RAG retrieval node handler.
-    - `code.py`: Custom Python code execution sandbox.
     - `switch.py` & `categorize.py`: Conditional branching logic.
-    - `generate_image.py`, `keyword_extract.py`, `rewrite.py`.
   - `agent/plugin/`: Global plugin manager ([`agent/plugin/__init__.py`](file:///home/logan78/Desktop/ragflow/agent/plugin)).
   - `agent/tools/`: Integration tools (Wikipedia, Google Search, Tavily, ArXiv, DuckDuckGo).
 
@@ -63,10 +60,10 @@ This document presents an exhaustive breakdown of every major top-level director
   - `internal/syncer/`: Background synchronization tasks.
 
 ### 8. `rag/`
-- **Role**: RAG retrieval algorithms, tokenization, and re-ranking.
+- **Role**: RAG retrieval algorithms, tokenization, and LLM configuration.
 - **Contents**:
-  - `rag/retrieval/`: Hybrid search (Vector + BM25) logic and cross-encoder re-rankers.
-  - `rag/nlp/`: Language-specific tokenization (Jieba, HanLP, HuggingFace).
+  - `rag/nlp/`: Language-specific tokenization and search implementations (e.g., `search.py`).
+  - `rag/llm/`: Model wrapper logic for OpenAI, local deployments, embedding, and cross-encoder re-rankers.
 
 ### 9. `web/`
 - **Role**: Single-Page React Web Application.

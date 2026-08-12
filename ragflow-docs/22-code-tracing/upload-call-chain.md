@@ -56,4 +56,3 @@ The document upload call chain handles multipart form parsing, file format valid
 - **Python File Storage Service**: `FileService.save_file()` in [api/db/services/file_service.py:L40](file:///home/logan78/Desktop/ragflow/api/db/services/file_service.py#L40)
 - **Python Document Service**: `DocumentService.insert()` in [api/db/services/document_service.py:L80](file:///home/logan78/Desktop/ragflow/api/db/services/document_service.py#L80)
 - **Go Document Handler**: `Upload()` in [internal/handler/document.go:L75](file:///home/logan78/Desktop/ragflow/internal/handler/document.go#L75)
-- **Go Storage Layer**: [internal/storage/storage.go:L45](file:///home/logan78/Desktop/ragflow/internal/storage/storage.go#L45)

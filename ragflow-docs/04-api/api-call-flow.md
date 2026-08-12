@@ -33,7 +33,7 @@ sequenceDiagram
     participant Client as Frontend SPA
     participant Quart as Python Quart ASGI (api/ragflow_server.py)
     participant Auth as Auth Decorator (api/apps/__init__.py)
-    participant RAG as RAG Hybrid Search Engine (rag/retrieval)
+    participant RAG as RAG Hybrid Search Engine (rag/nlp)
     participant LLM as LiteLLM Model Bridge
 
     Client->>Quart: POST /v1/api/chat/completion (Header: Authorization)

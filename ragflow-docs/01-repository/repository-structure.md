@@ -17,11 +17,11 @@ RAGFlow is organized as a unified multi-language monorepo housing frontend TypeS
 
 ```
 /home/logan78/Desktop/ragflow/
-├── admin/                      # Enterprise Admin web application & server services
-│   ├── client/                 # Admin frontend React application
-│   └── server/                 # Admin backend Go services
+├── admin/                      # Python-based administration client and server services
+│   ├── client/                 # Python CLI client and HTTP utilities
+│   └── server/                 # Python backend admin routes and services
 ├── agent/                      # Python Agent Execution Engine & Component Nodes
-│   ├── component/              # Visual canvas component nodes (LLM, Retrieval, Code, Switch, etc.)
+│   ├── component/              # Visual canvas component nodes (LLM, Switch, Categorize, etc.)
 │   ├── plugin/                 # Plugin extension manager
 │   └── tools/                  # Agent tool definitions (Tavily, Google, Wikipedia, Wolfram, etc.)
 ├── api/                        # Python Quart ASGI Web Backend

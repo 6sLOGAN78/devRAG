@@ -67,7 +67,6 @@ flowchart TD
 
 | Subsystem | Primary Language | File Path & Code Link | Primary Responsibility |
 | :--- | :--- | :--- | :--- |
-| **API & Routing** | Python / Go | [api/apps/document_app.py](file:///home/logan78/Desktop/ragflow/api/apps/document_app.py#L30), [internal/handler/](file:///home/logan78/Desktop/ragflow/internal/handler/) | Upload handling, task scheduling, dataset CRUD |
 | **Task Queue & Executor** | Python | [rag/svr/task_executor.py](file:///home/logan78/Desktop/ragflow/rag/svr/task_executor.py#L220), [common/settings.py](file:///home/logan78/Desktop/ragflow/common/settings.py#L139) | Redis stream consumer, concurrency limiter, status updates |
 | **DeepDoc Vision** | Python / C++ | [deepdoc/vision/layout_recognizer.py](file:///home/logan78/Desktop/ragflow/deepdoc/vision/layout_recognizer.py#L33), [deepdoc/vision/ocr.py](file:///home/logan78/Desktop/ragflow/deepdoc/vision/ocr.py#L25) | YOLO/ONNX DLA models, PaddleOCR engine, TSR model |
 | **Parser & Chunkers** | Python / Go | [rag/app/naive.py](file:///home/logan78/Desktop/ragflow/rag/app/naive.py#L30), [internal/ingestion/component/chunker/](file:///home/logan78/Desktop/ragflow/internal/ingestion/component/chunker/) | 14 domain-specific chunking implementations |

@@ -40,7 +40,6 @@ flowchart LR
    ```
 
 2. **Traditional to Simplified Chinese (`tradi2simp`)**:
-   Uses OpenCC / Darts Trie C++ native binding in [binding/cpp/](file:///home/logan78/Desktop/ragflow/binding/cpp/) wrapped by `rag_tokenizer`.
 
 3. **URL & Noise Filtering (`rmWWW`)**:
    Strips http/https links, email addresses, and Infinity lexer special characters `[\x20()^"'~*?:\\]`.

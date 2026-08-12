@@ -24,4 +24,3 @@ In addition to OpenAI and Ollama, RAGFlow supports over 35 other model providers
 - **Base URL**: `https://open.bigmodel.cn/api/paas/v4` ([rag/llm/__init__.py](file:///home/logan78/Desktop/ragflow/rag/llm/__init__.py#L88)).
 
 #### 4. SiliconFlow & OpenRouter Gateway Providers
-- SiliconFlow ([embedding_model.py](file:///home/logan78/Desktop/ragflow/rag/llm/embedding_model.py#L956)) and OpenRouter ([embedding_model.py](file:///home/logan78/Desktop/ragflow/rag/llm/embedding_model.py#L1382)) act as unified multi-model gateways forwarding requests to open-weights models (`BAAI/bge-large-zh-v1.5`, `Qwen/Qwen2.5-72B-Instruct`).

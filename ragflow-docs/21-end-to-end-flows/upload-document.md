@@ -44,7 +44,6 @@ Document upload is the ingestion gateway in RAGFlow. Users upload raw files (PDF
 - **Go Handler**: `Upload()` in [internal/handler/document.go:L75](file:///home/logan78/Desktop/ragflow/internal/handler/document.go#L75)
 - **File Storage Service**: `FileService.save_file()` in [api/db/services/file_service.py:L40](file:///home/logan78/Desktop/ragflow/api/db/services/file_service.py#L40)
 - **Document Service**: `DocumentService.insert()` in [api/db/services/document_service.py:L80](file:///home/logan78/Desktop/ragflow/api/db/services/document_service.py#L80)
-- **Storage Abstraction**: [internal/storage/storage.go](file:///home/logan78/Desktop/ragflow/internal/storage/storage.go)
 
 ---
 

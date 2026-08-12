@@ -46,7 +46,6 @@ RAGFlow features a drag-and-drop Agent Canvas that enables users to design, debu
 - **Canvas Graph Engine**: `Graph` class in [agent/canvas.py:L49](file:///home/logan78/Desktop/ragflow/agent/canvas.py#L49)
 - **Graph Execution Method**: `Graph.run()` in [agent/canvas.py:L440](file:///home/logan78/Desktop/ragflow/agent/canvas.py#L440)
 - **Base Component Class**: `ComponentBase` in [agent/component/base.py:L30](file:///home/logan78/Desktop/ragflow/agent/component/base.py#L30)
-- **Retrieval Component**: [agent/component/retrieval.py:L35](file:///home/logan78/Desktop/ragflow/agent/component/retrieval.py#L35)
 - **LLM Component**: [agent/component/llm.py:L40](file:///home/logan78/Desktop/ragflow/agent/component/llm.py#L40)
 - **Go Canvas Engine**: [internal/agent/canvas/canvas.go:L80](file:///home/logan78/Desktop/ragflow/internal/agent/canvas/canvas.go#L80)
 

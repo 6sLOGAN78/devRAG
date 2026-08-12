@@ -24,8 +24,6 @@ Located under `internal/agent/canvas/`:
 
 #### 3. Python Service & RAG Unit Tests
 Located under `test/unit_test/`:
-- `services/test_dialog_service.py`: Validates chat session state management.
-- `rag/test_chunker.py`: Verifies document chunking edge cases (empty strings, large tables).
 
 #### 4. Sandbox Security Unit Tests
 Located in [`agent/sandbox/tests/test_security.py`](file:///home/logan78/Desktop/ragflow/agent/sandbox/tests/test_security.py#L1-L80):

@@ -17,7 +17,6 @@ RAGFlow production architecture is organized into distinct decoupled layers:
 
 | Tier Component | Container / Process | Primary Port | Config Source | Healthcheck Endpoint |
 | :--- | :--- | :--- | :--- | :--- |
-| **Ingress Proxy** | Nginx | `80`, `443` | `docker/nginx/ragflow.conf` | `HTTP GET /` |
 | **Go API Server** | `ragflow-cpu` (`ragflow_server`) | `9384` | [`conf/service_conf.yaml:L3-L5`](file:///home/logan78/Desktop/ragflow/conf/service_conf.yaml#L3-L5) | `HTTP GET /v1/system/health` |
 | **Python Web API** | `ragflow-cpu` (`entrypoint.sh`) | `9380` | [`conf/service_conf.yaml:L3-L5`](file:///home/logan78/Desktop/ragflow/conf/service_conf.yaml#L3-L5) | `HTTP GET /v1/system/health` |
 | **Admin API Server** | `ragflow-cpu` (admin mode) | `9381`, `9383` | [`conf/service_conf.yaml:L6-L8`](file:///home/logan78/Desktop/ragflow/conf/service_conf.yaml#L6-L8) | `HTTP GET /v1/admin/health` |

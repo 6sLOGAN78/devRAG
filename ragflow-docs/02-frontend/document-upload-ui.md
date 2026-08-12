@@ -32,5 +32,4 @@ The Document Upload and Parsing UI provides a guided step-by-step pipeline for i
 
 - File Upload Dialog: [`web/src/components/file-upload-dialog/index.tsx`](file:///home/logan78/Desktop/ragflow/web/src/components/file-upload-dialog)
 - Chunking Method Selector: [`web/src/components/chunk-method-dialog/index.tsx`](file:///home/logan78/Desktop/ragflow/web/src/components/chunk-method-dialog)
-- Parser Configurator: [`web/src/components/parse-configuration/index.tsx`](file:///home/logan78/Desktop/ragflow/web/src/components/parse-configuration)
 - Document Hook: [`web/src/hooks/use-document-request.ts`](file:///home/logan78/Desktop/ragflow/web/src/hooks/use-document-request.ts)

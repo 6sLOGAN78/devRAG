@@ -33,8 +33,6 @@ graph TD
 | Subsystem Component | Python Path | Go Path | Key Responsibilities |
 | :--- | :--- | :--- | :--- |
 | **REST API Routes** | [chat_api.py](file:///home/logan78/Desktop/ragflow/api/apps/restful_apis/chat_api.py#L1) | [chat.go](file:///home/logan78/Desktop/ragflow/internal/handler/chat.go#L32) | HTTP endpoints for dialog CRUD, session completion, mindmap generation |
-| **Dialog Core Engine** | [dialog_service.py](file:///home/logan78/Desktop/ragflow/api/db/services/dialog_service.py#L292) | [chat.go](file:///home/logan78/Desktop/ragflow/internal/service/chat_service.go) | `async_chat`, `async_chat_solo`, retrieval blending, citation injection |
-| **Conversation Memory** | [conversation_service.py](file:///home/logan78/Desktop/ragflow/api/db/services/conversation_service.py#L1) | [conversation.go](file:///home/logan78/Desktop/ragflow/internal/service/conversation_service.go) | Session lifecycle, message array JSON storage, history truncation |
 | **OpenAI Compatibility** | [openai_api.py](file:///home/logan78/Desktop/ragflow/api/apps/restful_apis/openai_api.py#L1) | [openai_chat.go](file:///home/logan78/Desktop/ragflow/internal/handler/openai_chat.go#L1) | `/v1/chat/completions` proxy routing to RAG flow |
 
 ---

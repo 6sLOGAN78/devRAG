@@ -22,7 +22,6 @@ Supported LLM Providers:
 
 ### Streaming Response Execution
 
-In `api/apps/sdk/session.py` and `api/apps/chat_app.py`:
 
 ```python
 async def completion():

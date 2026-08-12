@@ -20,7 +20,7 @@ RAGFlow is organized as a unified monorepo accommodating the frontend web applic
 ├── helm/                     # Helm chart templates for Kubernetes deployment
 ├── internal/                 # Go backend code (routers, handlers, services, DAOs, ingestion)
 ├── rag/                      # Core RAG retrieval engine (hybrid search, embeddings, reranking)
-├── ragflow-reverse-engineering/ # Reverse-engineered technical documentation suite
+├── ragflow-docs/ # Reverse-engineered technical documentation suite
 └── web/                      # React SPA Frontend (TypeScript, Tailwind, Zustand, React Router 7)
 ```
 
@@ -36,5 +36,5 @@ RAGFlow is organized as a unified monorepo accommodating the frontend web applic
 | **`common/`** | Python | Vector store adapters, constants, logging, settings | [`common/doc_store/`](file:///home/logan78/Desktop/ragflow/common/doc_store), [`common/settings.py`](file:///home/logan78/Desktop/ragflow/common/settings.py) |
 | **`deepdoc/`** | Python (PyTorch/OCR)| Layout recognition, Table OCR, PDF chunking | [`deepdoc/vision/layout_recognizer.py`](file:///home/logan78/Desktop/ragflow/deepdoc/vision/layout_recognizer.py) |
 | **`internal/`** | Go (Gin) | Routers, Handlers, Services, DAOs, Ingestion syncer| [`internal/router/router.go`](file:///home/logan78/Desktop/ragflow/internal/router/router.go#L141), [`internal/handler/auth.go`](file:///home/logan78/Desktop/ragflow/internal/handler/auth.go) |
-| **`rag/`** | Python | Hybrid retrieval, NLP tokenizers, re-ranking models| [`rag/retrieval/`](file:///home/logan78/Desktop/ragflow/rag) |
+| **`rag/`** | Python | Hybrid retrieval, NLP tokenizers, re-ranking models| [`rag/nlp/`](file:///home/logan78/Desktop/ragflow/rag) |
 | **`web/`** | TS / React | Single-page Web UI application | [`web/src/routes.tsx`](file:///home/logan78/Desktop/ragflow/web/src/routes.tsx#L28), [`web/src/app.tsx`](file:///home/logan78/Desktop/ragflow/web/src/app.tsx#L1) |

@@ -7,7 +7,6 @@ This document details the architectural path taken by network requests originati
 ### Communication Architecture
 1. **Frontend Router & UI Page Components**: Built using React Router and TypeScript in `web/src/`.
 2. **API Client & Request Interceptors**: Standard HTTP requests wrapped with authentication headers (`Authorization: Bearer <token>`) or session cookies (`ragflow_auth`).
-3. **Reverse Proxy & Gateway**: Nginx routing `/v1/*` API requests to Python Quart backend (`api/ragflow_server.py`) or Go Gin server (`internal/server/server.go`).
 4. **Backend Router & Service Layer**: REST controllers parse requests, perform validation, delegate business logic to services, and access MySQL, Redis, MinIO, or Elasticsearch.
 
 ---
@@ -45,6 +44,4 @@ flowchart TD
 
 - **Frontend Routes Definition**: [web/src/routes.tsx](file:///home/logan78/Desktop/ragflow/web/src/routes.tsx#L1)
 - **Python App Server Entry**: [api/ragflow_server.py:L50](file:///home/logan78/Desktop/ragflow/api/ragflow_server.py#L50)
-- **Go App Server Entry**: [internal/server/server.go:L40](file:///home/logan78/Desktop/ragflow/internal/server/server.go#L40)
 - **Python Authorization Middleware**: `login_required` decorator in [api/apps/__init__.py:L40](file:///home/logan78/Desktop/ragflow/api/apps/__init__.py#L40)
-- **Go Auth Middleware**: [internal/handler/middleware.go:L30](file:///home/logan78/Desktop/ragflow/internal/handler/middleware.go#L30)

@@ -39,7 +39,6 @@ flowchart TD
 - **Queue Dispatch**: Task payload pushed to Redis queue `ragflow_TASK_EXE_QUEUE` via `REDIS_CONN.queue_product()`.
 - **Worker Execution**: Background process `rag/svr/task_executor.py:main()` [L1904](file:///home/logan78/Desktop/ragflow/rag/svr/task_executor.py#L1904) pops task payload.
 - **DeepDoc Parsing**: Vision layout analysis and OCR executed via [deepdoc/parser/pdf_parser.py:L50](file:///home/logan78/Desktop/ragflow/deepdoc/parser/pdf_parser.py#L50).
-- **Chunking**: Text blocks tokenized and grouped into semantic units via [rag/nlp/chunk_tokenizer.py:L40](file:///home/logan78/Desktop/ragflow/rag/nlp/chunk_tokenizer.py#L40).
 
 ---
 

@@ -10,7 +10,6 @@ The Document Upload subsystem accepts user file submissions via REST endpoints (
 
 ### Upload Route & Controller Flow
 
-Entry point: [api/apps/document_app.py](file:///home/logan78/Desktop/ragflow/api/apps/document_app.py#L30) calling `FileService.upload_document()` in [api/db/services/file_service.py](file:///home/logan78/Desktop/ragflow/api/db/services/file_service.py#L50).
 
 ```mermaid
 flowchart TD

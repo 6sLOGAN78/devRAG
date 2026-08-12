@@ -25,7 +25,6 @@ Defined in [`docker/docker-compose-base.yml#L397-L424`](file:///home/logan78/Des
 | `serenedb_data` | `/var/lib/serenedb` | SereneDB database files | `local` |
 | `./ragflow-logs` (Host bind) | `/ragflow/logs` | Gunicorn, Go server, and Python task logs | Bind Mount |
 | `./service_conf.yaml.template` | `/ragflow/conf/service_conf.yaml.template` | Dynamic environment configuration template | Bind Mount |
-| `./entrypoint.sh` | `/ragflow/entrypoint.sh` | Container boot initialization script | Bind Mount |
 | `/var/run/docker.sock` | `/var/run/docker.sock` | Docker daemon socket for sandbox manager | Bind Mount |
 
 ---

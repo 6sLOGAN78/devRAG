@@ -31,10 +31,8 @@ flowchart TD
 
 - Graph evaluation is driven by node input/output wiring defined in the canvas JSON schema.
 - **LLM Node** ([`agent/component/llm.py`](file:///home/logan78/Desktop/ragflow/agent/component/llm.py)): Generates prompts, calls LiteLLM, handles token streaming.
-- **Retrieval Node** ([`agent/component/retrieval.py`](file:///home/logan78/Desktop/ragflow/agent/component/retrieval.py)): Queries docstore vector indexes using tenant datasets.
-- **Code Node** ([`agent/component/code.py`](file:///home/logan78/Desktop/ragflow/agent/component/code.py)): Executes custom Python scripts within an isolated execution sandbox.
 
-### 3. Hybrid RAG Search Logic ([`rag/retrieval/`](file:///home/logan78/Desktop/ragflow/rag))
+### 3. Hybrid RAG Search Logic ([`rag/nlp/`](file:///home/logan78/Desktop/ragflow/rag))
 
 - Vector search computes Cosine / L2 distance across dense vector embeddings.
 - Full-text BM25 search queries term inverted indexes.
@@ -46,4 +44,4 @@ flowchart TD
 - Task Service: [`api/db/services/task_service.py`](file:///home/logan78/Desktop/ragflow/api/db/services/task_service.py)
 - Agent Node Components: [`agent/component/`](file:///home/logan78/Desktop/ragflow/agent/component)
 - DeepDoc Vision Pipeline: [`deepdoc/vision/`](file:///home/logan78/Desktop/ragflow/deepdoc/vision)
-- Hybrid Retrieval Engine: [`rag/retrieval/`](file:///home/logan78/Desktop/ragflow/rag)
+- Hybrid Retrieval Engine: [`rag/nlp/`](file:///home/logan78/Desktop/ragflow/rag)

@@ -42,7 +42,7 @@ sequenceDiagram
 sequenceDiagram
     participant Client as Frontend SPA
     participant PyApp as Quart App (api/apps/restful_apis/chat_api.py)
-    participant RAG as RAG Retrieval Engine (rag/retrieval)
+    participant RAG as RAG Retrieval Engine (rag/nlp)
     participant LLM as LiteLLM Model Bridge
     participant DocStore as Vector Engine (common/doc_store)
 
@@ -64,5 +64,5 @@ sequenceDiagram
 - Document Upload Handler: [`internal/handler/document.go`](file:///home/logan78/Desktop/ragflow/internal/handler/document.go)
 - Document Service: [`api/db/services/document_service.py`](file:///home/logan78/Desktop/ragflow/api/db/services/document_service.py)
 - Chat REST API: [`api/apps/restful_apis/chat_api.py`](file:///home/logan78/Desktop/ragflow/api/apps/restful_apis/chat_api.py)
-- RAG Retrieval Engine: [`rag/retrieval/`](file:///home/logan78/Desktop/ragflow/rag)
+- RAG Retrieval Engine: [`rag/nlp/`](file:///home/logan78/Desktop/ragflow/rag)
 - DocStore Connector: [`common/doc_store/`](file:///home/logan78/Desktop/ragflow/common/doc_store)

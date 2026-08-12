@@ -10,7 +10,6 @@
 | **GMM** | Gaussian Mixture Model | Clustering algorithm used in RAPTOR tree building |
 | **KB** | Knowledge Base | Dataset entity storing documents, vector index schema, and embedding settings |
 | **LLM** | Large Language Model | Generative AI models wrapped via `LLMBundle` in [api/db/services/llm_service.py](file:///home/logan78/Desktop/ragflow/api/db/services/llm_service.py) |
-| **OCR** | Optical Character Recognition | Image-to-text extraction via PaddleOCR in `deepdoc/vision/ocr_recognizer.py` |
 | **RAG** | Retrieval-Augmented Generation | Combining database retrieval with LLM generation |
 | **RAPTOR** | Recursive Abstractive Processing for Tree-Organized Retrieval | Hierarchical chunk summarization algorithm in [rag/utils/raptor_utils.py](file:///home/logan78/Desktop/ragflow/rag/utils/raptor_utils.py) |
 | **RBAC** | Role-Based Access Control | Permission management mapped via `user_tenant` table (`owner`, `admin`, `normal`) |

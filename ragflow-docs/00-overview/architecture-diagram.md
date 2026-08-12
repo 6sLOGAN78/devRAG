@@ -41,7 +41,7 @@ graph TB
         QuartServer["Quart ASGI Application"]
         PyAuthMiddleware["Login Decorator (api/apps/__init__.py)"]
         AgentEngine["Agent Canvas Flow Runtime (agent/component)"]
-        RetrievalEngine["Hybrid Retrieval & Rerank (rag/retrieval)"]
+        RetrievalEngine["Hybrid Retrieval & Rerank (rag/nlp)"]
         DeepDocEngine["DeepDoc OCR & Vision Parser (deepdoc/vision)"]
 
         QuartServer --> PyAuthMiddleware

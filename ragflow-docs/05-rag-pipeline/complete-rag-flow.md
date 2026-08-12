@@ -42,7 +42,6 @@ sequenceDiagram
 
 ### Complete Source Code Map
 
-1. **Ingestion Entry Point**: [api/apps/document_app.py](file:///home/logan78/Desktop/ragflow/api/apps/document_app.py#L30)
 2. **Task Queue Worker**: [rag/svr/task_executor.py](file:///home/logan78/Desktop/ragflow/rag/svr/task_executor.py#L220)
 3. **DeepDoc Layout Engine**: [deepdoc/vision/layout_recognizer.py](file:///home/logan78/Desktop/ragflow/deepdoc/vision/layout_recognizer.py#L33)
 4. **Hybrid Retrieval Dealer**: [rag/nlp/search.py](file:///home/logan78/Desktop/ragflow/rag/nlp/search.py#L39)

@@ -13,7 +13,6 @@ The RAGFlow test architecture isolates software components according to dependen
 The Python test runner [`run_tests.py`](file:///home/logan78/Desktop/ragflow/run_tests.py#L111-L358) provides a unified CLI for test discovery, execution, parallelization, and HTML coverage generation:
 
 #### CLI Options & Flags
-- `-c, --coverage`: Enables `pytest-cov` reporting with HTML output in `test/unit_test/htmlcov/index.html` ([`run_tests.py:L204-L208`](file:///home/logan78/Desktop/ragflow/run_tests.py#L204-L208)).
 - `-p, --parallel`: Uses `pytest-xdist` to spawn parallel worker processes across CPU cores ([`run_tests.py:L210-L220`](file:///home/logan78/Desktop/ragflow/run_tests.py#L210-L220)).
 - `-t, --test <path>`: Specifies a target test file or directory ([`run_tests.py:L183-L188`](file:///home/logan78/Desktop/ragflow/run_tests.py#L183-L188)).
 - `-m, --markers <expr>`: Filters tests by Pytest markers (e.g. `-m "unit"` or `-m "integration"`) ([`run_tests.py:L192-L194`](file:///home/logan78/Desktop/ragflow/run_tests.py#L192-L194)).

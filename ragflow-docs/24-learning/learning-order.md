@@ -25,7 +25,6 @@ flowchart TD
 - Read [00-overview](../00-overview/) and [21-end-to-end-flows/ragflow-one-request.md](../21-end-to-end-flows/ragflow-one-request.md).
 - Inspect entry point server files:
   - Python: [api/ragflow_server.py](file:///home/logan78/Desktop/ragflow/api/ragflow_server.py#L50)
-  - Go: [internal/server/server.go](file:///home/logan78/Desktop/ragflow/internal/server/server.go#L40)
   - Frontend Routes: [web/src/routes.tsx](file:///home/logan78/Desktop/ragflow/web/src/routes.tsx#L1)
 
 ### Step 2: Database Schemas & API Layer

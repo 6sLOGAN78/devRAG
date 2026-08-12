@@ -3,7 +3,6 @@
 ## Level 1: Conceptual Overview
 
 Creating a Knowledge Base (referred to as a **Dataset** in API endpoints and UI) is the core prerequisite for document ingestion and retrieval in RAGFlow. A Knowledge Base encapsulates:
-1. **Embedding Model Selection**: Specifies the dense vector embedding model (e.g. `BAAI/bge-large-zh-v1.5`, `text-embedding-3-small`, `qwen-embedding`) used to convert text chunks into vector representations.
 2. **Parsing Strategy / Chunking Engine**: Default chunking method (`naive`, `qa`, `resume`, `manual`, `paper`, `laws`, `table`, `book`, `presentation`, `picture`).
 3. **Vector Index Provisioning**: Physical index creation within Elasticsearch or InfiniFlow Infinity engine (`ragflow_{dataset_id}`) configured with matching vector dimension size, analyzer, and field schemas.
 
@@ -38,7 +37,6 @@ Creating a Knowledge Base (referred to as a **Dataset** in API endpoints and UI)
 - **Python Handler**: `create()` in [api/apps/restful_apis/dataset_api.py:L86](file:///home/logan78/Desktop/ragflow/api/apps/restful_apis/dataset_api.py#L86)
 - **Python KB Service**: `KnowledgebaseService` in [api/db/services/knowledgebase_service.py:L35](file:///home/logan78/Desktop/ragflow/api/db/services/knowledgebase_service.py#L35)
 - **Go Handler**: `Create()` in [internal/handler/dataset.go:L50](file:///home/logan78/Desktop/ragflow/internal/handler/dataset.go#L50)
-- **Go Dataset Service**: `Create()` in [internal/service/dataset.go:L60](file:///home/logan78/Desktop/ragflow/internal/service/dataset.go#L60)
 - **Vector Index Creator (ES)**: `create_idx()` in [rag/utils/es_conn.py:L110](file:///home/logan78/Desktop/ragflow/rag/utils/es_conn.py#L110)
 - **Vector Index Creator (Infinity)**: `create_table()` in [rag/utils/infinity_conn.py:L80](file:///home/logan78/Desktop/ragflow/rag/utils/infinity_conn.py#L80)
 

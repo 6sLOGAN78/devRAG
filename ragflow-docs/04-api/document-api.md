@@ -1,60 +1,58 @@
-# Document Management API
+# document_api.py Endpoints
 
-## Level 1: Endpoint Specification Overview
+Source: `api/apps/restful_apis/document_api.py`
 
-The Document Management APIs allow users and SDKs to upload raw document files, trigger task parsing workers, inspect extraction status, query text chunks, and delete documents.
+## Route: `/documents/upload`
+- **Methods:** POST
+- **Handler Function:** `list_docs()`
 
----
-
-## Level 2: Comprehensive API Endpoints Specification
-
-### 1. Document File Upload
-- **Endpoint**: `POST /v1/document/upload`
-- **Engine**: Python Quart (`api/apps/restful_apis/document_api.py`) & Go Gin (`internal/handler/document.go`)
-- **Auth Level**: JWT / API Key (`login_required`)
-- **Content-Type**: `multipart/form-data`
-- **Form Fields**:
-  - `file`: Raw document binary payload (PDF, DOCX, PPTX, XLSX, TXT).
-  - `kb_id`: Target knowledge base ID string.
+- **Calls Services:** None directly detected.
 
 ---
 
-### 2. Run Parsing & Chunking Tasks
-- **Endpoint**: `POST /v1/document/run`
-- **Engine**: Python Quart (`api/apps/restful_apis/document_api.py`)
-- **Auth Level**: JWT / API Key
-- **Request Payload**:
-  ```json
-  {
-    "doc_ids": ["doc-112233", "doc-445566"],
-    "run": "1"
-  }
-  ```
+## Route: `/datasets/<dataset_id>/documents`
+- **Methods:** DELETE
+- **Handler Function:** `list_thumbnails()`
+
+- **Calls Services:**
+  - `DocumentService`
 
 ---
 
-### 3. Change Chunk Enable Status
-- **Endpoint**: `POST /v1/document/change_status`
-- **Engine**: Python Quart (`api/apps/restful_apis/document_api.py`)
-- **Auth Level**: JWT / API Key
-- **Request Payload**:
-  ```json
-  {
-    "doc_id": "doc-112233",
-    "status": "1"
-  }
-  ```
+## Route: `/datasets/<dataset_id>/documents/metadatas`
+- **Methods:** PATCH
+- **Handler Function:** `_run_sync()`
+
+- **Calls Services:**
+  - `TaskService`
+  - `DocumentService`
 
 ---
 
-### 4. Remove Document
-- **Endpoint**: `POST /v1/document/rm`
-- **Engine**: Python Quart (`api/apps/restful_apis/document_api.py`)
-- **Auth Level**: JWT / API Key
-- **Request Payload**: `{ "doc_id": "doc-112233" }`
+## Route: `/datasets/<dataset_id>/documents/parse`
+- **Methods:** POST
+- **Handler Function:** `_parse_document_image_id()`
 
-### Source File References
+- **Calls Services:** None directly detected.
 
-- Python Document API Blueprint: [`api/apps/restful_apis/document_api.py`](file:///home/logan78/Desktop/ragflow/api/apps/restful_apis/document_api.py)
-- Go Document Handler: [`internal/handler/document.go`](file:///home/logan78/Desktop/ragflow/internal/handler/document.go)
-- Document Service: [`api/db/services/document_service.py`](file:///home/logan78/Desktop/ragflow/api/db/services/document_service.py)
+---
+
+## Route: `/documents/images/<image_id>`
+- **Methods:** GET
+- **Handler Function:** `_sandbox_artifact_dialog_ids_for_user()`
+
+- **Calls Services:**
+  - `UserCanvasService`
+
+---
+
+## Route: `/documents/artifact/<filename>`
+- **Methods:** GET
+- **Handler Function:** `_mimetype_for_document()`
+
+- **Calls Services:**
+  - `KnowledgebaseService`
+  - `File2DocumentService`
+  - `DocumentService`
+
+---

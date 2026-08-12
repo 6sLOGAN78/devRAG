@@ -15,7 +15,6 @@ RAGFlow supports specialized chunking templates based on document domain (`parse
 - **Paper / Laws**: Extract section headers, articles, and legal clauses.
 - **Table / Presentation**: Preserve full rows/columns and slide layouts.
 
-- **Primary Source**: [rag/nlp/chunk_tokenizer.py](file:///home/logan78/Desktop/ragflow/rag/nlp/chunk_tokenizer.py#L40).
 
 ---
 

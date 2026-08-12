@@ -14,7 +14,6 @@ To effectively develop, customize, and reverse engineer RAGFlow, engineers shoul
 - **Peewee ORM / GORM**: Database abstraction layer for MySQL in [api/db/db_models.py](file:///home/logan78/Desktop/ragflow/api/db/db_models.py).
 
 ### Go Backend & High-Performance Microservices
-- **Go 1.21+**: Concurrency primitives (`goroutines`, `channels`, `context`), Gin Web Framework in `internal/server/server.go` and `internal/handler/`.
 - **GORM**: Object Relational Mapping in Go in `internal/dao/`.
 
 ### Frontend Stack
@@ -37,7 +36,6 @@ To effectively develop, customize, and reverse engineer RAGFlow, engineers shoul
 
 ### DeepDoc Parsing & Vision Models
 - **YOLOv10 / PP-YOLO**: Object detection for document layout recognition (identifying title, paragraph, header, table, image, footer bounding boxes).
-- **PaddleOCR**: Optical Character Recognition engine for text extraction from scanned PDF pages and images in [deepdoc/vision/ocr_recognizer.py](file:///home/logan78/Desktop/ragflow/deepdoc/vision/ocr_recognizer.py).
 
 ### RAG & LLM Concepts
 - **Dense Vector Embeddings**: Cosine distance, inner product, L2 distance vector spaces.

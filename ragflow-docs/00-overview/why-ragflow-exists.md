@@ -51,5 +51,5 @@ The frontend visual workflow editor ([`web/src/pages/agent/canvas/index.tsx`](fi
 | :--- | :--- | :--- | :--- |
 | **PDF Tables** | Merged into flat text | Vision TSR reconstructs visual table matrix | [`deepdoc/vision/table_structure_recognizer.py`](file:///home/logan78/Desktop/ragflow/deepdoc/vision/table_structure_recognizer.py) |
 | **Multi-Column PDF** | Reads across columns horizontally | Layout detector parses reading ordering | [`deepdoc/vision/layout_recognizer.py`](file:///home/logan78/Desktop/ragflow/deepdoc/vision/layout_recognizer.py) |
-| **Retrieval Accuracy** | Dense vector search only | Dense + BM25 Hybrid + Re-ranking | [`rag/retrieval/`](file:///home/logan78/Desktop/ragflow/rag) |
+| **Retrieval Accuracy** | Dense vector search only | Dense + BM25 Hybrid + Re-ranking | [`rag/nlp/`](file:///home/logan78/Desktop/ragflow/rag) |
 | **Concurrency & Speed** | Single Python process bottlenecks | Dual-Stack Go (Gin) + Python (Quart) | [`cmd/ragflow_server.go`](file:///home/logan78/Desktop/ragflow/cmd/ragflow_server.go#L81) |

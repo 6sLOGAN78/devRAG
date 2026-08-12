@@ -21,14 +21,11 @@ Located in [`Dockerfile`](file:///home/logan78/Desktop/ragflow/Dockerfile):
 1. **Base Stage (`builder`)**: Uses Python 3.10 slim base, installs system build dependencies (`gcc`, `g++`, `cmake`, `git`, `libssl-dev`, `libpcre2-dev`).
 2. **Go Binary Compilation**: Executes [`build.sh`](file:///home/logan78/Desktop/ragflow/build.sh) to produce CGO-linked binaries `bin/ragflow_server` and `bin/ragflow-cli`.
 3. **Python Virtualenv Setup**: Uses `uv` package manager to build wheels and install dependencies defined in `pyproject.toml`.
-4. **Runtime Stage**: Copies compiled Go binaries, installed Python site-packages, Nginx site configs (`docker/nginx/ragflow.conf`), and config templates (`docker/service_conf.yaml.template`).
 
 ### Container Entrypoint Execution (`entrypoint.sh`)
 
 Located in [`docker/entrypoint.sh`](file:///home/logan78/Desktop/ragflow/docker/entrypoint.sh):
-1. **Config Templating**: Reads environment variables (`MYSQL_HOST`, `REDIS_PASSWORD`, `MINIO_USER`, etc.) and substitutes placeholders in `/ragflow/conf/service_conf.yaml.template` using `envsubst` to generate `/ragflow/conf/service_conf.yaml`.
 2. **Nginx Startup**: Starts local Nginx reverse proxy daemon (`nginx`).
-3. **Go Server Startup**: Spawns `/ragflow/bin/ragflow_server --config /ragflow/conf/service_conf.yaml` in background.
 4. **Python Web API Startup**: Launches Python Flask application server with Gunicorn or standard WSGI runner (`python3 api/ragflow_server.py`).
 
 ---

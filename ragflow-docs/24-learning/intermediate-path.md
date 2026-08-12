@@ -27,5 +27,4 @@ Backend engineers, AI developers, and RAG specialists who want to understand doc
 ## Hands-On Milestones
 
 - **Milestone 1**: Trace a document through parsing: upload PDF -> inspect Redis queue -> breakpoint in `pdf_parser.py` -> verify chunk insertion into Elasticsearch.
-- **Milestone 2**: Customize chunking tokenizer parameters in `rag/nlp/chunk_tokenizer.py`.
 - **Milestone 3**: Add a custom LLM provider class into `rag/llm/` and connect it via `LLMBundle`.

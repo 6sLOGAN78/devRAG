@@ -42,7 +42,6 @@ graph TD
 | :--- | :--- | :--- | :--- |
 | `/health`, `/system/ping` | Go | None | [`internal/handler/system.go`](file:///home/logan78/Desktop/ragflow/internal/handler/system.go) |
 | `/api/v1/auth/login` | Go | None | [`internal/handler/user.go`](file:///home/logan78/Desktop/ragflow/internal/handler/user.go) |
-| `/api/v1/searchbots/*` | Go | Beta Auth | [`internal/handler/search_bot.go`](file:///home/logan78/Desktop/ragflow/internal/handler/search_bot.go) |
 | `/api/v1/mcp` | Go | Beta Auth | [`internal/handler/mcp_server.go`](file:///home/logan78/Desktop/ragflow/internal/handler/mcp_server.go) |
 | `/v1/user/info` | Go | JWT / AuthMiddleware | [`internal/handler/user.go`](file:///home/logan78/Desktop/ragflow/internal/handler/user.go) |
 | `/v1/kb/*` | Python | `login_required` | [`api/apps/restful_apis/dataset_api.py`](file:///home/logan78/Desktop/ragflow/api/apps/restful_apis/dataset_api.py) |

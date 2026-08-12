@@ -29,7 +29,7 @@ graph TD
         Quart_App["Quart App (api/apps)"]
         Auth_Py["Login Decorator (api/apps/__init__.py)"]
         Agent_Canvas["Agent Engine (agent/component)"]
-        RAG_Search["RAG Hybrid Search (rag/retrieval)"]
+        RAG_Search["RAG Hybrid Search (rag/nlp)"]
         DeepDoc_Vision["DeepDoc Layout/TSR/OCR (deepdoc/vision)"]
         Quart_App --> Auth_Py --> Agent_Canvas & RAG_Search & DeepDoc_Vision
     end
@@ -64,5 +64,4 @@ graph TD
 | `internal/handler` | `internal/service` | In-process Go interface calls | [`internal/router/router.go`](file:///home/logan78/Desktop/ragflow/internal/router/router.go#L65) |
 | `internal/service` | `internal/dao` | GORM SQL queries | [`internal/dao/user.go`](file:///home/logan78/Desktop/ragflow/internal/dao/user.go) |
 | `api/apps/restful_apis` | `api/db/services` | Peewee ORM context calls | [`api/apps/__init__.py`](file:///home/logan78/Desktop/ragflow/api/apps/__init__.py#L128) |
-| `agent/component` | `common/doc_store` | Python class instantiation | [`agent/component/retrieval.py`](file:///home/logan78/Desktop/ragflow/agent/component/retrieval.py) |
 | `deepdoc/parser` | `deepdoc/vision` | PyTorch inference model execution | [`deepdoc/vision/layout_recognizer.py`](file:///home/logan78/Desktop/ragflow/deepdoc/vision/layout_recognizer.py) |

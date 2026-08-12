@@ -49,12 +49,9 @@ The agent call chain traces execution through the Agent Canvas engine. A visual 
 | Component Name | Class Name | Source File |
 |---|---|---|
 | Begin | `Begin` | [agent/component/begin.py:L30](file:///home/logan78/Desktop/ragflow/agent/component/begin.py#L30) |
-| Retrieval | `Retrieval` | [agent/component/retrieval.py:L35](file:///home/logan78/Desktop/ragflow/agent/component/retrieval.py#L35) |
 | LLM | `LLM` | [agent/component/llm.py:L40](file:///home/logan78/Desktop/ragflow/agent/component/llm.py#L40) |
 | Categorize | `Categorize` | [agent/component/categorize.py:L35](file:///home/logan78/Desktop/ragflow/agent/component/categorize.py#L35) |
 | Switch | `Switch` | [agent/component/switch.py:L35](file:///home/logan78/Desktop/ragflow/agent/component/switch.py#L35) |
-| ExeSQL | `ExeSQL` | [agent/component/exesql.py:L35](file:///home/logan78/Desktop/ragflow/agent/component/exesql.py#L35) |
-| Answer | `Answer` | [agent/component/answer.py:L30](file:///home/logan78/Desktop/ragflow/agent/component/answer.py#L30) |
 
 ---
 

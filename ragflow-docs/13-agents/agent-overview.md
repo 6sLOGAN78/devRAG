@@ -36,6 +36,4 @@ graph TD
 | Component | Python Path | Go Path | Key Responsibilities |
 | :--- | :--- | :--- | :--- |
 | **Agent Component Driver** | [agent_with_tools.py](file:///home/logan78/Desktop/ragflow/agent/component/agent_with_tools.py#L74) | [agent.go](file:///home/logan78/Desktop/ragflow/internal/agent/component/agent.go#L1) | Autonomous tool execution loop, tool indexed binding, max_rounds control |
-| **Tool Registry & Base** | [agent/tools/base.py](file:///home/logan78/Desktop/ragflow/agent/tools/base.py#L1) | [tool.go](file:///home/logan78/Desktop/ragflow/internal/agent/tool/tool.go) | `ToolBase`, `ToolParamBase`, schema reflection, execution wrappers |
 | **MCP Connectors** | [mcp_tool_call_conn.py](file:///home/logan78/Desktop/ragflow/common/mcp_tool_call_conn.py) | [connector.go](file:///home/logan78/Desktop/ragflow/internal/mcp/connector.go#L28) | MCP server protocol binding, tool discovery, schema translation |
-| **Code Execution Sandbox** | [agent/sandbox/client.py](file:///home/logan78/Desktop/ragflow/agent/sandbox/client.py#L1) | [sandbox.go](file:///home/logan78/Desktop/ragflow/internal/agent/sandbox/sandbox.go) | Secure Python/SQL code execution container client |

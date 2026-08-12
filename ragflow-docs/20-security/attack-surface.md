@@ -16,7 +16,6 @@ An attack surface analysis evaluates potential vulnerability entry points across
 | **Code Execution** | Arbitrary code execution via agent Python/Node.js steps | LLM generated code execution | Spawns isolated Docker containers with memory limits (`256m`), timeouts (`10s`), and no new privileges | `docker-compose-base.yml:L180` |
 | **Authentication** | Access token brute forcing or forgery | Forged Bearer headers | HMAC SHA256 secret key validation and expiration checks in `_load_user()` | [`api/apps/__init__.py:L144`](file:///home/logan78/Desktop/ragflow/api/apps/__init__.py#L144) |
 | **Multi-Tenancy** | Cross-tenant data retrieval leakage | Querying other tenant's dataset or document ID | Mandatory `tenant_id` filtering in all database service layer methods | `api/db/services/*` |
-| **File Upload** | Path traversal or file execution attacks | `../../etc/passwd` filename in upload request | Path sanitization and storage using UUID keys in MinIO | `api/apps/document_app.py` |
 | **Native C++ Memory** | Buffer overflow or memory corruption in C++ parser libraries | Crafted malicious PDF / DOCX binary files | Sandboxed execution in `deepdoc` container process | [`Dockerfile_deepdoc_oss`](file:///home/logan78/Desktop/ragflow/Dockerfile_deepdoc_oss) |
 
 ---

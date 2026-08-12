@@ -55,7 +55,5 @@ The ingestion call chain encompasses document parsing, layout recognition, OCR, 
 - **Worker Main Loop**: `main()` in [rag/svr/task_executor.py:L1904](file:///home/logan78/Desktop/ragflow/rag/svr/task_executor.py#L1904)
 - **DeepDoc PDF Parser**: [deepdoc/parser/pdf_parser.py:L50](file:///home/logan78/Desktop/ragflow/deepdoc/parser/pdf_parser.py#L50)
 - **DeepDoc Layout Recognizer**: [deepdoc/vision/layout_recognizer.py:L30](file:///home/logan78/Desktop/ragflow/deepdoc/vision/layout_recognizer.py#L30)
-- **Chunk Tokenizer**: [rag/nlp/chunk_tokenizer.py:L40](file:///home/logan78/Desktop/ragflow/rag/nlp/chunk_tokenizer.py#L40)
 - **Elasticsearch Storage Engine**: [rag/utils/es_conn.py:L150](file:///home/logan78/Desktop/ragflow/rag/utils/es_conn.py#L150)
 - **Infinity Storage Engine**: [rag/utils/infinity_conn.py:L120](file:///home/logan78/Desktop/ragflow/rag/utils/infinity_conn.py#L120)
-- **Go Ingestion Service**: [internal/ingestion/engine.go:L50](file:///home/logan78/Desktop/ragflow/internal/ingestion/engine.go#L50)

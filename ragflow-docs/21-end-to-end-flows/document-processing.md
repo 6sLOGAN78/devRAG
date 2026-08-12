@@ -6,7 +6,6 @@ Document processing transforms raw documents (PDF, DOCX, XLSX, Images, etc.) int
 1. **Task Scheduling**: A processing task is created in MySQL table `task` and enqueued into Redis task queue `ragflow_TASK_EXE_QUEUE`.
 2. **Task Execution**: A background worker process (`rag/svr/task_executor.py`) pops tasks from Redis.
 3. **DeepDoc Parser Execution**: Depending on document type and knowledge base `parser_id`, DeepDoc applies vision-based layout analysis (YOLOv10 / PP-YOLO), OCR text recognition (PaddleOCR), table structure reconstruction, and figure extraction.
-4. **Semantic Tokenization & Chunking**: Sentences and visual blocks are grouped into optimal chunk sizes using `rag/nlp/chunk_tokenizer.py`.
 
 ---
 
@@ -49,8 +48,6 @@ Document processing transforms raw documents (PDF, DOCX, XLSX, Images, etc.) int
 - **Worker Main Loop**: `main()` in [rag/svr/task_executor.py:L1904](file:///home/logan78/Desktop/ragflow/rag/svr/task_executor.py#L1904)
 - **DeepDoc PDF Parser**: [deepdoc/parser/pdf_parser.py:L50](file:///home/logan78/Desktop/ragflow/deepdoc/parser/pdf_parser.py#L50)
 - **DeepDoc Vision Layout**: [deepdoc/vision/layout_recognizer.py:L30](file:///home/logan78/Desktop/ragflow/deepdoc/vision/layout_recognizer.py#L30)
-- **Chunk Tokenizer**: [rag/nlp/chunk_tokenizer.py:L40](file:///home/logan78/Desktop/ragflow/rag/nlp/chunk_tokenizer.py#L40)
-- **Go Ingestion Engine**: [internal/ingestion/engine.go](file:///home/logan78/Desktop/ragflow/internal/ingestion/engine.go)
 
 ---
 

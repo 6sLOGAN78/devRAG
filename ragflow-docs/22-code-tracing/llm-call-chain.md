@@ -43,11 +43,6 @@ The `TenantLLM` database model maps model names to provider classes:
 
 | Provider Name | Implementation Class File |
 |---|---|
-| OpenAI | `rag/llm/openai_model.py` |
-| Qwen / DashScope | `rag/llm/qwen_model.py` |
-| Ollama | `rag/llm/ollama_model.py` |
-| DeepSeek | `rag/llm/deepseek_model.py` |
-| Zhipu AI | `rag/llm/zhipu_model.py` |
 
 ---
 
