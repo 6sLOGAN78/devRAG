@@ -2,7 +2,7 @@
 
 ## Level 1: Conceptual Overview
 
-The Document Upload subsystem accepts user file submissions via REST endpoints (`/v1/document/upload`), validates MIME types and file extensions, checks quota limits, computes content hashes, writes binary streams to object storage, and initializes metadata DB rows (`File`, `Document`, `File2Document`).
+The Document Upload subsystem accepts user file submissions via REST endpoints (`/api/v1/documents/upload`), validates MIME types and file extensions, checks quota limits, computes content hashes, writes binary streams to object storage, and initializes metadata DB rows (`File`, `Document`, `File2Document`).
 
 ---
 
@@ -13,7 +13,7 @@ The Document Upload subsystem accepts user file submissions via REST endpoints (
 
 ```mermaid
 flowchart TD
-    Request[POST /v1/document/upload] --> ValidateExt{Check Allowed Extension}
+    Request[POST /api/v1/documents/upload] --> ValidateExt{Check Allowed Extension}
     ValidateExt -->|Invalid| Error[Return 400 Invalid Extension]
     ValidateExt -->|Valid| Hash[Compute xxhash xxh64 Content Hash]
     

@@ -28,7 +28,7 @@ RAGFlow replaces basic text extraction with vision-driven document understanding
 
 ### 2. Multi-Engine Vector Search & Hybrid Retrieval (`rag/`)
 
-RAGFlow provides a unified docstore interface ([`common/doc_store/`](file:///home/logan78/Desktop/ragflow/common/doc_store)) supporting:
+RAGFlow provides a unified docstore interface ([`rag/utils/`](file:///home/logan78/Desktop/ragflow/rag/utils)) supporting:
 - Vector similarity search (Cosine / L2 distance).
 - BM25 Full-text search with customized tokenizers (Jieba, HanLP, HuggingFace tokenizers).
 - Fusion re-ranking via Cross-Encoders or Reciprocal Rank Fusion (RRF).

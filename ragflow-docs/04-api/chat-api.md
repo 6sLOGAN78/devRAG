@@ -30,7 +30,7 @@ The Chat & Dialogue Assistant APIs provide conversational RAG endpoints supporti
 ---
 
 ### 2. Stream Chat Completion (SSE Token Output)
-- **Endpoint**: `POST /v1/api/chat/completion`
+- **Endpoint**: `POST /api/v1/chat/completions`
 - **Engine**: Python Quart (`api/apps/restful_apis/chat_api.py`)
 - **Auth Level**: JWT / API Key
 - **Request Payload**:

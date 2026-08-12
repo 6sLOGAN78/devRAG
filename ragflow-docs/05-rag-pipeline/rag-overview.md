@@ -28,8 +28,8 @@ flowchart TD
     end
 
     subgraph DocStore Engines
-        DocStore --- Infinity[Infinity Engine / common/doc_store/infinity_conn.py]
-        DocStore --- ES[ElasticSearch Engine / common/doc_store/es_conn.py]
+        DocStore --- Infinity[Infinity Engine / rag/utils/infinity_conn.py]
+        DocStore --- ES[ElasticSearch Engine / rag/utils/es_conn.py]
         DocStore --- OB[OceanBase Engine / internal/engine/oceanbase]
         DocStore --- CH[ClickHouse Engine / internal/engine/clickhouse]
     end
@@ -48,7 +48,7 @@ flowchart TD
 ### End-to-End Call Chain
 
 ```
-[User/API] -> POST /v1/document/upload -> api/apps/document_app.py:upload()
+[User/API] -> POST /api/v1/documents/upload -> api/apps/restful_apis/document_api.py:upload_info()
   -> FileService.upload_document() [api/db/services/file_service.py]
   -> DocumentService.create() [api/db/services/document_service.py]
   -> TaskService.create_task() [api/db/services/task_service.py]

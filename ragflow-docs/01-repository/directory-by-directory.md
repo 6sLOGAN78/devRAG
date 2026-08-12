@@ -28,7 +28,7 @@ This document presents an exhaustive breakdown of every major top-level director
 - **Contents**:
   - `api/ragflow_server.py`: Python server entry point ([`api/ragflow_server.py`](file:///home/logan78/Desktop/ragflow/api/ragflow_server.py#L90)).
   - `api/apps/`: Quart application initialization, CORS, authentication decorators ([`api/apps/__init__.py`](file:///home/logan78/Desktop/ragflow/api/apps/__init__.py#L61)).
-  - `api/apps/restful_apis/`: REST API route modules (`kb_app.py`, `document_api.py`, `user_api.py`, `agent_api.py`, `chat_api.py`, `mcp_api.py`, `openai_api.py`).
+  - `api/apps/restful_apis/`: REST API route modules (`dataset_api.py`, `document_api.py`, `user_api.py`, `agent_api.py`, `chat_api.py`, `mcp_api.py`, `openai_api.py`).
   - `api/db/`: Peewee database tables ([`api/db/db_models.py`](file:///home/logan78/Desktop/ragflow/api/db/db_models.py)) and data service classes (`user_service.py`, `document_service.py`, etc.).
 
 ### 4. `cmd/`
@@ -40,7 +40,7 @@ This document presents an exhaustive breakdown of every major top-level director
 ### 5. `common/`
 - **Role**: Shared Python libraries, settings, and vector store connectors.
 - **Contents**:
-  - `common/doc_store/`: Vector DB adapters for Infinity, Elasticsearch, OpenSearch, OceanBase, Qdrant, Milvus, PGVector ([`common/doc_store/`](file:///home/logan78/Desktop/ragflow/common/doc_store)).
+  - `rag/utils/`: Vector DB adapters for Infinity, Elasticsearch, OpenSearch, OceanBase, Qdrant, Milvus, PGVector ([`rag/utils/`](file:///home/logan78/Desktop/ragflow/rag/utils)).
   - `common/settings.py`: Global environment settings loader.
   - `common/log_utils.py`: Central logger initialization.
 

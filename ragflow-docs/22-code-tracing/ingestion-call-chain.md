@@ -11,7 +11,7 @@ The ingestion call chain encompasses document parsing, layout recognition, OCR, 
 ```
 [React Parse Trigger]
        │
-       ▼ (HTTP POST /v1/document/run)
+       ▼ (HTTP POST /api/v1/datasets/<dataset_id>/documents/parse)
 [api/apps/restful_apis/document_api.py:parse_documents()] [L1552]
        │
        ├─► Update Document Status in MySQL: DocumentService.update_by_id(doc_id, {"run": "1"})

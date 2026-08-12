@@ -25,7 +25,7 @@ graph TD
 
 ### Key UI Features & Code Mapping
 
-1. **Server-Sent Events (SSE) Stream Handling**: Real-time token streaming from `/v1/api/chat/completion` handled via custom hook [`web/src/hooks/use-send-message.ts`](file:///home/logan78/Desktop/ragflow/web/src/hooks/use-send-message.ts).
+1. **Server-Sent Events (SSE) Stream Handling**: Real-time token streaming from `/api/v1/chat/completions` handled via custom hook [`web/src/hooks/use-send-message.ts`](file:///home/logan78/Desktop/ragflow/web/src/hooks/use-send-message.ts).
 2. **Markdown & Formula Rendering**: Markdown parsed via [`web/src/components/markdown-content`](file:///home/logan78/Desktop/ragflow/web/src/components/markdown-content) supporting code blocks, syntax highlighting, and KaTeX mathematical notation.
 3. **Citations & Chunk Highlighting**: Assistant responses include interactive citation pills linking directly to original PDF bounding boxes or chunk text.
 4. **Public Chat Sharing & Widgets**: Standalone chat embedding widget defined in [`web/src/pages/next-chats/share/index.tsx`](file:///home/logan78/Desktop/ragflow/web/src/pages/next-chats/share).

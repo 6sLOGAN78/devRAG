@@ -34,9 +34,9 @@ flowchart TD
 |---|---|---|---|---|
 | `/login-next` [L133](file:///home/logan78/Desktop/ragflow/web/src/routes.tsx#L133) | `pages/login-next` | `POST /v1/auth/login` | [user_api.py:L61](file:///home/logan78/Desktop/ragflow/api/apps/restful_apis/user_api.py#L61) | [user.go:L120](file:///home/logan78/Desktop/ragflow/internal/handler/user.go#L120) |
 | `/datasets` [L200](file:///home/logan78/Desktop/ragflow/web/src/routes.tsx#L200) | `pages/datasets` | `GET /v1/dataset/list` | [dataset_api.py:L312](file:///home/logan78/Desktop/ragflow/api/apps/restful_apis/dataset_api.py#L312) | [dataset.go:L90](file:///home/logan78/Desktop/ragflow/internal/handler/dataset.go#L90) |
-| `/dataset/files/:id` [L208](file:///home/logan78/Desktop/ragflow/web/src/routes.tsx#L208) | `pages/dataset/dataset` | `POST /v1/document/upload` | [document_api.py:L452](file:///home/logan78/Desktop/ragflow/api/apps/restful_apis/document_api.py#L452) | [document.go:L75](file:///home/logan78/Desktop/ragflow/internal/handler/document.go#L75) |
+| `/dataset/files/:id` [L208](file:///home/logan78/Desktop/ragflow/web/src/routes.tsx#L208) | `pages/dataset/dataset` | `POST /api/v1/documents/upload` | [document_api.py:L452](file:///home/logan78/Desktop/ragflow/api/apps/restful_apis/document_api.py#L452) | [document.go:L75](file:///home/logan78/Desktop/ragflow/internal/handler/document.go#L75) |
 | `/chat/:id` [L192](file:///home/logan78/Desktop/ragflow/web/src/routes.tsx#L192) | `pages/next-chats/chat` | `POST /v1/session/completion` | [chat_api.py:L1230](file:///home/logan78/Desktop/ragflow/api/apps/restful_apis/chat_api.py#L1230) | [chat.go:L110](file:///home/logan78/Desktop/ragflow/internal/handler/chat.go#L110) |
-| `/agent/:id` [L378](file:///home/logan78/Desktop/ragflow/web/src/routes.tsx#L378) | `pages/agent` | `POST /v1/agent/completion` | [agent_api.py:L1447](file:///home/logan78/Desktop/ragflow/api/apps/restful_apis/agent_api.py#L1447) | [canvas.go:L80](file:///home/logan78/Desktop/ragflow/internal/agent/canvas/canvas.go#L80) |
+| `/agent/:id` [L378](file:///home/logan78/Desktop/ragflow/web/src/routes.tsx#L378) | `pages/agent` | `POST /api/v1/agents/chat/completions` | [agent_api.py:L1447](file:///home/logan78/Desktop/ragflow/api/apps/restful_apis/agent_api.py#L1447) | [canvas.go:L80](file:///home/logan78/Desktop/ragflow/internal/agent/canvas/canvas.go#L80) |
 
 ---
 

@@ -8,7 +8,7 @@ RAGFlow is organized as a unified multi-language monorepo housing frontend TypeS
 
 1. **Separation of Gateway vs Compute**: High-concurrency routing, auth checks, system administration, and ingestion queuing are hosted in Go (`cmd/` & `internal/`), while heavy ML/AI pipelines, embedding calculations, and agent graph canvas evaluations run in Python (`api/`, `agent/`, `deepdoc/`, `rag/`).
 2. **Modular Ingestion Pipeline**: DeepDoc document parsing operates as a standalone package (`deepdoc/`) that can be executed independently or invoked via background worker threads.
-3. **Decoupled DocStore Interface**: Storage layer (`common/doc_store/`) abstracts vector databases so RAGFlow can operate seamlessly over Infinity, Elasticsearch, OpenSearch, OceanBase, Qdrant, Milvus, or PGVector.
+3. **Decoupled DocStore Interface**: Storage layer (`rag/utils/`) abstracts vector databases so RAGFlow can operate seamlessly over Infinity, Elasticsearch, OpenSearch, OceanBase, Qdrant, Milvus, or PGVector.
 4. **Single-Page Application Frontend**: Frontend UI (`web/`) communicates exclusively via REST APIs and Server-Sent Events (SSE) with the backend engine.
 
 ---

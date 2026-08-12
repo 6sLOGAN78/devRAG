@@ -25,7 +25,7 @@ flowchart TD
 ## Step 1: User Upload & Document Record Creation
 - **User Action**: User uploads `technical_manual.pdf` to Knowledge Base `kb_123` via the React frontend dropzone.
 - **Frontend Route**: Component in [web/src/pages/dataset/dataset/index.tsx](file:///home/logan78/Desktop/ragflow/web/src/routes.tsx#L208).
-- **HTTP Request**: `POST /v1/document/upload`
+- **HTTP Request**: `POST /api/v1/documents/upload`
 - **Backend API Handler**: `upload_document()` in [api/apps/restful_apis/document_api.py:L452](file:///home/logan78/Desktop/ragflow/api/apps/restful_apis/document_api.py#L452) delegating to `_upload_local_documents()` at [L658](file:///home/logan78/Desktop/ragflow/api/apps/restful_apis/document_api.py#L658).
 - **Binary Storage**: Raw PDF bytes stored in MinIO/S3 via `FileService.save_file()` in [api/db/services/file_service.py:L40](file:///home/logan78/Desktop/ragflow/api/db/services/file_service.py#L40).
 - **Database Entry**: Document metadata inserted into MySQL table `document` with status `UNSTART` (`run = '0'`).
@@ -34,7 +34,7 @@ flowchart TD
 
 ## Step 2: Task Dispatch & Asynchronous Parsing
 - **User Action**: User clicks "Parse" in the UI.
-- **HTTP Request**: `POST /v1/document/run`
+- **HTTP Request**: `POST /api/v1/datasets/<dataset_id>/documents/parse`
 - **API Handler**: `parse_documents()` in [api/apps/restful_apis/document_api.py:L1552](file:///home/logan78/Desktop/ragflow/api/apps/restful_apis/document_api.py#L1552).
 - **Queue Dispatch**: Task payload pushed to Redis queue `ragflow_TASK_EXE_QUEUE` via `REDIS_CONN.queue_product()`.
 - **Worker Execution**: Background process `rag/svr/task_executor.py:main()` [L1904](file:///home/logan78/Desktop/ragflow/rag/svr/task_executor.py#L1904) pops task payload.

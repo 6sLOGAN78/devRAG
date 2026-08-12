@@ -34,11 +34,11 @@
 
 #### Document & Chunk Operations
 - **`IMPORT FILE '<path>' INTO DATASET '<dataset_name>' [PARSER '<parser_type>']`**
-  - *Description*: Uploads local document file into target dataset (`POST /v1/document/upload`).
+  - *Description*: Uploads local document file into target dataset (`POST /api/v1/documents/upload`).
 - **`PARSE DOCUMENT '<doc_id>' IN DATASET '<dataset_name>'`**
-  - *Description*: Triggers async chunking and embedding execution task (`POST /v1/document/run`).
+  - *Description*: Triggers async chunking and embedding execution task (`POST /api/v1/datasets/<dataset_id>/documents/parse`).
 - **`LIST DOCUMENTS IN DATASET '<dataset_name>'`**
-  - *Description*: Lists documents inside a dataset (`POST /v1/document/list`).
+  - *Description*: Lists documents inside a dataset (`POST /api/v1/datasets/<dataset_id>/documents`).
 - **`LIST CHUNKS OF DOCUMENT '<doc_id>' IN DATASET '<dataset_name>'`**
   - *Description*: Displays chunked text segments and vector index status (`POST /v1/chunk/list`).
 
@@ -62,7 +62,7 @@ The Virtual Filesystem maps REST endpoints into UNIX directory operations:
 | VFS Command | Syntax & Options | Description | Backend Endpoint | Source Link |
 | :--- | :--- | :--- | :--- | :--- |
 | `ls` | `ls [path] [-n limit]` | List datasets (`/datasets`) or document files (`/datasets/{name}`) | `GET /v1/dataset/list` | [`dataset.go:L50`](file:///home/logan78/Desktop/ragflow/internal/cli/filesystem/dataset.go#L50) |
-| `cat` | `cat <path>` | Display raw text content of file node | `GET /v1/document/get` | [`file.go:L80`](file:///home/logan78/Desktop/ragflow/internal/cli/filesystem/file.go#L80) |
+| `cat` | `cat <path>` | Display raw text content of file node | `GET /api/v1/documents/<doc_id>/preview` | [`file.go:L80`](file:///home/logan78/Desktop/ragflow/internal/cli/filesystem/file.go#L80) |
 | `mkdir` | `mkdir <dataset_name>` | Create new dataset directory | `POST /v1/dataset/create` | [`dataset.go:L120`](file:///home/logan78/Desktop/ragflow/internal/cli/filesystem/dataset.go#L120) |
 | `rm` | `rm <path>` | Delete dataset directory or document file | `POST /v1/dataset/rm` | [`dataset.go:L180`](file:///home/logan78/Desktop/ragflow/internal/cli/filesystem/dataset.go#L180) |
 | `search` | `search "<query>" [path]` | Perform vector retrieval on path context | `POST /v1/api/retrieval` | [`engine.go:L110`](file:///home/logan78/Desktop/ragflow/internal/cli/filesystem/engine.go#L110) |

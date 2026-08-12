@@ -12,14 +12,14 @@ Document processing transforms raw documents (PDF, DOCX, XLSX, Images, etc.) int
 ## Level 2: Technical Implementation Details
 
 ### API Endpoint & Routing
-- **Python Route**: `POST /v1/document/run` handled by `parse_documents()` in [api/apps/restful_apis/document_api.py:L1552](file:///home/logan78/Desktop/ragflow/api/apps/restful_apis/document_api.py#L1552).
+- **Python Route**: `POST /api/v1/datasets/<dataset_id>/documents/parse` handled by `parse_documents()` in [api/apps/restful_apis/document_api.py:L1552](file:///home/logan78/Desktop/ragflow/api/apps/restful_apis/document_api.py#L1552).
 - **Go Route**: `POST /api/v1/datasets/:id/documents/run` handled by `Run()` in [internal/handler/document.go:L180](file:///home/logan78/Desktop/ragflow/internal/handler/document.go#L180).
 
 ### Code Call Chain
 ```
 [React UI Parse Button Click]
        │
-       ▼ (HTTP POST /v1/document/run)
+       ▼ (HTTP POST /api/v1/datasets/<dataset_id>/documents/parse)
 [api/apps/restful_apis/document_api.py:parse_documents()]
        │
        ├─► Update MySQL `document` status: run = '1' (RUNNING), progress = 0.0
@@ -63,7 +63,7 @@ sequenceDiagram
     participant MinIO as MinIO Storage
     participant DeepDoc as DeepDoc Parsing Engine
 
-    UI->>API: POST /v1/document/run (doc_ids=[...])
+    UI->>API: POST /api/v1/datasets/<dataset_id>/documents/parse (doc_ids=[...])
     API->>API: Update document status to RUNNING (run='1')
     API->>Redis: RPUSH ragflow_TASK_EXE_QUEUE task_id
     API-->>UI: 200 OK (Task queued)

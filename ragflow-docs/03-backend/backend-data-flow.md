@@ -17,12 +17,12 @@ sequenceDiagram
     participant PyApp as Python ASGI (api/ragflow_server.py)
     participant Service as DocumentService (api/db/services)
     participant DeepDoc as DeepDoc Parser (deepdoc/vision)
-    participant DocStore as Vector Store (common/doc_store)
+    participant DocStore as Vector Store (rag/utils)
 
-    Client->>Router: POST /v1/document/upload (PDF File)
+    Client->>Router: POST /api/v1/documents/upload (PDF File)
     Router->>Service: Save raw PDF file to MinIO Object Store
     Service-->>Router: Document Record Created (status=UNSTART)
-    Client->>PyApp: POST /v1/document/run { doc_ids: ["..."] }
+    Client->>PyApp: POST /api/v1/datasets/<dataset_id>/documents/parse { doc_ids: ["..."] }
     PyApp->>Service: Launch task execution job
     
     loop Chunking & Indexing Execution
@@ -44,9 +44,9 @@ sequenceDiagram
     participant PyApp as Quart App (api/apps/restful_apis/chat_api.py)
     participant RAG as RAG Retrieval Engine (rag/nlp)
     participant LLM as LiteLLM Model Bridge
-    participant DocStore as Vector Engine (common/doc_store)
+    participant DocStore as Vector Engine (rag/utils)
 
-    Client->>PyApp: POST /v1/api/chat/completion { session_id, message }
+    Client->>PyApp: POST /api/v1/chat/completions { session_id, message }
     PyApp->>RAG: Hybrid Search (Dense Vectors + BM25 Keywords)
     RAG->>DocStore: Retrieve Hit Chunks (filtered by tenant_id)
     DocStore-->>RAG: Top-K Grounding Chunks
@@ -65,4 +65,4 @@ sequenceDiagram
 - Document Service: [`api/db/services/document_service.py`](file:///home/logan78/Desktop/ragflow/api/db/services/document_service.py)
 - Chat REST API: [`api/apps/restful_apis/chat_api.py`](file:///home/logan78/Desktop/ragflow/api/apps/restful_apis/chat_api.py)
 - RAG Retrieval Engine: [`rag/nlp/`](file:///home/logan78/Desktop/ragflow/rag)
-- DocStore Connector: [`common/doc_store/`](file:///home/logan78/Desktop/ragflow/common/doc_store)
+- DocStore Connector: [`rag/utils/`](file:///home/logan78/Desktop/ragflow/rag/utils)

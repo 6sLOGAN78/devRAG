@@ -25,7 +25,7 @@ sequenceDiagram
     UI->>Axios: Call API Function (e.g. fetchDatasets)
     Axios->>AuthUtil: Retrieve token (authorizationUtil.getToken())
     AuthUtil-->>Axios: Return Bearer Token String
-    Axios->>Server: HTTP GET /api/v1/kb/list (Header: Authorization)
+    Axios->>Server: HTTP GET /api/v1/datasets (Header: Authorization)
     alt 200 OK
         Server-->>Axios: { retcode: 0, data: [...] }
         Axios-->>UI: Return data object

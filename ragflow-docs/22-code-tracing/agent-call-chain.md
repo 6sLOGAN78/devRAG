@@ -11,7 +11,7 @@ The agent call chain traces execution through the Agent Canvas engine. A visual 
 ```
 [React UI Agent Canvas / Chat Input]
        │
-       ▼ (HTTP POST /v1/agent/completion)
+       ▼ (HTTP POST /api/v1/agents/chat/completions)
 [api/apps/restful_apis/agent_api.py:agent_chat_completion()] [L1447]
        │
        ├─► 1. Access Check & DSL Lookup:

@@ -6,7 +6,7 @@ The Document Lifecycle tracks a file from initial upload through storage, parsin
 
 ```mermaid
 stateDiagram-v2
-    [*] --> UPLOADED: User Upload (api/apps/document_app.py)
+    [*] --> UPLOADED: User Upload (api/apps/restful_apis/document_api.py)
     UPLOADED --> UNSTART: Task Creation (Task.run = '0')
     UNSTART --> RUNNING: Worker Enqueue (Redis te.0.common)
     RUNNING --> PARSED: DeepDoc DLA & OCR Execution

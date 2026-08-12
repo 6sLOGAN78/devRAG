@@ -33,17 +33,17 @@ This document presents the complete API Endpoint Catalog for RAGFlow, listing en
 
 | HTTP Method | Route Path | Engine | Controller / Handler | Auth Level | Parameters & Request Body | Description |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| `POST` | `/v1/kb/create` | Python | `dataset_api.create` | JWT / API Key | JSON: `name`, `parser_id`, `embd_id` | Create a new knowledge base dataset. |
-| `POST` | `/v1/kb/update` | Python | `dataset_api.update` | JWT / API Key | JSON: `kb_id`, `name`, `parser_id` | Update dataset configurations. |
-| `POST` | `/v1/kb/rm` | Python | `dataset_api.rm` | JWT / API Key | JSON: `kb_id` | Delete a dataset and its document index. |
-| `GET` | `/v1/kb/list` | Python | `dataset_api.list_kbs` | JWT / API Key | Query: `page`, `page_size`, `keywords` | List knowledge bases for the current tenant. |
-| `POST` | `/v1/document/upload` | Python / Go | `document_api.upload` | JWT / API Key | Multipart: `file`, `kb_id` | Upload a document file to a dataset. |
-| `POST` | `/v1/document/run` | Python | `document_api.run` | JWT / API Key | JSON: `doc_ids`, `run` | Trigger parsing & chunking execution tasks. |
-| `POST` | `/v1/document/change_status` | Python | `document_api.change_status` | JWT / API Key | JSON: `doc_id`, `status` | Enable or disable document chunks in search. |
-| `POST` | `/v1/document/rm` | Python | `document_api.rm` | JWT / API Key | JSON: `doc_id` | Delete document and remove vector chunks. |
-| `GET` | `/v1/document/list` | Python | `document_api.list_docs` | JWT / API Key | Query: `kb_id`, `page`, `keywords` | List documents inside a dataset. |
-| `GET` | `/v1/chunk/list` | Python | `chunk_api.list_chunks` | JWT / API Key | Query: `doc_id`, `page`, `keywords` | Retrieve chunk text list and status. |
-| `POST` | `/v1/chunk/create` | Python | `chunk_api.create` | JWT / API Key | JSON: `doc_id`, `content_with_weight` | Create a manual chunk. |
+| `POST` | `/api/v1/datasets` | Python | `dataset_api.create` | JWT / API Key | JSON: `name`, `parser_id`, `embd_id` | Create a new dataset. |
+| `PUT` | `/api/v1/datasets/<dataset_id>` | Python | `dataset_api.update` | JWT / API Key | JSON: `name`, `parser_id` | Update dataset configurations. |
+| `DELETE` | `/api/v1/datasets` | Python | `dataset_api.delete` | JWT / API Key | JSON: `dataset_id` | Delete a dataset and its document index. |
+| `GET` | `/api/v1/datasets` | Python | `dataset_api.list_datasets` | JWT / API Key | Query: `page`, `page_size`, `keywords` | List datasets for the current tenant. |
+| `POST` | `/api/v1/documents/upload` | Python / Go | `document_api.upload_info` | JWT / API Key | Multipart: `file`, `dataset_id` | Upload a document file to a dataset. |
+| `POST` | `/api/v1/datasets/<dataset_id>/documents/parse` | Python | `document_api.run` | JWT / API Key | JSON: `doc_ids`, `run` | Trigger parsing & chunking execution tasks. |
+| `POST` | `/api/v1/datasets/<dataset_id>/documents/batch-update-status` | Python | `document_api.change_status` | JWT / API Key | JSON: `doc_id`, `status` | Enable or disable document chunks in search. |
+| `DELETE` | `/api/v1/datasets/<dataset_id>/documents` | Python | `document_api.delete` | JWT / API Key | JSON: `doc_id` | Delete document and remove vector chunks. |
+| `GET` | `/api/v1/datasets/<dataset_id>/documents` | Python | `document_api.list_docs` | JWT / API Key | Query: `dataset_id`, `page`, `keywords` | List documents inside a dataset. |
+| `GET` | `/api/v1/datasets/<dataset_id>/documents/<doc_id>/chunks` | Python | `chunk_api.list_chunks` | JWT / API Key | Query: `doc_id`, `page`, `keywords` | Retrieve chunk text list and status. |
+| `POST` | `/api/v1/datasets/<dataset_id>/documents/<doc_id>/chunks` | Python | `chunk_api.create` | JWT / API Key | JSON: `doc_id`, `content_with_weight` | Create a manual chunk. |
 
 ---
 
@@ -51,11 +51,11 @@ This document presents the complete API Endpoint Catalog for RAGFlow, listing en
 
 | HTTP Method | Route Path | Engine | Controller / Handler | Auth Level | Parameters & Request Body | Description |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| `POST` | `/v1/canvas/set` | Python | `agent_api.set_canvas` | JWT / API Key | JSON: `id`, `title`, `dsl` | Create or update agent canvas flow graph. |
-| `GET` | `/v1/canvas/get/:id` | Python | `agent_api.get_canvas` | JWT / API Key | Path: `id` | Get agent canvas DSL topology. |
-| `POST` | `/v1/canvas/completion` | Python | `agent_api.completion` | JWT / API Key | JSON: `id`, `message`, `stream` | Execute agent graph flow with streaming. |
-| `GET` | `/v1/canvas/list` | Python | `agent_api.list_canvas` | JWT / API Key | Query: `page`, `keywords` | List user agents. |
-| `POST` | `/v1/canvas/rm` | Python | `agent_api.rm_canvas` | JWT / API Key | JSON: `id` | Delete an agent canvas workflow. |
+| `POST` | `/api/v1/agents` | Python | `agent_api.create` | JWT / API Key | JSON: `title`, `description` | Create agent canvas flow graph. |
+| `GET` | `/api/v1/agents/<agent_id>` | Python | `agent_api.get` | JWT / API Key | Path: `agent_id` | Get agent canvas DSL topology. |
+| `POST` | `/api/v1/agents/chat/completions` | Python | `agent_api.agent_chat_completion` | JWT / API Key | JSON: `agent_id`, `message`, `stream` | Execute agent graph flow with streaming. |
+| `GET` | `/api/v1/agents` | Python | `agent_api.list_agents` | JWT / API Key | Query: `page`, `keywords` | List user agents. |
+| `DELETE` | `/api/v1/agents/<agent_id>` | Python | `agent_api.delete` | JWT / API Key | Path: `agent_id` | Delete an agent canvas workflow. |
 
 ---
 
@@ -63,11 +63,11 @@ This document presents the complete API Endpoint Catalog for RAGFlow, listing en
 
 | HTTP Method | Route Path | Engine | Controller / Handler | Auth Level | Parameters & Request Body | Description |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| `POST` | `/v1/api/dialog/set` | Python | `chat_api.set_dialog` | JWT / API Key | JSON: `name`, `kb_ids`, `llm_id` | Create or update a dialogue configuration. |
-| `GET` | `/v1/api/dialog/list` | Python | `chat_api.list_dialogs` | JWT / API Key | Query: `page`, `keywords` | List active dialogue assistants. |
-| `POST` | `/v1/api/dialog/rm` | Python | `chat_api.rm_dialog` | JWT / API Key | JSON: `dialog_id` | Remove a dialogue assistant. |
-| `POST` | `/v1/api/chat/completion` | Python | `chat_api.completion` | JWT / API Key | JSON: `session_id`, `message`, `stream` | Stream RAG chat completion tokens (SSE). |
-| `GET` | `/v1/api/session/list` | Python | `chat_api.list_sessions` | JWT / API Key | Query: `dialog_id` | List sessions under a dialogue assistant. |
+| `POST` | `/api/v1/chats` | Python | `chat_api.create` | JWT / API Key | JSON: `name`, `dataset_ids`, `llm_id` | Create a chat dialogue configuration. |
+| `GET` | `/api/v1/chats` | Python | `chat_api.list_chats` | JWT / API Key | Query: `page`, `keywords` | List active chat assistants. |
+| `DELETE` | `/api/v1/chats/<chat_id>` | Python | `chat_api.delete_chat` | JWT / API Key | Path: `chat_id` | Remove a chat assistant. |
+| `POST` | `/api/v1/chat/completions` | Python | `chat_api.session_completion` | JWT / API Key | JSON: `session_id`, `message`, `stream` | Stream RAG chat completion tokens (SSE). |
+| `GET` | `/api/v1/chats/<chat_id>/sessions` | Python | `chat_api.list_sessions` | JWT / API Key | Query: `chat_id` | List sessions under a chat assistant. |
 
 ---
 

@@ -1,7 +1,7 @@
 flowchart TD
     A[Upload File] --> B[MinIO / S3 Blob Storage]
     A --> C[MySQL Document Record: UNSTART]
-    C --> D[POST /v1/document/run]
+    C --> D[POST /api/v1/datasets/<dataset_id>/documents/parse]
     D --> E[Redis Task Queue: ragflow_TASK_EXE_QUEUE]
     E --> F[Worker: rag/svr/task_executor.py]
     F --> G[DeepDoc Engine]

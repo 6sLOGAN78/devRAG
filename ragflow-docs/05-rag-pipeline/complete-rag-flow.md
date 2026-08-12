@@ -21,7 +21,7 @@ sequenceDiagram
     participant DocStore as DocStore (ES / Infinity)
     participant LLM as LLM Engine
 
-    User->>WebUI: Upload Document (POST /v1/document/upload)
+    User->>WebUI: Upload Document (POST /api/v1/documents/upload)
     WebUI->>TaskQueue: Enqueue Task Payload
     Worker->>TaskQueue: Pop Task (collect)
     Worker->>DeepDoc: DLA + OCR + TSR Processing
@@ -30,7 +30,7 @@ sequenceDiagram
     Worker->>DocStore: Upsert Chunks & Embeddings
     Worker-->>WebUI: Ingestion Complete (100%)
     
-    User->>WebUI: Submit Query (POST /v1/canvas/completion)
+    User->>WebUI: Submit Query (POST /api/v1/agents/chat/completions)
     WebUI->>DocStore: Execute Hybrid Retrieval (Dealer.retrieval)
     DocStore-->>WebUI: Raw Candidates
     WebUI->>WebUI: Execute Cross-Encoder Reranking

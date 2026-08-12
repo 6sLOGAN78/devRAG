@@ -36,7 +36,7 @@ sequenceDiagram
     participant RAG as RAG Hybrid Search Engine (rag/nlp)
     participant LLM as LiteLLM Model Bridge
 
-    Client->>Quart: POST /v1/api/chat/completion (Header: Authorization)
+    Client->>Quart: POST /api/v1/chat/completions (Header: Authorization)
     Quart->>Auth: Validate JWT / API Key -> Set g.user & g.tenant_id
     Auth-->>Quart: User Authenticated
     Quart->>RAG: Execute Dense Vector + BM25 Hybrid Retrieval

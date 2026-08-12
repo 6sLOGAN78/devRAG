@@ -13,7 +13,7 @@ The document upload call chain handles multipart form parsing, file format valid
 ```
 [React Upload Component]
        │
-       ▼ (HTTP POST /v1/document/upload)
+       ▼ (HTTP POST /api/v1/documents/upload)
 [api/apps/restful_apis/document_api.py:upload_document()] [L452]
        │
        ├─► Request Validation & Knowledge Base Fetch:

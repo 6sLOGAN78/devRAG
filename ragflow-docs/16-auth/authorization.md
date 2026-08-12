@@ -31,6 +31,6 @@ graph TD
 | Authorization Type | Target Resource | Source File Reference | Code Logic |
 | :--- | :--- | :--- | :--- |
 | **Tenant Isolation** | Datasets & Documents | [`api/db/services/knowledgebase_service.py`](file:///home/logan78/Desktop/ragflow/api/db/services/knowledgebase_service.py) | Filters Peewee queries by `Knowledgebase.tenant_id == user.tenant_id`. |
-| **Tenant Isolation** | DocStore Vector Indexes | [`common/doc_store/`](file:///home/logan78/Desktop/ragflow/common/doc_store) | Embeds `tenant_id` filter into vector search payloads. |
+| **Tenant Isolation** | DocStore Vector Indexes | [`rag/utils/`](file:///home/logan78/Desktop/ragflow/rag/utils) | Embeds `tenant_id` filter into vector search payloads. |
 | **Role Verification**| Team Settings & Keys | [`api/apps/restful_apis/tenant_api.py`](file:///home/logan78/Desktop/ragflow/api/apps/restful_apis/tenant_api.py) | Verifies user role before permitting API key rotation. |
 | **Role Verification**| Admin Dashboard | [`internal/admin/handler.go`](file:///home/logan78/Desktop/ragflow/internal/admin/handler.go) | Restricts access to system metrics to admin users. |

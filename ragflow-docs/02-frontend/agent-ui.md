@@ -26,7 +26,7 @@ graph TD
 
 | Node Name | Visual Canvas Handle | Config Drawer Component | Functional Capabilities |
 | :--- | :--- | :--- | :--- |
-| **LLM Node** | `Begin` / `LLM` | [`pages/agent/form/llm-form/`](file:///home/logan78/Desktop/ragflow/web/src/pages/agent/form) | Model selection, system prompt template, temperature settings. |
+| **LLM Node** | `Begin` / `LLM` | [`pages/agent/form/agent-form/`](file:///home/logan78/Desktop/ragflow/web/src/pages/agent/form) | Model selection, system prompt template, temperature settings. |
 | **Retrieval Node** | `Retrieval` | [`pages/agent/form/retrieval-form/`](file:///home/logan78/Desktop/ragflow/web/src/pages/agent/form) | Knowledge base selector, vector similarity threshold, top_k count. |
 | **Code Node** | `Code` | [`pages/agent/form/code-form/`](file:///home/logan78/Desktop/ragflow/web/src/pages/agent/form) | Embedded Python code editor for custom data transformation. |
 | **Switch Node** | `Switch` | [`pages/agent/form/switch-form/`](file:///home/logan78/Desktop/ragflow/web/src/pages/agent/form) | If-Else / Switch condition expression evaluator. |

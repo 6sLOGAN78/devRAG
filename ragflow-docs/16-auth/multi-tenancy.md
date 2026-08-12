@@ -57,4 +57,4 @@ erDiagram
 - User Tenant Association Service: [`api/db/services/user_service.py`](file:///home/logan78/Desktop/ragflow/api/db/services/user_service.py#L33)
 - Go Tenant DAO: [`internal/dao/tenant.go`](file:///home/logan78/Desktop/ragflow/internal/dao/tenant.go)
 - Go Tenant Service: [`internal/service/tenant.go`](file:///home/logan78/Desktop/ragflow/internal/service/tenant.go)
-- DocStore Scoping Adapter: [`common/doc_store/`](file:///home/logan78/Desktop/ragflow/common/doc_store)
+- DocStore Scoping Adapter: [`rag/utils/`](file:///home/logan78/Desktop/ragflow/rag/utils)

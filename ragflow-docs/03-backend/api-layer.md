@@ -26,7 +26,7 @@ graph TD
         PyDecorator["login_required Decorator"]
         PyREST["Restful API Blueprints (restful_apis/)"]
 
-        PyDecorator --> PyKB["kb_app.py"]
+        PyDecorator --> PyKB["dataset_api.py"]
         PyDecorator --> PyDoc["document_api.py"]
         PyDecorator --> PyAgent["agent_api.py"]
         PyDecorator --> PyChat["chat_api.py"]
@@ -44,10 +44,10 @@ graph TD
 | `/api/v1/auth/login` | Go | None | [`internal/handler/user.go`](file:///home/logan78/Desktop/ragflow/internal/handler/user.go) |
 | `/api/v1/mcp` | Go | Beta Auth | [`internal/handler/mcp_server.go`](file:///home/logan78/Desktop/ragflow/internal/handler/mcp_server.go) |
 | `/v1/user/info` | Go | JWT / AuthMiddleware | [`internal/handler/user.go`](file:///home/logan78/Desktop/ragflow/internal/handler/user.go) |
-| `/v1/kb/*` | Python | `login_required` | [`api/apps/restful_apis/dataset_api.py`](file:///home/logan78/Desktop/ragflow/api/apps/restful_apis/dataset_api.py) |
-| `/v1/document/*` | Python | `login_required` | [`api/apps/restful_apis/document_api.py`](file:///home/logan78/Desktop/ragflow/api/apps/restful_apis/document_api.py) |
-| `/v1/canvas/*` | Python | `login_required` | [`api/apps/restful_apis/agent_api.py`](file:///home/logan78/Desktop/ragflow/api/apps/restful_apis/agent_api.py) |
-| `/v1/chat/*` | Python | `login_required` | [`api/apps/restful_apis/chat_api.py`](file:///home/logan78/Desktop/ragflow/api/apps/restful_apis/chat_api.py) |
+| `/api/v1/datasets` | Python | `login_required` | [`api/apps/restful_apis/dataset_api.py`](file:///home/logan78/Desktop/ragflow/api/apps/restful_apis/dataset_api.py) |
+| `/api/v1/documents` | Python | `login_required` | [`api/apps/restful_apis/document_api.py`](file:///home/logan78/Desktop/ragflow/api/apps/restful_apis/document_api.py) |
+| `/api/v1/agents` | Python | `login_required` | [`api/apps/restful_apis/agent_api.py`](file:///home/logan78/Desktop/ragflow/api/apps/restful_apis/agent_api.py) |
+| `/api/v1/chats` | Python | `login_required` | [`api/apps/restful_apis/chat_api.py`](file:///home/logan78/Desktop/ragflow/api/apps/restful_apis/chat_api.py) |
 
 ### Key Source Links
 

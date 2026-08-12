@@ -20,11 +20,11 @@ sequenceDiagram
 
     User->>UploadDialog: Drag & Drop PDF File -> Select "General" Parser
     UploadDialog->>DocHook: Call uploadDocument(formData)
-    DocHook->>ApiClient: POST /v1/document/upload (Multipart FormData + Bearer Token)
+    DocHook->>ApiClient: POST /api/v1/documents/upload (Multipart FormData + Bearer Token)
     ApiClient->>GoServer: Process upload
     GoServer-->>ApiClient: HTTP 200 { retcode: 0, data: { doc_id: "xyz" } }
     ApiClient-->>DocHook: Return document ID
-    DocHook->>GoServer: POST /v1/document/run { doc_ids: ["xyz"] }
+    DocHook->>GoServer: POST /api/v1/datasets/<dataset_id>/documents/parse { doc_ids: ["xyz"] }
     DocHook->>User: Update UI table badge to "RUNNING (0%)"
 ```
 
@@ -39,7 +39,7 @@ sequenceDiagram
 
     User->>ChatInput: Type question -> Press Enter
     ChatInput->>ChatHook: Call sendMessage(prompt)
-    ChatHook->>PyServer: POST /v1/api/chat/completion { session_id, message, stream: true }
+    ChatHook->>PyServer: POST /api/v1/chat/completions { session_id, message, stream: true }
     
     loop SSE Token Stream
         PyServer-->>ChatHook: data: {"answer": "chunk_text", "reference": {...}}

@@ -58,7 +58,7 @@ graph TB
     end
 
     Nginx -->|/api/v1/auth, /users, /sync| GinServer
-    Nginx -->|/v1/canvas, /v1/chat, /v1/document| QuartServer
+    Nginx -->|/api/v1/agents, /api/v1/chats, /api/v1/documents| QuartServer
 
     Go_Backend_Stack --> MySQL
     Go_Backend_Stack --> Redis

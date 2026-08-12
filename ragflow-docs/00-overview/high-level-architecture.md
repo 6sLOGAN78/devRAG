@@ -34,7 +34,7 @@ RAGFlow is organized into six major functional layers:
 | **Dataset & Doc** | Knowledge base CRUD, document upload, status check | [`api/db/services/document_service.py`](file:///home/logan78/Desktop/ragflow/api/db/services/document_service.py) | [`internal/service/document/`](file:///home/logan78/Desktop/ragflow/internal/service/document) |
 | **DeepDoc Engine**| Layout parsing, OCR, table extraction | [`deepdoc/vision/`](file:///home/logan78/Desktop/ragflow/deepdoc/vision) | [`internal/ingestion/`](file:///home/logan78/Desktop/ragflow/internal/ingestion) |
 | **Agent Engine**  | Canvas graph execution, node evaluation | [`agent/component/`](file:///home/logan78/Desktop/ragflow/agent/component) | [`internal/agent/canvas/`](file:///home/logan78/Desktop/ragflow/internal/agent/canvas) |
-| **DocStore Engine**| Vector & full-text indexing and retrieval | [`common/doc_store/`](file:///home/logan78/Desktop/ragflow/common/doc_store) | [`internal/dao/`](file:///home/logan78/Desktop/ragflow/internal/dao) |
+| **DocStore Engine**| Vector & full-text indexing and retrieval | [`rag/utils/`](file:///home/logan78/Desktop/ragflow/rag/utils) | [`internal/dao/`](file:///home/logan78/Desktop/ragflow/internal/dao) |
 
 ---
 

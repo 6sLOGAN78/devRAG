@@ -14,14 +14,14 @@ RAGFlow features a drag-and-drop Agent Canvas that enables users to design, debu
 ## Level 2: Technical Implementation Details
 
 ### API Endpoint & Routing
-- **Python Route**: `POST /v1/agent/completion` or `POST /v1/canvas/completion` handled by `agent_chat_completion()` in [api/apps/restful_apis/agent_api.py:L1447](file:///home/logan78/Desktop/ragflow/api/apps/restful_apis/agent_api.py#L1447).
+- **Python Route**: `POST /api/v1/agents/chat/completions` or `POST /api/v1/agents/chat/completions` handled by `agent_chat_completion()` in [api/apps/restful_apis/agent_api.py:L1447](file:///home/logan78/Desktop/ragflow/api/apps/restful_apis/agent_api.py#L1447).
 - **Go Engine**: `Canvas.Run()` in [internal/agent/canvas/canvas.go:L80](file:///home/logan78/Desktop/ragflow/internal/agent/canvas/canvas.go#L80).
 
 ### Code Call Chain
 ```
 [React UI Agent Canvas / Chat Input]
        │
-       ▼ (HTTP POST /v1/agent/completion)
+       ▼ (HTTP POST /api/v1/agents/chat/completions)
 [api/apps/restful_apis/agent_api.py:agent_chat_completion()]
        │
        ├─► Fetch Agent Canvas DSL from MySQL table `canvas`
@@ -63,7 +63,7 @@ sequenceDiagram
     participant LLMNode as LLM Node
     participant DB as MySQL Database
 
-    UI->>API: POST /v1/agent/completion (agent_id, input)
+    UI->>API: POST /api/v1/agents/chat/completions (agent_id, input)
     API->>DB: Fetch agent canvas DSL
     DB-->>API: Canvas DSL JSON
     API->>Graph: Graph(dsl).run(user_input)

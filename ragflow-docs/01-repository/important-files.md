@@ -33,7 +33,7 @@ This document catalogues the most critical files across the RAGFlow codebase, ca
 | [`deepdoc/vision/layout_recognizer.py`](file:///home/logan78/Desktop/ragflow/deepdoc/vision/layout_recognizer.py) | Python | ⭐⭐⭐⭐⭐ | YOLOv8-based computer vision layout analysis for identifying headers, text blocks, visual tables, and figures in PDF page images. |
 | [`deepdoc/vision/table_structure_recognizer.py`](file:///home/logan78/Desktop/ragflow/deepdoc/vision/table_structure_recognizer.py) | Python | ⭐⭐⭐⭐⭐ | Table Structure Recognition (TSR) model for converting visual bounding box table representations into HTML text matrices. |
 | [`agent/component/llm.py`](file:///home/logan78/Desktop/ragflow/agent/component/llm.py) | Python | ⭐⭐⭐⭐⭐ | Canvas LLM component node handler that executes multi-turn conversations and handles streaming token output. |
-| [`common/doc_store/`](file:///home/logan78/Desktop/ragflow/common/doc_store) | Python | ⭐⭐⭐⭐⭐ | Multi-vector store adapter interface binding Infinity, Elasticsearch, OceanBase, Qdrant, and Milvus. |
+| [`rag/utils/`](file:///home/logan78/Desktop/ragflow/rag/utils) | Python | ⭐⭐⭐⭐⭐ | Multi-vector store adapter interface binding Infinity, Elasticsearch, OceanBase, Qdrant, and Milvus. |
 
 ### 4. Frontend Single-Page Application
 

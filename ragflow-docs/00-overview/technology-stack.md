@@ -65,4 +65,4 @@ RAGFlow integrates modern web standards, concurrent systems programming in Go, A
 - **MySQL / OceanBase**: Relational DB storing system users, tenants, configuration, chat dialogues, agent canvas definitions.
 - **Redis**: Distributed session storage, API key caching, execution locks.
 - **MinIO / AWS S3**: File object storage for raw PDFs, Word files, images, OCR output crops.
-- **Vector Engines**: Pluggable support for Infinity, Elasticsearch, OpenSearch, OceanBase, Qdrant, Milvus, PostgreSQL (PGVector), and Tantivy ([`common/doc_store/`](file:///home/logan78/Desktop/ragflow/common/doc_store)).
+- **Vector Engines**: Pluggable support for Infinity, Elasticsearch, OpenSearch, OceanBase, Qdrant, Milvus, PostgreSQL (PGVector), and Tantivy ([`rag/utils/`](file:///home/logan78/Desktop/ragflow/rag/utils)).

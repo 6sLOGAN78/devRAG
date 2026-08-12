@@ -15,14 +15,14 @@ Document upload is the ingestion gateway in RAGFlow. Users upload raw files (PDF
 ## Level 2: Technical Implementation Details
 
 ### API Endpoint & Routing
-- **Python Route**: `POST /v1/document/upload` handled by `upload_document()` in [api/apps/restful_apis/document_api.py:L452](file:///home/logan78/Desktop/ragflow/api/apps/restful_apis/document_api.py#L452).
+- **Python Route**: `POST /api/v1/documents/upload` handled by `upload_document()` in [api/apps/restful_apis/document_api.py:L452](file:///home/logan78/Desktop/ragflow/api/apps/restful_apis/document_api.py#L452).
 - **Go Route**: `POST /api/v1/datasets/:id/documents/upload` handled by `Upload()` in [internal/handler/document.go:L75](file:///home/logan78/Desktop/ragflow/internal/handler/document.go#L75).
 
 ### Code Call Chain
 ```
 [React UI File Dropzone]
        │
-       ▼ (HTTP POST Multipart /v1/document/upload)
+       ▼ (HTTP POST Multipart /api/v1/documents/upload)
 [api/apps/restful_apis/document_api.py:upload_document()]
        │
        ├─► Check Knowledge Base existence & permission
@@ -58,7 +58,7 @@ sequenceDiagram
     participant DocSvc as DocumentService
     participant DB as MySQL Database
 
-    UI->>Route: POST /v1/document/upload (kb_id, file stream)
+    UI->>Route: POST /api/v1/documents/upload (kb_id, file stream)
     Route->>Route: Extract multipart file stream & compute xxhash
     Route->>FileSvc: save_file(file_id, file_bytes)
     FileSvc-->>Route: Object storage URI (bucket/location)
