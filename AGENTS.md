@@ -27,5 +27,5 @@ You are an expert full-stack developer working on **devRAG**, a multi-tenant ent
 5. **Continuous Documentation & Verification:**
    - At the conclusion of EVERY task or feature implementation requested by the user, you MUST:
      1. Automatically update `README.md` and `implementation.md` in the repository root.
-     2. Create a dedicated documentation file for the feature inside `.agents/features/<feature_name>.md` to track its design and behavior.
+     2. Update the `.agents/features.md` file to track the design and behavior of the newly implemented feature.
      3. Perform a repository-wide scan to find and fix any bugs or edge cases related to the feature you just implemented (using the `.agents/rules/bug-and-issue.md` prompt).
