@@ -1,0 +1,46 @@
+{{- if .Values.redis.enabled -}}
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "ragflow.fullname" . }}-redis-master
+spec:
+  serviceName: {{ include "ragflow.fullname" . }}-redis-master
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ragflow-redis
+  template:
+    metadata:
+      labels:
+        app: ragflow-redis
+    spec:
+      containers:
+        - name: redis
+          image: valkey/valkey:8
+          ports:
+            - containerPort: 6379
+              name: redis
+          volumeMounts:
+            - name: data
+              mountPath: /data
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        resources:
+          requests:
+            storage: 2Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "ragflow.fullname" . }}-redis-master
+spec:
+  ports:
+    - port: 6379
+      targetPort: 6379
+      name: redis
+  selector:
+    app: ragflow-redis
+{{- end }}

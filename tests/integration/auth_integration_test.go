@@ -89,7 +89,7 @@ func TestAuthFlow(t *testing.T) {
 
 	// Inject a Tenant manually for this user to pass Tenant membership validation
 	dao.DB.Create(&dao.Tenant{ID: "tenant-123", Name: "Test Tenant"})
-	dao.DB.Create(&dao.UserTenant{UserID: loginRes.UserID, TenantID: "tenant-123", Role: "owner"})
+	dao.DB.Create(&dao.UserTenant{UserID: loginRes.ID, TenantID: "tenant-123", Role: "owner"})
 
 	// Protected Route with Token
 	req4, _ := http.NewRequest("GET", "/api/v1/user/info", nil)
@@ -101,8 +101,8 @@ func TestAuthFlow(t *testing.T) {
 	}
 	var userInfo map[string]interface{}
 	json.Unmarshal(w4.Body.Bytes(), &userInfo)
-	if userInfo["role"] != "owner" {
-		t.Fatalf("Expected role 'owner', got %v", userInfo["role"])
+	if userInfo["user"].(map[string]interface{})["role"] != "owner" {
+		t.Fatalf("Expected role 'owner', got %v", userInfo["user"].(map[string]interface{})["role"])
 	}
 
 	// Test cross-tenant access rejection (if requested invalid tenant)

@@ -7,3 +7,5 @@ patch*.go
 patch*.py
 print*.py
 docker/volumes/
+.gemini/
+node_modules/

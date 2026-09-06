@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "ragflow.fullname" . }}-go
+  labels:
+    app: ragflow-go
+spec:
+  type: {{ .Values.go.service.type }}
+  ports:
+    - port: {{ .Values.go.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app: ragflow-go

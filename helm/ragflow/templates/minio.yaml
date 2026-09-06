@@ -1,0 +1,57 @@
+{{- if .Values.minio.enabled -}}
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "ragflow.fullname" . }}-minio
+spec:
+  serviceName: {{ include "ragflow.fullname" . }}-minio
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ragflow-minio
+  template:
+    metadata:
+      labels:
+        app: ragflow-minio
+    spec:
+      containers:
+        - name: minio
+          image: minio/minio:RELEASE.2023-11-20T22-40-07Z
+          command: ["server", "/data", "--console-address", ":9001"]
+          env:
+            - name: MINIO_ROOT_USER
+              value: {{ .Values.minio.auth.rootUser }}
+            - name: MINIO_ROOT_PASSWORD
+              value: {{ .Values.minio.auth.rootPassword }}
+          ports:
+            - containerPort: 9000
+              name: minio
+            - containerPort: 9001
+              name: console
+          volumeMounts:
+            - name: data
+              mountPath: /data
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        resources:
+          requests:
+            storage: 10Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "ragflow.fullname" . }}-minio
+spec:
+  ports:
+    - port: 9000
+      targetPort: 9000
+      name: minio
+    - port: 9001
+      targetPort: 9001
+      name: console
+  selector:
+    app: ragflow-minio
+{{- end }}

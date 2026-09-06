@@ -1,0 +1,55 @@
+{{- if .Values.mysql.enabled -}}
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "ragflow.fullname" . }}-mysql
+spec:
+  serviceName: {{ include "ragflow.fullname" . }}-mysql
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ragflow-mysql
+  template:
+    metadata:
+      labels:
+        app: ragflow-mysql
+    spec:
+      containers:
+        - name: mysql
+          image: mysql:8.0
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              value: {{ .Values.mysql.auth.rootPassword }}
+            - name: MYSQL_DATABASE
+              value: {{ .Values.mysql.auth.database }}
+            - name: MYSQL_USER
+              value: {{ .Values.mysql.auth.username }}
+            - name: MYSQL_PASSWORD
+              value: {{ .Values.mysql.auth.password }}
+          ports:
+            - containerPort: 3306
+              name: mysql
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/mysql
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        resources:
+          requests:
+            storage: 5Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "ragflow.fullname" . }}-mysql
+spec:
+  ports:
+    - port: 3306
+      targetPort: 3306
+      name: mysql
+  selector:
+    app: ragflow-mysql
+{{- end }}

@@ -1,0 +1,6 @@
+apiVersion: v2
+name: ragflow
+description: A multi-tenant enterprise RAG system
+type: application
+version: 0.1.0
+appVersion: "1.0.0"

@@ -1,0 +1,46 @@
+{{- if .Values.infinity.enabled -}}
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "ragflow.fullname" . }}-infinity
+spec:
+  serviceName: {{ include "ragflow.fullname" . }}-infinity
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ragflow-infinity
+  template:
+    metadata:
+      labels:
+        app: ragflow-infinity
+    spec:
+      containers:
+        - name: infinity
+          image: infiniflow/infinity:v0.3.0
+          ports:
+            - containerPort: 23817
+              name: infinity
+          volumeMounts:
+            - name: data
+              mountPath: /var/infinity
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        resources:
+          requests:
+            storage: 10Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "ragflow.fullname" . }}-infinity
+spec:
+  ports:
+    - port: 23817
+      targetPort: 23817
+      name: infinity
+  selector:
+    app: ragflow-infinity
+{{- end }}

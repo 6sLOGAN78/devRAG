@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "ragflow.fullname" . }}-go
+  labels:
+    app: ragflow-go
+spec:
+  replicas: {{ .Values.go.replicaCount }}
+  selector:
+    matchLabels:
+      app: ragflow-go
+  template:
+    metadata:
+      labels:
+        app: ragflow-go
+    spec:
+      containers:
+        - name: go
+          image: "{{ .Values.go.image.repository }}:{{ .Values.go.image.tag }}"
+          imagePullPolicy: {{ .Values.go.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 9380
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /api/v1/health
+              port: http
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          readinessProbe:
+            httpGet:
+              path: /api/v1/health
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          resources:
+            {{- toYaml .Values.go.resources | nindent 12 }}
+          envFrom:
+            - configMapRef:
+                name: {{ include "ragflow.fullname" . }}-config
+            - secretRef:
+                name: {{ include "ragflow.fullname" . }}-secrets
+          volumeMounts:
+            - name: config-volume
+              mountPath: /app/conf
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+            runAsUser: 1000
+            readOnlyRootFilesystem: true
+      volumes:
+        - name: config-volume
+          configMap:
+            name: {{ include "ragflow.fullname" . }}-config

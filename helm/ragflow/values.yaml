@@ -1,0 +1,101 @@
+# Default values for ragflow.
+
+global:
+  domain: localhost
+
+web:
+  replicaCount: 1
+  image:
+    repository: ragflow-web
+    pullPolicy: IfNotPresent
+    tag: "latest"
+  service:
+    type: ClusterIP
+    port: 80
+  resources: {}
+    # limits:
+    #   cpu: 100m
+    #   memory: 128Mi
+    # requests:
+    #   cpu: 10m
+    #   memory: 64Mi
+
+go:
+  replicaCount: 1
+  image:
+    repository: ragflow-go
+    pullPolicy: IfNotPresent
+    tag: "latest"
+  service:
+    type: ClusterIP
+    port: 9380
+  resources: {}
+    # limits:
+    #   cpu: 500m
+    #   memory: 512Mi
+    # requests:
+    #   cpu: 100m
+    #   memory: 256Mi
+  config:
+    logLevel: info
+
+python:
+  replicaCount: 1
+  image:
+    repository: ragflow-python
+    pullPolicy: IfNotPresent
+    tag: "latest"
+  service:
+    type: ClusterIP
+    port: 9381
+  gpu:
+    enabled: false
+    count: 1
+  resources: {}
+    # limits:
+    #   cpu: 2000m
+    #   memory: 4Gi
+    # requests:
+    #   cpu: 500m
+    #   memory: 1Gi
+  config:
+    logLevel: info
+
+ingress:
+  enabled: true
+  className: ""
+  annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+    # nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+    # nginx.ingress.kubernetes.io/proxy-buffering: "off"  # for SSE
+  hosts:
+    - host: ragflow.local
+      paths:
+        - path: /
+          pathType: Prefix
+          service: web
+        - path: /api
+          pathType: Prefix
+          service: go
+  tls: []
+
+mysql:
+  enabled: true
+  auth:
+    rootPassword: root
+    database: rag_flow
+    username: ragflow
+    password: ragflow
+
+redis:
+  enabled: true
+
+minio:
+  enabled: true
+  auth:
+    rootUser: admin
+    rootPassword: password
+    
+infinity:
+  enabled: true

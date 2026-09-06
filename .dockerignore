@@ -1,0 +1,12 @@
+.git
+.gemini
+venv
+__pycache__
+node_modules
+dist
+ragflow_server
+server
+.pytest_cache
+.ruff_cache
+volumes
+helm

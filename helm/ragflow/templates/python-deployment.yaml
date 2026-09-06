@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "ragflow.fullname" . }}-python
+  labels:
+    app: ragflow-python
+spec:
+  replicas: {{ .Values.python.replicaCount }}
+  selector:
+    matchLabels:
+      app: ragflow-python
+  template:
+    metadata:
+      labels:
+        app: ragflow-python
+    spec:
+      containers:
+        - name: python
+          image: "{{ .Values.python.image.repository }}:{{ .Values.python.image.tag }}"
+          imagePullPolicy: {{ .Values.python.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 9381
+              protocol: TCP
+          # Python initialization can be slow (e.g. model loading)
+          startupProbe:
+            httpGet:
+              path: /api/v1/ml/health
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            failureThreshold: 30
+          livenessProbe:
+            httpGet:
+              path: /api/v1/ml/health
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 20
+          readinessProbe:
+            httpGet:
+              path: /api/v1/ml/health
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          resources:
+            {{- toYaml .Values.python.resources | nindent 12 }}
+            {{- if .Values.python.gpu.enabled }}
+            limits:
+              nvidia.com/gpu: {{ .Values.python.gpu.count }}
+            {{- end }}
+          envFrom:
+            - configMapRef:
+                name: {{ include "ragflow.fullname" . }}-config
+            - secretRef:
+                name: {{ include "ragflow.fullname" . }}-secrets
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+            runAsUser: 1000
+            # Python writes to /tmp or current dir for some models
+            # readOnlyRootFilesystem: false 
