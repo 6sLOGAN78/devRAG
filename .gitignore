@@ -1,3 +1,4 @@
 docs
 ragflow-doc
 docker/volumes
+venv/

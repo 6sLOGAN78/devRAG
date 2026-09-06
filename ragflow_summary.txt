@@ -1,0 +1,3516 @@
+
+--- ragflow-docs/apis.md ---
+# RAGFlow API Endpoint Catalog
+
+  
+
+This document outlines the exact routing and division of labor between the Go API Gateway and the Python ASGI Server based on the RAGFlow system architecture.
+
+  
+
+## How Routing Works in Practice
+
+In front of these services, Nginx (or the Go Gin gateway reverse proxy) routes incoming URLs:
+
+- Calls matching `/api/v1/auth/*`, `/v1/user/*`, `/v1/tenant/*`, and `/api/v1/mcp` route directly to **Go (port 9380)**.
+
+- Calls matching `/api/v1/datasets/*`, `/api/v1/a
+...[truncated]
+
+--- ragflow-docs/apikey llm.md ---
+api token auth   • API Token Auth (AUTH_API): Validates the token against standard API keys stored in the APIToken database table to resolve  
+  the associated user.
+  Read(~/Desktop/ragflow/internal/service/api_token.go) (ctrl+o to expand)
+▸ Thought for 6s, 412 tokens
+  Prioritizing Specific Tools
+  Yes, both the JWT session tokens and the API tokens are generated natively by the Go backend system.                         
+                                                                        
+...[truncated]
+
+--- ragflow-docs/14-workflows/variables.md ---
+# Canvas State & Variable Resolution Engine
+
+## Level 1: Conceptual Overview
+
+The **Variable Resolution Engine** provides global scope state (`Graph.globals`) and node-local output references across the workflow graph. Variables are referenced in node parameters using standard template syntax: `{component_id.field_name}` or `{sys.user_id}`.
+
+---
+
+## Level 2: Implementation Details
+
+### Source File Map
+- **Go Canvas State**: [state.go](file:///home/logan78/Desktop/ragflow/internal/agent/canvas/st
+...[truncated]
+
+--- ragflow-docs/14-workflows/edges.md ---
+# Graph Edges & Routing Mechanics
+
+## Level 1: Conceptual Overview
+
+**Graph Edges** define dependency links and data flow vectors between nodes in a canvas workflow DAG. RAGFlow supports direct execution edges (`downstream` / `upstream`), conditional branch edges (`Switch` / `Categorize` routes), and subgraph boundary connections (`Loop` / `Iteration` parents).
+
+---
+
+## Level 2: Implementation Details
+
+### Source File Map
+- **Go DAG Compilation**: [compile.go](file:///home/logan78/Desktop/ragflo
+...[truncated]
+
+--- ragflow-docs/14-workflows/workflow-execution-flow.md ---
+# Workflow Execution Flow & Event Streaming
+
+## Level 1: Conceptual Overview
+
+The **Workflow Execution Flow** controls how canvas graph invocations are scheduled, monitored, and streamed to web clients. As each graph node starts and finishes execution, SSE events (`workflow_started`, `node_started`, `node_finished`, `message`, `workflow_finished`) are pushed over HTTP channels.
+
+---
+
+## Level 2: Implementation Details
+
+### Runner Event Protocol (`runner.go`)
+
+In [internal/agent/canvas/runner.go]
+...[truncated]
+
+--- ragflow-docs/14-workflows/workflow-engine.md ---
+# Dual-Engine Architecture & Graph Compilation
+
+## Level 1: Conceptual Overview
+
+RAGFlow features a dual-engine architecture for graph workflows:
+1. **Python Graph Runner**: Flexible step-by-step path traversal and dynamic component loading.
+2. **Go Eino DAG Engine**: High-concurrency compiled graph engine based on ByteDance's Eino framework, providing streaming state channels, automatic subgraph expansion, and strict dependency validation.
+
+---
+
+## Level 2: Implementation Details
+
+### Go Eino G
+...[truncated]
+
+--- ragflow-docs/14-workflows/tools.md ---
+# Workflow Tool Nodes & Extension Plugins
+
+## Level 1: Conceptual Overview
+
+**Workflow Tools** allow canvas components to interact with external APIs, databases, scrapers, and custom plugin modules (`agent/plugin/*`). Tools receive input variables from upstream canvas nodes and emit output dictionaries back into the workflow state context.
+
+---
+
+## Level 2: Implementation Details
+
+### Source File Map
+- **Plugin Manager**: [plugin_manager.py](file:///home/logan78/Desktop/ragflow/agent/plugin/plug
+...[truncated]
+
+--- ragflow-docs/14-workflows/nodes.md ---
+# Canvas Node Types & Component Specifications
+
+## Level 1: Conceptual Overview
+
+Canvas nodes represent individual processing steps in a workflow DAG. RAGFlow includes 20+ built-in node component types covering input processing, LLM generation, knowledge retrieval, flow control, variable manipulation, document generation, and browser automation.
+
+---
+
+## Level 2: Implementation Details
+
+### Comprehensive Node Catalog
+
+In [agent/component/](file:///home/logan78/Desktop/ragflow/agent/component/) &
+...[truncated]
+
+--- ragflow-docs/14-workflows/workflow-overview.md ---
+# Workflow Subsystem Overview & Visual Canvas
+
+## Level 1: Conceptual Overview
+
+The **Workflow Subsystem** in RAGFlow allows developers to construct complex, multi-step LLM application graphs via a visual canvas editor. Workflows process incoming queries, execute conditional branching, iterate over datasets, invoke external tools/APIs, and generate structured output streams.
+
+```mermaid
+graph TD
+    DSL[User Canvas DSL JSON] --> EngineSelector{Engine Target}
+    
+    EngineSelector -->|Python Gr
+...[truncated]
+
+--- ragflow-docs/14-workflows/execution.md ---
+# Canvas Execution State & Checkpointing
+
+## Level 1: Conceptual Overview
+
+**Execution State Management** maintains graph execution snapshots, supporting asynchronous execution, job cancellation, human-in-the-loop intermissions (`waiting_for_user`), and checkpoint restoration (`checkpoint_store.go`).
+
+---
+
+## Level 2: Implementation Details
+
+### Source File Map
+- **Checkpoint Store**: [checkpoint_store.go](file:///home/logan78/Desktop/ragflow/internal/agent/canvas/checkpoint_store.go#L1)
+- **Int
+...[truncated]
+
+--- ragflow-docs/11-llm/ollama.md ---
+# Ollama Local Model Integration
+
+## Level 1: Conceptual Overview
+
+**Ollama** enables zero-cost local LLM inference in RAGFlow for offline deployments, privacy-sensitive environments, and edge hardware. It supports chat completion (`llama3`, `qwen2.5`, `mistral`, `deepseek-r1`) and local embedding models (`nomic-embed-text`, `bge-m3`).
+
+---
+
+## Level 2: Implementation Details
+
+### Source File References
+- **Chat Driver**: [chat_model.py](file:///home/logan78/Desktop/ragflow/rag/llm/chat_model.py
+...[truncated]
+
+--- ragflow-docs/11-llm/rerank-models.md ---
+# Cross-Encoder Rerank Models
+
+## Level 1: Conceptual Overview
+
+**Rerank Models** act as a second-stage cross-encoder ranker in RAGFlow's hybrid retrieval pipeline. Unlike bi-encoder embeddings that compute vector cosine similarity independently, cross-encoders accept query-document pairs simultaneously to score contextual relevance.
+
+The rerank engine guarantees score normalization to $[0.0, 1.0]$ across all providers (Cohere, Jina, BAAI/SiliconFlow, NVIDIA, Voyage, LocalAI), ensuring hybrid bl
+...[truncated]
+
+--- ragflow-docs/11-llm/embeddings.md ---
+# Vector Embedding Models
+
+## Level 1: Conceptual Overview
+
+The **Embedding Engine** converts unstructured text chunks and user queries into dense vector representations. It supports batching, automated token truncation, and failover across local (HuggingFace, Ollama, Xinference) and cloud embedding services (OpenAI, DashScope Qwen, Zhipu, BAAI/SiliconFlow, Jina).
+
+```mermaid
+graph TD
+    Chunker[Document Chunking Pipeline] --> EmbedEngine[Embedding Engine (embedding_model.py)]
+    EmbedEngine -
+...[truncated]
+
+--- ragflow-docs/11-llm/provider-abstraction.md ---
+# Provider Abstraction Layer
+
+## Level 1: Conceptual Overview
+
+The **Provider Abstraction Layer** in RAGFlow allows standard application code to interact with over 40 distinct LLM vendors through unified abstract base classes. It bridges vendor-specific APIs (such as OpenAI REST endpoints, Anthropic Messages API, Ollama local REST endpoints, and DashScope native protocol) into consistent Python and Go driver signatures.
+
+```mermaid
+graph TD
+    App[DialogService / Canvas Component] --> BaseDrive
+...[truncated]
+
+--- ragflow-docs/11-llm/model-providers.md ---
+# Model Providers Catalog & Metadata
+
+## Level 1: Conceptual Overview
+
+RAGFlow supports 40+ model providers across multi-modal categories (Chat, Embedding, Rerank, Vision, Speech/ASR, TTS). Metadata for each model (context window size, maximum completion tokens, vision support, pricing) is centrally registered in [rag/llm/model_meta.py](file:///home/logan78/Desktop/ragflow/rag/llm/model_meta.py#L1).
+
+---
+
+## Level 2: Implementation Details
+
+### Provider Registry Enum
+
+Supported providers are enu
+...[truncated]
+
+--- ragflow-docs/11-llm/llm-request-flow.md ---
+# LLM Request Flow & Streaming Protocol
+
+## Level 1: Conceptual Overview
+
+The **LLM Request Flow** handles prompt assembly, credential lookup, parameter sanitization, API execution, stream chunk transformation, token usage accounting, and citation parsing. RAGFlow supports both non-streaming completions and real-time Server-Sent Events (SSE) streaming protocols.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor User as Client / REST API
+    participant DS as DialogService / Canvas Node
+    pa
+...[truncated]
+
+--- ragflow-docs/11-llm/llm-architecture.md ---
+# 11-LLM: Subsystem Overview & Architecture
+
+## Level 1: Conceptual Overview
+
+The **LLM Subsystem** in RAGFlow abstracts text generation, vector embeddings, cross-encoder reranking, optical character recognition (OCR/CV), speech-to-text (ASR), and text-to-speech (TTS) across 40+ cloud and open-source model providers. It isolates downstream business logic (Chat, Agent Workflows, RAG Indexing) from vendor-specific API formats, token limits, rate-limit retries, and authentication mechanisms.
+
+```me
+...[truncated]
+
+--- ragflow-docs/11-llm/prompt-management.md ---
+# Prompt Template Management & Function Calling
+
+## Level 1: Conceptual Overview
+
+**Prompt Management** in RAGFlow provides system prompt compilation, context variable interpolation (`{knowledge_base}`, `{chat_history}`, `{user_query}`), prompt template persistence, and function/tool schema generation for ReAct or JSON tool calling.
+
+---
+
+## Level 2: Implementation Details
+
+### Source File Map
+- **Prompt Generators**: [rag/prompts/generator.py](file:///home/logan78/Desktop/ragflow/rag/prompts/ge
+...[truncated]
+
+--- ragflow-docs/11-llm/openai.md ---
+# OpenAI & Azure OpenAI Integration
+
+## Level 1: Conceptual Overview
+
+OpenAI and Azure OpenAI serve as primary model providers in RAGFlow for Chat (`gpt-4o`, `gpt-4-turbo`, `o1`, `o3-mini`), Embeddings (`text-embedding-3-small`, `text-embedding-3-large`), and Vision/Audio processing. Integration is implemented via both direct OpenAI SDK calls and LiteLLM wrappers.
+
+---
+
+## Level 2: Implementation Details
+
+### Source File References
+- **Chat Driver**: [chat_model.py](file:///home/logan78/Desktop/
+...[truncated]
+
+--- ragflow-docs/11-llm/other-providers.md ---
+# Other Model Providers (DeepSeek, Zhipu, Qwen, HuggingFace, etc.)
+
+## Level 1: Conceptual Overview
+
+In addition to OpenAI and Ollama, RAGFlow supports over 35 other model providers, including domestic Chinese AI providers (Tongyi Qianwen/DashScope, Zhipu AI, DeepSeek, Moonshot, Baidu Yiyan, Tencent Hunyuan) and global cloud platforms (Anthropic, Google Gemini, AWS Bedrock, Cohere, Groq, TogetherAI, SiliconFlow).
+
+---
+
+## Level 2: Implementation Details
+
+### Provider-Specific Driver Highlights
+
+
+...[truncated]
+
+--- ragflow-docs/22-code-tracing/frontend-to-backend.md ---
+# Frontend-to-Backend Call Chain
+
+## Level 1: Conceptual Overview
+
+This document details the architectural path taken by network requests originating from the React frontend application down to the backend REST API handlers, service layers, and infrastructure datastores.
+
+### Communication Architecture
+1. **Frontend Router & UI Page Components**: Built using React Router and TypeScript in `web/src/`.
+2. **API Client & Request Interceptors**: Standard HTTP requests wrapped with authentication hea
+...[truncated]
+
+--- ragflow-docs/22-code-tracing/workflow-call-chain.md ---
+# Workflow Call Chain Tracing
+
+## Level 1: Conceptual Overview
+
+The workflow call chain orchestrates multi-step, production-grade automation workflows triggered asynchronously via HTTP Webhooks or REST API calls.
+
+---
+
+## Level 2: Complete Code Call Chain
+
+```
+[Webhook Request / API Trigger]
+       │
+       ▼ (HTTP POST /v1/agent/<agent_id>/webhook)
+[api/apps/restful_apis/agent_api.py:webhook()] [L1830]
+       │
+       ├─► 1. Security Authorization:
+       │     └─► validate_webhook_security(sec
+...[truncated]
+
+--- ragflow-docs/22-code-tracing/ingestion-call-chain.md ---
+# Ingestion & Parsing Call Chain Tracing
+
+## Level 1: Conceptual Overview
+
+The ingestion call chain encompasses document parsing, layout recognition, OCR, tokenization, chunking, vector embedding, and index insertion.
+
+---
+
+## Level 2: Complete Code Call Chain
+
+```
+[React Parse Trigger]
+       │
+       ▼ (HTTP POST /api/v1/datasets/<dataset_id>/documents/parse)
+[api/apps/restful_apis/document_api.py:parse_documents()] [L1552]
+       │
+       ├─► Update Document Status in MySQL: DocumentService.u
+...[truncated]
+
+--- ragflow-docs/22-code-tracing/chat-call-chain.md ---
+# Chat Call Chain Tracing
+
+## Level 1: Conceptual Overview
+
+The chat call chain traces the full flow of conversation management, prompt construction, hybrid search invocation, LLM generation streaming, and chat dialog history persistence.
+
+---
+
+## Level 2: Complete Code Call Chain
+
+```
+[React UI Next-Chats Component] (web/src/pages/next-chats/chat)
+       │
+       ▼ (HTTP POST /v1/session/completion)
+[api/apps/restful_apis/chat_api.py:session_completion()] [L1230]
+       │
+       ├─► 1. Ensure O
+...[truncated]
+
+--- ragflow-docs/22-code-tracing/upload-call-chain.md ---
+# Upload Call Chain Tracing
+
+## Level 1: Conceptual Overview
+
+The document upload call chain handles multipart form parsing, file format validation, content hashing, storage persistence to MinIO or S3, and database row insertion.
+
+---
+
+## Level 2: Complete Code Call Chain
+
+### Call Chain Diagram
+
+```
+[React Upload Component]
+       │
+       ▼ (HTTP POST /api/v1/documents/upload)
+[api/apps/restful_apis/document_api.py:upload_document()] [L452]
+       │
+       ├─► Request Validation & Knowledge Ba
+...[truncated]
+
+--- ragflow-docs/22-code-tracing/llm-call-chain.md ---
+# LLM Call Chain Tracing
+
+## Level 1: Conceptual Overview
+
+The LLM call chain abstracts model interactions across cloud LLM providers (OpenAI, Anthropic, DashScope/Qwen, DeepSeek, Zhipu, Baidu) and self-hosted models (Ollama, vLLM, LocalAI, LMStudio).
+
+---
+
+## Level 2: Complete Code Call Chain
+
+```
+[Service Layer / Agent Canvas / Chat Controller]
+       │
+       ▼
+[api/db/services/llm_service.py:LLMBundle] [L35]
+       │
+       ├─► Model Initialization:
+       │     └─► LLMBundle.__init__(tenant
+...[truncated]
+
+--- ragflow-docs/22-code-tracing/retrieval-call-chain.md ---
+# Retrieval Call Chain Tracing
+
+## Level 1: Conceptual Overview
+
+The retrieval call chain spans from query submission down to multi-index vector search, hybrid candidate collection, cross-encoder reranking, and citation marker format assembly.
+
+---
+
+## Level 2: Complete Code Call Chain
+
+```
+[User Search Query / Chat Request]
+       │
+       ▼ (HTTP POST /v1/session/completion or /v1/search)
+[api/apps/restful_apis/chat_api.py:session_completion()] [L1230]
+  or  [api/apps/restful_apis/search_api.p
+...[truncated]
+
+--- ragflow-docs/22-code-tracing/agent-call-chain.md ---
+# Agent Call Chain Tracing
+
+## Level 1: Conceptual Overview
+
+The agent call chain traces execution through the Agent Canvas engine. A visual agent DSL is compiled into a graph DAG of component objects, which are executed asynchronously with state isolation.
+
+---
+
+## Level 2: Complete Code Call Chain
+
+```
+[React UI Agent Canvas / Chat Input]
+       │
+       ▼ (HTTP POST /api/v1/agents/chat/completions)
+[api/apps/restful_apis/agent_api.py:agent_chat_completion()] [L1447]
+       │
+       ├─► 1. Acc
+...[truncated]
+
+--- ragflow-docs/21-end-to-end-flows/ragflow-one-request.md ---
+# The Ultimate Single-Story Trace: RAGFlow One Request
+
+This document presents **The Ultimate Single-Story Trace** of RAGFlow, following a single user request from initial UI button click to chunking, vector indexing, hybrid retrieval, prompt assembly, LLM Server-Sent Events (SSE) streaming, and final database session persistence.
+
+---
+
+## Executive Lifecycle Overview
+
+```mermaid
+flowchart TD
+    A[1. React UI Upload & Parse] --> B[2. HTTP POST Upload & Storage]
+    B --> C[3. Redis Task Queue E
+...[truncated]
+
+--- ragflow-docs/21-end-to-end-flows/user-registration.md ---
+# End-to-End User Registration Flow
+
+## Level 1: Conceptual Overview
+
+User registration in RAGFlow is the entry point for tenant isolation and multi-user workspace management. When a new user signs up, the system must not only create a core user identity record but also automatically provision an isolated **Tenant** (workspace), establish ownership via a **UserTenant** link table, and configure default system models and default settings.
+
+### Key Objectives
+1. **Identity Provisioning**: Validate
+...[truncated]
+
+--- ragflow-docs/21-end-to-end-flows/rag-answer.md ---
+# End-to-End RAG Answer Synthesis Flow
+
+## Level 1: Conceptual Overview
+
+RAG Answer Synthesis is the core generation phase of Retrieval-Augmented Generation in RAGFlow. Following hybrid retrieval, candidate document chunks are processed to construct an accurate, citation-anchored context for the Large Language Model (LLM).
+
+### Synthesis Pipeline Stages
+1. **Reranking & Fusion**: Candidate chunks from hybrid search are re-scored using cross-encoder rerank models (e.g. `bge-reranker-large`, `jina
+...[truncated]
+
+--- ragflow-docs/21-end-to-end-flows/login.md ---
+# End-to-End User Authentication & Login Flow
+
+## Level 1: Conceptual Overview
+
+The authentication and login flow validates user credentials, loads user workspace metadata, initializes LLM model defaults for the user's active tenant, and issues a signed authentication token or session cookie (`ragflow_auth`). 
+
+### Supported Authentication Channels
+1. **Password Authentication**: Standard email and hashed password verification.
+2. **OAuth / OIDC Channels**: External authorization via GitHub (`ap
+...[truncated]
+
+--- ragflow-docs/21-end-to-end-flows/upload-document.md ---
+# End-to-End Upload Document Flow
+
+## Level 1: Conceptual Overview
+
+Document upload is the ingestion gateway in RAGFlow. Users upload raw files (PDF, DOCX, PPTX, XLSX, TXT, Markdown, JPG, PNG) into a target Knowledge Base. The upload flow performs file validation, calculates content checksums to prevent duplicate file uploads, streams raw binary blobs to object storage (MinIO, S3, or local disk), and records the document entry in MySQL with initial status `UNSTART`.
+
+### Core Technical Objective
+...[truncated]
+
+--- ragflow-docs/21-end-to-end-flows/document-processing.md ---
+# End-to-End Document Processing Flow
+
+## Level 1: Conceptual Overview
+
+Document processing transforms raw documents (PDF, DOCX, XLSX, Images, etc.) into structured, chunked text units ready for vector embedding and retrieval. When a user clicks "Parse" in the UI, RAGFlow initiates an asynchronous parsing pipeline:
+1. **Task Scheduling**: A processing task is created in MySQL table `task` and enqueued into Redis task queue `ragflow_TASK_EXE_QUEUE`.
+2. **Task Execution**: A background worker proc
+...[truncated]
+
+--- ragflow-docs/21-end-to-end-flows/agent-execution.md ---
+# End-to-End Agent Execution Flow
+
+## Level 1: Conceptual Overview
+
+RAGFlow features a drag-and-drop Agent Canvas that enables users to design, debug, and run multi-step autonomous AI agents and complex RAG workflows. Agent Canvas models workflow logic as a Directed Acyclic Graph (DAG) of specialized components (Begin, Retrieval, Categorize, LLM, Code, Switch, ExeSQL, Generate, Iteration, Answer).
+
+### Execution Principles
+1. **DAG Topology Resolution**: When an agent request arrives, the engine
+...[truncated]
+
+--- ragflow-docs/21-end-to-end-flows/ask-question.md ---
+# End-to-End Ask Question Flow
+
+## Level 1: Conceptual Overview
+
+The Ask Question flow is the entry point for retrieval-augmented question answering. When a user submits a prompt via the Chat UI or Search bar, the system processes the raw input string, authenticates the active session and Knowledge Base access permissions, tokenizes the prompt, and initiates hybrid retrieval against the target vector stores.
+
+### Core Steps
+1. **Query Ingestion**: Receive HTTP POST with user prompt text, session
+...[truncated]
+
+--- ragflow-docs/21-end-to-end-flows/indexing.md ---
+# End-to-End Indexing Flow
+
+## Level 1: Conceptual Overview
+
+The indexing flow takes raw text chunks produced during document parsing and transforms them into searchable vector indices and metadata-enriched document stores. 
+
+### Key Processing Stages
+1. **Vector Embedding Generation**: Dense vector representation computed for each chunk text using the tenant's chosen embedding model via `LLMBundle.encode()`.
+2. **Metadata & Prompt Enrichment**: Optional background LLM passes extract high-level 
+...[truncated]
+
+--- ragflow-docs/21-end-to-end-flows/chat-streaming.md ---
+# End-to-End Chat Streaming Flow (SSE)
+
+## Level 1: Conceptual Overview
+
+Chat streaming in RAGFlow provides real-time, low-latency visual feedback by delivering generated response tokens to the frontend as soon as they are produced by the Large Language Model.
+
+### Core Architectural Features
+1. **Server-Sent Events (SSE) Protocol**: HTTP connection remains open with `Content-Type: text/event-stream` and `Cache-Control: no-cache`.
+2. **Chunked Token Delivery**: Response chunks are formatted into
+...[truncated]
+
+--- ragflow-docs/21-end-to-end-flows/workflow-execution.md ---
+# End-to-End Workflow Execution Flow
+
+## Level 1: Conceptual Overview
+
+Workflow Execution represents the orchestration lifecycle for complex multi-node automation pipelines, canvas sessions, and API/webhook-triggered agent workflows in RAGFlow.
+
+### Workflow Lifecycle Principles
+1. **Runtime Replica Isolation**: Before executing a workflow session, the engine creates a snapshot replica of the canvas DSL via `CanvasReplicaService` to prevent live edits from disrupting in-flight sessions.
+2. **Sta
+...[truncated]
+
+--- ragflow-docs/21-end-to-end-flows/create-knowledge-base.md ---
+# End-to-End Create Knowledge Base Flow
+
+## Level 1: Conceptual Overview
+
+Creating a Knowledge Base (referred to as a **Dataset** in API endpoints and UI) is the core prerequisite for document ingestion and retrieval in RAGFlow. A Knowledge Base encapsulates:
+2. **Parsing Strategy / Chunking Engine**: Default chunking method (`naive`, `qa`, `resume`, `manual`, `paper`, `laws`, `table`, `book`, `presentation`, `picture`).
+3. **Vector Index Provisioning**: Physical index creation within Elasticsea
+...[truncated]
+
+--- ragflow-docs/07-retrieval/vector-search.md ---
+# Vector Search Engine
+
+## Level 1: Conceptual Overview
+
+Vector Search performs K-Nearest Neighbors (KNN) retrieval in high-dimensional vector spaces using dense embeddings generated by embedding models. It captures semantic context, allowing queries to match passages with similar meaning even when exact words differ.
+
+---
+
+## Level 2: Implementation Details
+
+### Dense Vector Expression
+
+Implemented in [rag/nlp/search.py](file:///home/logan78/Desktop/ragflow/rag/nlp/search.py#L55-L63):
+
+```pytho
+...[truncated]
+
+--- ragflow-docs/07-retrieval/keyword-search.md ---
+# Keyword & Synonym Search
+
+## Level 1: Conceptual Overview
+
+Keyword & Synonym Search expands raw user query strings by identifying key phrases, generating synonym alternatives, and applying fine-grained tokenization to maximize retrieval recall.
+
+---
+
+## Level 2: Implementation Details
+
+### Synonym Lookup & Term Expansion
+
+Implemented in [rag/nlp/query.py](file:///home/logan78/Desktop/ragflow/rag/nlp/query.py#L31-L75) and `rag/nlp/synonym.py`:
+
+```python
+self.syn = synonym.Dealer(redis=REDIS_CO
+...[truncated]
+
+--- ragflow-docs/07-retrieval/reranking.md ---
+# Cross-Encoder Reranking
+
+## Level 1: Conceptual Overview
+
+Cross-Encoder Reranking evaluates candidate chunk relevance by feeding full query-document pairs into cross-attention transformer layers, producing a unified relevance score.
+
+---
+
+## Level 2: Implementation Details
+
+### Implementation in `Dealer.rerank_by_model`
+
+In [rag/nlp/search.py](file:///home/logan78/Desktop/ragflow/rag/nlp/search.py#L494-L519):
+
+```python
+def rerank_by_model(self, rerank_mdl, sres, query, tkweight=0.3, vtweight=
+...[truncated]
+
+--- ragflow-docs/07-retrieval/retrieval-overview.md ---
+# Retrieval Subsystem Overview
+
+## Level 1: Conceptual Overview
+
+The Retrieval Subsystem in RAGFlow searches knowledge bases for relevant document chunks given a user prompt. It executes a hybrid search architecture combining vector KNN dense retrieval, full-text term matching (BM25), metadata filtering, PageRank weighting, and cross-encoder re-ranking.
+
+```mermaid
+flowchart TD
+    Query[User Query String] --> Dealer[Dealer / rag/nlp/search.py]
+    
+    Dealer --> VectorPath[Vector Search Path /
+...[truncated]
+
+--- ragflow-docs/07-retrieval/retrieval-flow.md ---
+# Retrieval Execution Flow
+
+## Level 1: Conceptual Overview
+
+The Retrieval Execution Flow traces how an incoming search request is converted into structured query expressions, executed against DocStore vector and full-text indices, pruned of deleted documents, fused across candidate sets, score-thresholded, and returned as references.
+
+---
+
+## Level 2: Implementation Details
+
+### Step-by-Step Code Walkthrough
+
+In [rag/nlp/search.py](file:///home/logan78/Desktop/ragflow/rag/nlp/search.py#L549-L70
+...[truncated]
+
+--- ragflow-docs/07-retrieval/full-text-search.md ---
+# Full-Text Search Engine
+
+## Level 1: Conceptual Overview
+
+Full-Text Search matches user query terms against document chunk text fields (`content_ltks`, `title_tks`, `important_kwd`, `question_tks`) using inverse document frequency (IDF) term weighting and field boosting multipliers.
+
+---
+
+## Level 2: Implementation Details
+
+### Query Construction & Term Weighting
+
+Implemented in [rag/nlp/query.py](file:///home/logan78/Desktop/ragflow/rag/nlp/query.py#L28-L92):
+
+```python
+self.query_fields = [
+
+...[truncated]
+
+--- ragflow-docs/07-retrieval/hybrid-retrieval.md ---
+# Hybrid Retrieval Subsystem
+
+## Level 1: Conceptual Overview
+
+Hybrid Retrieval combines dense vector similarity search with sparse BM25 full-text keyword retrieval, ensuring both high semantic recall and high exact term precision.
+
+---
+
+## Level 2: Implementation Details
+
+### Fusion Expressions & Score Merging
+
+In [rag/nlp/search.py](file:///home/logan78/Desktop/ragflow/rag/nlp/search.py#L210):
+
+```python
+fusionExpr = FusionExpr("weighted_sum", topk, {"weights": "0.001,1"})
+matchExprs = [matchT
+...[truncated]
+
+--- ragflow-docs/07-retrieval/similarity.md ---
+# Similarity Metrics Reference
+
+## Level 1: Conceptual Overview
+
+RAGFlow leverages multiple mathematical similarity metrics across vector space distance, term frequency overlap, and tag feature similarity.
+
+---
+
+## Level 2: Implementation Details
+
+### Mathematical Formulas
+
+#### 1. Cosine Vector Similarity
+$$\text{Cosine}(A, B) = \frac{\sum_{i=1}^{d} A_i B_i}{\sqrt{\sum_{i=1}^{d} A_i^2} \sqrt{\sum_{i=1}^{d} B_i^2}}$$
+
+In [rag/nlp/search.py](file:///home/logan78/Desktop/ragflow/rag/nlp/search.py#
+...[truncated]
+
+--- ragflow-docs/07-retrieval/filters.md ---
+# Retrieval Metadata Filters
+
+## Level 1: Conceptual Overview
+
+Metadata Filters restrict candidate retrieval scope using pre-search Boolean filtering conditions, ensuring chunks match dataset boundaries, document IDs, active availability flags, or metadata tag conditions.
+
+---
+
+## Level 2: Implementation Details
+
+### Filter Construction Logic
+
+Implemented in `Dealer.get_filters()` in [rag/nlp/search.py](file:///home/logan78/Desktop/ragflow/rag/nlp/search.py#L121-L133):
+
+```python
+def get_filters
+...[truncated]
+
+--- ragflow-docs/12-chat/streaming.md ---
+# Streaming Token Protocol (SSE)
+
+## Level 1: Conceptual Overview
+
+The **Streaming Engine** delivers real-time token outputs from the LLM provider to front-end clients via HTTP Server-Sent Events (SSE). This reduces perceived latency (Time-To-First-Token) and provides smooth user experience during document answer synthesis.
+
+---
+
+## Level 2: Implementation Details
+
+### Source File Map
+- **Quart SSE Controller**: [chat_api.py](file:///home/logan78/Desktop/ragflow/api/apps/restful_apis/chat_api.py
+...[truncated]
+
+--- ragflow-docs/12-chat/context.md ---
+# Context Construction & Citation Indexing
+
+## Level 1: Conceptual Overview
+
+**Context Construction** formats retrieved vector and keyword chunks, system prompt templates, metadata filters, and historical turn messages into a single prompt payload for the LLM. It embeds citation tags (`##0$$`, `##1$$`) directly into context blocks so generated answers explicitly cite source document chunks.
+
+---
+
+## Level 2: Implementation Details
+
+### Source File Map
+- **Prompt Generator**: [rag/prompts/generat
+...[truncated]
+
+--- ragflow-docs/12-chat/complete-chat-flow.md ---
+# Complete Chat Call Flow & Execution Sequence
+
+## Level 1: Conceptual Overview
+
+The complete chat execution flow traces a user query from HTTP request arrival to final SSE response termination. It handles dialog resolution, session retrieval, optional web search / knowledge base retrieval, reranking, prompt compilation, LLM streaming, citation parsing (`##0$$`), and database persistence.
+
+---
+
+## Level 2: Implementation Details
+
+### Execution Step Sequence
+
+```mermaid
+sequenceDiagram
+    autonu
+...[truncated]
+
+--- ragflow-docs/12-chat/conversation.md ---
+# Conversation Session Management
+
+## Level 1: Conceptual Overview
+
+**Conversation Management** maintains state, session titles, and message histories for multi-turn interactions. It supports both Web UI user sessions (`Conversation`) and external API consumer sessions (`API4Conversation`).
+
+---
+
+## Level 2: Implementation Details
+
+### Source File References
+- **Conversation Service**: [conversation_service.py](file:///home/logan78/Desktop/ragflow/api/db/services/conversation_service.py#L1)
+- **
+...[truncated]
+
+--- ragflow-docs/12-chat/messages.md ---
+# Message Persistence & Feedback Analytics
+
+## Level 1: Conceptual Overview
+
+**Message Handling** manages turn-by-turn message creation, document chunk attribution, user feedback (`thumb_up` / `thumb_down`), chunk-level feedback annotations, and message history updates.
+
+---
+
+## Level 2: Implementation Details
+
+### Source File Map
+- **Feedback Service**: [chunk_feedback_service.py](file:///home/logan78/Desktop/ragflow/api/db/services/chunk_feedback_service.py#L1)
+- **Dialog Service**: [dialog_se
+...[truncated]
+
+--- ragflow-docs/12-chat/chat-architecture.md ---
+# Chat Subsystem Architecture Overview
+
+## Level 1: Conceptual Overview
+
+The **Chat Subsystem** in RAGFlow powers interactive conversational AI assistants equipped with Retrieval-Augmented Generation (RAG). It manages assistant presets (`Dialog`), multi-turn session persistence (`Conversation` / `API4Conversation`), hybrid retrieval against linked Knowledge Bases (`kb_ids`), memory context window management, citation annotation (`##0$$`), and SSE token streaming.
+
+```mermaid
+graph TD
+    Client[
+...[truncated]
+
+--- ragflow-docs/12-chat/memory.md ---
+# Conversation Memory & Context Truncation
+
+## Level 1: Conceptual Overview
+
+**Conversation Memory** prevents prompt overflow errors when multi-turn dialogues exceed the chosen LLM's maximum token context window (`max_tokens`). It truncates historic conversation turns using token-based rolling windows while retaining the static system prompt and newly retrieved knowledge context.
+
+---
+
+## Level 2: Implementation Details
+
+### Source File Map
+- **Token Utilities**: [common/token_utils.py](file:///
+...[truncated]
+
+--- ragflow-docs/08-database/indexes.md ---
+# Database Indexes & Performance Optimization
+
+## Level 1: Conceptual Overview
+
+Relational database indexes in RAGFlow are placed on high-cardinality foreign keys (`tenant_id`, `kb_id`, `doc_id`) and status filter columns (`status`, `run`, `progress`) to ensure fast JOIN operations and rapid status filtering.
+
+---
+
+## Level 2: Implementation Details
+
+### Database Index Specifications
+
+Defined in [api/db/db_models.py](file:///home/logan78/Desktop/ragflow/api/db/db_models.py):
+
+| Table | Index Fie
+...[truncated]
+
+--- ragflow-docs/08-database/transactions.md ---
+# Database Transactions & Concurrency
+
+## Level 1: Conceptual Overview
+
+Database transactions guarantee ACID properties across multi-step mutations (e.g. creating a document row, generating task rows, writing file-to-document mappings).
+
+---
+
+## Level 2: Implementation Details
+
+### Transaction Retry Blocks
+
+In [api/db/db_models.py](file:///home/logan78/Desktop/ragflow/api/db/db_models.py#L301-L318):
+
+```python
+def begin(self):
+    for attempt in range(self.max_retries + 1):
+        try:
+        
+...[truncated]
+
+--- ragflow-docs/08-database/migrations.md ---
+# Database Migrations
+
+## Level 1: Conceptual Overview
+
+Schema migrations manage database DDL evolution across versions without data loss, executing column additions, type alterations, and index creation across MySQL, OceanBase, and PostgreSQL.
+
+---
+
+## Level 2: Implementation Details
+
+### Database Migrator Enums
+
+In [api/db/db_models.py](file:///home/logan78/Desktop/ragflow/api/db/db_models.py#L464-L468) and Go migration driver [internal/dao/migration.go](file:///home/logan78/Desktop/ragflow/in
+...[truncated]
+
+--- ragflow-docs/08-database/entities.md ---
+# Database Entities
+
+Source: `api/db/db_models.py`
+
+### TextFieldType
+### LongTextField
+### JSONField
+### ListField
+### SerializedField
+### BaseModel
+### JsonSerializedField
+### RetryingPooledMySQLDatabase
+### RetryingPooledPostgresqlDatabase
+### RetryingPooledOceanBaseDatabase
+### PooledDatabase
+### DatabaseMigrator
+### DatabaseLock
+### DataBaseModel
+### User
+### Tenant
+### UserTenant
+### InvitationCode
+### LLMFactories
+### LLM
+### TenantLLM
+### TenantLangfuse
+### Knowledgebase
+### Document
+###
+...[truncated]
+
+--- ragflow-docs/08-database/relationships.md ---
+# Database Entity Relationships
+
+## Level 1: Conceptual Overview
+
+This document details primary key / foreign key relationships, cascade behaviors, and cardinality mappings between database entities.
+
+---
+
+## Level 2: Implementation Details
+
+### Entity Relationship Diagram (ERD)
+
+```mermaid
+erDiagram
+    Tenant ||--|{ User : "contains"
+    Tenant ||--|{ Knowledgebase : "owns"
+    Tenant ||--|{ File : "stores"
+    Knowledgebase ||--|{ Document : "groups"
+    Document ||--|{ Task : "generates"
+   
+...[truncated]
+
+--- ragflow-docs/08-database/database-flow.md ---
+# Database Operational Flow
+
+## Level 1: Conceptual Overview
+
+The Database Operational Flow outlines transaction boundaries, thread-local connection contexts, lazy initialization, and high-concurrency connection lifecycle management across API request handlers and background worker tasks.
+
+---
+
+## Level 2: Implementation Details
+
+### Connection Lifecycle Management
+
+In [api/db/db_models.py](file:///home/logan78/Desktop/ragflow/api/db/db_models.py#L470-L485):
+
+```python
+@singleton
+class BaseDataB
+...[truncated]
+
+--- ragflow-docs/08-database/schema.md ---
+# Database Schema & Tables Specification
+
+## Level 1: Conceptual Overview
+
+The Database Schema defines all core tables, column types, primary keys, nullability constraints, defaults, and foreign key relations across MySQL, OceanBase, and PostgreSQL database engines.
+
+---
+
+## Level 2: Implementation Details
+
+### Table Specifications
+
+#### 1. `document` Table
+Peewee model: [Document](file:///home/logan78/Desktop/ragflow/api/db/db_models.py#L894) | Go struct: `entity.Document`
+
+```sql
+CREATE TABLE 
+...[truncated]
+
+--- ragflow-docs/08-database/database-overview.md ---
+# Database Architecture Overview
+
+## Level 1: Conceptual Overview
+
+The Database Architecture in RAGFlow uses relational databases (MySQL, OceanBase, PostgreSQL) for metadata persistence, state tracking, tenant configuration, document records, task queues, and user authentication.
+
+It features a dual-layer ORM/DAO pattern:
+1. **Python Layer**: Uses Peewee ORM with connection-pooling retry classes (`RetryingPooledMySQLDatabase`, `RetryingPooledPostgresqlDatabase`, `RetryingPooledOceanBaseDatabase`
+...[truncated]
+
+--- ragflow-docs/18-deployment/volumes.md ---
+# Volume Management & Data Persistence
+
+## Level 1: Conceptual Explanation
+
+Data persistence in RAGFlow is configured to prevent loss of relational state, uploaded document binaries, vector index structures, message queues, and execution logs across container restarts. Persistence uses named Docker volumes managed by standard storage drivers alongside host bind mounts for logs and configuration overrides.
+
+---
+
+## Level 2: Implementation Details
+
+### Volume Declarations & Binding Table
+
+Defined 
+...[truncated]
+
+--- ragflow-docs/18-deployment/deployment-overview.md ---
+# Deployment Overview
+
+## Level 1: Conceptual Explanation
+
+RAGFlow is designed for enterprise-grade, high-availability multi-service deployment. Its deployment model supports single-node evaluation setups via Docker Compose to distributed multi-node production clusters using Kubernetes and Helm charts.
+
+### Core Deployment Profiles
+- **CPU Profile (`ragflow-cpu`)**: Evaluates/runs core Python server services, Go server instances, Nginx reverse proxy, MySQL, Valkey/Redis, MinIO, NATS message queu
+...[truncated]
+
+--- ragflow-docs/18-deployment/deployment-flow.md ---
+# Deployment Lifecycle & Execution Flow
+
+## Level 1: Conceptual Explanation
+
+The deployment lifecycle governs how RAGFlow containers boot, initialize dependent storage systems, populate initial database schemas, generate dynamic environment configurations, start background workers, and transition into a healthy operating state.
+
+---
+
+## Level 2: Implementation Details
+
+### Initialization Sequence
+
+1. **Pre-flight Container Dependency Checks**:
+   - `ragflow-cpu` waits for `mysql` health check (`
+...[truncated]
+
+--- ragflow-docs/18-deployment/docker-compose.md ---
+# Docker Compose Topology
+
+## Level 1: Conceptual Explanation
+
+RAGFlow provides standard Docker Compose manifests (`docker/docker-compose.yml` and `docker/docker-compose-base.yml`) that orchestrate the full multi-container service topology. 
+
+Docker Compose profiles allow selectively deploying required infrastructure tiers:
+- **`cpu`**: Deploys `ragflow-cpu` main application container.
+- **`gpu`**: Deploys `ragflow-gpu` container with NVIDIA GPU runtime pass-through.
+- **`elasticsearch` / `opens
+...[truncated]
+
+--- ragflow-docs/18-deployment/environment-variables.md ---
+# Environment Variables Reference
+
+## Level 1: Conceptual Explanation
+
+Environment variables control RAGFlow container configuration, network port bindings, database credentials, resource limits, vector engine selection, and security settings. Environment variables are defined in the `.env` file mounted into Docker Compose or passed directly into container runtimes.
+
+---
+
+## Level 2: Implementation Details
+
+### Environment Variable Catalog
+
+Extracted from [`docker/docker-compose.yml`](file:///ho
+...[truncated]
+
+--- ragflow-docs/18-deployment/docker.md ---
+# Docker Build & Images
+
+## Level 1: Conceptual Explanation
+
+RAGFlow leverages containerization to bundle Python runtime dependencies, compiled Go binaries (`ragflow_server`), native C++ libraries (DeepDoc, PDFium, OfficeOxide), and deep learning model weights. 
+
+The image build system consists of:
+- **`Dockerfile`**: Production multi-stage build image bundling the Web server, Task Executor, Go API binary, Nginx, and Python virtual environment (`uv`).
+- **`Dockerfile_base`**: Base image pre-comp
+...[truncated]
+
+--- ragflow-docs/18-deployment/services.md ---
+# Container Services
+
+## Level 1: Conceptual Explanation
+
+RAGFlow separates concerns into modular container services. Each service handles a distinct task in the RAG pipeline—from HTTP REST handling, background ingestion tasks, vector index storage, SQL persistence, binary object storage, to isolated sandbox code execution.
+
+---
+
+## Level 2: Implementation Details
+
+### Service Specifications & Roles
+
+#### 1. `ragflow-cpu` / `ragflow-gpu`
+- **Role**: Core application service container executing N
+...[truncated]
+
+--- ragflow-docs/18-deployment/networking.md ---
+# Network Topology & Communications
+
+## Level 1: Conceptual Explanation
+
+RAGFlow uses a single isolated Docker bridge network named `ragflow` (`driver: bridge`). All microservices communicate across this overlay network using DNS container aliases (`mysql`, `redis`, `minio`, `nats`, `infinity`, `es01`, `sandbox-executor-manager`). External access is restricted strictly to designated ingress ports exposed to the host machine.
+
+---
+
+## Level 2: Implementation Details
+
+### Network Bridge Specificat
+...[truncated]
+
+--- ragflow-docs/18-deployment/production-architecture.md ---
+# Production Architecture
+
+## Level 1: Conceptual Explanation
+
+RAGFlow production architecture is organized into distinct decoupled layers:
+1. **Edge / Ingress Layer**: Public facing Nginx load balancer providing SSL termination, HTTP/2 streaming, and path-based routing (`/v1/` to Web API, `/mcp` to Model Context Protocol server).
+2. **Application Server Layer**: Dual-core architecture comprising the high-concurrency Go REST API server (`ragflow_server` on port 9384) and the Python Flask API ser
+...[truncated]
+
+--- ragflow-docs/17-integrations/search-integrations.md ---
+# Search Engine Integrations & Web Retrieval
+
+## Level 1: Conceptual Overview
+
+**Search Integrations** enable RAGFlow assistants and agents to query live external web search APIs (Google, DuckDuckGo, Tavily, SearxNG, Querit, Bing) and academic databases (ArXiv, PubMed, Google Scholar) when local knowledge bases do not contain adequate answers.
+
+---
+
+## Level 2: Implementation Details
+
+### Source File Map
+- **Google Search**: [agent/tools/google.py](file:///home/logan78/Desktop/ragflow/agent/tool
+...[truncated]
+
+--- ragflow-docs/17-integrations/integrations-overview.md ---
+# Integrations Subsystem Overview
+
+## Level 1: Conceptual Overview
+
+The **Integrations Subsystem** connects RAGFlow with external messaging channels (DingTalk, Feishu/Lark, WeChat Work, Discord, Telegram, LINE, WhatsApp, QQ Bot), vector and hybrid search engines (Infinity, Elasticsearch, OpenSearch, PGVector), object storage systems (MinIO, S3, Azure Blob, OSS), and MCP servers.
+
+```mermaid
+graph TD
+    RAGFlow[RAGFlow Engine Core] --> MessagingChannels[Chat Channels (api/channels & internal/cha
+...[truncated]
+
+--- ragflow-docs/17-integrations/model-integrations.md ---
+# Multi-Provider Model Integrations
+
+## Level 1: Conceptual Overview
+
+RAGFlow integrates with over 40 model providers across 6 multi-modal task types (Chat, Embeddings, Reranking, Vision/OCR, ASR, TTS). Provider drivers manage encrypted tenant credentials, custom base URLs, proxy routing, token rate limits, and fallback retries.
+
+---
+
+## Level 2: Implementation Details
+
+### Source File Map
+- **Provider Enum & Base URLs**: [rag/llm/__init__.py](file:///home/logan78/Desktop/ragflow/rag/llm/__init_
+...[truncated]
+
+--- ragflow-docs/17-integrations/external-services.md ---
+# External Chat Channels & Enterprise Messaging Integrations
+
+## Level 1: Conceptual Overview
+
+RAGFlow natively integrates with 8 major enterprise and consumer chat messaging platforms:
+- **Enterprise Platforms**: Feishu / Lark, DingTalk, WeChat Work (WeCom)
+- **Global Messaging Bots**: Discord, Telegram, LINE, WhatsApp, QQ Bot
+
+The channel subsystem continuously reconciles active channel bots from the `chat_channel` table without requiring API server restarts. Inbound webhooks or long-polling b
+...[truncated]
+
+--- ragflow-docs/17-integrations/storage-integrations.md ---
+# Object Storage Integrations
+
+## Level 1: Conceptual Overview
+
+**Object Storage** manages raw document file persistence, extracted images, OCR parsed page renders, generated report documents (.docx/.pdf), and audio files across S3-compatible storage endpoints (MinIO, AWS S3, Alibaba Cloud OSS, Azure Blob Storage).
+
+---
+
+## Level 2: Implementation Details
+
+### Source File Map
+- **File Service**: [api/db/services/file_service.py](file:///home/logan78/Desktop/ragflow/api/db/services/file_service.p
+...[truncated]
+
+--- ragflow-docs/17-integrations/vector-database-integrations.md ---
+# Vector Database & Retrieval Engine Integrations
+
+## Level 1: Conceptual Overview
+
+RAGFlow integrates with high-performance vector search engines and hybrid search databases. Primary vector engines include InfiniFlow Infinity, Elasticsearch 8+, OpenSearch, and PostgreSQL (PGVector).
+
+---
+
+## Level 2: Implementation Details
+
+### Source File Map
+- **Search Factory**: [rag/nlp/search.py](file:///home/logan78/Desktop/ragflow/rag/nlp/search.py)
+- **Infinity Client**: [rag/utils/infinity_conn.py](fil
+...[truncated]
+
+--- ragflow-docs/24-learning/beginner-path.md ---
+# Beginner Path: Fundamentals of RAGFlow
+
+## Target Audience
+Developers or architects new to RAGFlow who want to understand high-level system concepts, set up the development environment, navigate the codebase, and understand core API workflows.
+
+---
+
+## Learning Objectives
+1. Understand RAGFlow's core value proposition: vision-based document parsing + hybrid retrieval + visual agent canvas.
+2. Build and run RAGFlow locally using Docker Compose or source code.
+3. Understand the multi-tenant mode
+...[truncated]
+
+--- ragflow-docs/24-learning/prerequisites.md ---
+# Technical Prerequisites for RAGFlow Engineering
+
+## Overview
+
+To effectively develop, customize, and reverse engineer RAGFlow, engineers should be familiar with the core technological stack, language paradigms, datastores, and Machine Learning / NLP primitives used across the codebase.
+
+---
+
+## 1. Programming Languages & Frameworks
+
+### Python Backend & AI Processing
+- **Python 3.10+**: Asynchronous execution (`asyncio`, `contextvars`), type hinting, decorators, dataclasses.
+- **Quart / Flask*
+...[truncated]
+
+--- ragflow-docs/24-learning/important-concepts.md ---
+# Important Concepts in RAGFlow
+
+## 1. Vision-Based DeepDoc Parsing
+Unlike traditional RAG systems that rely solely on text extraction, RAGFlow uses **DeepDoc**, a computer vision and layout analysis engine. DeepDoc detects visual bounding boxes for document elements (titles, paragraphs, headers, footers, tables, figures) using YOLO models, executes OCR via PaddleOCR, and reconstructs table HTML structures.
+
+- **Primary Source**: [deepdoc/parser/pdf_parser.py](file:///home/logan78/Desktop/ragflo
+...[truncated]
+
+--- ragflow-docs/24-learning/what-to-read-first.md ---
+# What to Read First in RAGFlow
+
+## Quick Navigation Matrix
+
+If you want to understand... **READ THIS FIRST**:
+
+| Topic / System Area | Starting File | Key Code Source Link |
+|---|---|---|
+| **Single Request Lifecycle** | [21-end-to-end-flows/ragflow-one-request.md](../21-end-to-end-flows/ragflow-one-request.md) | Entire Pipeline |
+| **API Server Routing** | [22-code-tracing/frontend-to-backend.md](../22-code-tracing/frontend-to-backend.md) | [api/ragflow_server.py](file:///home/logan78/Desktop/
+...[truncated]
+
+--- ragflow-docs/24-learning/learning-order.md ---
+# Recommended Learning Order for RAGFlow
+
+## Overview
+
+To systematically master the RAGFlow architecture, developers should follow a progressive, step-by-step reading order that builds up from macro-architecture to deep engine implementations.
+
+---
+
+## Recommended Step-by-Step Pathway
+
+```mermaid
+flowchart TD
+    Phase1[Phase 1: High-Level Architecture & Concepts] --> Phase2[Phase 2: REST APIs & Database Schemas]
+    Phase2 --> Phase3[Phase 3: DeepDoc Parsing & Ingestion Worker]
+    Phase3 --> P
+...[truncated]
+
+--- ragflow-docs/24-learning/advanced-path.md ---
+# Advanced Path: Agent Canvas Engine & Multi-Service Architecture
+
+## Target Audience
+Senior software architects, AI system developers, and open-source contributors extending RAGFlow's Agent Canvas, workflow engine, or Go backend service microarchitecture.
+
+---
+
+## Learning Objectives
+1. Reverse-engineer the Agent Canvas Graph execution engine (`agent/canvas.py` and `internal/agent/canvas/`).
+2. Learn how to write custom Agent Canvas nodes by extending `ComponentBase` in `agent/component/`.
+3. U
+...[truncated]
+
+--- ragflow-docs/24-learning/intermediate-path.md ---
+# Intermediate Path: DeepDoc Parsing & Retrieval Pipeline
+
+## Target Audience
+Backend engineers, AI developers, and RAG specialists who want to understand document ingestion, DeepDoc parsing, hybrid search retrieval algorithms, and LLM integrations.
+
+---
+
+## Learning Objectives
+1. Deep-dive into asynchronous task processing via Redis and `rag/svr/task_executor.py`.
+2. Understand vision layout analysis (YOLOv10 / PP-YOLO) and PaddleOCR text extraction in `deepdoc/`.
+3. Master hybrid retrieval mec
+...[truncated]
+
+--- ragflow-docs/15-cli/commands.md ---
+# CLI REPL Command Catalog & Argument Specifications
+
+## Level 1: Conceptual Explanation
+
+`ragflow-cli` features a SQL-like domain-specific language (DSL) alongside traditional UNIX shell commands. The grammar is parsed using a hand-written recursive descent parser ([`internal/cli/parser.go`](file:///home/logan78/Desktop/ragflow/internal/cli/parser.go)) and scanner ([`internal/cli/lexer.go`](file:///home/logan78/Desktop/ragflow/internal/cli/lexer.go)). Commands are segregated into **User Operati
+...[truncated]
+
+--- ragflow-docs/15-cli/configuration.md ---
+# CLI Configuration
+
+## Level 1: Conceptual Explanation
+
+`ragflow-cli` configuration is governed by a multi-tiered hierarchy. Settings can be specified via command-line flags, environment variables, local YAML configuration files (`rf.yml`), or dynamic REPL session overrides. This structure ensures flexibility for local developer debugging, automated container scripts, and production administrator operations.
+
+---
+
+## Level 2: Implementation Details
+
+### Configuration File Schema (`rf.yml`)
+
+The
+...[truncated]
+
+--- ragflow-docs/15-cli/command-entry-points.md ---
+# Command Entry Points
+
+## Level 1: Conceptual Explanation
+
+The CLI entry point coordinates binary initialization, signal handling, environment and configuration loading, mode determination (User vs. Admin), input parsing, and dispatching execution to HTTP services or the Virtual Filesystem (VFS). 
+
+It operates via two distinct modes:
+1. **Interactive REPL Mode**: Continuously prompts the user for SQL-like or filesystem commands using an auto-completing shell loop.
+2. **Single-Command Batch Mode
+...[truncated]
+
+--- ragflow-docs/15-cli/cli-overview.md ---
+# RAGFlow CLI Overview
+
+## Level 1: Conceptual Explanation
+
+`ragflow-cli` is the native command-line interface for the RAGFlow RAG system, implemented in Go. It provides interactive administration, programmatic scripting, host management, virtual filesystem navigation, and fine-grained control over RAGFlow services, datasets, document parsers, and agent workflows.
+
+### Core Objectives & Dual Modes
+1. **Interactive REPL Mode**: An interactive shell environment powered by `github.com/peterh/liner`
+...[truncated]
+
+--- ragflow-docs/15-cli/cli-execution-flow.md ---
+# CLI Execution Flow
+
+## Level 1: Conceptual Explanation
+
+The CLI execution flow transforms raw text typed into the terminal into executed REST API requests or Virtual Filesystem operations. The lifecycle consists of:
+1. **Lexical Analysis (Tokenizer)**: Converts character streams into structured tokens ([`internal/cli/lexer.go`](file:///home/logan78/Desktop/ragflow/internal/cli/lexer.go)).
+2. **Syntactic Analysis (Parser)**: Validates command grammar via recursive descent parsing and builds a `
+...[truncated]
+
+--- ragflow-docs/19-testing/test-architecture.md ---
+# Test Architecture & Go Test Tiers
+
+## Level 1: Conceptual Explanation
+
+The RAGFlow test architecture isolates software components according to dependency requirements and execution speeds. Fast unit tests run without external databases, while integration and CGO tests validate C++ bindings and live vector database engines.
+
+---
+
+## Level 2: Implementation Details
+
+### Python Test Runner Breakdown (`run_tests.py`)
+
+The Python test runner [`run_tests.py`](file:///home/logan78/Desktop/ragflow/run
+...[truncated]
+
+--- ragflow-docs/19-testing/unit-tests.md ---
+# Unit Tests
+
+## Level 1: Conceptual Explanation
+
+Unit tests validate individual functions, parsers, cryptographic routines, data serialization modules, and canvas state machines in complete isolation without calling external network APIs or databases.
+
+---
+
+## Level 2: Implementation Details
+
+### Unit Test Suites & Modules
+
+#### 1. Go Parser & CLI Unit Tests
+Located in [`internal/cli/user_parser_test.go`](file:///home/logan78/Desktop/ragflow/internal/cli/user_parser_test.go#L1-L100) and [`inter
+...[truncated]
+
+--- ragflow-docs/19-testing/frontend-tests.md ---
+# Frontend Tests
+
+## Level 1: Conceptual Explanation
+
+Frontend testing validates the React user interface (`/web`), ensuring UI components, agent canvas workflows, document upload widgets, and chat dialog components render correctly and handle user interactions cleanly without runtime JavaScript errors.
+
+---
+
+## Level 2: Implementation Details
+
+### Frontend Testing Framework
+
+- **Tooling**: Node.js, npm/pnpm, React Testing Library, and Jest / Vitest.
+- **Location**: `/web/src/__tests__/` or co-l
+...[truncated]
+
+--- ragflow-docs/19-testing/integration-tests.md ---
+# Integration Tests
+
+## Level 1: Conceptual Explanation
+
+Integration tests verify component interactions across process boundaries. They validate communication between the Go server, Python Web API, MySQL database, Redis cache, NATS message queue, vector engines (Infinity, Elasticsearch), and native C++ shared libraries.
+
+---
+
+## Level 2: Implementation Details
+
+### Integration Test Scenarios & Files
+
+#### 1. Native C++ Binding Integration Tests (CGO)
+Located in [`internal/deepdoc/parser/pdf/inf
+...[truncated]
+
+--- ragflow-docs/19-testing/testing-overview.md ---
+# Testing Overview
+
+## Level 1: Conceptual Explanation
+
+RAGFlow implements a multi-layered verification strategy spanning Python backend unit/integration tests, Go core server unit/integration/benchmark tests, CGO native library tests, and end-to-end (E2E) API validation.
+
+### Testing Objectives & Principles
+1. **Python Test Suite**: Managed via [`run_tests.py`](file:///home/logan78/Desktop/ragflow/run_tests.py) and `pytest`, covering API services, chunkers, dialog services, LLM providers, and a
+...[truncated]
+
+--- ragflow-docs/19-testing/backend-tests.md ---
+# Backend Tests
+
+## Level 1: Conceptual Explanation
+
+Backend testing covers both Go server packages (`/cmd`, `/internal`) and Python web services (`/api`, `/rag`, `/deepdoc`). It ensures API contract compliance, data model integrity, database transaction correctness, and vector search accuracy.
+
+---
+
+## Level 2: Implementation Details
+
+### Go Backend Test Suite
+Executed via standard Go toolchain:
+```bash
+# Run all Go unit tests
+go test -v ./internal/...
+
+# Run with race detector
+go test -v -race
+...[truncated]
+
+--- ragflow-docs/13-agents/rag-agent.md ---
+# Specialized RAG Agent Implementation
+
+## Level 1: Conceptual Overview
+
+The **RAG Agent** (`rag_agent`) is a specialized agent preset that optimizes Knowledge Base document retrieval, query rewriting, multi-document synthesis, and citation generation. It can be invoked directly as a solo dialog handler or as a component node within canvas agent workflows.
+
+---
+
+## Level 2: Implementation Details
+
+### Source File Map
+- **Dialog Service RAG Agent**: [dialog_service.py](file:///home/logan78/Deskto
+...[truncated]
+
+--- ragflow-docs/13-agents/agent-api.md ---
+# Agent API
+
+Source: `api/apps/restful_apis/agent_api.py`
+
+This file handles the orchestration of AI agents, canvas configurations, testing, and webhook integration.
+
+## Key Endpoints and Execution Flow
+
+1. **`GET /agents/<agent_id>/sessions`**
+   - **Handler:** `list_sessions()`
+   - **Services:** `API4ConversationService`, `UserCanvasService`
+   - **Flow:** Validates agent existence via `UserCanvasService`, then queries sessions from `API4ConversationService`.
+
+2. **`POST /agents/chat/completi
+...[truncated]
+
+--- ragflow-docs/13-agents/tools.md ---
+# Native Tool Ecosystem & MCP Integration
+
+## Level 1: Conceptual Overview
+
+RAGFlow includes a rich ecosystem of native tools (search engines, financial APIs, translation tools, academic databases) and native support for the Model Context Protocol (MCP). Native tools inherit from `ToolBase`, and MCP integrations dynamically import tool definitions from external MCP servers via stdio or SSE transports.
+
+---
+
+## Level 2: Implementation Details
+
+### Native Tool Catalog
+
+In [agent/tools/](file:///ho
+...[truncated]
+
+--- ragflow-docs/13-agents/agent-flow.md ---
+# Agent Autonomous ReAct Loop Flow
+
+## Level 1: Conceptual Overview
+
+The **Autonomous ReAct Loop** manages multi-step tool execution. In each iteration, the agent asks the LLM for the next step. If the LLM generates a tool call, the agent invokes the requested tool, appends the tool observation output to internal history, and loops. If the LLM returns text output without tool calls or reaches `max_rounds`, the loop terminates.
+
+---
+
+## Level 2: Implementation Details
+
+### Sequence Execution Diag
+...[truncated]
+
+--- ragflow-docs/13-agents/planning.md ---
+# Agent Planning & Reasoning Mechanics
+
+## Level 1: Conceptual Overview
+
+**Agent Planning** involves task decomposition, tool selection, and supervisor delegation. RAGFlow supports supervisor reasoning prompts (`reasoning`, `context`, `user_prompt`), structured output format enforcement (JSON schema parsing via `json_repair`), and ReAct mode switching (`function_call` vs `react`).
+
+---
+
+## Level 2: Implementation Details
+
+### Source File Map
+- **Agent Component**: [agent_with_tools.py](file:///h
+...[truncated]
+
+--- ragflow-docs/13-agents/memory.md ---
+# Agent State & Turn Memory
+
+## Level 1: Conceptual Overview
+
+**Agent Memory** tracks multi-turn ReAct observations within an execution step, as well as persistent memory across graph workflow nodes. It maintains local scratchpads (`tool` role messages) during task solving and exposes results back to the canvas variable state (`Graph.globals`).
+
+---
+
+## Level 2: Implementation Details
+
+### Source File Map
+- **Canvas State (Go)**: [state.go](file:///home/logan78/Desktop/ragflow/internal/agent/can
+...[truncated]
+
+--- ragflow-docs/13-agents/execution.md ---
+# Agent Tool Execution & Sandboxed Environments
+
+## Level 1: Conceptual Overview
+
+**Tool Execution** handles native tool invocations (web scrapers, financial APIs, scientific databases), MCP tool requests, and custom code execution (Python/SQL). Custom user code runs inside isolated sandboxes (`agent/sandbox/*`) to prevent host compromise or unauthorized system access.
+
+---
+
+## Level 2: Implementation Details
+
+### Source File Map
+- **Native Tool Base**: [agent/tools/base.py](file:///home/logan78
+...[truncated]
+
+--- ragflow-docs/13-agents/agent-overview.md ---
+# Agent Subsystem Overview & Capability Architecture
+
+## Level 1: Conceptual Overview
+
+The **Agent Subsystem** in RAGFlow provides autonomous problem-solving capabilities by combining Large Language Models, tool execution loops (ReAct/Function Calling), Model Context Protocol (MCP) integrations, sandboxed code execution, and multi-agent delegation.
+
+```mermaid
+graph TD
+    Canvas[Canvas Workflow Engine] --> AgentComp[Agent Component (agent_with_tools.py)]
+    AgentComp --> ReActLoop[ReAct Autono
+...[truncated]
+
+--- ragflow-docs/13-agents/agent-architecture.md ---
+# Agent Architecture & Class Structure
+
+## Level 1: Conceptual Overview
+
+The **Agent Architecture** builds upon `LLM` and `ToolBase` superclasses. An Agent component wraps a dedicated LLM instance (`chat_mdl`), a map of indexed tool bindings (`tools`), an optional array of MCP server connections (`mcp`), and loop control constraints (`max_rounds`).
+
+---
+
+## Level 2: Implementation Details
+
+### Class Hierarchy & Method Signatures
+
+In [agent_with_tools.py](file:///home/logan78/Desktop/ragflow/agen
+...[truncated]
+
+--- ragflow-docs/16-auth/authentication.md ---
+# Complete Authentication Model
+
+## Level 1: Multi-Channel Authentication Overview
+
+RAGFlow implements an enterprise multi-channel authentication model across its dual-stack Go and Python API backends.
+
+```
++-----------------------------------------------------------------------------------+
+| AUTHENTICATION GATEWAY CHANNELS                                                    |
++-----------------------------------------------------------------------------------+
+| 1. JWT Access Tokens: `Authoriza
+...[truncated]
+
+--- ragflow-docs/16-auth/sessions.md ---
+# Session & Cookie Management
+
+## Level 1: Session Lifecycle Architecture
+
+RAGFlow manages user sessions across Redis cache storage and browser HTTP cookies:
+
+1. **Redis Session Cache**: Sessions are stored in Redis (`SESSION_TYPE = "redis"` in [`api/apps/__init__.py:L79`](file:///home/logan78/Desktop/ragflow/api/apps/__init__.py#L79)).
+2. **Session Cookie Fallback (`_load_user_from_session`)**: OAuth/OIDC callbacks call `login_user(user)` which writes `_user_id` into the server-side session. Wh
+...[truncated]
+
+--- ragflow-docs/16-auth/tokens.md ---
+# Tokens & Token Management
+
+## Level 1: Token Architecture
+
+RAGFlow uses three types of tokens:
+
+1. **JWT User Access Tokens**: Signed JWT strings generated upon successful email/password or OAuth login.
+2. **Programmatic API Tokens**: Managed in the `APIToken` table, enabling programmatic SDK and API integrations.
+3. **SDK Beta Tokens**: Dedicated tokens (`AUTH_BETA`) used for public search bots and MCP server endpoints (`/searchbots/*`, `/mcp`).
+
+---
+
+## Level 2: Token Validation & Revocation
+...[truncated]
+
+--- ragflow-docs/16-auth/authorization.md ---
+# Complete Authorization Model
+
+## Level 1: Multi-Tenant Authorization Architecture
+
+Authorization in RAGFlow operates at two distinct boundaries:
+
+1. **Workspace Multi-Tenancy Boundary (`tenant_id`)**: Every data resource (dataset, document, task, chat session, agent canvas workflow) belongs to a specific tenant workspace. All database queries automatically append `WHERE tenant_id = g.user.tenant_id` to guarantee tenant isolation.
+2. **User Role Boundary (`role`)**: Users within a tenant worksp
+...[truncated]
+
+--- ragflow-docs/16-auth/roles.md ---
+# User Roles & System Privileges
+
+## Level 1: Role Definitions
+
+RAGFlow defines three system roles for users within organization tenant workspaces:
+
+1. **`owner` (Workspace Owner)**:
+   - Creator of the tenant workspace.
+   - Holds full administrative privileges, including team member management, workspace billing/plan configuration, API provider key management, and deletion of the workspace.
+2. **`admin` (Workspace Administrator)**:
+   - Appointed by the owner to manage tenant resources.
+   - C
+...[truncated]
+
+--- ragflow-docs/16-auth/multi-tenant-rbac.md ---
+# RAGFlow Multi-Tenant & RBAC Architecture
+
+This document explains the organization, tenancy, and Role-Based Access Control (RBAC) implementation in RAGFlow. It covers how Workspaces (Tenants) work, the difference between user roles, and how data is isolated at the API and database levels.
+
+## 1. Core Concepts: Users, Tenants, and Workspaces
+
+RAGFlow is designed natively as a **multi-tenant** application. A "Tenant" in RAGFlow represents a Workspace, an Organization, or a Team. 
+
+When a user reg
+...[truncated]
+
+--- ragflow-docs/16-auth/multi-tenancy.md ---
+# Multi-Tenancy Architecture
+
+## Level 1: Conceptual Multi-Tenancy Design
+
+RAGFlow provides strict multi-tenancy isolation for enterprise deployments. A tenant represents an organization or isolated team workspace.
+
+### Key Characteristics
+
+1. **Workspace Multi-Tenancy**: Multiple users can belong to a single tenant workspace, sharing datasets, documents, models, and agent workflows.
+2. **Tenant ID Scoping**: Every database entity (`Knowledgebase`, `Document`, `Task`, `Dialog`, `Canvas`) referen
+...[truncated]
+
+--- ragflow-docs/16-auth/permissions.md ---
+# Permission Matrix & Capabilities
+
+## Level 1: Permission Management Overview
+
+Permissions in RAGFlow dictate which operations users and API keys can execute across datasets, documents, canvas workflows, system settings, and model providers.
+
+---
+
+## Level 2: Role Permission Matrix
+
+| Functional Area | Action / Endpoint | `owner` | `admin` | `normal` | Beta Token | API Token |
+| :--- | :--- | :---: | :---: | :---: | :---: | :---: |
+| **Datasets** | Create / Edit / Delete Dataset | ✅ | ✅ | ✅ | ❌
+...[truncated]
+
+--- ragflow-docs/09-storage/storage-overview.md ---
+# Object & Blob Storage Overview
+
+## Level 1: Conceptual Overview
+
+The Storage Subsystem manages raw binary document files, extracted page images, cropped table screenshots, and avatar blobs. It provides a pluggable storage interface supporting **MinIO**, **Amazon S3**, **Google Cloud Storage (GCS)**, **Alibaba Cloud OSS**, and **Local Filesystem**.
+
+```mermaid
+flowchart TD
+    App[File Service / Task Executor Worker] --> StorageFactory[Storage Factory]
+    
+    StorageFactory -->|STORAGE_IMPL=M
+...[truncated]
+
+--- ragflow-docs/09-storage/storage-flow.md ---
+# Storage Operational Flow
+
+## Level 1: Conceptual Overview
+
+The Storage Operational Flow governs blob creation, key generation, bucket verification, binary streaming, and deletion workflows across the application lifecycle.
+
+---
+
+## Level 2: Implementation Details
+
+### Binary Read & Write Flow
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant App as Document Service / Worker
+    participant Storage as Storage Engine (MinIO / S3)
+    
+    App->>Storage: bucket_exists(bucket_name)
+    al
+...[truncated]
+
+--- ragflow-docs/09-storage/local-storage.md ---
+# Local File Storage Driver
+
+## Level 1: Conceptual Overview
+
+The Local File Storage driver persists binary assets directly to the host filesystem, providing single-node file storage without external cloud object dependencies.
+
+---
+
+## Level 2: Implementation Details
+
+### Path Sanitization & Security
+
+Implemented in [api/utils/file_utils.py](file:///home/logan78/Desktop/ragflow/api/utils/file_utils.py#L20) (`sanitize_path`):
+
+```python
+def sanitize_path(path_str):
+    # Prevents directory traver
+...[truncated]
+
+--- ragflow-docs/09-storage/object-storage.md ---
+# Object Storage Integration (MinIO / S3 / GCS / OSS)
+
+## Level 1: Conceptual Overview
+
+Object Storage integration provides high-scalability, durable storage for binary assets using MinIO, AWS S3, Google Cloud Storage, or Alibaba Cloud OSS.
+
+---
+
+## Level 2: Implementation Details
+
+### Configuration Settings
+
+Configured via environment variables in `common/settings.py` ([common/settings.py](file:///home/logan78/Desktop/ragflow/common/settings.py#L135)) and Go server config:
+- `STORAGE_IMPL`: `MI
+...[truncated]
+
+--- ragflow-docs/09-storage/file-lifecycle.md ---
+# File Lifecycle & Storage Cleanup
+
+## Level 1: Conceptual Overview
+
+The File Lifecycle oversees asset creation, content-hash deduplication, retention, reference counting, and garbage-collection cleanup when documents or datasets are deleted.
+
+---
+
+## Level 2: Implementation Details
+
+### Deletion & Reference Counting
+
+Implemented in `FileService.remove_file()` in [api/db/services/file_service.py](file:///home/logan78/Desktop/ragflow/api/db/services/file_service.py#L200):
+
+```mermaid
+flowchart TD
+...[truncated]
+
+--- ragflow-docs/03-backend/authentication.md ---
+# Backend Authentication Mechanisms
+
+## Level 1: Multi-Modal Authentication Architecture
+
+The backend supports five distinct authentication channels across Python and Go:
+
+1. **Email & Password Authentication**: Validates user credentials, verifies hashed password strings using PBKDF2 / Bcrypt, and returns a signed access token.
+2. **JWT Access Token Authentication**: Standard Bearer token authentication validated via `Serializer(secret_key)` in Python ([`api/apps/__init__.py:L185`](file:///home
+...[truncated]
+
+--- ragflow-docs/03-backend/middleware.md ---
+# Backend Middleware Infrastructure
+
+## Level 1: Middleware Chain Mechanics
+
+Middleware functions execute before and after HTTP route handlers, performing cross-cutting concerns:
+
+1. **Request CORS Handling**: Configures permissive Access-Control-Allow-Origin headers (`allow_origin="*"`) for cross-domain client requests.
+2. **Request Logging & Header Injection**: Logs HTTP method, URL path, response status, and duration. Injects `X-API-Source: go` on Go responses ([`internal/router/router.go:L14
+...[truncated]
+
+--- ragflow-docs/03-backend/api-layer.md ---
+# Backend API Layer
+
+## Level 1: HTTP API Dispatch Architecture
+
+The API layer is responsible for parsing HTTP requests, enforcing CORS headers, executing authentication decorators, validating JSON payloads, invoking service logic, and serializing JSON or SSE stream responses.
+
+---
+
+## Level 2: Dual Routing Dispatch Comparison
+
+```mermaid
+graph TD
+    Client["HTTP Client Request"] --> RouteBridge{"Endpoint Router"}
+
+    subgraph Go_Gin_Layer ["Go Gin Routing Layer (internal/router)"]
+        GoG
+...[truncated]
+
+--- ragflow-docs/03-backend/entry-points.md ---
+# Backend Entry Points & Initialization
+
+## Level 1: System Boot Sequence
+
+The backend system boots via two main entry points: the **Go Server** (`cmd/ragflow_server.go`) and the **Python Server** (`api/ragflow_server.py`).
+
+---
+
+## Level 2: Comprehensive Boot & Thread Lifecycle
+
+### 1. Go Engine Entry Point ([`cmd/ragflow_server.go`](file:///home/logan78/Desktop/ragflow/cmd/ragflow_server.go#L81))
+
+#### Command-Line Flags
+- `--api`: Starts the primary Gin API HTTP service.
+- `--admin`: Starts t
+...[truncated]
+
+--- ragflow-docs/03-backend/authorization.md ---
+# Backend Authorization & Access Control
+
+## Level 1: Role-Based & Multi-Tenant Authorization
+
+RAGFlow implements a dual-tier authorization model:
+
+1. **Role-Based Access Control (RBAC)**: Users are assigned system roles:
+   - `owner`: Primary account owner with full organization and workspace controls.
+   - `admin`: Enterprise administrator capable of managing users, tenant settings, and system parameters.
+   - `normal`: Standard workspace member with read/write access to assigned datasets, cha
+...[truncated]
+
+--- ragflow-docs/03-backend/backend-architecture.md ---
+# Backend System Architecture
+
+## Level 1: Architectural Patterns
+
+The RAGFlow backend is architected around four core software design patterns:
+
+1. **Dual-Stack Gateway Strategy**: Requests entering the system pass through Nginx to either the Go Gin server (for user/tenant/auth/sync handlers) or the Python Quart server (for heavy ML/agent execution). The Go server attaches `X-API-Source: go` to HTTP responses ([`internal/router/router.go:L146`](file:///home/logan78/Desktop/ragflow/internal/rout
+...[truncated]
+
+--- ragflow-docs/03-backend/backend-data-flow.md ---
+# Backend Data Flow Architecture
+
+## Level 1: End-to-End Data Processing Pipeline
+
+This document details how data flows through the backend system, from HTTP request entry to database transaction execution, vector store indexing, and response rendering.
+
+---
+
+## Level 2: Comprehensive Execution Sequence Diagrams
+
+### 1. Document Chunking & Indexing Flow
+
+```mermaid
+sequenceDiagram
+    participant Client as Frontend SPA / API Client
+    participant Router as Go Gin Gateway (cmd/ragflow_server.go)
+...[truncated]
+
+--- ragflow-docs/03-backend/services.md ---
+# Backend Services Catalog
+
+## Level 1: Service Layer Responsibilities
+
+The service layer contains domain-specific business logic, orchestrating database transactions, external LLM calls, document parsing workers, and search index updates.
+
+---
+
+## Level 2: Comprehensive Service Matrix & Source Map
+
+### 1. Python Service Layer ([`api/db/services/`](file:///home/logan78/Desktop/ragflow/api/db/services))
+
+| Service Class | File Path | Responsibilities & Methods |
+| :--- | :--- | :--- |
+| `UserServ
+...[truncated]
+
+--- ragflow-docs/03-backend/business-logic.md ---
+# Domain Business Logic
+
+## Level 1: Core Business Domain Overview
+
+RAGFlow encapsulates four major business logic domains:
+
+1. **Multi-Tenant User & Access Governance**: Enforces organization tenant boundaries, user roles (`owner`, `admin`, `normal`), API tokens (`APIToken`), and tenant-isolated LLM provider credentials.
+2. **Deep Document Processing & Chunking Execution**: Controls document upload, type-specific layout parsing, visual table extraction (TSR), chunk generation, and docstore inde
+...[truncated]
+
+--- ragflow-docs/03-backend/backend-overview.md ---
+# Backend Architecture Overview
+
+## Level 1: Conceptual Overview & Dual-Stack Architecture
+
+RAGFlow employs a modern, production-grade **dual-stack backend architecture**:
+
+1. **Go Backend Server (Gin Framework)** ([`cmd/ragflow_server.go`](file:///home/logan78/Desktop/ragflow/cmd/ragflow_server.go#L81)):
+   Designed for high concurrency, memory efficiency, and rapid network I/O. Hosts user authentication handlers, tenant management APIs, task ingestion pipelines, background syncers, admin endpo
+...[truncated]
+
+--- ragflow-docs/99-glossary/important-terms.md ---
+# Important RAGFlow Terms & Identifiers
+
+## Key System Identifiers & Constants
+
+### Task Queue Name
+- **`ragflow_TASK_EXE_QUEUE`**: Redis list key used for queuing document parsing tasks between API handlers and background workers.
+- **Source**: [api/db/services/task_service.py](file:///home/logan78/Desktop/ragflow/api/db/services/task_service.py) & [rag/svr/task_executor.py](file:///home/logan78/Desktop/ragflow/rag/svr/task_executor.py#L1904).
+
+### Document Run Statuses (`document.run`)
+- **`0`
+...[truncated]
+
+--- ragflow-docs/99-glossary/acronyms.md ---
+# RAGFlow Technical Acronyms Reference
+
+| Acronym | Full Form | System Description |
+|---|---|---|
+| **API** | Application Programming Interface | REST/HTTP endpoints in `api/apps/restful_apis/` and `internal/handler/` |
+| **BM25** | Best Matching 25 | Probabilistic term frequency / inverse document frequency ranking algorithm used for sparse text retrieval in [rag/nlp/query.py](file:///home/logan78/Desktop/ragflow/rag/nlp/query.py) |
+| **DAG** | Directed Acyclic Graph | Execution model for Agen
+...[truncated]
+
+--- ragflow-docs/99-glossary/glossary.md ---
+# RAGFlow Comprehensive Technical Glossary
+
+## Glossary Definitions
+
+### Agent Canvas
+The visual drag-and-drop workflow designer in RAGFlow that compiles graphical component nodes into an executable Directed Acyclic Graph (`Graph` in [agent/canvas.py](file:///home/logan78/Desktop/ragflow/agent/canvas.py#L49)).
+
+### Bounding Box
+Coordinates `[x0, y0, x1, y1]` extracted by DeepDoc layout analysis models (`layout_recognizer.py`) indicating the exact spatial region of a paragraph, table, or figure o
+...[truncated]
+
+--- ragflow-docs/05-rag-pipeline/llm-generation.md ---
+# LLM Generation Subsystem
+
+## Level 1: Conceptual Overview
+
+The LLM Generation subsystem streams tokens from language models back to user interfaces or API clients while enforcing token budgets, rate limits, temperature controls, and stop sequences.
+
+---
+
+## Level 2: Implementation Details
+
+### LLM Bundle & Factory Architecture
+
+Implemented in `api/db/services/llm_service.py` (`LLMBundle`) and `rag/llm/chat_model.py`.
+
+Supported LLM Providers:
+- OpenAI (GPT-4o, GPT-3.5)
+- Anthropic (Claude 3.5 
+...[truncated]
+
+--- ragflow-docs/05-rag-pipeline/chunking.md ---
+# Domain Chunking Subsystem
+
+## Level 1: Conceptual Overview
+
+Chunking in RAGFlow is domain-aware. Rather than blindly splitting text at fixed token intervals, RAGFlow provides 14 specialized chunkers configured per dataset (`parser_id`), ensuring semantic boundaries (chapters, legal articles, academic paper sections, table rows, slides) are preserved.
+
+```mermaid
+flowchart TD
+    Doc[Document Layout & Text Blocks] --> Dispatch{parser_id Resolver}
+    
+    Dispatch -->|naive / general| Naive[Nai
+...[truncated]
+
+--- ragflow-docs/05-rag-pipeline/rag-overview.md ---
+# RAG Architectural Overview
+
+## Level 1: Conceptual Overview
+
+RAGFlow is an enterprise-grade Retrieval-Augmented Generation (RAG) platform designed to process complex, unstructured heterogenous documents (PDFs, Office files, images, markdown, HTML, audio, structured tables) with deep document layout understanding and domain-adapted chunking strategies.
+
+The system combines a high-concurrency **Go core engine** (`internal/`) for metadata operations, API management, and streaming retrieval with a
+...[truncated]
+
+--- ragflow-docs/05-rag-pipeline/complete-rag-flow.md ---
+# End-to-End Complete RAG Execution Flow
+
+## Level 1: Conceptual Overview
+
+The complete RAG flow spans document upload, asynchronous worker queue ingestion, layout recognition, domain-specific chunking, multi-engine vector indexing, hybrid retrieval, neural reranking, context construction, and streaming LLM generation with inline citations.
+
+---
+
+## Level 2: Implementation Details
+
+### Complete End-to-End Sequence Diagram
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor User
+    participant 
+...[truncated]
+
+--- ragflow-docs/05-rag-pipeline/context-construction.md ---
+# Context Construction Subsystem
+
+## Level 1: Conceptual Overview
+
+Context Construction selects, formats, deduplicates, and orders retrieved candidate document chunks into a coherent context block. This context block is injected into the LLM system prompt to provide factual grounding.
+
+---
+
+## Level 2: Implementation Details
+
+### Context Building Workflow
+
+Implemented in `api/db/services/dialog_service.py` and `rag/app/`:
+
+```mermaid
+flowchart TD
+    RetrievedChunks[Retrieved & Reranked Chunks] 
+...[truncated]
+
+--- ragflow-docs/05-rag-pipeline/reranking.md ---
+# Re-ranking Subsystem
+
+## Level 1: Conceptual Overview
+
+Re-ranking is the multi-stage refinement step in the RAG retrieval pipeline. While first-pass retrieval extracts a top candidate set (e.g., top 1024 candidates) using lightweight vector index matches and BM25 term frequencies, the Re-ranking subsystem applies computationally heavy cross-encoder neural models to evaluate fine-grained sentence pair semantic relevance.
+
+---
+
+## Level 2: Implementation Details
+
+### Reranking Modes
+
+Implemented
+...[truncated]
+
+--- ragflow-docs/05-rag-pipeline/embedding.md ---
+# Vector Embedding Subsystem
+
+## Level 1: Conceptual Overview
+
+The Vector Embedding subsystem transforms processed text chunks and user queries into high-dimensional numerical vectors. These dense vector representations capture semantic meaning, enabling semantic similarity search in vector databases (Infinity, Elasticsearch, OceanBase).
+
+---
+
+## Level 2: Implementation Details
+
+### Embedding Model Architecture
+
+Implemented in `rag/llm/embedding_model.py` and invoked by task executor [rag/svr/ta
+...[truncated]
+
+--- ragflow-docs/05-rag-pipeline/parsing.md ---
+# Document Parsing Subsystem
+
+## Level 1: Conceptual Overview
+
+Document Parsing in RAGFlow converts heterogeneous source formats (PDF, DOCX, XLSX, PPTX, HTML, TXT, EPUB, images) into a unified visual layout and structured content stream.
+
+Instead of treating documents as simple raw text streams, RAGFlow employs vision-first parsing through **DeepDoc**. DeepDoc renders document pages into high-resolution images, executes layout recognition (detecting titles, paragraphs, tables, images, headers, f
+...[truncated]
+
+--- ragflow-docs/05-rag-pipeline/ingestion-pipeline.md ---
+# Ingestion Pipeline
+
+## Level 1: Conceptual Overview
+
+The Document Ingestion Pipeline in RAGFlow converts raw binary document files into structured, tokenized, embedded, and indexed searchable chunks. It handles task generation, distributed queue consumption, multi-stage document processing, chunk extraction, vector embedding, and index insertion into vector databases.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant UI as Web UI / API
+    participant Svc as Document / Task Service
+  
+...[truncated]
+
+--- ragflow-docs/05-rag-pipeline/retrieval.md ---
+# RAG Pipeline: NLP & Retrieval
+
+Source: `rag/nlp/`
+
+- **search.py**: Part of the NLP processing.
+- **term_weight.py**: Part of the NLP processing.
+- **synonym.py**: Part of the NLP processing.
+- **__init__.py**: Part of the NLP processing.
+- **surname.py**: Part of the NLP processing.
+- **rag_tokenizer.py**: Part of the NLP processing.
+- **delim.py**: Part of the NLP processing.
+- **query.py**: Part of the NLP processing.
+
+
+--- ragflow-docs/05-rag-pipeline/indexing.md ---
+# Indexing & Storage Engine Integration
+
+## Level 1: Conceptual Overview
+
+Indexing converts extracted chunks, tokenized terms, metadata tags, and dense vector embeddings into structured database records in vector and full-text search engines. RAGFlow abstracts storage engines under a unified `DocStoreConnection` interface, allowing seamless deployment across **Infinity**, **Elasticsearch**, **OceanBase**, **ClickHouse**, and **SereneDB**.
+
+---
+
+## Level 2: Implementation Details
+
+### Tenant Inde
+...[truncated]
+
+--- ragflow-docs/05-rag-pipeline/hybrid-search.md ---
+# Hybrid Search & Score Fusion
+
+## Level 1: Conceptual Overview
+
+Hybrid Search in RAGFlow merges exact keyword full-text search (BM25) with semantic dense vector search (KNN Cosine Similarity). This hybrid approach guarantees high precision for rare domain terminology, codes, and exact names, while maintaining semantic recall for conceptual queries.
+
+---
+
+## Level 2: Implementation Details
+
+### Hybrid Score Fusion Equation
+
+In [rag/nlp/search.py](file:///home/logan78/Desktop/ragflow/rag/nlp/sear
+...[truncated]
+
+--- ragflow-docs/05-rag-pipeline/prompt-construction.md ---
+# Prompt Construction Subsystem
+
+## Level 1: Conceptual Overview
+
+Prompt Construction combines conversation history, system directives, dynamic user parameters, and retrieved context blocks into a structured prompt payload sent to LLMs.
+
+---
+
+## Level 2: Implementation Details
+
+### Dialog System Configuration
+
+Dialog parameters are stored in `Dialog` model in [api/db/db_models.py](file:///home/logan78/Desktop/ragflow/api/db/db_models.py#L1020-L1050):
+
+- `prompt_type`: `"simple"` vs `"advanced"`
+
+...[truncated]
+
+--- ragflow-docs/05-rag-pipeline/final-answer.md ---
+# Final Answer Post-Processing
+
+## Level 1: Conceptual Overview
+
+Final Answer Post-Processing evaluates LLM output, verifies factual alignment against retrieved groundings, injects clickable inline citation badges, formats markdown/LaTeX formulas, and logs audit metrics.
+
+---
+
+## Level 2: Implementation Details
+
+### Citation Matching Algorithm (`insert_citations`)
+
+In [rag/nlp/search.py](file:///home/logan78/Desktop/ragflow/rag/nlp/search.py#L252-L310):
+
+1. **Sentence Splitting**: Splitting gene
+...[truncated]
+
+--- ragflow-docs/05-rag-pipeline/preprocessing.md ---
+# Text Preprocessing & Tokenization
+
+## Level 1: Conceptual Overview
+
+Text preprocessing transforms raw document chunks and search queries into clean, normalized token sequences. It handles language detection, traditional-to-simplified Chinese conversion, full-width to half-width character normalization, tokenization via native C++ Trie bindings, stopword stripping, and term-position indexing.
+
+---
+
+## Level 2: Implementation Details
+
+### NLP Preprocessing Pipeline
+
+Implemented in [rag/nlp/rag_t
+...[truncated]
+
+--- ragflow-docs/00-overview/architecture-diagram.md ---
+# System Architecture Diagram
+
+## Level 1: Visual Overview
+
+This document presents the complete architectural diagram for RAGFlow, illustrating the interactions between the React single-page application, the dual-stack Go/Python API server backends, the DeepDoc multi-modal parser, the background sync worker, and the persistence storage infrastructure.
+
+---
+
+## Level 2: Comprehensive Architecture Diagram (Mermaid)
+
+```mermaid
+graph TB
+    subgraph Client_Layer["Client Presentation Layer"]
+       
+...[truncated]
+
+--- ragflow-docs/00-overview/high-level-architecture.md ---
+# High-Level Architecture
+
+## Level 1: Subsystem Layers
+
+RAGFlow is organized into six major functional layers:
+
+1. **Presentation Layer (Web Client)**: React 18 frontend SPA built with TypeScript, TailwindCSS, Zustand state management, and React Router v7 ([`web/src/routes.tsx`](file:///home/logan78/Desktop/ragflow/web/src/routes.tsx#L28)).
+2. **API & Routing Gateway Layer**:
+   - **Go Gin Server** ([`cmd/ragflow_server.go`](file:///home/logan78/Desktop/ragflow/cmd/ragflow_server.go#L81)): Prov
+...[truncated]
+
+--- ragflow-docs/00-overview/repository-map.md ---
+# Repository Map
+
+## Level 1: Monorepo Organization
+
+RAGFlow is organized as a unified monorepo accommodating the frontend web application, dual-stack Go and Python backend servers, AI/ML deep document parsing engines, multi-tenant databases, CLI tools, deployment manifests, and integration test suites.
+
+```
+/home/logan78/Desktop/ragflow/
+├── admin/                    # Admin service and Web UI dashboard
+├── agent/                    # Python Agent Execution Engine & Component Nodes
+├── api/    
+...[truncated]
+
+--- ragflow-docs/00-overview/why-ragflow-exists.md ---
+# Why RAGFlow Exists
+
+## Level 1: Enterprise RAG Challenges & Motivation
+
+Retrieval-Augmented Generation (RAG) is the dominant architecture for building LLM applications over proprietary data. However, enterprise adoption of RAG fails in practice due to three fundamental systemic problems:
+
+1. **Document Structure Loss (The "Garbage In, Garbage Out" Problem)**:
+   Enterprise knowledge resides in complex PDF reports, financial balance sheets, scanned contracts, slide decks, and multi-column resea
+...[truncated]
+
+--- ragflow-docs/00-overview/README.md ---
+# RAGFlow Documentation Master Map: 00-Overview
+
+Welcome to the **00-Overview** module of the reverse-engineered technical documentation for **RAGFlow**. This section lays down the architectural foundation, core design philosophy, dual-stack Python/Go operational paradigm, and complete high-level technology stack.
+
+---
+
+## Level 1: Conceptual Architecture & System Vision
+
+RAGFlow is an open-source Retrieval-Augmented Generation (RAG) engine designed for enterprise applications. It bridges raw un
+...[truncated]
+
+--- ragflow-docs/00-overview/technology-stack.md ---
+# Technology Stack
+
+## Level 1: Stack Inventory & Layering
+
+RAGFlow integrates modern web standards, concurrent systems programming in Go, AI data processing in Python, machine learning vision models, and enterprise database technologies into a scalable topology.
+
+```
++-----------------------------------------------------------------------------------+
+| FRONTEND SPA: React 18, TypeScript, Vite/UmiJS, TailwindCSS, Zustand, React Router 7 |
++-------------------------------------------------------
+...[truncated]
+
+--- ragflow-docs/00-overview/what-is-ragflow.md ---
+# What is RAGFlow?
+
+## Level 1: Conceptual Explanation
+
+**RAGFlow** is an open-source, enterprise-grade Retrieval-Augmented Generation (RAG) engine designed to ground Large Language Models (LLMs) in deep enterprise knowledge bases. Unlike standard baseline RAG implementations that rely on naive string splitting or basic text extraction, RAGFlow solves the fundamental challenge of **"Garbage In, Garbage Out"** in RAG systems.
+
+### Core Capabilities
+
+1. **Deep Document Parsing (DeepDoc)**:
+   Extr
+...[truncated]
+
+--- ragflow-docs/04-api/dataset-api.md ---
+# dataset_api.py Endpoints
+
+Source: `api/apps/restful_apis/dataset_api.py`
+
+## Route: `/datasets/tags/aggregation`
+- **Methods:** GET
+- **Handler Function:** `aggregate_tags()`
+
+- **Calls Services:** None directly detected.
+
+---
+
+## Route: `/datasets/metadata/flattened`
+- **Methods:** GET
+- **Handler Function:** `get_flattened_metadata()`
+
+- **Calls Services:** None directly detected.
+
+---
+
+## Route: `/datasets`
+- **Methods:** POST
+- **Handler Function:** `list_datasets()`
+
+- **Calls Services:**
+...[truncated]
+
+--- ragflow-docs/04-api/tenant-api.md ---
+# tenant_api.py Endpoints
+
+Source: `api/apps/restful_apis/tenant_api.py`
+
+## Route: `/tenants/<tenant_id>/users`
+- **Methods:** GET
+- **Handler Function:** `user_list()`
+
+- **Calls Services:**
+  - `UserTenantService`
+  - `UserService`
+
+---
+
+## Route: `/tenants/<tenant_id>/users`
+- **Methods:** POST
+- **Handler Function:** `tenant_list()`
+
+- **Calls Services:**
+  - `UserTenantService`
+
+---
+
+## Route: `/tenants/<tenant_id>`
+- **Methods:** PATCH
+- **Handler Function:** `agree()`
+
+- **Calls Services
+...[truncated]
+
+--- ragflow-docs/04-api/user-api.md ---
+# user_api.py Endpoints
+
+Source: `api/apps/restful_apis/user_api.py`
+
+## Route: `/auth/login`
+- **Methods:** POST
+- **Handler Function:** `rollback_user_registration()`
+
+- **Calls Services:**
+  - `FileService`
+  - `UserTenantService`
+  - `TenantService`
+  - `UserService`
+  - `TenantLLMService`
+
+---
+
+## Route: `/users`
+- **Methods:** POST
+- **Handler Function:** `_verified_key()`
+
+- **Calls Services:**
+  - `UserService`
+
+---
+
+
+--- ragflow-docs/04-api/compilation_template_group-api.md ---
+# compilation_template_group_api.py Endpoints
+
+Source: `api/apps/restful_apis/compilation_template_group_api.py`
+
+## Route: `/compilation-template-groups`
+- **Methods:** GET
+- **Handler Function:** `list_groups()`
+
+- **Calls Services:**
+  - `CompilationTemplateGroupService`
+
+---
+
+## Route: `/compilation-template-groups/<group_id>`
+- **Methods:** GET
+- **Handler Function:** `detail()`
+
+- **Calls Services:**
+  - `CompilationTemplateGroupService`
+
+---
+
+## Route: `/compilation-template-groups`
+- **M
+...[truncated]
+
+--- ragflow-docs/04-api/mcp-api.md ---
+# mcp_api.py Endpoints
+
+Source: `api/apps/restful_apis/mcp_api.py`
+
+## Route: `/mcp/servers`
+- **Methods:** GET
+- **Handler Function:** `detail()`
+
+- **Calls Services:**
+  - `MCPServerService`
+  - `TenantService`
+
+---
+
+
+--- ragflow-docs/04-api/stats-api.md ---
+# stats_api.py Endpoints
+
+Source: `api/apps/restful_apis/stats_api.py`
+
+## Route: `/system/stats`
+- **Methods:** GET
+- **Handler Function:** `stats()`
+
+- **Calls Services:**
+  - `UserTenantService`
+  - `API4ConversationService`
+
+---
+
+
+--- ragflow-docs/04-api/chat_channel-api.md ---
+# chat_channel_api.py Endpoints
+
+Source: `api/apps/restful_apis/chat_channel_api.py`
+
+## Route: `/chat-channels`
+- **Methods:** POST
+- **Handler Function:** `list_chat_channel()`
+
+- **Calls Services:**
+  - `DialogService`
+  - `ChatChannelService`
+
+---
+
+## Route: `/chat-channels/<channel_id>`
+- **Methods:** GET
+- **Handler Function:** `get_chat_channel()`
+
+- **Calls Services:**
+  - `DialogService`
+  - `ChatChannelService`
+
+---
+
+## Route: `/chat-channels/<channel_id>`
+- **Methods:** PATCH
+- **Hand
+...[truncated]
+
+--- ragflow-docs/04-api/chat-api.md ---
+# Chat & Dialogue Assistant API
+
+## Level 1: Endpoint Specification Overview
+
+The Chat & Dialogue Assistant APIs provide conversational RAG endpoints supporting multi-session dialogues and Server-Sent Events (SSE) streaming token output.
+
+---
+
+## Level 2: Comprehensive API Endpoints Specification
+
+### 1. Create / Update Dialogue Configuration
+- **Endpoint**: `POST /v1/api/dialog/set`
+- **Engine**: Python Quart (`api/apps/restful_apis/chat_api.py`)
+- **Auth Level**: JWT / API Key
+- **Request Payl
+...[truncated]
+
+--- ragflow-docs/04-api/agent-api.md ---
+# agent_api.py Endpoints
+
+Source: `api/apps/restful_apis/agent_api.py`
+
+## Route: `/agents/<agent_id>/sessions`
+- **Methods:** GET
+- **Handler Function:** `list_agent_sessions()`
+
+- **Calls Services:**
+  - `API4ConversationService`
+  - `UserCanvasService`
+
+---
+
+## Route: `/agents/<agent_id>/sessions`
+- **Methods:** POST
+- **Handler Function:** `get_agent_session()`
+
+- **Calls Services:**
+  - `API4ConversationService`
+  - `UserCanvasService`
+
+---
+
+## Route: `/agents/<agent_id>/sessions/<session_i
+...[truncated]
+
+--- ragflow-docs/04-api/langfuse-api.md ---
+# langfuse_api.py Endpoints
+
+Source: `api/apps/restful_apis/langfuse_api.py`
+
+## Route: `/langfuse/api-key`
+- **Methods:** POST,PUT
+- **Handler Function:** `get_api_key()`
+
+- **Calls Services:**
+  - `TenantLangfuseService`
+
+---
+
+## Route: `/langfuse/api-key`
+- **Methods:** DELETE
+- **Handler Function:** `delete_api_key()`
+
+- **Calls Services:**
+  - `TenantLangfuseService`
+
+---
+
+
+--- ragflow-docs/04-api/provider-api.md ---
+# provider_api.py Endpoints
+
+Source: `api/apps/restful_apis/provider_api.py`
+
+## Route: `/providers`
+- **Methods:** GET
+- **Handler Function:** `list_providers()`
+
+- **Calls Services:** None directly detected.
+
+---
+
+## Route: `/providers`
+- **Methods:** PUT
+- **Handler Function:** `show_provider()`
+
+- **Calls Services:** None directly detected.
+
+---
+
+## Route: `/providers/<provider_id_or_name>`
+- **Methods:** DELETE
+- **Handler Function:** `delete_provider()`
+
+- **Calls Services:** None directly
+...[truncated]
+
+--- ragflow-docs/04-api/document-api.md ---
+# document_api.py Endpoints
+
+Source: `api/apps/restful_apis/document_api.py`
+
+## Route: `/documents/upload`
+- **Methods:** POST
+- **Handler Function:** `list_docs()`
+
+- **Calls Services:** None directly detected.
+
+---
+
+## Route: `/datasets/<dataset_id>/documents`
+- **Methods:** DELETE
+- **Handler Function:** `list_thumbnails()`
+
+- **Calls Services:**
+  - `DocumentService`
+
+---
+
+## Route: `/datasets/<dataset_id>/documents/metadatas`
+- **Methods:** PATCH
+- **Handler Function:** `_run_sync()`
+
+- **
+...[truncated]
+
+--- ragflow-docs/04-api/api-call-flow.md ---
+# End-to-End API Call Flow
+
+## Level 1: System Call Sequence
+
+This document details end-to-end API request lifecycles across the Go Gin gateway and Python Quart ASGI application.
+
+---
+
+## Level 2: Comprehensive Sequence Diagrams
+
+### 1. User Authentication & JWT Issuance Call Flow
+
+```mermaid
+sequenceDiagram
+    participant Client as Frontend SPA / Client
+    participant Gin as Go Gin Engine (cmd/ragflow_server.go)
+    participant UserDAO as User DAO (internal/dao/user.go)
+    participant DB as 
+...[truncated]
+
+--- ragflow-docs/04-api/bot-api.md ---
+# bot_api.py Endpoints
+
+Source: `api/apps/restful_apis/bot_api.py`
+
+## Route: `/chatbots/<dialog_id>/completions`
+- **Methods:** POST
+- **Handler Function:** `_resolve_reference_metadata()`
+
+- **Calls Services:** None directly detected.
+
+---
+
+
+--- ragflow-docs/04-api/system-api.md ---
+# system_api.py Endpoints
+
+Source: `api/apps/restful_apis/system_api.py`
+
+## Route: `/system/ping`
+- **Methods:** GET
+- **Handler Function:** `version()`
+
+- **Calls Services:** None directly detected.
+
+---
+
+## Route: `/language`
+- **Methods:** GET
+- **Handler Function:** `language()`
+
+- **Calls Services:**
+  - `KnowledgebaseService`
+
+---
+
+## Route: `/system/status`
+- **Methods:** GET
+- **Handler Function:** `status()`
+
+- **Calls Services:**
+  - `KnowledgebaseService`
+
+---
+
+## Route: `/system/oce
+...[truncated]
+
+--- ragflow-docs/04-api/search-api.md ---
+# search_api.py Endpoints
+
+Source: `api/apps/restful_apis/search_api.py`
+
+## Route: `/searches`
+- **Methods:** POST
+- **Handler Function:** `list_searches()`
+
+- **Calls Services:**
+  - `UserTenantService`
+  - `SearchService`
+
+---
+
+## Route: `/searches/<search_id>`
+- **Methods:** GET
+- **Handler Function:** `detail()`
+
+- **Calls Services:**
+  - `UserTenantService`
+  - `SearchService`
+  - `TenantService`
+
+---
+
+## Route: `/searches/<search_id>`
+- **Methods:** PUT
+- **Handler Function:** `delete_sea
+...[truncated]
+
+--- ragflow-docs/04-api/plugin-api.md ---
+# plugin_api.py Endpoints
+
+Source: `api/apps/restful_apis/plugin_api.py`
+
+## Route: `/plugin/tools`
+- **Methods:** GET
+- **Handler Function:** `llm_tools()`
+
+- **Calls Services:** None directly detected.
+
+---
+
+
+--- ragflow-docs/04-api/authentication-api.md ---
+# Authentication & User Management API
+
+## Level 1: Endpoint Specification Overview
+
+The Authentication & User Management APIs handle user registration, credential login, password reset, captcha generation, tenant selection, and user profile retrieval.
+
+---
+
+## Level 2: Comprehensive API Endpoints Specification
+
+### 1. User Email Login
+- **Endpoint**: `POST /api/v1/auth/login`
+- **Engine**: Go Gin (`internal/handler/user.go`)
+- **Auth Level**: Unauthenticated
+- **Request Body**:
+  ```json
+  {
+  
+...[truncated]
+
+--- ragflow-docs/04-api/compilation_template-api.md ---
+# compilation_template_api.py Endpoints
+
+Source: `api/apps/restful_apis/compilation_template_api.py`
+
+## Route: `/compilation-templates/builtins`
+- **Methods:** GET
+- **Handler Function:** `list_builtin_templates()`
+
+- **Calls Services:**
+  - `CompilationTemplateService`
+
+---
+
+## Route: `/compilation-templates/wiki-presets`
+- **Methods:** GET
+- **Handler Function:** `list_wiki_presets()`
+
+- **Calls Services:**
+  - `CompilationTemplateService`
+
+---
+
+
+--- ragflow-docs/04-api/endpoint-catalog.md ---
+# Master API Endpoint Catalog
+
+## Level 1: Endpoint Catalog Overview
+
+This document presents the complete API Endpoint Catalog for RAGFlow, listing endpoints across both the **Go Gin Engine** and the **Python Quart ASGI Engine**, annotated with HTTP methods, route paths, underlying controllers/handlers, required parameters, authentication levels, and functional descriptions.
+
+---
+
+## Level 2: Comprehensive API Endpoint Table
+
+### 1. System & Authentication APIs
+
+| HTTP Method | Route Path | Engi
+...[truncated]
+
+--- ragflow-docs/04-api/connector-api.md ---
+# connector_api.py Endpoints
+
+Source: `api/apps/restful_apis/connector_api.py`
+
+## Route: `/connectors/<connector_id>`
+- **Methods:** PATCH
+- **Handler Function:** `list_connector()`
+
+- **Calls Services:**
+  - `SyncLogsService`
+  - `ConnectorService`
+
+---
+
+## Route: `/connectors/<connector_id>`
+- **Methods:** GET
+- **Handler Function:** `get_connector()`
+
+- **Calls Services:**
+  - `SyncLogsService`
+  - `ConnectorService`
+
+---
+
+## Route: `/connectors/<connector_id>/logs`
+- **Methods:** GET
+- **Ha
+...[truncated]
+
+--- ragflow-docs/04-api/models-api.md ---
+# models_api.py Endpoints
+
+Source: `api/apps/restful_apis/models_api.py`
+
+## Route: `/models`
+- **Methods:** GET
+- **Handler Function:** `get_added_models()`
+
+- **Calls Services:**
+  - `TenantService`
+
+---
+
+## Route: `/models/default`
+- **Methods:** GET
+- **Handler Function:** `get_default_models()`
+
+- **Calls Services:** None directly detected.
+
+---
+
+
+--- ragflow-docs/04-api/api-overview.md ---
+# REST API Layer Overview
+
+## Level 1: Conceptual Overview & Protocol Design
+
+The RAGFlow REST API layer exposes multi-tenant interfaces for client applications, web SPAs, SDKs, and Model Context Protocol (MCP) clients.
+
+### Key API Design Rules
+
+1. **Dual Routing Gateways**:
+   - Go Gin Engine ([`internal/router/router.go`](file:///home/logan78/Desktop/ragflow/internal/router/router.go#L141)): Serves user login, system config, search bots, MCP server endpoints, and document ingestion APIs. Resp
+...[truncated]
+
+--- ragflow-docs/04-api/workflow-api.md ---
+# Pipeline & Workflow API
+
+## Level 1: Endpoint Specification Overview
+
+The Pipeline & Workflow APIs provide public static metadata templates, pipeline operator definitions, and task status query capabilities.
+
+---
+
+## Level 2: Comprehensive API Endpoints Specification
+
+### 1. List Built-in Ingestion Pipelines
+- **Endpoint**: `GET /api/v1/pipelines`
+- **Engine**: Go Gin ([`internal/router/router.go:L170`](file:///home/logan78/Desktop/ragflow/internal/router/router.go#L170))
+- **Auth Level**: Una
+...[truncated]
+
+--- ragflow-docs/10-cache-and-queues/scheduling.md ---
+# Job Scheduling & Task Priorities
+
+## Level 1: Conceptual Overview
+
+Job Scheduling determines priority queuing order, task splitting, and page-range allocation for large multi-page PDF documents.
+
+---
+
+## Level 2: Implementation Details
+
+### Page Range Splitting Algorithm
+
+Implemented in `TaskService.create_task()` in [api/db/services/task_service.py](file:///home/logan78/Desktop/ragflow/api/db/services/task_service.py#L50):
+
+Large multi-page documents (e.g. 500-page PDF) are split into paralle
+...[truncated]
+
+--- ragflow-docs/10-cache-and-queues/redis.md ---
+# Redis Cache & Distributed Lock Infrastructure
+
+## Level 1: Conceptual Overview
+
+Redis acts as a key-value cache, stream message queue broker, distributed lock manager, and synonym dictionary cache in RAGFlow.
+
+---
+
+## Level 2: Implementation Details
+
+### Connection Adapter & Distributed Lock
+
+Implemented in [rag/utils/redis_conn.py](file:///home/logan78/Desktop/ragflow/rag/utils/redis_conn.py#L30-L150):
+
+```python
+class RedisDistributedLock:
+    def __init__(self, lock_key, timeout=60):
+      
+...[truncated]
+
+--- ragflow-docs/10-cache-and-queues/async-processing.md ---
+# Asynchronous Processing Engine
+
+## Level 1: Conceptual Overview
+
+The Asynchronous Processing Engine uses `asyncio` event loops paired with thread-pool executors to run non-blocking network I/O alongside heavy blocking compute workloads (C++ tokenizers, ONNX vision models).
+
+---
+
+## Level 2: Implementation Details
+
+### Thread Pool Offloading (`thread_pool_exec`)
+
+Implemented in `common/misc_utils.py` and heavily used in [rag/nlp/search.py](file:///home/logan78/Desktop/ragflow/rag/nlp/search.py#
+...[truncated]
+
+--- ragflow-docs/10-cache-and-queues/queues.md ---
+# Queue Infrastructure & Message Routing
+
+## Level 1: Conceptual Overview
+
+RAGFlow relies on Redis Streams as its primary distributed message queue system for offloading heavy document parsing, layout recognition, embedding generation, and Knowledge Graph extraction tasks from API HTTP threads to background worker pools.
+
+```mermaid
+flowchart TD
+    API[REST API Gateway / DocumentService] --> QueueGen[get_svr_queue_name]
+    
+    QueueGen -->|Priority 1| HighQ[te.1.common Stream Queue]
+    Queue
+...[truncated]
+
+--- ragflow-docs/10-cache-and-queues/background-jobs.md ---
+# Background Jobs Subsystem
+
+## Level 1: Conceptual Overview
+
+The Background Jobs Subsystem handles long-running async background operations such as RAPTOR summary tree construction, GraphRAG entity-relation extraction, MindMap generation, and memory sync.
+
+---
+
+## Level 2: Implementation Details
+
+### Pipeline Task Mapping
+
+Defined in [rag/svr/task_executor.py](file:///home/logan78/Desktop/ragflow/rag/svr/task_executor.py#L130-L160):
+
+```python
+TASK_TYPE_TO_PIPELINE_TASK_TYPE = {
+    "dataflow":
+...[truncated]
+
+--- ragflow-docs/10-cache-and-queues/workers.md ---
+# Background Worker Processing
+
+## Level 1: Conceptual Overview
+
+Background Workers are autonomous Python and Go processes executing ingestion pipelines. They manage process heartbeats, distributed locking, chunk batching, exception recovery, and Redis stream message acknowledgments (`XACK`).
+
+---
+
+## Level 2: Implementation Details
+
+### Worker Initialization & Heartbeats
+
+Implemented in [rag/svr/task_executor.py](file:///home/logan78/Desktop/ragflow/rag/svr/task_executor.py#L164-L180):
+
+```pyth
+...[truncated]
+
+--- ragflow-docs/20-security/authorization-security.md ---
+# Authorization Security & RBAC Multi-Tenancy Isolation
+
+## Level 1: Conceptual Explanation
+
+Authorization in RAGFlow enforces multi-tenant workspace isolation and role-based access control (RBAC). Every dataset, document, document chunk, chat agent, and workflow task is bound to a single `tenant_id`. Cross-tenant data leakage is prevented at the database service layer by explicitly appending `tenant_id = current_user.tenant_id` to every query filter.
+
+---
+
+## Level 2: Implementation Details
+
+##
+...[truncated]
+
+--- ragflow-docs/20-security/secrets.md ---
+# Secrets & Credentials Management
+
+## Level 1: Conceptual Explanation
+
+Secrets management ensures system credentials (database passwords, object store access keys, Redis passwords, encryption keys, and third-party LLM API keys) are stored securely, populated via environment variables, and never hardcoded in source repositories or emitted in log files.
+
+---
+
+## Level 2: Implementation Details
+
+### Configuration Secret Management
+
+1. **Environment Interpolation**: Production configuration values 
+...[truncated]
+
+--- ragflow-docs/20-security/authentication-security.md ---
+# Authentication Security & Tokens
+
+## Level 1: Conceptual Explanation
+
+RAGFlow supports three authentication schemes:
+1. **JWT Session Authentication (`AUTH_JWT`)**: Short-lived access tokens generated upon email/password login, passed in the `Authorization: Bearer <jwt>` HTTP header or session cookie.
+2. **API Keys (`AUTH_API`)**: Persistent developer API tokens (`ragflow-xxxx...`) mapped to specific tenant accounts for programmatic REST integrations.
+3. **Beta Tokens (`AUTH_BETA`)**: Legacy/b
+...[truncated]
+
+--- ragflow-docs/20-security/api-security.md ---
+# API Security & Protection
+
+## Level 1: Conceptual Explanation
+
+API Security protects RAGFlow HTTP endpoints from unauthorized access, rate-limiting abuse, injection attacks, CORS violations, and invalid parameter payloads.
+
+---
+
+## Level 2: Implementation Details
+
+### API Security Safeguards
+
+1. **Authentication Decorator Enforcement**: Every non-public API endpoint is protected with `@login_required` ([`api/apps/__init__.py#L235`](file:///home/logan78/Desktop/ragflow/api/apps/__init__.py#L235
+...[truncated]
+
+--- ragflow-docs/20-security/file-security.md ---
+# File Security & Unpickling Safety
+
+## Level 1: Conceptual Explanation
+
+File security in RAGFlow protects against three critical attack vectors:
+1. **Unpickling Remote Code Execution (RCE)**: Deserializing untrusted Python pickle objects can lead to arbitrary code execution. RAGFlow implements a strict custom unpickler (`RestrictedUnpickler`) to eliminate deserialization exploits.
+2. **File Upload & Path Traversal Safeguards**: Uploaded document files are validated, extension-checked, sanitized
+...[truncated]
+
+--- ragflow-docs/20-security/attack-surface.md ---
+# Attack Surface Analysis
+
+## Level 1: Conceptual Explanation
+
+An attack surface analysis evaluates potential vulnerability entry points across exposed network ports, external API routes, C/C++ native shared libraries, file upload handlers, and LLM prompt injection vectors.
+
+---
+
+## Level 2: Implementation Details
+
+### Threat Vector & Mitigation Matrix
+
+| Vector Domain | Threat Description | Attack Vector | Code Mitigation | Source Reference |
+| :--- | :--- | :--- | :--- | :--- |
+| **Deserializa
+...[truncated]
+
+--- ragflow-docs/20-security/security-overview.md ---
+# Security Overview
+
+## Level 1: Conceptual Explanation
+
+RAGFlow implements defense-in-depth security principles across API transport, user authentication, multi-tenant workspace isolation, access control (RBAC), code execution sandboxing, secrets management, and safe object deserialization (unpickling protection).
+
+### Key Security Layers
+1. **Authentication & Identity**: Dual-mechanism auth supporting JWT session tokens, persistent API Keys (`ragflow-xxxx`), and OAuth2 SSO integrations.
+2. **M
+...[truncated]
+
+--- ragflow-docs/06-document-processing/layout-analysis.md ---
+# Document Layout Analysis (DLA)
+
+## Level 1: Conceptual Overview
+
+Document Layout Analysis (DLA) is the core computer vision component in DeepDoc. It processes document page images and predicts bounding box regions labeled with structural semantic categories: Title, Text, Figure, Figure Caption, Table, Table Caption, Header, Footer, Reference, and Equation.
+
+---
+
+## Level 2: Implementation Details
+
+### Model Architecture & Labels
+
+Implemented in [deepdoc/vision/layout_recognizer.py](file:///hom
+...[truncated]
+
+--- ragflow-docs/06-document-processing/images.md ---
+# Images Processing Subsystem
+
+## Level 1: Conceptual Overview
+
+The Images Processing subsystem extracts, crops, captions, and embeds visual elements (photos, diagrams, flowcharts, infographics, plots) found in documents.
+
+---
+
+## Level 2: Implementation Details
+
+### VLM Captioning & Image Deduplication
+
+Implemented in [rag/app/picture.py](file:///home/logan78/Desktop/ragflow/rag/app/picture.py#L20) and `rag/utils/base64_image.py`.
+
+1. **Image Hashing**: Generates unique visual image ID using `i
+...[truncated]
+
+--- ragflow-docs/06-document-processing/chunking-strategies.md ---
+# Chunking Strategies Reference
+
+## Level 1: Conceptual Overview
+
+RAGFlow provides domain-specific chunking strategies tuned for different document formats, layout structures, and downstream RAG application requirements.
+
+---
+
+## Level 2: Implementation Details
+
+### Configuration Options (`parser_config`)
+
+Configured per dataset or document in `Document.parser_config` JSON field in [api/db/db_models.py](file:///home/logan78/Desktop/ragflow/api/db/db_models.py#L894):
+
+```json
+{
+  "pages": [[1, 10
+...[truncated]
+
+--- ragflow-docs/06-document-processing/parsers.md ---
+# Document Parsers
+
+Source: `deepdoc/parser/`
+
+- **json_parser.py**: Handles parsing logic for specific file format.
+- **ppt_parser.py**: Handles parsing logic for specific file format.
+- **opendataloader_parser.py**: Handles parsing logic for specific file format.
+- **epub_parser.py**: Handles parsing logic for specific file format.
+- **tcadp_parser.py**: Handles parsing logic for specific file format.
+- **paddleocr_parser.py**: Handles parsing logic for specific file format.
+- **excel_parser.p
+...[truncated]
+
+--- ragflow-docs/06-document-processing/ocr.md ---
+# Optical Character Recognition (OCR) Engine
+
+## Level 1: Conceptual Overview
+
+The OCR engine extracts character text sequences and character bounding boxes from document page images when native text layers are missing, corrupted, or formatted as scanned bitmaps.
+
+---
+
+## Level 2: Implementation Details
+
+### Engine Architecture
+
+Implemented in [deepdoc/vision/ocr.py](file:///home/logan78/Desktop/ragflow/deepdoc/vision/ocr.py#L25) and C++/ONNX bindings.
+
+```mermaid
+flowchart LR
+    PageImage[Page
+...[truncated]
+
+--- ragflow-docs/06-document-processing/office-documents.md ---
+# Office Documents Subsystem
+
+## Level 1: Conceptual Overview
+
+The Office Documents subsystem parses DOCX (Microsoft Word), XLSX (Microsoft Excel), and PPTX (Microsoft PowerPoint) files into structured text blocks, tables, and embedded images while preserving document structure.
+
+---
+
+## Level 2: Implementation Details
+
+### Parser Implementations
+
+1. **DOCX Parsing (`docx_parser.py`)**:
+   - Python: [deepdoc/parser/docx_parser.py](file:///home/logan78/Desktop/ragflow/deepdoc/parser/docx_parser.p
+...[truncated]
+
+--- ragflow-docs/06-document-processing/document-processing-workers.md ---
+# Document Processing Workers Architecture
+
+## Level 1: Conceptual Overview
+
+Document Processing Workers are asynchronous background execution units that poll Redis queues, deserialize document task messages, invoke DeepDoc vision models and domain chunkers, encode vector embeddings, and write results to DocStore database engines.
+
+---
+
+## Level 2: Implementation Details
+
+### Worker Process Loop & Concurrency Limiters
+
+Worker entry point: [rag/svr/task_executor.py](file:///home/logan78/Desktop/r
+...[truncated]
+
+--- ragflow-docs/06-document-processing/upload.md ---
+# Document Upload Subsystem
+
+## Level 1: Conceptual Overview
+
+The Document Upload subsystem accepts user file submissions via REST endpoints (`/api/v1/documents/upload`), validates MIME types and file extensions, checks quota limits, computes content hashes, writes binary streams to object storage, and initializes metadata DB rows (`File`, `Document`, `File2Document`).
+
+---
+
+## Level 2: Implementation Details
+
+### Upload Route & Controller Flow
+
+
+```mermaid
+flowchart TD
+    Request[POST /api/v1/
+...[truncated]
+
+--- ragflow-docs/06-document-processing/document-lifecycle.md ---
+# Document Processing Lifecycle
+
+## Level 1: Conceptual Overview
+
+The Document Lifecycle tracks a file from initial upload through storage, parsing, visual layout analysis, chunking, indexing, and eventual deletion. The document transitions through strict state machine phases backed by relational database tables (`Document`, `Task`, `File`) and distributed Redis state notifications.
+
+```mermaid
+stateDiagram-v2
+    [*] --> UPLOADED: User Upload (api/apps/restful_apis/document_api.py)
+    UPLOADED
+...[truncated]
+
+--- ragflow-docs/06-document-processing/tables.md ---
+# Table Structure Recognition (TSR)
+
+## Level 1: Conceptual Overview
+
+Table Structure Recognition (TSR) reconstructs 2D grid matrix relationships (rows, columns, spanning cells, headers) from visual table images, converting tables into structured HTML strings.
+
+---
+
+## Level 2: Implementation Details
+
+### Table Structure Recognition Pipeline
+
+Implemented in [deepdoc/vision/table_structure_recognizer.py](file:///home/logan78/Desktop/ragflow/deepdoc/vision/table_structure_recognizer.py#L40) and [d
+...[truncated]
+
+--- ragflow-docs/06-document-processing/pdf-processing.md ---
+# PDF Processing Pipeline
+
+## Level 1: Conceptual Overview
+
+PDF Processing is the core pipeline of DeepDoc. PDFs present complex challenges: non-linear reading orders, multi-column layouts, embedded raster images, vector line tables, missing text layers (scanned documents), and complex equations.
+
+---
+
+## Level 2: Implementation Details
+
+### Pipeline Execution Steps
+
+Implemented in [deepdoc/parser/pdf_parser.py](file:///home/logan78/Desktop/ragflow/deepdoc/parser/pdf_parser.py#L35) and [internal
+...[truncated]
+
+--- ragflow-docs/06-document-processing/file-storage.md ---
+# File Storage Abstraction
+
+## Level 1: Conceptual Overview
+
+The File Storage abstraction encapsulates underlying cloud and local blob storage engines behind a uniform key-value interface (`get`, `put`, `rm`, `bucket_exists`). This isolates document parsing and embedding workers from specific cloud providers (MinIO, AWS S3, Google Cloud Storage, Alibaba Cloud OSS, local filesystem).
+
+---
+
+## Level 2: Implementation Details
+
+### Storage Interface & Factory
+
+Implemented in Python (`rag/utils/stora
+...[truncated]
+
+--- ragflow-docs/02-frontend/directory-structure.md ---
+# Frontend Directory Structure
+
+## Level 1: Workspace Organization
+
+The `web/` directory contains the full frontend workspace, including package configuration, build scripts, asset pipelines, and source files under `web/src/`.
+
+---
+
+## Level 2: Complete `web/src/` Source Tree
+
+```
+web/src/
+├── app.tsx                         # Root React application wrapper & i18n mounting
+├── routes.tsx                      # React Router 7 route definitions & lazy loading logic
+├── assets/                     
+...[truncated]
+
+--- ragflow-docs/02-frontend/authentication.md ---
+# Frontend Authentication Flow
+
+## Level 1: Auth Architecture & Session Lifecycle
+
+The RAGFlow web frontend supports multiple authentication mechanisms:
+
+1. **Email & Password Authentication**: Standard form login `/auth/login` and registration `/users`.
+2. **Third-Party OAuth2 / OIDC**: Single-Click login with GitHub, Google, or Enterprise OpenID Connect (OIDC).
+3. **Session & Local Token Persistence**: Upon successful authentication, the server returns an access token which is stored in browse
+...[truncated]
+
+--- ragflow-docs/02-frontend/knowledge-base-ui.md ---
+# Knowledge Base UI Studio
+
+## Level 1: Dataset Management Capabilities
+
+The Knowledge Base (Dataset) Studio allows users to manage document collections, configure parsing methods, inspect chunk extraction quality, run hybrid vector search tests, and edit metadata.
+
+---
+
+## Level 2: Component Hierarchy & Source Map
+
+```
+web/src/pages/datasets/ & dataset/
+├── Datasets Gallery (pages/datasets/index.tsx)
+│   ├── Create Dataset Modal (components/create-dataset-dialog)
+│   └── Dataset Card Grid (data
+...[truncated]
+
+--- ragflow-docs/02-frontend/frontend-data-flow.md ---
+# Frontend Data Flow
+
+## Level 1: End-to-End User Interaction Flow
+
+This document details the lifecycle of data moving through the frontend single-page application—from raw user input down through React components, Zustand state stores, Axios API wrappers, Server-Sent Events (SSE) channels, and back into rendered DOM elements.
+
+---
+
+## Level 2: Comprehensive Interaction Sequence Diagrams
+
+### 1. Document Upload & Chunking Flow
+
+```mermaid
+sequenceDiagram
+    participant User as User Browser
+    
+...[truncated]
+
+--- ragflow-docs/02-frontend/routing.md ---
+# Frontend Routing Architecture
+
+## Level 1: Route Mechanics & Lazy Loading
+
+RAGFlow frontend uses **React Router v7** (`createBrowserRouter`) defined in [`web/src/routes.tsx`](file:///home/logan78/Desktop/ragflow/web/src/routes.tsx#L28).
+
+The routing system provides:
+1. **Dynamic Code Splitting**: Route components are dynamically imported using `withLazyRoute` ([`web/src/routes.tsx:L112`](file:///home/logan78/Desktop/ragflow/web/src/routes.tsx#L112)), loading JavaScript chunks on demand to mini
+...[truncated]
+
+--- ragflow-docs/02-frontend/workflow-ui.md ---
+# Workflow & Pipeline UI
+
+## Level 1: Dataflow & Pipeline Execution
+
+The Workflow UI provides visual layout elements for defining data pipelines, compilation templates, and task monitoring across data ingestion and pipeline operators.
+
+---
+
+## Level 2: Component Breakdown & Source Links
+
+### Key Subsystems
+
+1. **Compilation Templates Studio** (`/compilation-templates`): Interfaces for selecting, creating, and editing compilation pipeline templates.
+   - Source: [`web/src/pages/dataset/compilatio
+...[truncated]
+
+--- ragflow-docs/02-frontend/components.md ---
+# Reusable Frontend Components
+
+## Level 1: Component Subsystem Architecture
+
+The reusable UI component library is located under [`web/src/components/`](file:///home/logan78/Desktop/ragflow/web/src/components). It provides standardized interface widgets for document parsing, LLM parameter configuration, markdown rendering, canvas node controls, and modal dialogs.
+
+---
+
+## Level 2: Component Catalog & File Map
+
+### 1. Document & Parsing Components
+
+| Component Name | Source Folder | Purpose & Fea
+...[truncated]
+
+--- ragflow-docs/02-frontend/chat-ui.md ---
+# Chat UI Playground
+
+## Level 1: Interactive Chat Experience
+
+The Chat UI Playground ([`web/src/pages/next-chats/`](file:///home/logan78/Desktop/ragflow/web/src/pages/next-chats)) provides a multi-session conversational interface with Large Language Models grounded in knowledge base datasets.
+
+---
+
+## Level 2: Component Architecture & Source Links
+
+```mermaid
+graph TD
+    ChatPage["Chat Playground Page (pages/next-chats/index.tsx)"] --> Sidebar["Dialogue Sessions Sidebar"]
+    ChatPage --> Acti
+...[truncated]
+
+--- ragflow-docs/02-frontend/state-management.md ---
+# State Management
+
+## Level 1: Multi-Tier State Strategy
+
+RAGFlow frontend uses a tiered state management approach:
+
+1. **Global Store State (Zustand)**: Persistent application state (user profile, authentication tokens, global language, dark/light theme, active dataset settings, active model credentials).
+2. **Server Async State (Custom React Hooks)**: Asynchronous server state fetching, caching, invalidation, and background polling ([`web/src/hooks/`](file:///home/logan78/Desktop/ragflow/web/
+...[truncated]
+
+--- ragflow-docs/02-frontend/agent-ui.md ---
+# Agent Canvas UI
+
+## Level 1: Visual Workflow Editor
+
+The Agent Canvas UI ([`web/src/pages/agent/canvas/index.tsx`](file:///home/logan78/Desktop/ragflow/web/src/pages/agent/canvas/index.tsx)) is a drag-and-drop workflow editor built on top of `@xyflow/react` (React Flow v12). It empowers developers to visually assemble, configure, debug, and execute complex agent graphs.
+
+---
+
+## Level 2: Component Architecture & Source Map
+
+```mermaid
+graph TD
+    CanvasPage["Agent Canvas Page (pages/agent/can
+...[truncated]
+
+--- ragflow-docs/02-frontend/frontend-architecture.md ---
+# Frontend Architecture
+
+## Level 1: Conceptual System Architecture
+
+The frontend architecture follows modern component-driven SPA paradigms. It leverages React 18 for concurrent UI rendering, React Router 7 for route matching and code-splitting, Zustand for store state, TailwindCSS for styling, and custom TanStack React Query / Axios hooks for asynchronous data synchronization.
+
+---
+
+## Level 2: Architectural Layers & Source Map
+
+```
++------------------------------------------------------------
+...[truncated]
+
+--- ragflow-docs/02-frontend/api-client.md ---
+# API Client Architecture
+
+## Level 1: HTTP Client & Interceptor Mechanics
+
+The RAGFlow frontend relies on an Axios-based HTTP client wrapper located in [`web/src/utils/authorization-util.ts`](file:///home/logan78/Desktop/ragflow/web/src/utils/authorization-util.ts) and [`web/src/services/`](file:///home/logan78/Desktop/ragflow/web/src/services).
+
+### Key Responsibilities
+
+1. **Token Injection**: Automatically injects `Authorization: Bearer <access_token>` header into every outgoing HTTP request
+...[truncated]
+
+--- ragflow-docs/02-frontend/document-upload-ui.md ---
+# Document Upload & Parser UI
+
+## Level 1: Document Processing Workflow
+
+The Document Upload and Parsing UI provides a guided step-by-step pipeline for importing multi-format documents into RAGFlow knowledge bases.
+
+---
+
+## Level 2: Component Breakdown & Source Links
+
+### 1. Document Upload Dialog ([`components/file-upload-dialog`](file:///home/logan78/Desktop/ragflow/web/src/components/file-upload-dialog))
+- Drag-and-drop file upload container supporting PDF, DOCX, PPTX, XLSX, TXT, MD, CSV, JPG
+...[truncated]
+
+--- ragflow-docs/02-frontend/pages.md ---
+# Frontend Pages
+
+Source: `web/src/pages/`
+
+- **document-viewer**: `web/src/pages/document-viewer`
+- **dataset**: `web/src/pages/dataset`
+- **home**: `web/src/pages/home`
+- **admin**: `web/src/pages/admin`
+- **chunk**: `web/src/pages/chunk`
+- **files**: `web/src/pages/files`
+- **agent**: `web/src/pages/agent`
+- **dataflow-result**: `web/src/pages/dataflow-result`
+- **login-next**: `web/src/pages/login-next`
+- **next-search**: `web/src/pages/next-search`
+- **next-searches**: `web/src/pages/next-s
+...[truncated]
+
+--- ragflow-docs/02-frontend/frontend-overview.md ---
+# Frontend Overview
+
+## Level 1: Design Philosophy & User Experience
+
+The RAGFlow Web Frontend is an enterprise-grade Single-Page Application (SPA) designed for operational efficiency, rapid visual workflow creation, deep knowledge base management, real-time chat testing, and multi-tenant administration.
+
+### Primary UI Pillars
+
+1. **Knowledge Base (Dataset) Studio**: Interface for creating datasets, uploading multi-format files, configuring parser options (General, Q&A, Paper, Manual, Law, Tabl
+...[truncated]

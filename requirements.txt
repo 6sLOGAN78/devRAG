@@ -1,6 +1,12 @@
 quart
 peewee
 pymysql
-hypercorn\npytest\nruff\nquart-cors\nhttpx
+hypercorn
+pytest
+ruff
+quart-cors
+httpx
 pytest-asyncio
-PyJWT\nredis
+PyJWT
+redis
+pydantic
