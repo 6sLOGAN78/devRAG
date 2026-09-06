@@ -26,3 +26,7 @@
      - Updated `LLMNode.execute` to fallback to `user_default_llm` for the API key and model factory if a tenant key is not provided.
      - *Next Step*: Implement the `TenantLLM` MySQL table, Go API endpoints for users to manage their keys, and update `LLMNode` to fetch the tenant's API key before falling back to the system default.
    - *Status*: Fallback configuration aligned with RAGFlow. TenantLLM implementation pending.
+
+## Resolved Gaps
+1. **[P0] Missing Tenant API Key Management (TenantLLM)**
+   - *Fix*: Created the `TenantLLM` database model and `GET`/`POST`/`DELETE` API endpoints in Go. Patched the Python `LLMNode` execution logic to securely query `TenantLLM` via Peewee and inject the configured credentials into `litellm` before falling back to the system default. Added full isolation test to prove that tenants cannot access or use other tenants' API keys.

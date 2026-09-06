@@ -2,6 +2,7 @@ import logging
 from typing import Any, Dict, Optional
 import litellm
 from jinja2.sandbox import SandboxedEnvironment
+from api.db.db_models import TenantLLM
 from jinja2 import StrictUndefined, TemplateError
 
 from .base import AgentNode
@@ -57,21 +58,55 @@ class LLMNode(AgentNode):
         if not messages:
             raise ValueError(f"Node {self.id} generated empty prompt messages")
             
-        # Load user_default_llm configuration
-        cfg = load_config("conf/service_conf.yaml")
-        chat_cfg = cfg.user_default_llm.default_models.chat_model
-        # Fallback to configured default if model is not set or we want to use defaults
+        tenant_id = resolved_inputs.get("__tenant_id__")
+        tenant_llm = None
+        
         actual_model = self.model
-        if chat_cfg.name and ("/" not in actual_model):
-            actual_model = f"{chat_cfg.factory}/{chat_cfg.name}"
+        factory = ""
+        model_name = self.model
+        if "/" in self.model:
+            factory, model_name = self.model.split("/", 1)
+
+        # 1. Try to find TenantLLM matching this exact factory/model
+        if tenant_id and factory and model_name:
+            try:
+                tenant_llm = TenantLLM.select().where((TenantLLM.tenant_id == tenant_id) & (TenantLLM.llm_factory == factory) & (TenantLLM.llm_name == model_name)).first()
+            except Exception:
+                pass
+        
+        # 2. Try to find ANY TenantLLM for this tenant if the model is just a factory name or we just want their default
+        # (For MVP we can just let them use their specific key, but let's see if we can find any key for this factory)
+        if tenant_id and factory and not tenant_llm:
+            try:
+                tenant_llm = TenantLLM.select().where((TenantLLM.tenant_id == tenant_id) & (TenantLLM.llm_factory == factory)).first()
+            except Exception:
+                pass
 
         litellm_kwargs = {
             "model": actual_model,
-            "api_key": chat_cfg.api_key if chat_cfg.api_key else None,
-            "api_base": chat_cfg.base_url if chat_cfg.base_url else None,
             "messages": messages,
             "stream": self.stream,
         }
+
+        # 3. Fallback to system default if no tenant LLM found
+        if tenant_llm and tenant_llm.api_key:
+            litellm_kwargs["api_key"] = tenant_llm.api_key
+            if tenant_llm.api_base:
+                litellm_kwargs["api_base"] = tenant_llm.api_base
+        else:
+            # Fallback to configured default
+            cfg = load_config("conf/service_conf.yaml")
+            chat_cfg = cfg.user_default_llm.default_models.chat_model
+            
+            if chat_cfg.name and ("/" not in actual_model):
+                actual_model = f"{chat_cfg.factory}/{chat_cfg.name}"
+                litellm_kwargs["model"] = actual_model
+                
+            if chat_cfg.api_key:
+                litellm_kwargs["api_key"] = chat_cfg.api_key
+            if chat_cfg.base_url:
+                litellm_kwargs["api_base"] = chat_cfg.base_url
+
         
         if self.temperature is not None:
             litellm_kwargs["temperature"] = self.temperature

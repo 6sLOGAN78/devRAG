@@ -148,3 +148,18 @@ type ChatMessage struct {
 func (ChatMessage) TableName() string {
 	return "chat_message"
 }
+
+type TenantLLM struct {
+	ID        string    `gorm:"column:id;type:varchar(36);primaryKey"`
+	TenantID  string    `gorm:"column:tenant_id;type:varchar(36);not null;index:idx_tenant_llm,unique"`
+	Factory   string    `gorm:"column:llm_factory;type:varchar(128);not null;index:idx_tenant_llm,unique"`
+	Name      string    `gorm:"column:llm_name;type:varchar(128);not null;index:idx_tenant_llm,unique"`
+	APIKey    string    `gorm:"column:api_key;type:text"`
+	APIBase   string    `gorm:"column:api_base;type:varchar(255)"`
+	CreatedAt time.Time `gorm:"column:created_at;autoCreateTime"`
+	UpdatedAt time.Time `gorm:"column:updated_at;autoUpdateTime"`
+}
+
+func (TenantLLM) TableName() string {
+	return "tenant_llm"
+}

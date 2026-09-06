@@ -4,6 +4,7 @@ from .connection import db
 
 class BaseModel(Model):
     class Meta:
+        primary_key = False
         database = db
 
 class Tenant(BaseModel):
@@ -13,6 +14,7 @@ class Tenant(BaseModel):
     created_at = DateTimeField(default=datetime.datetime.now)
     
     class Meta:
+        primary_key = False
         table_name = 'tenant'
 
 class User(BaseModel):
@@ -22,6 +24,7 @@ class User(BaseModel):
     nickname = CharField(max_length=255, null=True)
     
     class Meta:
+        primary_key = False
         table_name = 'user'
 
 class UserTenant(BaseModel):
@@ -30,6 +33,7 @@ class UserTenant(BaseModel):
     role = CharField(max_length=255, null=False) # Enum validation handled at service layer typically, or we can enforce constraints
     
     class Meta:
+        primary_key = False
         table_name = 'user_tenant'
         indexes = (
             (('user_id', 'tenant_id'), True), # Unique constraint
@@ -46,6 +50,7 @@ class Dataset(BaseModel):
     updated_at = DateTimeField(default=datetime.datetime.now)
 
     class Meta:
+        primary_key = False
         table_name = 'dataset'
 
 class Document(BaseModel):
@@ -62,6 +67,7 @@ class Document(BaseModel):
     updated_at = DateTimeField(default=datetime.datetime.now)
 
     class Meta:
+        primary_key = False
         table_name = 'document'
 
 class DocumentTask(BaseModel):
@@ -75,6 +81,7 @@ class DocumentTask(BaseModel):
     updated_at = DateTimeField(default=datetime.datetime.now)
 
     class Meta:
+        primary_key = False
         table_name = 'document_task'
         indexes = (
             (('document_id',), False),
@@ -97,6 +104,7 @@ class DocumentChunk(BaseModel):
     updated_at = DateTimeField(default=datetime.datetime.now)
 
     class Meta:
+        primary_key = False
         table_name = 'document_chunk'
         indexes = (
             (('document_id', 'chunk_index'), False),
@@ -115,6 +123,7 @@ class AgentCanvas(BaseModel):
     updated_at = DateTimeField(default=datetime.datetime.now)
 
     class Meta:
+        primary_key = False
         table_name = 'agent_canvas'
         indexes = (
             (('tenant_id',), False),
@@ -131,6 +140,7 @@ class ChatSession(BaseModel):
     updated_at = DateTimeField(default=datetime.datetime.now)
 
     class Meta:
+        primary_key = False
         table_name = 'chat_session'
         indexes = (
             (('user_id', 'tenant_id'), False),
@@ -147,7 +157,25 @@ class ChatMessage(BaseModel):
     updated_at = DateTimeField(default=datetime.datetime.now)
 
     class Meta:
+        primary_key = False
         table_name = 'chat_message'
         indexes = (
             (('session_id', 'tenant_id'), False),
+        )
+
+class TenantLLM(BaseModel):
+    id = CharField(max_length=36, primary_key=True)
+    tenant_id = CharField(max_length=36, null=False)
+    llm_factory = CharField(max_length=128, null=False)
+    llm_name = CharField(max_length=128, null=False)
+    api_key = TextField(null=True)
+    api_base = CharField(max_length=255, null=True)
+    created_at = DateTimeField(default=datetime.datetime.now)
+    updated_at = DateTimeField(default=datetime.datetime.now)
+
+    class Meta:
+        primary_key = False
+        table_name = 'tenant_llm'
+        indexes = (
+            (('tenant_id', 'llm_factory', 'llm_name'), True),
         )

@@ -73,6 +73,13 @@ func InitRouter(cfg *config.Config) *gin.Engine {
 			agent.GET("/canvas/:id", handler.GetCanvas)
 		}
 
+		tenant := authV1.Group("/tenant")
+		{
+			tenant.GET("/llm", handler.ListTenantLLMs)
+			tenant.POST("/llm", handler.UpdateTenantLLM)
+			tenant.DELETE("/llm/:id", handler.DeleteTenantLLM)
+		}
+
 		chat := authV1.Group("/chat")
 		{
 			chat.POST("/session", handler.CreateChatSession)
