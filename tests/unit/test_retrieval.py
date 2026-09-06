@@ -70,10 +70,14 @@ def test_tie_breaking(retrieval_service):
     assert fused[1].chunk_id == "c1"
 
 @patch('rag.nlp.retrieval.EmbeddingEngine')
-def test_hybrid_search_flow(mock_engine_class, mock_vector_store, retrieval_service):
+@patch('rag.nlp.retrieval.RerankEngine')
+def test_hybrid_search_flow(mock_rerank_engine_class, mock_engine_class, mock_vector_store, retrieval_service):
     mock_engine = MagicMock()
     mock_engine.embed.return_value = [[0.1]*384]
     mock_engine_class.return_value = mock_engine
+    
+    mock_rerank_engine = MagicMock()
+    mock_rerank_engine_class.return_value = mock_rerank_engine
     
     mock_vector_store.search.return_value = [
         SearchResult(id="c1", document_id="d1", dataset_id="ds1", content="test", score=0.9)
@@ -81,6 +85,9 @@ def test_hybrid_search_flow(mock_engine_class, mock_vector_store, retrieval_serv
     mock_vector_store.search_lexical.return_value = [
         SearchResult(id="c2", document_id="d1", dataset_id="ds1", content="test2", score=10.0)
     ]
+    
+    # Reranker returns scores matching the fused chunks
+    mock_rerank_engine.rerank_scores.return_value = [0.99, 0.88]
     
     results = retrieval_service.search("ds1", "hello", top_k=5, filters={"tenant_id": "t1"})
     

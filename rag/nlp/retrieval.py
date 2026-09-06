@@ -5,6 +5,7 @@ import concurrent.futures
 
 from rag.vector_store.base import BaseVectorStore, SearchResult
 from rag.nlp.embedding import EmbeddingEngine, EmbeddingConfig
+from rag.nlp.rerank import RerankEngine, RerankConfig
 
 logger = logging.getLogger(__name__)
 
@@ -19,20 +20,28 @@ class RetrievedChunk:
     lexical_rank: int = -1
     dense_score: float = 0.0
     lexical_score: float = 0.0
+    rerank_rank: int = -1
+    rerank_score: float = 0.0
     retrieval_method: str = ""
     metadata: Dict[str, Any] = field(default_factory=dict)
 
 class RetrievalService:
     def __init__(self, vector_store: BaseVectorStore):
         self.vector_store = vector_store
+        # We can cache engines at service level to avoid repeatedly loading weights for local models
+        self._rerank_engines = {}
 
     def _get_embedding_config(self, dataset_id: str) -> EmbeddingConfig:
-        # Resolves dataset embedding configuration.
-        # Fallback aligns with 06-03 architecture assumptions.
         return EmbeddingConfig(
             provider="huggingface",
             model="all-MiniLM-L6-v2",
             dimension=384
+        )
+        
+    def _get_rerank_config(self, dataset_id: str) -> RerankConfig:
+        return RerankConfig(
+            provider="huggingface",
+            model="cross-encoder/ms-marco-MiniLM-L-6-v2"
         )
         
     def search(
@@ -42,10 +51,12 @@ class RetrievalService:
         top_k: int = 10,
         filters: Optional[Dict[str, Any]] = None,
         rrf_k: int = 60,
-        candidate_multiplier: int = 3
+        candidate_multiplier: int = 3,
+        rerank_enabled: bool = True
     ) -> List[RetrievedChunk]:
         """
-        Executes hybrid retrieval combining dense and lexical search with RRF fusion.
+        Executes hybrid retrieval combining dense and lexical search with RRF fusion,
+        followed by Cross-Encoder reranking of the top candidates.
         """
         if not query or not query.strip():
             return []
@@ -53,7 +64,7 @@ class RetrievalService:
         index_name = f"idx_{dataset_id.replace('-', '_')}"
         config = self._get_embedding_config(dataset_id)
         
-        # Fetch more candidates than top_k for better fusion coverage
+        # Candidate pool size bounds the expensive reranking step
         candidate_k = top_k * candidate_multiplier
         
         dense_results: List[SearchResult] = []
@@ -79,18 +90,55 @@ class RetrievalService:
                 logger.warning(f"Lexical search failed or unsupported: {e}. Falling back to dense only.")
                 return []
 
-        # Run concurrently to minimize latency (lexical doesn't wait for embedding generation)
+        # Concurrently fetch dense and lexical candidate sets
         with concurrent.futures.ThreadPoolExecutor(max_workers=2) as executor:
             future_dense = executor.submit(run_dense)
             future_lexical = executor.submit(run_lexical)
             
-            # Dense is strictly required. If it fails, bubble up the error.
+            # Dense is required; let exception bubble up
             dense_results = future_dense.result()
-            
-            # Lexical is optional and may gracefully degrade if the backend lacks FTS
             lexical_results = future_lexical.result()
         
-        return self._fuse_results(dense_results, lexical_results, rrf_k, top_k)
+        # Merge candidates and apply RRF
+        fused = self._fuse_results(dense_results, lexical_results, rrf_k, candidate_k)
+        
+        if not fused:
+            return []
+            
+        # Optional Cross-Encoder Reranking Phase
+        if rerank_enabled:
+            rerank_config = self._get_rerank_config(dataset_id)
+            if rerank_config.model not in self._rerank_engines:
+                self._rerank_engines[rerank_config.model] = RerankEngine(rerank_config)
+                
+            engine = self._rerank_engines[rerank_config.model]
+            
+            try:
+                texts = [c.content for c in fused]
+                scores = engine.rerank_scores(query, texts)
+                
+                if len(scores) != len(fused):
+                    raise ValueError(f"Reranker returned {len(scores)} scores for {len(fused)} chunks")
+                    
+                for i, chunk in enumerate(fused):
+                    chunk.rerank_score = float(scores[i])
+                    
+                # Deterministic Re-sort: Rerank Score > Original Fused Score > Chunk ID
+                fused.sort(key=lambda x: (
+                    -x.rerank_score,
+                    -x.score,
+                    x.chunk_id
+                ))
+                
+                # Assign rerank ranks
+                for rank, chunk in enumerate(fused):
+                    chunk.rerank_rank = rank + 1
+                    
+            except Exception as e:
+                logger.error(f"Reranking failed: {e}. Falling back to Hybrid Fusion ranking.")
+                # Fallback implicitly leaves the array sorted by RRF since we haven't re-sorted yet
+                
+        return fused[:top_k]
 
     def _fuse_results(
         self, 
@@ -102,7 +150,6 @@ class RetrievalService:
         
         chunk_map: Dict[str, RetrievedChunk] = {}
         
-        # 1. Process Dense Results
         for rank, res in enumerate(dense_results):
             chunk_map[res.id] = RetrievedChunk(
                 chunk_id=res.id,
@@ -115,10 +162,8 @@ class RetrievalService:
                 retrieval_method="dense",
                 metadata=res.metadata or {}
             )
-            # Add RRF score contribution
             chunk_map[res.id].score += 1.0 / (rrf_k + chunk_map[res.id].dense_rank)
             
-        # 2. Process Lexical Results
         for rank, res in enumerate(lexical_results):
             if res.id not in chunk_map:
                 chunk_map[res.id] = RetrievedChunk(
@@ -136,16 +181,10 @@ class RetrievalService:
             chunk = chunk_map[res.id]
             chunk.lexical_rank = rank + 1
             chunk.lexical_score = res.score
-            # Add RRF score contribution
             chunk.score += 1.0 / (rrf_k + chunk.lexical_rank)
             
         fused = list(chunk_map.values())
         
-        # 3. Deterministic Tie-breaking
-        # primary: RRF score descending
-        # secondary: lexical rank ascending (lower is better, absent=999999)
-        # tertiary: dense rank ascending
-        # quaternary: chunk_id (stable identifier)
         fused.sort(key=lambda x: (
             -x.score,
             x.lexical_rank if x.lexical_rank > 0 else 999999,
