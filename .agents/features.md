@@ -5,3 +5,8 @@ This file tracks the design and behavior of features implemented by agents in th
 - Established strict directory boundaries for Go (`internal/`, `cmd/`) and Python (`api/`, `rag/`, `deepdoc/`).
 - Scaffolded React SPA frontend in `web/` using Vite.
 - Initialized package managers (`go mod`, `npm`, `requirements.txt`) and linter configs (`ruff`, `golangci-lint`).
+## Phase 02: Production Infrastructure
+- Set up `docker-compose-base.yml` with MySQL 8.0, Valkey 8, NATS 2.10, MinIO, Infinity v0.3.0, and Nginx.
+- Configured `.env` variables for credentials, avoiding git commits of secrets.
+- Implemented health checks, persistent volumes, and a unified Docker network (`ragflow-network`).
+- Created infrastructure test suite validating container startup and health endpoints.

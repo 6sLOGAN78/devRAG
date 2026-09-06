@@ -1,0 +1,114 @@
+name: devrag
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-rag_flow}
+      MYSQL_USER: ${MYSQL_USER:-ragflow}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-ragflow}
+    volumes:
+      - ./volumes/mysql:/var/lib/mysql
+      - ./init/mysql:/docker-entrypoint-initdb.d
+    ports:
+      - "13306:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD:-root}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - ragflow-network
+
+  redis:
+    image: valkey/valkey:8
+    container_name: redis
+    ports:
+      - "16379:6379"
+    volumes:
+      - ./volumes/redis:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - ragflow-network
+
+  minio:
+    image: minio/minio:RELEASE.2023-11-20T22-40-07Z
+    container_name: minio
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_USER:-admin}
+      MINIO_ROOT_PASSWORD: ${MINIO_PASSWORD:-password}
+    ports:
+      - "19000:9000"
+      - "19001:9001"
+    volumes:
+      - ./volumes/minio:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - ragflow-network
+
+  nats:
+    image: nats:2.10-alpine
+    container_name: nats
+    command: -js
+    ports:
+      - "14222:4222"
+      - "18222:8222"
+    volumes:
+      - ./volumes/nats:/data
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8222/healthz"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - ragflow-network
+
+  infinity:
+    image: infiniflow/infinity:v0.3.0
+    container_name: infinity
+    ports:
+      - "23817:23817"
+    volumes:
+      - ./volumes/infinity:/var/infinity
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:23817/admin/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - ragflow-network
+
+  nginx:
+    image: nginx:1.25-alpine
+    container_name: nginx
+    ports:
+      - "8080:80"
+      - "8443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - mysql
+      - redis
+      - minio
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost/health"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - ragflow-network
+
+networks:
+  ragflow-network:
+    driver: bridge
