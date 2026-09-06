@@ -39,6 +39,3 @@
 
 ## Next Subphase
 05-04 frontend progress UI
-
-## Redis Distributed Lock
-As required, `RedisDistributedLock` was implemented in `common/redis_conn.py` to synchronize distributed tasks (such as progress updates, GraphRAG indexing, and dataset modifications) across instances, ensuring concurrency correctness in Python workers outside of DB transactions.
