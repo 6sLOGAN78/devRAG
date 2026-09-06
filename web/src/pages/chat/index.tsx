@@ -2,12 +2,23 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useChatSessions, useCreateChatSession, useChatHistory } from '../../hooks/use-chat';
 import type { ChatMessage as IChatMessage } from '../../hooks/use-chat';
 import { useSendMessage } from '../../hooks/use-send-message';
+
+import { MarkdownContent } from '../../components/markdown-content';
+import { CitationViewer } from '../../components/citation-viewer';
 import { MessageInput } from '../../components/message-input';
 import { MessageSquare, Plus, Loader2, User, Bot, AlertCircle } from 'lucide-react';
 
-const ChatBubble = ({ message, isStreaming }: { message: IChatMessage; isStreaming?: boolean }) => {
+const ChatBubble = ({ message, isStreaming, onCitationClick }: { message: IChatMessage; isStreaming?: boolean; onCitationClick?: (index: number) => void }) => {
   const isUser = message.role === 'user';
   
+  // Parse citations if string
+  let citationsData = null;
+  if (message.citations) {
+    try {
+      citationsData = typeof message.citations === 'string' ? JSON.parse(message.citations) : message.citations;
+    } catch(e) { }
+  }
+
   return (
     <div className={`flex w-full ${isUser ? 'justify-end' : 'justify-start'} mb-6`}>
       <div className={`flex max-w-[80%] ${isUser ? 'flex-row-reverse' : 'flex-row'} gap-4`}>
@@ -16,12 +27,16 @@ const ChatBubble = ({ message, isStreaming }: { message: IChatMessage; isStreami
             {isUser ? <User className="w-5 h-5" /> : <Bot className="w-5 h-5" />}
           </div>
         </div>
-        <div className={`flex flex-col ${isUser ? 'items-end' : 'items-start'}`}>
+        <div className={`flex flex-col ${isUser ? 'items-end' : 'items-start'} min-w-0 w-full`}>
           <span className="text-sm text-gray-500 mb-1 px-1">
             {isUser ? 'You' : 'Assistant'}
           </span>
-          <div className={`p-4 rounded-2xl ${isUser ? 'bg-blue-600 text-white rounded-tr-none' : 'bg-gray-100 text-gray-800 rounded-tl-none'} shadow-sm whitespace-pre-wrap break-words`}>
-            {message.content}
+          <div className={`p-4 rounded-2xl ${isUser ? 'bg-blue-600 text-white rounded-tr-none' : 'bg-gray-100 text-gray-800 rounded-tl-none'} shadow-sm whitespace-pre-wrap break-words w-full overflow-hidden`}>
+            {isUser ? (
+              message.content
+            ) : (
+              <MarkdownContent content={message.content} citations={citationsData} onCitationClick={onCitationClick} />
+            )}
             {isStreaming && <span className="ml-1 animate-pulse inline-block w-2 h-4 bg-gray-500 align-middle"></span>}
           </div>
         </div>
@@ -41,8 +56,24 @@ export const ChatPage = () => {
     sessionId: activeSessionId || '' 
   });
 
-  const scrollRef = useRef<HTMLDivElement>(null);
+const scrollRef = useRef<HTMLDivElement>(null);
   const [autoScroll, setAutoScroll] = useState(true);
+  
+  const [selectedCitationIndex, setSelectedCitationIndex] = useState<number | null>(null);
+  const [selectedCitationData, setSelectedCitationData] = useState<any>(null);
+  const [isCitationViewerOpen, setIsCitationViewerOpen] = useState(false);
+
+  const handleCitationClick = (msgCitations: any, index: number) => {
+    let parsed = msgCitations;
+    if (typeof parsed === 'string') {
+      try { parsed = JSON.parse(parsed); } catch(e) {}
+    }
+    if (parsed && parsed[index]) {
+      setSelectedCitationData(parsed[index]);
+      setSelectedCitationIndex(index);
+      setIsCitationViewerOpen(true);
+    }
+  };
 
   // Default select first session
   useEffect(() => {
@@ -157,7 +188,7 @@ export const ChatPage = () => {
               ) : (
                 <div className="max-w-4xl mx-auto w-full flex flex-col">
                   {history?.map(msg => (
-                    <ChatBubble key={msg.id} message={msg} />
+                    <ChatBubble key={msg.id} message={msg} onCitationClick={(idx) => handleCitationClick(msg.citations, idx)} />
                   ))}
                   
                   {isStreaming && (
@@ -195,9 +226,16 @@ export const ChatPage = () => {
                 disabled={!activeSessionId || isLoadingHistory}
               />
             </div>
-          </>
+</>
         )}
       </main>
+
+      <CitationViewer 
+        isOpen={isCitationViewerOpen} 
+        onClose={() => setIsCitationViewerOpen(false)} 
+        citation={selectedCitationData} 
+        citationIndex={selectedCitationIndex} 
+      />
     </div>
   );
 };

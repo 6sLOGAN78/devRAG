@@ -76,14 +76,20 @@ class RetrievalNode(AgentNode):
             source = chunk.metadata.get("source", chunk.document_id)
             context_parts.append(f"--- CHUNK {i+1} ---\n[Source: {source}]\n{chunk.content}")
             
-            chunks_data.append({
+            chunk_info = {
                 "chunk_id": chunk.chunk_id,
                 "document_id": chunk.document_id,
                 "score": chunk.score,
                 "rerank_score": getattr(chunk, 'rerank_score', 0.0),
                 "content": chunk.content,
                 "source": source
-            })
+            }
+            if "page" in chunk.metadata:
+                chunk_info["page"] = chunk.metadata["page"]
+            if "bbox" in chunk.metadata:
+                chunk_info["bbox"] = chunk.metadata["bbox"]
+                
+            chunks_data.append(chunk_info)
             
         context_string = "\n\n".join(context_parts)
         
