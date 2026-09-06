@@ -15,6 +15,7 @@ import '@xyflow/react/dist/style.css';
 
 import { NodePalette } from './palette';
 import { customNodeTypes } from './custom-nodes';
+import { ConfigDrawer } from './config-drawer';
 
 let id = 0;
 const getId = () => `dndnode_${id++}`;
@@ -100,6 +101,7 @@ export const CanvasPage = () => {
       <ReactFlowProvider>
         <NodePalette />
         <CanvasArea />
+        <ConfigDrawer />
       </ReactFlowProvider>
     </div>
   );

@@ -94,12 +94,14 @@ const OutputHandle = ({ id = 'output', top = '50%' }: { id?: string, top?: strin
 // ==========================================
 
 export const LLMNodeUI = memo((props: NodeProps) => {
+  const data = props.data as CanvasNodeData;
+  const config = data.config as any;
   return (
     <CustomNodeBase {...props} icon={<Bot className="w-4 h-4 text-purple-600" />} title="LLM">
       <InputHandle />
       <div className="space-y-1">
         <p className="text-gray-500 font-medium">Text Generation</p>
-        <p className="text-gray-400 italic">Configuration pending...</p>
+        <p className="text-gray-400 italic text-xs">{config?.model || 'No model selected'}</p>
       </div>
       <OutputHandle />
     </CustomNodeBase>
@@ -107,12 +109,15 @@ export const LLMNodeUI = memo((props: NodeProps) => {
 });
 
 export const RetrievalNodeUI = memo((props: NodeProps) => {
+  const data = props.data as CanvasNodeData;
+  const config = data.config as any;
+  const datasetCount = config?.datasets?.length || 0;
   return (
     <CustomNodeBase {...props} icon={<Database className="w-4 h-4 text-blue-600" />} title="Retrieval">
       <InputHandle />
       <div className="space-y-1">
         <p className="text-gray-500 font-medium">Hybrid Search</p>
-        <p className="text-gray-400 italic">No dataset selected</p>
+        <p className="text-gray-400 italic text-xs">{datasetCount === 0 ? 'No datasets' : `${datasetCount} dataset(s)`}</p>
       </div>
       <OutputHandle />
     </CustomNodeBase>
@@ -120,11 +125,14 @@ export const RetrievalNodeUI = memo((props: NodeProps) => {
 });
 
 export const CodeNodeUI = memo((props: NodeProps) => {
+  const data = props.data as CanvasNodeData;
+  const config = data.config as any;
   return (
     <CustomNodeBase {...props} icon={<Code className="w-4 h-4 text-green-600" />} title="Code">
       <InputHandle />
       <div className="space-y-1">
         <p className="text-gray-500 font-medium">Python Transform</p>
+        <p className="text-gray-400 italic text-xs truncate">{config?.code ? 'Code configured' : 'No code'}</p>
       </div>
       <OutputHandle />
     </CustomNodeBase>
@@ -132,27 +140,27 @@ export const CodeNodeUI = memo((props: NodeProps) => {
 });
 
 export const SwitchNodeUI = memo((props: NodeProps) => {
-  // Switch outputs: true, false, default for basic scaffolding
-  // In Phase 07, SwitchNode evaluates an expression and returns a route.
+  const data = props.data as CanvasNodeData;
+  const config = data.config as any;
+  
+  const conditions = config?.conditions || [];
+  const defaultRoute = config?.default_route || 'default';
+
   return (
     <CustomNodeBase {...props} icon={<GitBranch className="w-4 h-4 text-orange-600" />} title="Switch">
       <InputHandle />
       <div className="space-y-4">
         <p className="text-gray-500 font-medium mb-2">Condition Evaluation</p>
-        
-        {/* Branch handles */}
         <div className="relative flex flex-col space-y-4 text-right pr-2">
+          {conditions.map((c: any, i: number) => (
+            <div className="relative" key={`cond-${i}`}>
+              <span className="text-gray-600 font-mono text-xs">{c.route || `route_${i}`}</span>
+              <OutputHandle id={c.route || `route_${i}`} top="50%" />
+            </div>
+          ))}
           <div className="relative">
-            <span className="text-gray-600 font-mono">true</span>
-            <OutputHandle id="true" top="50%" />
-          </div>
-          <div className="relative">
-            <span className="text-gray-600 font-mono">false</span>
-            <OutputHandle id="false" top="50%" />
-          </div>
-          <div className="relative">
-            <span className="text-gray-600 font-mono">default</span>
-            <OutputHandle id="default" top="50%" />
+            <span className="text-gray-600 font-mono text-xs">{defaultRoute}</span>
+            <OutputHandle id={defaultRoute} top="50%" />
           </div>
         </div>
       </div>
@@ -162,7 +170,11 @@ export const SwitchNodeUI = memo((props: NodeProps) => {
 
 export const CategorizeNodeUI = memo((props: NodeProps) => {
   const data = props.data as CanvasNodeData;
-  const categories = data.routes && data.routes.length > 0 ? data.routes : ['cat_1', 'cat_2'];
+  const config = data.config as any;
+  
+  const categories = config?.categories && config.categories.length > 0 
+    ? config.categories 
+    : ['category_1', 'category_2'];
   
   return (
     <CustomNodeBase {...props} icon={<ListTree className="w-4 h-4 text-teal-600" />} title="Categorize">
@@ -170,9 +182,9 @@ export const CategorizeNodeUI = memo((props: NodeProps) => {
       <div className="space-y-4">
         <p className="text-gray-500 font-medium mb-2">LLM Classification</p>
         <div className="relative flex flex-col space-y-4 text-right pr-2">
-          {categories.map((cat, idx) => (
+          {categories.map((cat: string, idx: number) => (
             <div className="relative" key={idx}>
-              <span className="text-gray-600 font-mono">{cat}</span>
+              <span className="text-gray-600 font-mono text-xs">{cat}</span>
               <OutputHandle id={cat} top="50%" />
             </div>
           ))}
