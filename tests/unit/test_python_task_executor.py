@@ -33,8 +33,10 @@ def client(app):
     return app.test_client()
 
 @patch('api.services.storage_service.storage_service.download_file')
+@patch('common.redis_conn.RedisDistributedLock')
 @pytest.mark.asyncio
-async def test_parse_document_api(mock_download, client):
+async def test_parse_document_api(mock_lock, mock_download, client):
+    mock_lock.return_value.__enter__.return_value = True
     # Setup test data
     doc = Document.create(
         id="doc-123",

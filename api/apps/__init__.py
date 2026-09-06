@@ -19,6 +19,12 @@ def create_app():
     # Setup CORS
     app = cors(app, allow_origin="*")
 
+    @app.before_serving
+    async def startup():
+        import asyncio
+        from api.services.executor_cleaner import clean_task_executor_loop
+        asyncio.create_task(clean_task_executor_loop())
+
     @app.before_request
     async def log_request_info():
         from quart import request

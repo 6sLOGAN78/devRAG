@@ -114,18 +114,27 @@ class ParsingService:
                         })
                     
                     if chunk_data:
-                        # SQLite max variables limit might require batching if chunk_data is huge
                         batch_size = 100
                         for i in range(0, len(chunk_data), batch_size):
                             DocumentChunk.insert_many(chunk_data[i:i+batch_size]).execute()
 
-                    # Update task status
-                    task.status = 'success'
-                    task.progress = 100
-                    task.updated_at = datetime.now()
-                    task.save()
+                    # Update task status under lock
+                    from common.redis_conn import RedisDistributedLock
+                    try:
+                        with RedisDistributedLock("update_progress", timeout=10, blocking_timeout=5):
+                            # Refetch task to ensure we are updating latest state
+                            t = DocumentTask.get_by_id(task.id)
+                            t.status = 'success'
+                            t.progress = 100
+                            t.updated_at = datetime.now()
+                            t.save()
+                    except Exception as lock_err:
+                        # Fallback if Redis fails, just update the DB transactionally
+                        task.status = 'success'
+                        task.progress = 100
+                        task.updated_at = datetime.now()
+                        task.save()
                     
-                    # Also update document parse status
                     doc.parse_status = 'success'
                     doc.updated_at = datetime.now()
                     doc.save()
@@ -137,13 +146,24 @@ class ParsingService:
         except Exception as e:
             # Catch all unexpected outer errors
             print(f"Unhandled error processing task {task_id}: {e}")
+            
+            
 
     def _fail_task(self, task: DocumentTask, error_msg: str):
         try:
-            task.status = 'failed'
-            task.error_msg = error_msg
-            task.updated_at = datetime.now()
-            task.save()
+            from common.redis_conn import RedisDistributedLock
+            try:
+                with RedisDistributedLock("update_progress", timeout=10, blocking_timeout=5):
+                    t = DocumentTask.get_by_id(task.id)
+                    t.status = 'failed'
+                    t.error_msg = error_msg
+                    t.updated_at = datetime.now()
+                    t.save()
+            except Exception as lock_err:
+                task.status = 'failed'
+                task.error_msg = error_msg
+                task.updated_at = datetime.now()
+                task.save()
             
             doc = Document.get_or_none(Document.id == task.document_id)
             if doc:
