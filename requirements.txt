@@ -11,3 +11,4 @@ PyJWT
 redis
 pydantic
 paddlepaddle\npaddleocr\nopencv-python-headless
+infinity-sdk
