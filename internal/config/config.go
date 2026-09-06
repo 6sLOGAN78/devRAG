@@ -16,6 +16,13 @@ type Config struct {
 	NATS     NATSConfig     `yaml:"nats" json:"nats"`
 	RAGFlow  RAGFlowConfig  `yaml:"ragflow" json:"ragflow"`
 	Auth     AuthConfig     `yaml:"auth" json:"auth"`
+	Syncer   SyncerConfig   `yaml:"syncer" json:"syncer"`
+}
+
+type SyncerConfig struct {
+	PollIntervalSec int `yaml:"poll_interval_sec" json:"poll_interval_sec"`
+	BatchSize       int `yaml:"batch_size" json:"batch_size"`
+	MaxInFlight     int `yaml:"max_in_flight" json:"max_in_flight"`
 }
 
 type MySQLConfig struct {
@@ -153,6 +160,16 @@ func validate(c *Config) error {
 	}
 	if c.Auth.SessionTTLMinutes <= 0 {
 		return fmt.Errorf("auth.session_ttl_minutes must be > 0")
+	}
+
+	if c.Syncer.PollIntervalSec <= 0 {
+		c.Syncer.PollIntervalSec = 5 // default 5 seconds
+	}
+	if c.Syncer.BatchSize <= 0 {
+		c.Syncer.BatchSize = 10 // default batch size
+	}
+	if c.Syncer.MaxInFlight <= 0 {
+		c.Syncer.MaxInFlight = 50 // default concurrency
 	}
 
 	return nil
