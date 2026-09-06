@@ -11,7 +11,7 @@ PyJWT
 redis
 pydantic
 paddlepaddle\npaddleocr\nopencv-python-headless
-infinity-sdk
+infinity-sdk==0.3.0
 litellm
 tenacity
 sentence-transformers

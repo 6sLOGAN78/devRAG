@@ -17,14 +17,15 @@ class InfinityAdapter(BaseVectorStore):
 
     def _initialize_client(self):
         try:
+            from infinity.common import NetworkAddress
             cfg = load_config('conf/service_conf.yaml')
             # Assuming infinity running on the given host/port
-            uri = f"{cfg.infinity.host}:{cfg.infinity.port}"
+            uri = NetworkAddress(cfg.infinity.host, cfg.infinity.port)
             self.client = infinity.connect(uri)
             # Create database if not exists
             self.client.create_database(self.db_name, ConflictType.Ignore)
             self._db = self.client.get_database(self.db_name)
-            logger.info(f"Connected to Infinity at {uri}, database: {self.db_name}")
+            logger.info(f"Connected to Infinity at {cfg.infinity.host}:{cfg.infinity.port}, database: {self.db_name}")
         except Exception as e:
             logger.error(f"Failed to initialize Infinity client: {e}")
             raise
@@ -113,7 +114,8 @@ class InfinityAdapter(BaseVectorStore):
             
             # Build search query
             # We match the embedding column using cosine distance
-            q = table.output(["id", "document_id", "dataset_id", "content", "_score"])
+            # In Infinity 0.3.0, SCORE() fails with match_dense. We'll add it back when upgrading or fusing.
+            q = table.output(["id", "document_id", "dataset_id", "content"])
             
             if filters:
                 # Basic string filtering example: "document_id = 'doc1'"
@@ -137,7 +139,7 @@ class InfinityAdapter(BaseVectorStore):
                     document_id=row["document_id"],
                     dataset_id=row["dataset_id"],
                     content=row["content"],
-                    score=row["_score"],
+                    score=0.0, # Placeholder until retrieval phase
                     metadata={}
                 ))
             return results
