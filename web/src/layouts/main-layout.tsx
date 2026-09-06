@@ -1,6 +1,6 @@
 import { Outlet, NavLink, useNavigate, useLocation } from 'react-router';
 import { useAuthStore } from '../stores/auth-store';
-import { Home, FileText, Database, MessageSquare, Settings, LogOut, Bot } from 'lucide-react';
+import { Home, FileText, Database, MessageSquare, Settings, LogOut, Bot, ShieldCheck } from 'lucide-react';
 
 export const MainLayout = () => {
   const { user, logout, isHydrating } = useAuthStore();
@@ -54,6 +54,16 @@ export const MainLayout = () => {
         </nav>
 
         <div className="p-4 border-t space-y-1">
+          {(user?.role === 'admin' || user?.role === 'owner') && (
+            <button
+              onClick={() => navigate('/admin')}
+              className="flex items-center space-x-3 px-4 py-3 w-full text-left rounded-lg text-blue-600 hover:bg-blue-50 transition-colors"
+            >
+              <ShieldCheck className="w-5 h-5" />
+              <span>Administration</span>
+            </button>
+          )}
+
           <button
             onClick={() => {}}
             className="flex items-center space-x-3 px-4 py-3 w-full text-left rounded-lg text-gray-600 hover:bg-gray-50 transition-colors"

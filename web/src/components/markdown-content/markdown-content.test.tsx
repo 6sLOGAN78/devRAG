@@ -1,7 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import { MarkdownContent } from './index';
-import React from 'react';
 
 describe('MarkdownContent Rendering', () => {
   it('renders standard markdown (headings, bold, italics)', () => {

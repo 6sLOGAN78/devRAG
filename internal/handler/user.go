@@ -33,10 +33,12 @@ func GetUserInfo(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"id":        user.ID,
-		"email":     user.Email,
-		"nickname":  user.Nickname,
-		"tenant_id": tenantID,
-		"role":      c.GetString("role"),
+		"user": gin.H{
+			"id":        user.ID,
+			"email":     user.Email,
+			"nickname":  user.Nickname,
+			"tenant_id": tenantID,
+			"role":      c.GetString("role"),
+		},
 	})
 }

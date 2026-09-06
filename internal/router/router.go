@@ -38,6 +38,15 @@ func InitRouter(cfg *config.Config) *gin.Engine {
 	authV1.Use(middleware.Auth(cfg))
 	authV1.Use(middleware.RateLimit(cfg, logger))
 	{
+		admin := authV1.Group("/admin")
+		admin.Use(middleware.RequireAdmin())
+		{
+			admin.GET("/stats", handler.AdminGetStats)
+			admin.GET("/users", handler.AdminListUsers)
+			admin.PATCH("/users/:id/role", handler.AdminUpdateUserRole)
+			admin.DELETE("/users/:id", handler.AdminRemoveUser)
+		}
+
 		userAuth := authV1.Group("/user")
 		{
 			userAuth.GET("/info", handler.GetUserInfo)

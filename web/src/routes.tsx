@@ -9,6 +9,11 @@ import { ProtectedRoute } from './components/ProtectedRoute';
 import { DatasetListPage } from './pages/datasets';
 import { DatasetDetailPage } from './pages/datasets/detail';
 import { ChatPage } from './pages/chat';
+import { AdminGuard } from './components/AdminGuard';
+import { AdminLayout } from './pages/admin/layout';
+import { AdminOverview } from './pages/admin/index';
+import { AdminUsers } from './pages/admin/users';
+
 
 export const AppRoutes = () => {
   return (
@@ -24,6 +29,13 @@ export const AppRoutes = () => {
         <Route path="/datasets" element={<DatasetListPage />} />
         <Route path="/datasets/:datasetId" element={<DatasetDetailPage />} />
         
+        
+        {/* Admin Routes */}
+        <Route path="/admin" element={<AdminGuard><AdminLayout /></AdminGuard>}>
+          <Route index element={<AdminOverview />} />
+          <Route path="users" element={<AdminUsers />} />
+        </Route>
+
         {/* Placeholders for future routes */}
         <Route path="/documents" element={<div className="p-4 bg-white shadow rounded-lg">Documents (Coming Soon)</div>} />
         <Route path="/chat" element={<ChatPage />} />

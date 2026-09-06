@@ -32,9 +32,11 @@ type LoginReq struct {
 
 type LoginRes struct {
 	Token    string `json:"token"`
-	UserID   string `json:"user_id"`
+	ID       string `json:"id"`
 	Email    string `json:"email"`
 	Nickname string `json:"nickname"`
+	TenantID string `json:"tenant_id"`
+	Role     string `json:"role"`
 }
 
 func Register(req RegisterReq) error {
@@ -87,10 +89,14 @@ func Login(ctx context.Context, req LoginReq, cfg *config.Config) (*LoginRes, er
 		return nil, err
 	}
 
+	tenantID, role, _ := ResolveTenantContext(user.ID, "")
+
 	return &LoginRes{
 		Token:    token,
-		UserID:   user.ID,
+		ID:       user.ID,
 		Email:    user.Email,
 		Nickname: user.Nickname,
+		TenantID: tenantID,
+		Role:     role,
 	}, nil
 }
