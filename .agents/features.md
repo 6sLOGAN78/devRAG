@@ -16,3 +16,9 @@ This file tracks the design and behavior of features implemented by agents in th
 - Implemented `internal/config/config.go` with strict JSON tags and `gopkg.in/yaml.v3` parsing.
 - Implemented `common/settings.py` leveraging `pyyaml` and strict `pydantic` structural validation.
 - Verified full validation suite including missing fields, type errors, invalid ports, and overrides.
+## Phase 04: Core Database Models & Dual-ORM Synchronization
+- Defined schema contracts for `Tenant`, `User`, and `UserTenant`.
+- Implemented `internal/dao/models.go` with strict GORM annotations.
+- Implemented `api/db/db_models.py` matching exactly to the Go schema using Peewee.
+- Configured pooled database connections in both Go (`internal/dao/db.go`) and Python (`api/db/connection.py`).
+- Added integration test suite to verify cross-language read/write compatibility and strict constraints.

@@ -17,3 +17,6 @@ This file tracks the implementation progress of features and tasks in devRAG.
 - Created strict Go (yaml.v3) and Python (Pydantic) parsers.
 - Bound them to `conf/service_conf.yaml`.
 - Verified 1:1 cross-language matching via automated CLI test suites.
+## Phase 04: Core Database Models
+- Dual-ORM (GORM + Peewee) setup mapped identically to the same tables (`tenant`, `user`, `user_tenant`).
+- Enforced multi-tenancy foundation and cross-language compatibility.
