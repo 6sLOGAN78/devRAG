@@ -1,4 +1,4 @@
-from peewee import Model, CharField, DateTimeField
+from peewee import Model, CharField, DateTimeField, TextField, IntegerField
 import datetime
 from .connection import db
 
@@ -63,3 +63,42 @@ class Document(BaseModel):
 
     class Meta:
         table_name = 'document'
+
+class DocumentTask(BaseModel):
+    id = CharField(max_length=36, primary_key=True)
+    document_id = CharField(max_length=36, null=False)
+    tenant_id = CharField(max_length=36, null=False)
+    status = CharField(max_length=50, null=False, default='unstart')
+    progress = IntegerField(default=0)
+    error_msg = TextField(null=True)
+    created_at = DateTimeField(default=datetime.datetime.now)
+    updated_at = DateTimeField(default=datetime.datetime.now)
+
+    class Meta:
+        table_name = 'document_task'
+        indexes = (
+            (('document_id',), False),
+            (('tenant_id',), False),
+        )
+
+class DocumentChunk(BaseModel):
+    id = CharField(max_length=36, primary_key=True)
+    document_id = CharField(max_length=36, null=False)
+    tenant_id = CharField(max_length=36, null=False)
+    content = TextField(null=False)
+    chunk_index = IntegerField(null=False)
+    content_type = CharField(max_length=50, null=False, default='text')
+    page_numbers = TextField(null=True) # JSON array of ints
+    source_regions = TextField(null=True) # JSON array of regions
+    source_block_ids = TextField(null=True) # JSON array of strings
+    metadata = TextField(null=True) # JSON object
+    token_count = IntegerField(default=0)
+    created_at = DateTimeField(default=datetime.datetime.now)
+    updated_at = DateTimeField(default=datetime.datetime.now)
+
+    class Meta:
+        table_name = 'document_chunk'
+        indexes = (
+            (('document_id', 'chunk_index'), False),
+            (('tenant_id',), False),
+        )

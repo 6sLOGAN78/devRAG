@@ -22,7 +22,7 @@ func main() {
 	defer dao.CloseDB()
 
 	// AutoMigrate tables for development
-	dao.DB.AutoMigrate(&dao.Tenant{}, &dao.User{}, &dao.UserTenant{}, &dao.Dataset{}, &dao.Document{})
+	dao.DB.AutoMigrate(&dao.User{}, &dao.Tenant{}, &dao.UserTenant{}, &dao.Dataset{}, &dao.Document{}, &dao.DocumentTask{}, &dao.DocumentChunk{})
 
 	if err := dao.InitRedis(cfg); err != nil {
 		log.Fatalf("Failed to initialize Redis: %v", err)

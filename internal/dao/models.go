@@ -68,3 +68,38 @@ type Document struct {
 func (Document) TableName() string {
 	return "document"
 }
+
+type DocumentTask struct {
+	ID         string    `gorm:"column:id;type:varchar(36);primaryKey"`
+	DocumentID string    `gorm:"column:document_id;type:varchar(36);not null;index"`
+	TenantID   string    `gorm:"column:tenant_id;type:varchar(36);not null;index"`
+	Status     string    `gorm:"column:status;type:varchar(50);not null;default:'unstart'"`
+	Progress   int       `gorm:"column:progress;not null;default:0"`
+	ErrorMsg   string    `gorm:"column:error_msg;type:text"`
+	CreatedAt  time.Time `gorm:"column:created_at;autoCreateTime"`
+	UpdatedAt  time.Time `gorm:"column:updated_at;autoUpdateTime"`
+}
+
+func (DocumentTask) TableName() string {
+	return "document_task"
+}
+
+type DocumentChunk struct {
+	ID               string    `gorm:"column:id;type:varchar(36);primaryKey"`
+	DocumentID       string    `gorm:"column:document_id;type:varchar(36);not null;index:idx_doc_chunk"`
+	TenantID         string    `gorm:"column:tenant_id;type:varchar(36);not null;index"`
+	Content          string    `gorm:"column:content;type:longtext;not null"`
+	ChunkIndex       int       `gorm:"column:chunk_index;not null;index:idx_doc_chunk"`
+	ContentType      string    `gorm:"column:content_type;type:varchar(50);not null;default:'text'"`
+	PageNumbers      string    `gorm:"column:page_numbers;type:json"`
+	SourceRegions    string    `gorm:"column:source_regions;type:json"`
+	SourceBlockIDs   string    `gorm:"column:source_block_ids;type:json"`
+	Metadata         string    `gorm:"column:metadata;type:json"`
+	TokenCount       int       `gorm:"column:token_count;not null;default:0"`
+	CreatedAt        time.Time `gorm:"column:created_at;autoCreateTime"`
+	UpdatedAt        time.Time `gorm:"column:updated_at;autoUpdateTime"`
+}
+
+func (DocumentChunk) TableName() string {
+	return "document_chunk"
+}

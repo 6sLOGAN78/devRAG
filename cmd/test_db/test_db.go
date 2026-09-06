@@ -20,7 +20,7 @@ func main() {
 	}
 
 	// Auto Migrate
-	err = dao.DB.AutoMigrate(&dao.Tenant{}, &dao.User{}, &dao.UserTenant{})
+	err = dao.DB.AutoMigrate(&dao.User{}, &dao.Tenant{}, &dao.UserTenant{}, &dao.Dataset{}, &dao.Document{}, &dao.DocumentTask{}, &dao.DocumentChunk{})
 	if err != nil {
 		log.Fatal("AutoMigrate failed: ", err)
 	}

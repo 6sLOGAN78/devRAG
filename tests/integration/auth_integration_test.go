@@ -40,7 +40,7 @@ func setupTestApp(t *testing.T) (*config.Config, *http.ServeMux) {
 		t.Skipf("Skipping integration test, DB not available: %v", err)
 	}
 
-	dao.DB.AutoMigrate(&dao.User{}, &dao.Tenant{}, &dao.UserTenant{})
+	dao.DB.AutoMigrate(&dao.User{}, &dao.Tenant{}, &dao.UserTenant{}, &dao.Dataset{}, &dao.Document{}, &dao.DocumentTask{}, &dao.DocumentChunk{})
 	dao.DB.Where("1 = 1").Delete(&dao.UserTenant{})
 	dao.DB.Where("1 = 1").Delete(&dao.Tenant{})
 	dao.DB.Where("1 = 1").Delete(&dao.User{})
