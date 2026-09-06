@@ -8,7 +8,14 @@ from pathlib import Path
 from ..models import TableStructure, TableRow, TableCell, TextBlock
 from ..errors import ParsingFailureError, InvalidInputError
 
-class TableStructureRecognizer:
+import abc
+
+class BaseTableStructureRecognizer(abc.ABC):
+    @abc.abstractmethod
+    def extract(self, image_path: Path) -> list[TableStructure]:
+        pass
+
+class HFTableStructureRecognizer(BaseTableStructureRecognizer):
     def __init__(self, model_path: str = "microsoft/table-transformer-structure-recognition", cache_dir: str = "assets/table", confidence_threshold: float = 0.5, device: str = "cpu"):
         self.threshold = confidence_threshold
         self.device = device
@@ -218,3 +225,27 @@ class TableStructureRecognizer:
             rows=table_rows,
             columns=len(cols)
         )
+
+
+class DeepDocONNXTSR(BaseTableStructureRecognizer):
+    def __init__(self):
+        pass
+
+    def extract(self, image_path: Path) -> list[TableStructure]:
+        import logging
+        logging.getLogger(__name__).warning("DeepDocONNXTSR invoked but weights not downloaded. Returning empty.")
+        return []
+
+def get_tsr_model() -> BaseTableStructureRecognizer:
+    try:
+        import os
+        from common.settings import load_config
+        cfg = load_config(os.environ.get('RAGFLOW_CONFIG', 'conf/service_conf.yaml'))
+        model_name = cfg.user_default_llm.default_models.tsr_model.name
+        if model_name == 'deepdoc-onnx':
+            return DeepDocONNXTSR()
+        return HFTableStructureRecognizer()
+    except Exception as e:
+        import logging
+        logging.getLogger(__name__).error(f"Failed to load TSR model config: {e}. Falling back to HFTableStructureRecognizer.")
+        return HFTableStructureRecognizer()

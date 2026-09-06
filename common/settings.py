@@ -31,6 +31,30 @@ class RAGFlowConfig(BaseModel):
     go_port: int = Field(gt=0, le=65535)
     python_port: int = Field(gt=0, le=65535)
 
+
+class EmbeddingModelConfig(BaseModel):
+    name: str = 'BAAI/bge-large-en-v1.5'
+    dimension: int = 1024
+    provider: str = 'huggingface'
+
+class OcrModelConfig(BaseModel):
+    name: str = 'paddleocr'
+
+class LayoutModelConfig(BaseModel):
+    name: str = 'yolov8'
+
+class TsrModelConfig(BaseModel):
+    name: str = 'hf-tsr'
+
+class DefaultModelsConfig(BaseModel):
+    embedding_model: EmbeddingModelConfig = EmbeddingModelConfig()
+    ocr_model: OcrModelConfig = OcrModelConfig()
+    layout_model: LayoutModelConfig = LayoutModelConfig()
+    tsr_model: TsrModelConfig = TsrModelConfig()
+
+class UserDefaultLLMConfig(BaseModel):
+    default_models: DefaultModelsConfig = DefaultModelsConfig()
+
 class AuthConfig(BaseModel):
     jwt_secret: str
     jwt_expiration_minutes: int
@@ -44,6 +68,7 @@ class Config(BaseModel):
     nats: NATSConfig
     ragflow: RAGFlowConfig
     auth: AuthConfig
+    user_default_llm: UserDefaultLLMConfig = UserDefaultLLMConfig()
 
 def expand_env(text: str) -> str:
     pattern = re.compile(r'\$\{([a-zA-Z_][a-zA-Z0-9_]*)(?::-([^}]*))?\}')

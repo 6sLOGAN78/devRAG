@@ -30,3 +30,16 @@ auth:
   jwt_secret: ${JWT_SECRET:-default-dev-secret-do-not-use-in-prod}
   jwt_expiration_minutes: ${JWT_EXPIRATION_MINUTES:-1440}
   session_ttl_minutes: ${SESSION_TTL_MINUTES:-1440}
+
+user_default_llm:
+  default_models:
+    embedding_model:
+      name: 'BAAI/bge-large-en-v1.5'
+      dimension: 1024
+      provider: 'huggingface'
+    ocr_model:
+      name: 'paddleocr' # options: paddleocr, deepdoc-onnx
+    layout_model:
+      name: 'yolov8' # options: yolov8, deepdoc-onnx
+    tsr_model:
+      name: 'hf-tsr' # options: hf-tsr, deepdoc-onnx

@@ -1,3 +1,5 @@
+from common.settings import load_config
+import os
 import logging
 from typing import List, Dict, Any, Optional
 from dataclasses import dataclass, field
@@ -32,10 +34,12 @@ class RetrievalService:
         self._rerank_engines = {}
 
     def _get_embedding_config(self, dataset_id: str) -> EmbeddingConfig:
+        cfg = load_config(os.environ.get('RAGFLOW_CONFIG', 'conf/service_conf.yaml'))
+        model_cfg = cfg.user_default_llm.default_models.embedding_model
         return EmbeddingConfig(
-            provider="huggingface",
-            model="all-MiniLM-L6-v2",
-            dimension=384
+            provider=model_cfg.provider,
+            model=model_cfg.name,
+            dimension=model_cfg.dimension
         )
         
     def _get_rerank_config(self, dataset_id: str) -> RerankConfig:

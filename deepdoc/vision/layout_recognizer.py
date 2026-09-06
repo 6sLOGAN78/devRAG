@@ -12,7 +12,14 @@ class LayoutRegion(BaseModel):
     bbox: List[float] # [xmin, ymin, xmax, ymax]
     confidence: float
 
-class LayoutRecognizer:
+import abc
+
+class BaseLayoutRecognizer(abc.ABC):
+    @abc.abstractmethod
+    def detect(self, image_path: Path) -> List[LayoutRegion]:
+        pass
+
+class YoloLayoutRecognizer(BaseLayoutRecognizer):
     def __init__(self, model_path: str = "assets/layout/yolov8_layout.pt", confidence_threshold: float = 0.5, device: str = "cpu"):
         self.threshold = confidence_threshold
         try:
@@ -188,3 +195,29 @@ def build_structured_page(page_number: int, ocr_blocks: List[TextBlock], layout_
         blocks=final_blocks,
         metadata={"total_regions": len(layout_regions)}
     )
+
+
+class DeepDocONNXLayoutRecognizer(BaseLayoutRecognizer):
+    def __init__(self, model_path: str = "assets/deepdoc/layout.onnx"):
+        self.model_path = model_path
+        # Will initialize onnxruntime inference session here when weights are downloaded
+
+    def detect(self, image_path: Path) -> List[LayoutRegion]:
+        # Stub implementation pending ONNX weight availability
+        import logging
+        logging.getLogger(__name__).warning("DeepDocONNXLayoutRecognizer invoked but weights not downloaded. Returning empty layout.")
+        return []
+
+def get_layout_recognizer() -> BaseLayoutRecognizer:
+    try:
+        import os
+        from common.settings import load_config
+        cfg = load_config(os.environ.get('RAGFLOW_CONFIG', 'conf/service_conf.yaml'))
+        model_name = cfg.user_default_llm.default_models.layout_model.name
+        if model_name == 'deepdoc-onnx':
+            return DeepDocONNXLayoutRecognizer()
+        return YoloLayoutRecognizer()
+    except Exception as e:
+        import logging
+        logging.getLogger(__name__).error(f"Failed to load layout model config: {e}. Falling back to YoloLayoutRecognizer.")
+        return YoloLayoutRecognizer()

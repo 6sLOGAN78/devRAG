@@ -6,7 +6,14 @@ from ..errors import InvalidInputError, ParsingFailureError
 from ..models import TextBlock
 
 
-class OcrEngine:
+import abc
+
+class BaseOcrEngine(abc.ABC):
+    @abc.abstractmethod
+    def extract(self, image_path: Path) -> list[TextBlock]:
+        pass
+
+class PaddleOcrEngine(BaseOcrEngine):
     """
     Wrapper for PaddleOCR.
     Extracts text from images and normalizes the results into DeepDoc TextBlock models.
@@ -70,3 +77,28 @@ class OcrEngine:
                 block_idx += 1
                 
         return blocks
+
+
+class DeepDocONNXOcrEngine(BaseOcrEngine):
+    def __init__(self, lang: str = "en", use_gpu: bool = False):
+        self.lang = lang
+        # Stub for ONNX OcrEngine
+
+    def extract(self, image_path: Path) -> list[TextBlock]:
+        import logging
+        logging.getLogger(__name__).warning("DeepDocONNXOcrEngine invoked but weights not downloaded. Returning empty.")
+        return []
+
+def get_ocr_engine(lang: str = "en", use_gpu: bool = False) -> BaseOcrEngine:
+    try:
+        import os
+        from common.settings import load_config
+        cfg = load_config(os.environ.get('RAGFLOW_CONFIG', 'conf/service_conf.yaml'))
+        model_name = cfg.user_default_llm.default_models.ocr_model.name
+        if model_name == 'deepdoc-onnx':
+            return DeepDocONNXOcrEngine(lang=lang, use_gpu=use_gpu)
+        return PaddleOcrEngine(lang=lang, use_gpu=use_gpu)
+    except Exception as e:
+        import logging
+        logging.getLogger(__name__).error(f"Failed to load OCR model config: {e}. Falling back to PaddleOcrEngine.")
+        return PaddleOcrEngine(lang=lang, use_gpu=use_gpu)

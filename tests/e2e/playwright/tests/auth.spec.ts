@@ -1,7 +1,16 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('Auth E2E', () => {
-  test('User can login and view dashboard', async ({ page }) => {
+  test('User can login and view dashboard', async ({ page, request }) => {
+    // Ensure user exists
+    await request.post('/api/v1/user/register', {
+      data: {
+        email: 'test@example.com',
+        nickname: 'TestUser',
+        password: 'Password123'
+      }
+    });
+
     // Navigate to root, should redirect to login
     await page.goto('/');
     await expect(page).toHaveURL(/.*\/login/);

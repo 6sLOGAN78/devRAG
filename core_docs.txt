@@ -1,0 +1,531 @@
+# System Architecture Diagram
+
+## Level 1: Visual Overview
+
+This document presents the complete architectural diagram for RAGFlow, illustrating the interactions between the React single-page application, the dual-stack Go/Python API server backends, the DeepDoc multi-modal parser, the background sync worker, and the persistence storage infrastructure.
+
+---
+
+## Level 2: Comprehensive Architecture Diagram (Mermaid)
+
+```mermaid
+graph TB
+    subgraph Client_Layer["Client Presentation Layer"]
+        Browser["User Browser"]
+        SDK["Python / HTTP SDK"]
+        Browser -->|HTTPS / WSS| WebUI["React SPA (web/src)"]
+    end
+
+    subgraph Gateway_Layer["Ingress & Routing Gateway"]
+        Nginx["Nginx Reverse Proxy"]
+        WebUI --> Nginx
+        SDK --> Nginx
+    end
+
+    subgraph Go_Backend_Stack["Go Backend Stack (cmd/ragflow_server.go)"]
+        GinServer["Gin Router Engine"]
+        GoAuthHandler["Auth Handler & JWT Middleware"]
+        UserHandler["User & Tenant Handlers"]
+        DocHandler["Document Ingestion Handler"]
+        MCPServer["MCP Server Handler"]
+        GoSyncer["Task Syncer (internal/syncer)"]
+
+        GinServer --> GoAuthHandler
+        GoAuthHandler --> UserHandler
+        GoAuthHandler --> DocHandler
+        GoAuthHandler --> MCPServer
+        DocHandler --> GoSyncer
+    end
+
+    subgraph Py_Backend_Stack["Python Backend Stack (api/ragflow_server.py)"]
+        QuartServer["Quart ASGI Application"]
+        PyAuthMiddleware["Login Decorator (api/apps/__init__.py)"]
+        AgentEngine["Agent Canvas Flow Runtime (agent/component)"]
+        RetrievalEngine["Hybrid Retrieval & Rerank (rag/nlp)"]
+        DeepDocEngine["DeepDoc OCR & Vision Parser (deepdoc/vision)"]
+
+        QuartServer --> PyAuthMiddleware
+        PyAuthMiddleware --> AgentEngine
+        PyAuthMiddleware --> RetrievalEngine
+        PyAuthMiddleware --> DeepDocEngine
+    end
+
+    subgraph Storage_Layer["Persistence & Indexing Infrastructure"]
+        MySQL[("MySQL Database (api/db/db_models.py)")]
+        Redis[("Redis Cache / Session Lock")]
+        MinIO[("MinIO / S3 File Storage")]
+        VectorStore[("Vector Store (Infinity / Elasticsearch / OceanBase / Qdrant / Milvus)")]
+    end
+
+    Nginx -->|/api/v1/auth, /users, /sync| GinServer
+    Nginx -->|/api/v1/agents, /api/v1/chats, /api/v1/documents| QuartServer
+
+    Go_Backend_Stack --> MySQL
+    Go_Backend_Stack --> Redis
+
+    Py_Backend_Stack --> MySQL
+    Py_Backend_Stack --> Redis
+    Py_Backend_Stack --> MinIO
+    Py_Backend_Stack --> VectorStore
+```
+
+---
+
+## Component Reference Links
+
+- **Go Entry Point**: [`cmd/ragflow_server.go`](file:///home/logan78/Desktop/ragflow/cmd/ragflow_server.go#L81)
+- **Go Router**: [`internal/router/router.go`](file:///home/logan78/Desktop/ragflow/internal/router/router.go#L141)
+- **Python Entry Point**: [`api/ragflow_server.py`](file:///home/logan78/Desktop/ragflow/api/ragflow_server.py#L90)
+- **Python App Config**: [`api/apps/__init__.py`](file:///home/logan78/Desktop/ragflow/api/apps/__init__.py#L61)
+- **Frontend App Entry**: [`web/src/app.tsx`](file:///home/logan78/Desktop/ragflow/web/src/app.tsx#L1)
+- **Frontend Routes**: [`web/src/routes.tsx`](file:///home/logan78/Desktop/ragflow/web/src/routes.tsx#L28)
+- **Database Schema**: [`api/db/db_models.py`](file:///home/logan78/Desktop/ragflow/api/db/db_models.py)
+- **DeepDoc Parser**: [`deepdoc/vision/layout_recognizer.py`](file:///home/logan78/Desktop/ragflow/deepdoc/vision/layout_recognizer.py)
+# High-Level Architecture
+
+## Level 1: Subsystem Layers
+
+RAGFlow is organized into six major functional layers:
+
+1. **Presentation Layer (Web Client)**: React 18 frontend SPA built with TypeScript, TailwindCSS, Zustand state management, and React Router v7 ([`web/src/routes.tsx`](file:///home/logan78/Desktop/ragflow/web/src/routes.tsx#L28)).
+2. **API & Routing Gateway Layer**:
+   - **Go Gin Server** ([`cmd/ragflow_server.go`](file:///home/logan78/Desktop/ragflow/cmd/ragflow_server.go#L81)): Provides high-concurrency API handling, user authentication, tenant management, ingestion task dispatching, search bot APIs, and MCP server endpoints.
+   - **Python Quart Server** ([`api/ragflow_server.py`](file:///home/logan78/Desktop/ragflow/api/ragflow_server.py#L90)): Async Python ASGI server handling agent flow executions, chat stream completion, deep document parsing jobs, and ML operations.
+3. **Core Business Logic & RAG Engine**:
+   - **Agent Engine** ([`agent/`](file:///home/logan78/Desktop/ragflow/agent)): Modular node execution runtime (LLM, Retrieval, Code, Switch, Categorize, Keyword Extract, Message, Rewrite).
+   - **RAG Retrieval Engine** ([`rag/`](file:///home/logan78/Desktop/ragflow/rag)): Hybrid search, vector calculation, embedding model integration, cross-encoder re-ranking.
+4. **Deep Document Parsing Engine (DeepDoc)**:
+   - Vision layout recognition, Table structure recognition (TSR), OCR, layout-aware document chunking ([`deepdoc/`](file:///home/logan78/Desktop/ragflow/deepdoc)).
+5. **Persistence & Data Storage Layer**:
+   - **Relational DB**: MySQL / OceanBase storing metadata, users, tenants, datasets, documents, chat histories, agent canvas structures.
+   - **Distributed Cache / Key-Value Store**: Redis storing user sessions, rate limits, distributed lock keys, execution progress.
+   - **Object Storage**: MinIO / S3 storing uploaded raw files, images, generated thumbnails, audio files.
+   - **Vector Engine**: Infinity, Elasticsearch, OpenSearch, OceanBase, Qdrant, Milvus, PostgreSQL/PGVector, Tantivy.
+6. **Background Ingestion & Execution Workers**:
+   - Task sync workers ([`internal/syncer/`](file:///home/logan78/Desktop/ragflow/internal/syncer)), ingestion service ([`internal/ingestion/`](file:///home/logan78/Desktop/ragflow/internal/ingestion)), and task executor threads.
+
+---
+
+## Level 2: Component Interactions & Source Links
+
+### Layer Breakdown Table
+
+| Layer | Primary Responsibilities | Python Implementation | Go Implementation |
+| :--- | :--- | :--- | :--- |
+| **API / Gateway** | Request parsing, auth validation, CORS, routing | [`api/apps/__init__.py`](file:///home/logan78/Desktop/ragflow/api/apps/__init__.py#L61) | [`internal/router/router.go`](file:///home/logan78/Desktop/ragflow/internal/router/router.go#L141) |
+| **User & Tenant** | Users, password hashing, tenant context, API keys | [`api/db/services/user_service.py`](file:///home/logan78/Desktop/ragflow/api/db/services/user_service.py#L33) | [`internal/service/tenant.go`](file:///home/logan78/Desktop/ragflow/internal/service/tenant.go) |
+| **Dataset & Doc** | Knowledge base CRUD, document upload, status check | [`api/db/services/document_service.py`](file:///home/logan78/Desktop/ragflow/api/db/services/document_service.py) | [`internal/service/document/`](file:///home/logan78/Desktop/ragflow/internal/service/document) |
+| **DeepDoc Engine**| Layout parsing, OCR, table extraction | [`deepdoc/vision/`](file:///home/logan78/Desktop/ragflow/deepdoc/vision) | [`internal/ingestion/`](file:///home/logan78/Desktop/ragflow/internal/ingestion) |
+| **Agent Engine**  | Canvas graph execution, node evaluation | [`agent/component/`](file:///home/logan78/Desktop/ragflow/agent/component) | [`internal/agent/canvas/`](file:///home/logan78/Desktop/ragflow/internal/agent/canvas) |
+| **DocStore Engine**| Vector & full-text indexing and retrieval | [`rag/utils/`](file:///home/logan78/Desktop/ragflow/rag/utils) | [`internal/dao/`](file:///home/logan78/Desktop/ragflow/internal/dao) |
+
+---
+
+## Service Communication Architecture
+
+```mermaid
+flowchart TB
+    subgraph Frontend["React Frontend (web/src)"]
+        UI["UI Views (Pages & Canvas)"]
+        AxiosClient["API Client / Interceptor"]
+        UI --> AxiosClient
+    end
+
+    subgraph Dual_Backend["Dual-Stack Backend Engine"]
+        direction LR
+        subgraph Go_Gin["Go Gin Server (:9380)"]
+            GoRouter["Gin Router (internal/router)"]
+            GoAuth["Auth Middleware (internal/handler/auth.go)"]
+            GoIngest["Ingestion & Syncer (internal/syncer)"]
+            GoRouter --> GoAuth --> GoIngest
+        end
+
+        subgraph Py_Quart["Python Quart ASGI Server (:9380)"]
+            PyApp["Quart App (api/apps)"]
+            PyAuth["Login Decorator (api/apps/__init__.py)"]
+            PyAgent["Agent Executor (agent/)"]
+            PyApp --> PyAuth --> PyAgent
+        end
+    end
+
+    subgraph Data_Stores["Infrastructure Layer"]
+        MySQL[("MySQL / OceanBase DB")]
+        Redis[("Redis Distributed Cache")]
+        MinIO[("MinIO Object Storage")]
+        VectorDB[("Vector Engine (Infinity/ES/Qdrant)")]
+    end
+
+    AxiosClient -->|REST / SSE API| Go_Gin
+    AxiosClient -->|REST / SSE API| Py_Quart
+
+    Go_Gin --> MySQL
+    Go_Gin --> Redis
+    Py_Quart --> MySQL
+    Py_Quart --> Redis
+    Py_Quart --> MinIO
+    Py_Quart --> VectorDB
+```
+# What is RAGFlow?
+
+## Level 1: Conceptual Explanation
+
+**RAGFlow** is an open-source, enterprise-grade Retrieval-Augmented Generation (RAG) engine designed to ground Large Language Models (LLMs) in deep enterprise knowledge bases. Unlike standard baseline RAG implementations that rely on naive string splitting or basic text extraction, RAGFlow solves the fundamental challenge of **"Garbage In, Garbage Out"** in RAG systems.
+
+### Core Capabilities
+
+1. **Deep Document Parsing (DeepDoc)**:
+   Extracts structured knowledge from complex layout documents (PDFs, DOCX, PPTX, Scan images, Tables, Excel sheets, Audio). DeepDoc utilizes vision models for layout analysis, OCR, visual table extraction, and multi-column order reconstruction.
+
+2. **Dual-Stack High Concurrency Engine**:
+   Leverages a dual-stack backend architecture where high-frequency API routing, ingestion task syncing, admin services, and MCP servers run on a fast **Go (Gin)** runtime ([`cmd/ragflow_server.go`](file:///home/logan78/Desktop/ragflow/cmd/ragflow_server.go#L81)), while complex machine learning pipelines, LLM invocations, and agent workflows run on **Python (Quart ASGI)** ([`api/ragflow_server.py`](file:///home/logan78/Desktop/ragflow/api/ragflow_server.py#L90)).
+
+3. **Visual Agentic Workflow Canvas**:
+   Offers a drag-and-drop workflow canvas built with React and `@xyflow/react` ([`web/src/pages/agent/canvas/index.tsx`](file:///home/logan78/Desktop/ragflow/web/src/pages/agent/canvas/index.tsx)), allowing developers to compose complex multi-node agents (Retrieval, LLM, Code, If-Else, Switch, Iteration, Keyword Extract, Image Generate).
+
+4. **Multi-Vector Hybrid Retrieval & Re-ranking**:
+   Integrates vector similarity search (dense embeddings) with BM25 full-text keyword search and cross-encoder re-ranking. Supports pluggable vector engines including Infinity, Elasticsearch, OpenSearch, OceanBase, Qdrant, Milvus, PostgreSQL (PGVector), and Tantivy.
+
+5. **Multi-Tenancy & Enterprise Governance**:
+   Includes complete user role management (`owner`, `admin`, `normal`), multi-tenant data isolation (`tenant_id`), session persistence via Redis, API tokens, and Model Context Protocol (MCP) server endpoints.
+
+---
+
+## Level 2: Implementation & Source Architecture
+
+### Primary Component Architecture
+
+```mermaid
+graph TD
+    Client["Web Client / API Client / SDK"] --> RouterBridge{"Routing Gateway (Nginx / Go / Python)"}
+    
+    subgraph Go_Backend ["Go Engine (cmd/ragflow_server.go)"]
+        GinRouter["Gin Router (internal/router)"]
+        GoAuth["Auth Middleware (internal/handler/auth.go)"]
+        GoServices["Ingestion & Sync Services (internal/service)"]
+        GoDAO["DAO Layer (internal/dao)"]
+        GinRouter --> GoAuth --> GoServices --> GoDAO
+    end
+
+    subgraph Python_Backend ["Python Engine (api/ragflow_server.py)"]
+        QuartApp["Quart ASGI App (api/apps)"]
+        PyAuth["Login Decorator (api/apps/__init__.py)"]
+        AgentEngine["Agent Workflow Execution (agent/)"]
+        DeepDoc["DeepDoc Parser (deepdoc/)"]
+        QuartApp --> PyAuth --> AgentEngine --> DeepDoc
+    end
+
+    RouterBridge -->|Go Routes / v1 API| Go_Backend
+    RouterBridge -->|Python Routes / ML Jobs| Python_Backend
+
+    GoDAO --> MySQL[("MySQL DB")]
+    GoDAO --> Redis[("Redis Cache / Session")]
+    AgentEngine --> DocStore[("Vector DocStore (Infinity/ES/OceanBase)")]
+```
+
+### Key Source References
+
+- Python Main Entry: [`api/ragflow_server.py`](file:///home/logan78/Desktop/ragflow/api/ragflow_server.py#L90)
+- Python App Registration & Middleware: [`api/apps/__init__.py`](file:///home/logan78/Desktop/ragflow/api/apps/__init__.py#L61)
+- Go Engine Main Entry: [`cmd/ragflow_server.go`](file:///home/logan78/Desktop/ragflow/cmd/ragflow_server.go#L81)
+- Go Router Config: [`internal/router/router.go`](file:///home/logan78/Desktop/ragflow/internal/router/router.go#L141)
+- DeepDoc Vision Pipeline: [`deepdoc/vision/`](file:///home/logan78/Desktop/ragflow/deepdoc/vision)
+- Agent Workflow Engine: [`agent/component/`](file:///home/logan78/Desktop/ragflow/agent/component)
+- Frontend App Routes: [`web/src/routes.tsx`](file:///home/logan78/Desktop/ragflow/web/src/routes.tsx#L28)
+# Backend System Architecture
+
+## Level 1: Architectural Patterns
+
+The RAGFlow backend is architected around four core software design patterns:
+
+1. **Dual-Stack Gateway Strategy**: Requests entering the system pass through Nginx to either the Go Gin server (for user/tenant/auth/sync handlers) or the Python Quart server (for heavy ML/agent execution). The Go server attaches `X-API-Source: go` to HTTP responses ([`internal/router/router.go:L146`](file:///home/logan78/Desktop/ragflow/internal/router/router.go#L146)).
+2. **Layered Service-DAO Pattern**: Clean isolation between the Handler/Controller layer (`api/apps/restful_apis/` or `internal/handler/`), Service layer (`api/db/services/` or `internal/service/`), and Data Access Object (DAO) layer (`api/db/db_models.py` or `internal/dao/`).
+3. **Distributed Lock Coordination**: Background document chunking status updaters and task ingestion queues synchronize using Redis distributed locks (`RedisDistributedLock`) ([`api/ragflow_server.py:L56`](file:///home/logan78/Desktop/ragflow/api/ragflow_server.py#L56)).
+4. **Pluggable Vector Storage Abstraction**: Vector database interactions pass through a unified DocStore interface ([`rag/utils/`](file:///home/logan78/Desktop/ragflow/rag/utils)), decoupling business logic from underlying search engines (Infinity, ES, OceanBase, Qdrant, Milvus).
+
+---
+
+## Level 2: Detailed Architectural Diagrams & Code Map
+
+```mermaid
+graph TB
+    subgraph Client_Requests ["Client Ingress"]
+        REST_Req["REST API Request"]
+        SSE_Req["SSE Chat Stream Request"]
+    end
+
+    subgraph Go_Stack ["Go Backend Engine (cmd/ragflow_server.go)"]
+        Gin_Engine["Gin Engine Router (internal/router/router.go)"]
+        Go_Auth["Auth Middleware (internal/handler/auth.go)"]
+        Go_Handler["Gin Handlers (internal/handler/)"]
+        Go_Service["Go Service Layer (internal/service/)"]
+        Go_DAO["Go DAO Layer (internal/dao/)"]
+
+        Gin_Engine --> Go_Auth --> Go_Handler --> Go_Service --> Go_DAO
+    end
+
+    subgraph Py_Stack ["Python Backend Engine (api/ragflow_server.py)"]
+        Quart_Engine["Quart App Router (api/apps/__init__.py)"]
+        Py_Auth["login_required Decorator"]
+        Py_API["RESTful APIs (api/apps/restful_apis/)"]
+        Py_Service["Python Services (api/db/services/)"]
+        Peewee_DB["Peewee DB Models (api/db/db_models.py)"]
+
+        Quart_Engine --> Py_Auth --> Py_API --> Py_Service --> Peewee_DB
+    end
+
+    subgraph Subsystems ["Engine Execution Subsystems"]
+        Agent_Engine["Agent Canvas Runtime (agent/component/)"]
+        DeepDoc_Engine["DeepDoc OCR & TSR (deepdoc/vision/)"]
+        DocStore_Adapter["DocStore Vector Adapter (rag/utils/)"]
+
+        Py_Service --> Agent_Engine & DeepDoc_Engine & DocStore_Adapter
+    end
+
+    REST_Req -->|Go Routes| Gin_Engine
+    REST_Req -->|Python Routes| Quart_Engine
+    SSE_Req --> Quart_Engine
+
+    Go_DAO --> MySQL[("MySQL DB")]
+    Peewee_DB --> MySQL
+    Go_DAO --> Redis[("Redis Cache")]
+    DocStore_Adapter --> VectorDB[("Vector Engine")]
+```
+
+### Primary Code References
+
+- Go Main Entry: [`cmd/ragflow_server.go`](file:///home/logan78/Desktop/ragflow/cmd/ragflow_server.go#L81)
+- Go Router: [`internal/router/router.go`](file:///home/logan78/Desktop/ragflow/internal/router/router.go#L141)
+- Python Server Entry: [`api/ragflow_server.py`](file:///home/logan78/Desktop/ragflow/api/ragflow_server.py#L90)
+- Python App Setup: [`api/apps/__init__.py`](file:///home/logan78/Desktop/ragflow/api/apps/__init__.py#L61)
+- Database Models: [`api/db/db_models.py`](file:///home/logan78/Desktop/ragflow/api/db/db_models.py)
+- DocStore Interface: [`rag/utils/`](file:///home/logan78/Desktop/ragflow/rag/utils)
+# REST API Layer Overview
+
+## Level 1: Conceptual Overview & Protocol Design
+
+The RAGFlow REST API layer exposes multi-tenant interfaces for client applications, web SPAs, SDKs, and Model Context Protocol (MCP) clients.
+
+### Key API Design Rules
+
+1. **Dual Routing Gateways**:
+   - Go Gin Engine ([`internal/router/router.go`](file:///home/logan78/Desktop/ragflow/internal/router/router.go#L141)): Serves user login, system config, search bots, MCP server endpoints, and document ingestion APIs. Responses contain header `X-API-Source: go`.
+   - Python Quart Engine ([`api/apps/restful_apis/`](file:///home/logan78/Desktop/ragflow/api/apps/restful_apis)): Serves legacy RAG endpoints, agent canvas flows, chat completion streams (SSE), and deep document parsing endpoints.
+2. **Version Prefixing**: Standard endpoints use prefix `/api/v1` or `/v1`.
+3. **Standardized Response Envelope**: All JSON responses use a standard structure:
+   ```json
+   {
+     "retcode": 0,
+     "retmsg": "success",
+     "data": {}
+   }
+   ```
+4. **Authentication Headers**: Requires `Authorization: Bearer <token>` or API Key header. Public bot routes use beta SDK tokens (`AUTH_BETA`).
+
+---
+
+## Level 2: API Architecture & Source Code Links
+
+```mermaid
+graph TD
+    Client["Client / Web SPA / Python SDK"] --> Gateway{"API Router Gateway"}
+
+    subgraph Go_Gin ["Go Gin Engine (cmd/ragflow_server.go)"]
+        GoRouter["Gin Router (internal/router/router.go)"]
+        GoAuth["Auth Middleware (internal/handler/auth.go)"]
+        GoHandlers["Gin Handlers (internal/handler/)"]
+
+        GoRouter --> GoAuth --> GoHandlers
+    end
+
+    subgraph Python_Quart ["Python Quart Engine (api/ragflow_server.py)"]
+        PyApp["Quart App (api/apps/__init__.py)"]
+        PyAuth["login_required Decorator"]
+        PyREST["Restful API Blueprints (api/apps/restful_apis/)"]
+
+        PyApp --> PyAuth --> PyREST
+    end
+
+    Gateway -->|System / Auth / MCP| Go_Gin
+    Gateway -->|Canvas / RAG / SSE Chat| Python_Quart
+```
+
+### Core Source Links
+
+- Go Router Setup: [`internal/router/router.go`](file:///home/logan78/Desktop/ragflow/internal/router/router.go#L141)
+- Python Restful APIs Folder: [`api/apps/restful_apis/`](file:///home/logan78/Desktop/ragflow/api/apps/restful_apis)
+- Response Envelope Utility: [`api/utils/api_utils.py`](file:///home/logan78/Desktop/ragflow/api/utils/api_utils.py)
+- OpenAPI Schema Generator: `QuartSchema(app)` in [`api/apps/__init__.py:L65`](file:///home/logan78/Desktop/ragflow/api/apps/__init__.py#L65)
+# Document Processing Lifecycle
+
+## Level 1: Conceptual Overview
+
+The Document Lifecycle tracks a file from initial upload through storage, parsing, visual layout analysis, chunking, indexing, and eventual deletion. The document transitions through strict state machine phases backed by relational database tables (`Document`, `Task`, `File`) and distributed Redis state notifications.
+
+```mermaid
+stateDiagram-v2
+    [*] --> UPLOADED: User Upload (api/apps/restful_apis/document_api.py)
+    UPLOADED --> UNSTART: Task Creation (Task.run = '0')
+    UNSTART --> RUNNING: Worker Enqueue (Redis te.0.common)
+    RUNNING --> PARSED: DeepDoc DLA & OCR Execution
+    PARSED --> INDEXED: Vector Embeddings & Index Insert
+    INDEXED --> COMPLETED: Progress = 1.0, TaskStatus.DONE
+    
+    RUNNING --> FAILED: Error Triggered (Progress = -1)
+    RUNNING --> CANCELLED: User Cancel Action
+    COMPLETED --> REMOVED: Delete API Invocation
+```
+
+---
+
+## Level 2: Implementation Details
+
+### Document Status Enum Values
+
+Defined in [common/constants.py](file:///home/logan78/Desktop/ragflow/common/constants.py#L50) and [api/db/db_models.py](file:///home/logan78/Desktop/ragflow/api/db/db_models.py#L894):
+
+- `run`: Task execution state (`"0"` = Unstarted, `"1"` = Running, `"2"` = Cancelled, `"3"` = Finished, `"4"` = Failed)
+- `status`: Validation flag (`"1"` = Active, `"0"` = Deleted/Wasted)
+- `progress`: Floating point completion percentage (0.0 to 1.0, `-1.0` on failure)
+
+### Lifecycle Handlers
+
+| Phase | Python Service Method | Go DAO Method | Primary File |
+| :--- | :--- | :--- | :--- |
+| **Upload** | `FileService.upload_document()` | `DocumentDAO.Create()` | [api/db/services/file_service.py](file:///home/logan78/Desktop/ragflow/api/db/services/file_service.py#L50), [internal/dao/document.go](file:///home/logan78/Desktop/ragflow/internal/dao/document.go#L30) |
+| **Task Creation** | `TaskService.create_task()` | `IngestionTaskDAO.Create()` | [api/db/services/task_service.py](file:///home/logan78/Desktop/ragflow/api/db/services/task_service.py#L50), [internal/dao/ingestion.go](file:///home/logan78/Desktop/ragflow/internal/dao/ingestion.go#L36) |
+| **Parsing** | `task_executor.run_tenant_task()` | - | [rag/svr/task_executor.py](file:///home/logan78/Desktop/ragflow/rag/svr/task_executor.py#L1150) |
+| **Deletion** | `DocumentService.remove_document()` | `DocumentDAO.Delete()` | [api/db/services/document_service.py](file:///home/logan78/Desktop/ragflow/api/db/services/document_service.py#L200), [internal/dao/document.go](file:///home/logan78/Desktop/ragflow/internal/dao/document.go#L80) |
+# Retrieval Execution Flow
+
+## Level 1: Conceptual Overview
+
+The Retrieval Execution Flow traces how an incoming search request is converted into structured query expressions, executed against DocStore vector and full-text indices, pruned of deleted documents, fused across candidate sets, score-thresholded, and returned as references.
+
+---
+
+## Level 2: Implementation Details
+
+### Step-by-Step Code Walkthrough
+
+In [rag/nlp/search.py](file:///home/logan78/Desktop/ragflow/rag/nlp/search.py#L549-L700):
+
+```python
+async def retrieval(
+    self,
+    question,
+    embd_mdl,
+    tenant_ids,
+    kb_ids,
+    page,
+    page_size,
+    similarity_threshold=0.2,
+    vector_similarity_weight=0.3,
+    top=1024,
+    doc_ids=None,
+    rerank_mdl=None,
+):
+```
+
+1. **Window Size Calculation**:
+   Calculates window limit via `_rerank_window(page_size, top)` to keep pagination blocks aligned.
+2. **Search Request Dispatch**:
+   Calls `self.search(req, idx_names, kb_ids, embd_mdl)` returning raw `SearchResult` candidates.
+3. **Safety Net Chunk Pruning**:
+   Executes `self._prune_deleted_chunks(sres)` to ensure stale chunks from deleted documents are removed.
+4. **Reranking / Score Merging**:
+   - If `rerank_mdl` is active: Calls `self.rerank_by_model()`.
+   - If using Elasticsearch: Calls `self._knn_scores()` and `self.rerank_with_knn()`.
+   - If using Infinity: Uses normalized direct scores.
+5. **Thresholding & Stable Sorting**:
+   Applies `sim_np >= post_threshold` and sorts using `np.argsort(sim_np * -1, kind="stable")`.
+# Database Schema & Tables Specification
+
+## Level 1: Conceptual Overview
+
+The Database Schema defines all core tables, column types, primary keys, nullability constraints, defaults, and foreign key relations across MySQL, OceanBase, and PostgreSQL database engines.
+
+---
+
+## Level 2: Implementation Details
+
+### Table Specifications
+
+#### 1. `document` Table
+Peewee model: [Document](file:///home/logan78/Desktop/ragflow/api/db/db_models.py#L894) | Go struct: `entity.Document`
+
+```sql
+CREATE TABLE `document` (
+  `id` varchar(32) NOT NULL PRIMARY KEY,
+  `thumbnail` longtext,
+  `kb_id` varchar(256) NOT NULL,
+  `parser_id` varchar(32) NOT NULL,
+  `pipeline_id` varchar(32),
+  `parser_config` longtext NOT NULL,
+  `source_type` varchar(128) NOT NULL DEFAULT 'local',
+  `type` varchar(32) NOT NULL,
+  `created_by` varchar(32) NOT NULL,
+  `name` varchar(255),
+  `location` varchar(255),
+  `size` bigint NOT NULL DEFAULT 0,
+  `token_num` int NOT NULL DEFAULT 0,
+  `chunk_num` int NOT NULL DEFAULT 0,
+  `progress` float NOT NULL DEFAULT 0,
+  `progress_msg` longtext,
+  `process_begin_at` datetime,
+  `process_duration` float NOT NULL DEFAULT 0,
+  `suffix` varchar(32) NOT NULL,
+  `content_hash` varchar(32) DEFAULT '',
+  `run` varchar(1) DEFAULT '0',
+  `status` varchar(1) DEFAULT '1',
+  `create_time` bigint,
+  `update_time` bigint,
+  INDEX `idx_doc_kb_id` (`kb_id`),
+  INDEX `idx_doc_parser_id` (`parser_id`),
+  INDEX `idx_doc_status` (`status`)
+);
+```
+
+#### 2. `task` Table
+Peewee model: [Task](file:///home/logan78/Desktop/ragflow/api/db/db_models.py#L1002) | Go DAO: [IngestionTaskDAO](file:///home/logan78/Desktop/ragflow/internal/dao/ingestion.go#L30)
+
+```sql
+CREATE TABLE `task` (
+  `id` varchar(32) NOT NULL PRIMARY KEY,
+  `doc_id` varchar(32) NOT NULL,
+  `from_page` int NOT NULL DEFAULT 0,
+  `to_page` int NOT NULL DEFAULT 1000000,
+  `task_type` varchar(32) NOT NULL DEFAULT '',
+  `priority` int NOT NULL DEFAULT 0,
+  `begin_at` datetime,
+  `process_duration` float NOT NULL DEFAULT 0,
+  `progress` float NOT NULL DEFAULT 0,
+  `progress_msg` longtext,
+  `retry_count` int NOT NULL DEFAULT 0,
+  `digest` longtext,
+  `chunk_ids` longtext,
+  `create_time` bigint,
+  `update_time` bigint,
+  INDEX `idx_task_doc_id` (`doc_id`),
+  INDEX `idx_task_progress` (`progress`)
+);
+```
+
+#### 3. `knowledgebase` Table
+Peewee model: [Knowledgebase](file:///home/logan78/Desktop/ragflow/api/db/db_models.py#L837) | Go DAO: [KnowledgebaseDAO](file:///home/logan78/Desktop/ragflow/internal/dao/kb.go#L30)
+
+```sql
+CREATE TABLE `knowledgebase` (
+  `id` varchar(32) NOT NULL PRIMARY KEY,
+  `avatar` longtext,
+  `tenant_id` varchar(32) NOT NULL,
+  `name` varchar(128) NOT NULL,
+  `language` varchar(32) DEFAULT 'English',
+  `description` longtext,
+  `embd_id` varchar(128) NOT NULL,
+  `parser_id` varchar(32) NOT NULL DEFAULT 'naive',
+  `parser_config` longtext NOT NULL,
+  `status` varchar(1) DEFAULT '1',
+  INDEX `idx_kb_tenant_id` (`tenant_id`),
+  INDEX `idx_kb_name` (`name`)
+);
+```
