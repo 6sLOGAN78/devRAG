@@ -1,12 +1,13 @@
 import React from 'react';
 import type { NodeDefinition, NodeTypeType } from './types';
-import { Bot, Database, Code, GitBranch } from 'lucide-react';
+import { Bot, Database, Code, GitBranch, ListTree } from 'lucide-react';
 
 const NODE_DEFINITIONS: NodeDefinition[] = [
   { type: 'llm', label: 'LLM Node', description: 'Generates text using an LLM' },
   { type: 'retrieval', label: 'Retrieval Node', description: 'Searches knowledge base' },
   { type: 'code', label: 'Code Node', description: 'Executes Python code' },
   { type: 'switch', label: 'Switch Node', description: 'Conditional routing' },
+  { type: 'categorize', label: 'Categorize Node', description: 'LLM-based classification' },
 ];
 
 const iconMap: Record<NodeTypeType, React.ReactNode> = {
@@ -14,6 +15,7 @@ const iconMap: Record<NodeTypeType, React.ReactNode> = {
   retrieval: <Database className="w-5 h-5" />,
   code: <Code className="w-5 h-5" />,
   switch: <GitBranch className="w-5 h-5" />,
+  categorize: <ListTree className="w-5 h-5" />,
 };
 
 export const NodePalette = () => {

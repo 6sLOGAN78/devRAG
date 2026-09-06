@@ -14,7 +14,7 @@ import type { Connection, Edge, Node } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 
 import { NodePalette } from './palette';
-import { nodeTypes } from './placeholder-nodes';
+import { customNodeTypes } from './custom-nodes';
 
 let id = 0;
 const getId = () => `dndnode_${id++}`;
@@ -62,6 +62,17 @@ const CanvasArea = () => {
     [screenToFlowPosition, setNodes]
   );
 
+  const isValidConnection = useCallback(
+    (connection: Connection | Edge) => {
+      // Prevent self connections
+      if (connection.source === connection.target) {
+        return false;
+      }
+      return true;
+    },
+    []
+  );
+
   return (
     <div className="flex-1 h-full w-full relative" ref={reactFlowWrapper}>
       <ReactFlow
@@ -71,8 +82,9 @@ const CanvasArea = () => {
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
         onDrop={onDrop}
+        isValidConnection={isValidConnection}
         onDragOver={onDragOver}
-        nodeTypes={nodeTypes}
+        nodeTypes={customNodeTypes}
         fitView
       >
         <Controls />
