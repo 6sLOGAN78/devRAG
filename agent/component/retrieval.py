@@ -46,7 +46,18 @@ class RetrievalNode(AgentNode):
         if not self.dataset_id:
             raise ValueError(f"RetrievalNode {self.id} requires a dataset_id")
             
+        print(f"DEBUG resolved_inputs: {resolved_inputs}")
         dataset_id = self._render_template(self.dataset_id, resolved_inputs) if "{{" in self.dataset_id else self.dataset_id
+        
+        with open("debug_inputs.txt", "w") as f: f.write(str(resolved_inputs))
+        # TENANT ISOLATION CHECK
+        tenant_id = resolved_inputs.get("__tenant_id__")
+        if tenant_id:
+            from api.db.db_models import Dataset
+            dataset = Dataset.get_or_none((Dataset.id == dataset_id) & (Dataset.tenant_id == tenant_id))
+            if not dataset:
+                raise ValueError(f"Security Error: Dataset {dataset_id} not found or access denied for tenant {tenant_id}")
+
             
         query = self._render_template(self.query_template, resolved_inputs)
         if not query or not query.strip():

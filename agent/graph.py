@@ -14,7 +14,8 @@ class AgentGraph:
         self.version = definition.get("version", 1)
         self.nodes_dict: Dict[str, AgentNode] = {}
         self.edges: List[Dict[str, str]] = definition.get("edges", [])
-        self.inputs_map: Dict[str, Dict[str, str]] = {}
+        
+        self.inputs_map: Dict[str, Dict[str, str]] = definition.get("inputs_map", {})
         
         self._parse_nodes(definition.get("nodes", []))
         self._validate_edges()
@@ -42,7 +43,7 @@ class AgentGraph:
             
             # Extract inputs mapping if present
             # e.g., "inputs": {"value": "node_a.result"}
-            self.inputs_map[node_id] = node_data.get("inputs", {})
+            if "inputs" in node_data: self.inputs_map[node_id] = node_data.get("inputs", {})
 
     def _validate_edges(self):
         for edge in self.edges:

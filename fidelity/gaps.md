@@ -12,3 +12,10 @@
    - *Issue*: The Go API (`internal/storage/minio.go`) uploads all documents to a hardcoded `devrag-documents` bucket. The Python `parsing_service.py` incorrectly assumed the first path segment was the bucket name (e.g., `tenant`), causing MinIO `NoSuchBucket` errors during task execution.
    - *Fix*: Patched `api/services/parsing_service.py` to correctly expect the `devrag-documents` bucket and pass the full `minio_path` as the object name.
    - *Status*: Verified. Python worker successfully downloads from MinIO, parses, and inserts chunks into Infinity.
+3. **[P0] Agent Graph Engine: Missing Input Resolution and Cross-Tenant Data Vulnerability**
+   - *Issue*: DevRAG's `AgentGraph` incorrectly parsed `inputs_map`, resulting in execution states failing to propagate data (like user queries) between DAG nodes. More critically, the `RetrievalNode` blindly executed vector queries against any `dataset_id` provided in the configuration without validating if the dataset belonged to the authenticated tenant, exposing a severe cross-tenant data access vulnerability.
+   - *Fix*: 
+     - Corrected `agent/graph.py` to properly parse `inputs_map` without overwriting it during node initialization.
+     - Updated `GraphRunner` to securely inject `__tenant_id__` from the HTTP context into the resolved inputs for all nodes.
+     - Patched `RetrievalNode.execute` to strictly validate `Dataset` ownership against `__tenant_id__` before proceeding with the Infinity vector search.
+   - *Status*: Verified. A test chat request successfully resolves inputs, safely queries the tenant's isolated vector index, and passes the retrieved chunks to the LLM node.

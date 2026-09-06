@@ -16,8 +16,8 @@ class ExecutionResult:
         self.failed_node = failed_node
 
 class GraphRunner:
-    def __init__(self):
-        pass
+    def __init__(self, tenant_id: Optional[str] = None):
+        self.tenant_id = tenant_id
 
     def _resolve_inputs(self, node_id: str, graph: AgentGraph, state: ExecutionState) -> Dict[str, Any]:
         """
@@ -52,6 +52,9 @@ class GraphRunner:
             else:
                 resolved[k] = output
                 
+
+
+        with open("debug_runner.txt", "w") as f: f.write(f"node={node_id} g.inputs={graph.inputs_map} resolved={resolved}")
         return resolved
 
     def run(self, graph: AgentGraph, initial_inputs: Optional[Dict[str, Any]] = None) -> ExecutionResult:
@@ -80,6 +83,9 @@ class GraphRunner:
             try:
                 resolved_inputs = self._resolve_inputs(node_id, graph, state)
                 logger.info(f"[Execution: {execution_id}] Executing node {node_id}")
+                
+                if self.tenant_id:
+                    resolved_inputs["__tenant_id__"] = self.tenant_id
                 
                 result_obj = node.execute(resolved_inputs)
                 

@@ -92,8 +92,9 @@ async def chat_completions():
         "__stream_callback__": stream_callback
     }
 
+    tenant_id = g.tenant_id
     async def run_graph():
-        runner = GraphRunner()
+        runner = GraphRunner(tenant_id=tenant_id)
         try:
             result = await asyncio.to_thread(runner.run, agent_graph, initial_inputs)
             await queue.put({"type": "done", "result": result})
