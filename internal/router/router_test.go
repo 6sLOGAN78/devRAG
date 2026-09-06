@@ -1,6 +1,7 @@
 package router_test
 
 import (
+	"github.com/6sLOGAN78/devRAG/internal/config"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -9,7 +10,7 @@ import (
 )
 
 func TestHealthRoute(t *testing.T) {
-	engine := router.InitRouter()
+	engine := router.InitRouter(&config.Config{Auth: config.AuthConfig{JWTSecret: "test"}})
 
 	req, _ := http.NewRequest("GET", "/api/v1/health", nil)
 	w := httptest.NewRecorder()

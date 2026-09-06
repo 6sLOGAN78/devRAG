@@ -24,7 +24,12 @@
     "endpoints": "nats:14222"
   },
   "ragflow": {
-    "go_port": 9384,
-    "python_port": 9380
+    "go_port": 9380,
+    "python_port": 9381
+  },
+  "auth": {
+    "jwt_secret": "default-dev-secret-do-not-use-in-prod",
+    "jwt_expiration_minutes": 1440,
+    "session_ttl_minutes": 1440
   }
 }

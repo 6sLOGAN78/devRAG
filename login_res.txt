@@ -1,0 +1,6 @@
+HTTP/1.1 200 OK
+Content-Type: application/json; charset=utf-8
+Date: Sun, 06 Sep 2026 08:38:50 GMT
+Content-Length: 375
+
+{"token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiZGU2YmNjOGQtZjUzNS00ZTFjLWJkZGUtZjMwNzBlY2FlYjA1Iiwic2Vzc2lvbl9pZCI6ImY5MWZjODQ1LTM4ODMtNGQ3OC1iNDNiLTg4OTlmMWQxMDM0YiIsImV4cCI6MTc4ODc3MDMzMCwiaWF0IjoxNzg4NjgzOTMwfQ.SJH9gcgPLBoLzygYgFApDc5RC3_ozD-2ownCWrEnk-k","user_id":"de6bcc8d-f535-4e1c-bdde-f3070ecaeb05","email":"test2@example.com","nickname":"Test User"}

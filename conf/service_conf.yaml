@@ -25,3 +25,8 @@ nats:
 ragflow:
   go_port: ${RAGFLOW_GO_PORT:-9380}
   python_port: ${RAGFLOW_PYTHON_PORT:-9381}
+
+auth:
+  jwt_secret: ${JWT_SECRET:-default-dev-secret-do-not-use-in-prod}
+  jwt_expiration_minutes: ${JWT_EXPIRATION_MINUTES:-1440}
+  session_ttl_minutes: ${SESSION_TTL_MINUTES:-1440}

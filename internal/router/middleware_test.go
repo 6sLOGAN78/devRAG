@@ -1,6 +1,7 @@
 package router_test
 
 import (
+	"github.com/6sLOGAN78/devRAG/internal/config"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -10,7 +11,7 @@ import (
 )
 
 func TestRecoveryMiddleware(t *testing.T) {
-	engine := router.InitRouter()
+	engine := router.InitRouter(&config.Config{Auth: config.AuthConfig{JWTSecret: "test"}})
 	engine.GET("/panic", func(c *gin.Context) {
 		panic("test panic")
 	})
@@ -26,7 +27,7 @@ func TestRecoveryMiddleware(t *testing.T) {
 }
 
 func TestCORSMiddleware(t *testing.T) {
-	engine := router.InitRouter()
+	engine := router.InitRouter(&config.Config{Auth: config.AuthConfig{JWTSecret: "test"}})
 
 	req, _ := http.NewRequest("OPTIONS", "/api/v1/health", nil)
 	req.Header.Set("Origin", "http://example.com")

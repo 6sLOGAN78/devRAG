@@ -31,6 +31,11 @@ class RAGFlowConfig(BaseModel):
     go_port: int = Field(gt=0, le=65535)
     python_port: int = Field(gt=0, le=65535)
 
+class AuthConfig(BaseModel):
+    jwt_secret: str
+    jwt_expiration_minutes: int
+    session_ttl_minutes: int
+
 class Config(BaseModel):
     mysql: MySQLConfig
     redis: RedisConfig
@@ -38,6 +43,7 @@ class Config(BaseModel):
     infinity: InfinityConfig
     nats: NATSConfig
     ragflow: RAGFlowConfig
+    auth: AuthConfig
 
 def expand_env(text: str) -> str:
     pattern = re.compile(r'\$\{([a-zA-Z_][a-zA-Z0-9_]*)(?::-([^}]*))?\}')

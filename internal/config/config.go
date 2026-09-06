@@ -15,6 +15,7 @@ type Config struct {
 	Infinity InfinityConfig `yaml:"infinity" json:"infinity"`
 	NATS     NATSConfig     `yaml:"nats" json:"nats"`
 	RAGFlow  RAGFlowConfig  `yaml:"ragflow" json:"ragflow"`
+	Auth     AuthConfig     `yaml:"auth" json:"auth"`
 }
 
 type MySQLConfig struct {
@@ -44,6 +45,12 @@ type InfinityConfig struct {
 
 type NATSConfig struct {
 	Endpoints string `yaml:"endpoints" json:"endpoints"`
+}
+
+type AuthConfig struct {
+	JWTSecret            string `yaml:"jwt_secret" json:"jwt_secret"`
+	JWTExpirationMinutes int    `yaml:"jwt_expiration_minutes" json:"jwt_expiration_minutes"`
+	SessionTTLMinutes    int    `yaml:"session_ttl_minutes" json:"session_ttl_minutes"`
 }
 
 type RAGFlowConfig struct {
@@ -77,7 +84,7 @@ func expandEnv(s string) string {
 		sub := re.FindStringSubmatch(match)
 		key := sub[1]
 		defaultVal := sub[2]
-		
+
 		val := os.Getenv(key)
 		if val == "" {
 			return defaultVal
@@ -87,26 +94,66 @@ func expandEnv(s string) string {
 }
 
 func validate(c *Config) error {
-	if c.MySQL.Host == "" { return fmt.Errorf("mysql.host is required") }
-	if c.MySQL.Port <= 0 || c.MySQL.Port > 65535 { return fmt.Errorf("mysql.port must be valid port") }
-	if c.MySQL.User == "" { return fmt.Errorf("mysql.user is required") }
-	if c.MySQL.Password == "" { return fmt.Errorf("mysql.password is required") }
-	if c.MySQL.DB == "" { return fmt.Errorf("mysql.db is required") }
+	if c.MySQL.Host == "" {
+		return fmt.Errorf("mysql.host is required")
+	}
+	if c.MySQL.Port <= 0 || c.MySQL.Port > 65535 {
+		return fmt.Errorf("mysql.port must be valid port")
+	}
+	if c.MySQL.User == "" {
+		return fmt.Errorf("mysql.user is required")
+	}
+	if c.MySQL.Password == "" {
+		return fmt.Errorf("mysql.password is required")
+	}
+	if c.MySQL.DB == "" {
+		return fmt.Errorf("mysql.db is required")
+	}
 
-	if c.Redis.Host == "" { return fmt.Errorf("redis.host is required") }
-	if c.Redis.Port <= 0 || c.Redis.Port > 65535 { return fmt.Errorf("redis.port must be valid port") }
+	if c.Redis.Host == "" {
+		return fmt.Errorf("redis.host is required")
+	}
+	if c.Redis.Port <= 0 || c.Redis.Port > 65535 {
+		return fmt.Errorf("redis.port must be valid port")
+	}
 
-	if c.MinIO.Endpoint == "" { return fmt.Errorf("minio.endpoint is required") }
-	if c.MinIO.AccessKey == "" { return fmt.Errorf("minio.access_key is required") }
-	if c.MinIO.SecretKey == "" { return fmt.Errorf("minio.secret_key is required") }
+	if c.MinIO.Endpoint == "" {
+		return fmt.Errorf("minio.endpoint is required")
+	}
+	if c.MinIO.AccessKey == "" {
+		return fmt.Errorf("minio.access_key is required")
+	}
+	if c.MinIO.SecretKey == "" {
+		return fmt.Errorf("minio.secret_key is required")
+	}
 
-	if c.Infinity.Host == "" { return fmt.Errorf("infinity.host is required") }
-	if c.Infinity.Port <= 0 || c.Infinity.Port > 65535 { return fmt.Errorf("infinity.port must be valid port") }
+	if c.Infinity.Host == "" {
+		return fmt.Errorf("infinity.host is required")
+	}
+	if c.Infinity.Port <= 0 || c.Infinity.Port > 65535 {
+		return fmt.Errorf("infinity.port must be valid port")
+	}
 
-	if c.NATS.Endpoints == "" { return fmt.Errorf("nats.endpoints is required") }
+	if c.NATS.Endpoints == "" {
+		return fmt.Errorf("nats.endpoints is required")
+	}
 
-	if c.RAGFlow.GoPort <= 0 || c.RAGFlow.GoPort > 65535 { return fmt.Errorf("ragflow.go_port must be valid port") }
-	if c.RAGFlow.PythonPort <= 0 || c.RAGFlow.PythonPort > 65535 { return fmt.Errorf("ragflow.python_port must be valid port") }
+	if c.RAGFlow.GoPort <= 0 || c.RAGFlow.GoPort > 65535 {
+		return fmt.Errorf("ragflow.go_port must be valid port")
+	}
+	if c.RAGFlow.PythonPort <= 0 || c.RAGFlow.PythonPort > 65535 {
+		return fmt.Errorf("ragflow.python_port must be valid port")
+	}
+
+	if c.Auth.JWTSecret == "" {
+		return fmt.Errorf("auth.jwt_secret is required")
+	}
+	if c.Auth.JWTExpirationMinutes <= 0 {
+		return fmt.Errorf("auth.jwt_expiration_minutes must be > 0")
+	}
+	if c.Auth.SessionTTLMinutes <= 0 {
+		return fmt.Errorf("auth.session_ttl_minutes must be > 0")
+	}
 
 	return nil
 }

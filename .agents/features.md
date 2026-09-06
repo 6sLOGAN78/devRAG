@@ -33,3 +33,8 @@ This file tracks the design and behavior of features implemented by agents in th
 - Established `/api/v1/ml` and `/api/v1/agents` blueprints boundaries.
 - Integrated base CORS, Logging, and robust Exception handling middlewares.
 - Completed runtime verification and passed full `pytest` and `ruff check` pipelines.
+## Phase 02-03: Authentication Flow
+- Implemented `/api/v1/user/register` handling bcrypt password hashing and MySQL persistence.
+- Implemented `/api/v1/user/login` handling JWT generation and Redis session caching.
+- Built strictly-coupled `Auth` middleware enforcing signed JWT expiration and correlated Redis `session_id` presence.
+- Updated unified configuration contracts across Go and Python to load `Auth` secrets implicitly.
