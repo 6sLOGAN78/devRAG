@@ -1,0 +1,41 @@
+import sys
+import os
+import logging
+import traceback
+from quart import Quart, jsonify
+from quart_cors import cors
+
+# Adjust python path to find common
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
+from common.settings import load_config  # noqa: F401, E402
+from api.apps.ml import ml_bp
+from api.apps.agents import agents_bp
+
+logger = logging.getLogger(__name__)
+
+def create_app():
+    app = Quart(__name__)
+
+    # Setup CORS
+    app = cors(app, allow_origin="*")
+
+    @app.before_request
+    async def log_request_info():
+        from quart import request
+        logger.info(f"Request: {request.method} {request.path}")
+
+    @app.errorhandler(Exception)
+    async def handle_exception(e):
+        # Do not expose internal stack traces in production responses.
+        logger.error(f"Unhandled Exception: {traceback.format_exc()}")
+        return jsonify({"error": "Internal Server Error"}), 500
+
+    @app.errorhandler(404)
+    async def not_found(e):
+        return jsonify({"error": "Not Found"}), 404
+
+    # Register blueprints
+    app.register_blueprint(ml_bp, url_prefix='/api/v1/ml')
+    app.register_blueprint(agents_bp, url_prefix='/api/v1/agents')
+
+    return app
