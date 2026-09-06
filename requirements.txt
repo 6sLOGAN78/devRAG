@@ -10,3 +10,4 @@ pytest-asyncio
 PyJWT
 redis
 pydantic
+paddlepaddle\npaddleocr\nopencv-python-headless
