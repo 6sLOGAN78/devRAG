@@ -12,3 +12,6 @@ redis
 pydantic
 paddlepaddle\npaddleocr\nopencv-python-headless
 infinity-sdk
+litellm
+tenacity
+sentence-transformers
