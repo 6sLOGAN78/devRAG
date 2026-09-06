@@ -33,6 +33,11 @@ auth:
 
 user_default_llm:
   default_models:
+    chat_model:
+      name: 'deepseek-chat'
+      factory: 'deepseek'
+      api_key: 'mock-api-key'
+      base_url: 'https://api.deepseek.com'
     embedding_model:
       name: 'BAAI/bge-large-en-v1.5'
       dimension: 1024

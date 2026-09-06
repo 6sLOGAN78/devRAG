@@ -5,6 +5,7 @@ from jinja2.sandbox import SandboxedEnvironment
 from jinja2 import StrictUndefined, TemplateError
 
 from .base import AgentNode
+from common.settings import load_config
 
 logger = logging.getLogger(__name__)
 
@@ -56,8 +57,18 @@ class LLMNode(AgentNode):
         if not messages:
             raise ValueError(f"Node {self.id} generated empty prompt messages")
             
+        # Load user_default_llm configuration
+        cfg = load_config("conf/service_conf.yaml")
+        chat_cfg = cfg.user_default_llm.default_models.chat_model
+        # Fallback to configured default if model is not set or we want to use defaults
+        actual_model = self.model
+        if chat_cfg.name and ("/" not in actual_model):
+            actual_model = f"{chat_cfg.factory}/{chat_cfg.name}"
+
         litellm_kwargs = {
-            "model": self.model,
+            "model": actual_model,
+            "api_key": chat_cfg.api_key if chat_cfg.api_key else None,
+            "api_base": chat_cfg.base_url if chat_cfg.base_url else None,
             "messages": messages,
             "stream": self.stream,
         }
@@ -95,7 +106,6 @@ class LLMNode(AgentNode):
                 
             return {
                 "text": output_text,
-                "model": self.model,
                 "usage": usage
             }
             

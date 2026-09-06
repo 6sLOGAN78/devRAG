@@ -43,10 +43,17 @@ class OcrModelConfig(BaseModel):
 class LayoutModelConfig(BaseModel):
     name: str = 'yolov8'
 
+class ChatModelConfig(BaseModel):
+    name: str = ""
+    factory: str = ""
+    api_key: str = ""
+    base_url: str = ""
+
 class TsrModelConfig(BaseModel):
     name: str = 'hf-tsr'
 
 class DefaultModelsConfig(BaseModel):
+    chat_model: ChatModelConfig = ChatModelConfig()
     embedding_model: EmbeddingModelConfig = EmbeddingModelConfig()
     ocr_model: OcrModelConfig = OcrModelConfig()
     layout_model: LayoutModelConfig = LayoutModelConfig()
