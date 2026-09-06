@@ -9,3 +9,6 @@ print*.py
 docker/volumes/
 .gemini/
 node_modules/
+assets/
+tests/e2e/playwright/test-results/
+tests/e2e/playwright/playwright-report/
