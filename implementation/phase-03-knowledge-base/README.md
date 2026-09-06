@@ -32,3 +32,7 @@ Document parsing, OCR, or chunking.
 
 ## Next Phase
 Phase 04: Deep Document Parsing (DeepDoc)
+
+## Distributed Coordination Requirements
+- **Dataset APIs**: Must use `RedisDistributedLock` in Dataset API Service to control concurrent dataset modifications.
+- **Knowledge Compilation**: Must use locks (`merge_lock`) for dataset compilation and structure compilation (`dataset_nav.py` and `structure.py`).

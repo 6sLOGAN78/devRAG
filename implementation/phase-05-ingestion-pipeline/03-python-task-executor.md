@@ -16,6 +16,9 @@ Connects the orchestrator to the actual DeepDoc logic.
 - [ ] Update `document_task` progress to `100%` and `SUCCESS`.
 
 ## Components
+- **Redis Distributed Locks**: 
+  - Must use `RedisDistributedLock("update_progress")` in background threads updating chunking progress.
+  - Must use `RedisDistributedLock("clean_task_executor")` in cleaner threads managing executor state.
 - ML Task Handler
 - Chunk Saver
 

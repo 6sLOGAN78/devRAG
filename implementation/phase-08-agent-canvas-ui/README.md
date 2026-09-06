@@ -31,3 +31,6 @@ Execution log UI (can be deferred).
 
 ## Next Phase
 Phase 09: Chat & Streaming API
+
+## Distributed Coordination Requirements
+- **Canvas Replica Service**: Must use `RedisDistributedLock` to synchronize canvas replica operations across nodes.

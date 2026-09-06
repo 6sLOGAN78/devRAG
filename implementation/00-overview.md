@@ -69,3 +69,5 @@ MVP Excludes:
 
 ## Production Ready
 The system is considered production-ready at the end of **Phase 10**, once rate limits, integration tests, and Kubernetes manifests are established.
+
+- **Distributed Coordination:** `RedisDistributedLock` (via `common/redis_conn.py`) is used across the Python backend for synchronizing concurrent background operations and avoiding race conditions across instances.

@@ -32,3 +32,7 @@ LLM generation (done in Phase 07).
 
 ## Next Phase
 Phase 07: Agentic Workflow Engine (Backend)
+
+## Distributed Coordination Requirements
+- **GraphRAG Indexing**: Must use `RedisDistributedLock(f"graphrag_task_{kb_id}")` to prevent concurrent writes/merges to the same Knowledge Base.
+- **Document Store**: Must use `RedisDistributedLock(lock_name)` in `ob_conn_base.py` to prevent concurrent initialization and writes.
