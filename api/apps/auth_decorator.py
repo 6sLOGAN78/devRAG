@@ -8,7 +8,7 @@ import redis.asyncio as redis
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
 from common.settings import load_config
-from api.db.db_models import UserTenant, User
+from api.db.db_models import UserTenant
 
 cfg = load_config(os.environ.get('RAGFLOW_CONFIG', 'conf/service_conf.yaml'))
 
@@ -56,7 +56,7 @@ def require_auth(f):
         # Peewee is sync, so this blocks the loop briefly, but it's fine for MVP
         try:
             user_tenants = list(UserTenant.select().where(UserTenant.user_id == user_id))
-        except Exception as e:
+        except Exception:
             return jsonify({"error": "Database error"}), 500
             
         if not user_tenants:

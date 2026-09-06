@@ -34,3 +34,16 @@ class UserTenant(BaseModel):
         indexes = (
             (('user_id', 'tenant_id'), True), # Unique constraint
         )
+
+class Dataset(BaseModel):
+    id = CharField(max_length=36, primary_key=True)
+    name = CharField(max_length=255, null=False)
+    description = CharField(max_length=1000, null=True)
+    tenant_id = CharField(max_length=36, null=False)
+    created_by = CharField(max_length=36, null=False)
+    status = CharField(max_length=50, null=False, default='active')
+    created_at = DateTimeField(default=datetime.datetime.now)
+    updated_at = DateTimeField(default=datetime.datetime.now)
+
+    class Meta:
+        table_name = 'dataset'

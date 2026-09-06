@@ -48,3 +48,8 @@ This file tracks the design and behavior of features implemented by agents in th
 - Updated `auth_decorator.py` in Python Quart stack to extract and bind `g.role` across endpoints dynamically.
 - Deployed active prevention logic securing systems against `invite` states impersonating valid user contexts (403 Forbidden).
 - Completed and wrote extensive documentation detailing RBAC integration parameters for upcoming CRUD schemas.
+## Phase 03-01: Dataset CRUD API
+- Implemented `Dataset` models matching RAG standards across both Go and Python Peewee abstractions.
+- Created `internal/dao/dataset.go` exclusively bounding retrieval and deletion scopes against authenticated `tenant_id` clauses to eliminate IDOR vectors.
+- Developed `internal/service/dataset.go` generating IDs correctly assigning `tenant_id`, `created_by`, and initialized states cleanly.
+- Exposed `POST /api/v1/dataset`, `GET /api/v1/dataset/list`, and `DELETE /api/v1/dataset/:id` securely over HTTP enforcing isolation contexts.

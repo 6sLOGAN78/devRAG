@@ -1,7 +1,6 @@
 import pytest
 from quart import Quart, jsonify, g
 from api.apps.auth_decorator import require_auth
-from api.db.db_models import UserTenant
 import jwt
 from unittest.mock import patch, MagicMock
 

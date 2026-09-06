@@ -35,3 +35,18 @@ type UserTenant struct {
 func (UserTenant) TableName() string {
 	return "user_tenant"
 }
+
+type Dataset struct {
+	ID          string    `gorm:"column:id;type:varchar(36);primaryKey"`
+	Name        string    `gorm:"column:name;type:varchar(255);not null"`
+	Description string    `gorm:"column:description;type:text"`
+	TenantID    string    `gorm:"column:tenant_id;type:varchar(36);not null;index"`
+	CreatedBy   string    `gorm:"column:created_by;type:varchar(36);not null;index"`
+	Status      string    `gorm:"column:status;type:varchar(50);not null;default:'active'"`
+	CreatedAt   time.Time `gorm:"column:created_at;autoCreateTime"`
+	UpdatedAt   time.Time `gorm:"column:updated_at;autoUpdateTime"`
+}
+
+func (Dataset) TableName() string {
+	return "dataset"
+}

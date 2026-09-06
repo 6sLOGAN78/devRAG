@@ -25,6 +25,14 @@ func InitRouter(cfg *config.Config) *gin.Engine {
 			// User info route
 			user.GET("/info", middleware.Auth(cfg), handler.GetUserInfo)
 		}
+
+		dataset := v1.Group("/dataset")
+		dataset.Use(middleware.Auth(cfg))
+		{
+			dataset.POST("", handler.CreateDataset)
+			dataset.GET("/list", handler.ListDatasets)
+			dataset.DELETE("/:id", handler.DeleteDataset)
+		}
 	}
 
 	return r

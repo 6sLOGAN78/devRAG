@@ -37,3 +37,6 @@ This file tracks the implementation progress of features and tasks in devRAG.
 ## Phase 02-05: Multi-Tenant Context & RBAC Foundation
 - Fully established safe RBAC parsing through the `UserTenant` database layer seamlessly into both API gateway and Python worker loop contexts. 
 - Integrated spoofing protection avoiding payload overrides safely terminating any injection attempt.
+## Phase 03-01: Dataset CRUD API
+- Enforced complete API isolation where queries actively map to DB states matching authenticated bounds avoiding untrusted IDs!
+- Executed Runtime and Integration verification proving cross-tenant deletion failures!

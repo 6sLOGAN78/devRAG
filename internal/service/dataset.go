@@ -1,0 +1,71 @@
+package service
+
+import (
+	"strings"
+	"time"
+	"github.com/google/uuid"
+	"github.com/6sLOGAN78/devRAG/internal/dao"
+)
+
+type CreateDatasetReq struct {
+	Name        string `json:"name" binding:"required,max=255"`
+	Description string `json:"description" binding:"max=1000"`
+}
+
+type DatasetDTO struct {
+	ID          string    `json:"id"`
+	Name        string    `json:"name"`
+	Description string    `json:"description"`
+	TenantID    string    `json:"tenant_id"`
+	CreatedBy   string    `json:"created_by"`
+	Status      string    `json:"status"`
+	CreatedAt   time.Time `json:"created_at"`
+	UpdatedAt   time.Time `json:"updated_at"`
+}
+
+func mapDatasetToDTO(ds *dao.Dataset) DatasetDTO {
+	return DatasetDTO{
+		ID:          ds.ID,
+		Name:        ds.Name,
+		Description: ds.Description,
+		TenantID:    ds.TenantID,
+		CreatedBy:   ds.CreatedBy,
+		Status:      ds.Status,
+		CreatedAt:   ds.CreatedAt,
+		UpdatedAt:   ds.UpdatedAt,
+	}
+}
+
+func CreateDataset(tenantID, userID string, req CreateDatasetReq) (DatasetDTO, error) {
+	ds := &dao.Dataset{
+		ID:          uuid.New().String(),
+		Name:        strings.TrimSpace(req.Name),
+		Description: strings.TrimSpace(req.Description),
+		TenantID:    tenantID,
+		CreatedBy:   userID,
+		Status:      "active",
+	}
+
+	if err := dao.CreateDataset(ds); err != nil {
+		return DatasetDTO{}, err
+	}
+
+	return mapDatasetToDTO(ds), nil
+}
+
+func ListDatasets(tenantID string) ([]DatasetDTO, error) {
+	datasets, err := dao.ListDatasetsByTenant(tenantID)
+	if err != nil {
+		return nil, err
+	}
+	
+	dtos := make([]DatasetDTO, len(datasets))
+	for i, ds := range datasets {
+		dtos[i] = mapDatasetToDTO(&ds)
+	}
+	return dtos, nil
+}
+
+func DeleteDataset(tenantID, datasetID string) error {
+	return dao.DeleteDatasetByIDAndTenant(datasetID, tenantID)
+}
