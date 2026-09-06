@@ -10,12 +10,14 @@ import (
 type CreateDatasetReq struct {
 	Name        string `json:"name" binding:"required,max=255"`
 	Description string `json:"description" binding:"max=1000"`
+	EmbdID      string `json:"embd_id" binding:"max=128"`
 }
 
 type DatasetDTO struct {
 	ID          string    `json:"id"`
 	Name        string    `json:"name"`
 	Description string    `json:"description"`
+	EmbdID      string    `json:"embd_id"`
 	TenantID    string    `json:"tenant_id"`
 	CreatedBy   string    `json:"created_by"`
 	Status      string    `json:"status"`
@@ -28,6 +30,7 @@ func mapDatasetToDTO(ds *dao.Dataset) DatasetDTO {
 		ID:          ds.ID,
 		Name:        ds.Name,
 		Description: ds.Description,
+		EmbdID:      ds.EmbdID,
 		TenantID:    ds.TenantID,
 		CreatedBy:   ds.CreatedBy,
 		Status:      ds.Status,
@@ -41,6 +44,7 @@ func CreateDataset(tenantID, userID string, req CreateDatasetReq) (DatasetDTO, e
 		ID:          uuid.New().String(),
 		Name:        strings.TrimSpace(req.Name),
 		Description: strings.TrimSpace(req.Description),
+		EmbdID:      strings.TrimSpace(req.EmbdID),
 		TenantID:    tenantID,
 		CreatedBy:   userID,
 		Status:      "active",

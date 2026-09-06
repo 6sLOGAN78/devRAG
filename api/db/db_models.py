@@ -43,6 +43,7 @@ class Dataset(BaseModel):
     id = CharField(max_length=36, primary_key=True)
     name = CharField(max_length=255, null=False)
     description = CharField(max_length=1000, null=True)
+    embd_id = CharField(max_length=128, null=True)
     tenant_id = CharField(max_length=36, null=False)
     created_by = CharField(max_length=36, null=False)
     status = CharField(max_length=50, null=False, default='active')
@@ -116,6 +117,7 @@ class AgentCanvas(BaseModel):
     tenant_id = CharField(max_length=36, null=False)
     name = CharField(max_length=255, null=False)
     description = CharField(max_length=1000, null=True)
+    embd_id = CharField(max_length=128, null=True)
     graph_definition = TextField(null=False) # JSON object
     version = IntegerField(default=1)
     created_by = CharField(max_length=36, null=False)

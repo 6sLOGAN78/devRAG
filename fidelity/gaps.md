@@ -30,3 +30,10 @@
 ## Resolved Gaps
 1. **[P0] Missing Tenant API Key Management (TenantLLM)**
    - *Fix*: Created the `TenantLLM` database model and `GET`/`POST`/`DELETE` API endpoints in Go. Patched the Python `LLMNode` execution logic to securely query `TenantLLM` via Peewee and inject the configured credentials into `litellm` before falling back to the system default. Added full isolation test to prove that tenants cannot access or use other tenants' API keys.
+5. **[P1] Missing Tenant-Scoped Embedding Resolution (Dataset EmbdID)**
+   - *Issue*: Even after adding `TenantLLM`, DevRAG's `Dataset` model completely lacked the `embd_id` field. The Python `indexing_service.py` and `retrieval.py` were hardcoded to use the system `user_default_llm.default_models.embedding_model` for all vector embedding. This means tenants could not configure custom embedding models (like OpenAI `text-embedding-3-small` vs `BAAI/bge-large-en-v1.5`) and all embeddings leaked billing to the host keys.
+   - *Fix*: 
+     - Added `embd_id` to `Dataset` in Go (`models.go`) and Python (`db_models.py`).
+     - Added `embd_id` to `CreateDatasetReq` and `DatasetDTO` in Go.
+     - Patched `_get_embedding_config` in both `indexing_service.py` and `retrieval.py` to query the Dataset's `embd_id`, map it to `TenantLLM` to securely extract the API key, and configure the `EmbeddingConfig` provider dynamically (`litellm` vs `huggingface`).
+   - *Status*: Verified via E2E test. Document indexing successfully pulls the tenant-specific API key and executes embedding generation on the specified model.

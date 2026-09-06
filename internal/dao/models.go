@@ -40,6 +40,7 @@ type Dataset struct {
 	ID          string    `gorm:"column:id;type:varchar(36);primaryKey"`
 	Name        string    `gorm:"column:name;type:varchar(255);not null"`
 	Description string    `gorm:"column:description;type:text"`
+	EmbdID      string    `gorm:"column:embd_id;type:varchar(128)"`
 	TenantID    string    `gorm:"column:tenant_id;type:varchar(36);not null;index"`
 	CreatedBy   string    `gorm:"column:created_by;type:varchar(36);not null;index"`
 	Status      string    `gorm:"column:status;type:varchar(50);not null;default:'active'"`

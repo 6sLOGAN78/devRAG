@@ -34,12 +34,46 @@ class RetrievalService:
         self._rerank_engines = {}
 
     def _get_embedding_config(self, dataset_id: str) -> EmbeddingConfig:
+        from api.db.db_models import Dataset, TenantLLM
         cfg = load_config(os.environ.get('RAGFLOW_CONFIG', 'conf/service_conf.yaml'))
         model_cfg = cfg.user_default_llm.default_models.embedding_model
+        
+        provider = model_cfg.provider
+        model_name = model_cfg.name
+        api_key = None
+        base_url = None
+
+        dataset = Dataset.select().where(Dataset.id == dataset_id).first()
+        if dataset and dataset.embd_id:
+            embd_id = dataset.embd_id
+
+            if "/" in embd_id:
+                factory, name = embd_id.split("/", 1)
+                # Keep model_name as the full string for litellm
+                model_name = embd_id 
+                # If it's a remote model, the provider for EmbeddingEngine should be "litellm"
+                provider = "litellm" if factory != "huggingface" else "huggingface"
+            else:
+                factory = embd_id
+                name = embd_id
+
+            tenant_llm = TenantLLM.select().where(
+                (TenantLLM.tenant_id == dataset.tenant_id) & 
+                (TenantLLM.llm_factory == factory) & 
+                (TenantLLM.llm_name == name)
+            ).first()
+
+            
+            if tenant_llm and tenant_llm.api_key:
+                api_key = tenant_llm.api_key
+                base_url = tenant_llm.api_base
+
         return EmbeddingConfig(
-            provider=model_cfg.provider,
-            model=model_cfg.name,
-            dimension=model_cfg.dimension
+            provider=provider,
+            model=model_name,
+            dimension=model_cfg.dimension,
+            api_key=api_key,
+            base_url=base_url
         )
         
     def _get_rerank_config(self, dataset_id: str) -> RerankConfig:
