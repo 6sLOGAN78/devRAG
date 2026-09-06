@@ -32,3 +32,8 @@ NodeRegistry.register("llm", LLMNode)
 
 from .component.retrieval import RetrievalNode
 NodeRegistry.register("retrieval", RetrievalNode)
+
+from .component.logic import SwitchNode, CategorizeNode, CodeNode
+NodeRegistry.register("switch", SwitchNode)
+NodeRegistry.register("categorize", CategorizeNode)
+NodeRegistry.register("code", CodeNode)

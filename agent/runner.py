@@ -4,6 +4,7 @@ from typing import Dict, Any, Optional
 
 from .graph import AgentGraph
 from .state import ExecutionState
+from .component.base import NodeResult
 
 logger = logging.getLogger(__name__)
 
@@ -62,14 +63,47 @@ class GraphRunner:
         if initial_inputs:
             state.set_output("__start__", initial_inputs)
             
+        node_active = {n: False for n in graph.nodes_dict}
+        # Start nodes are active by default
+        for n in graph.nodes_dict:
+            in_degree = sum(1 for e in graph.edges if e["target"] == n)
+            if in_degree == 0:
+                node_active[n] = True
+            
         for node_id in graph.topological_order:
+            if not node_active[node_id]:
+                logger.info(f"[Execution: {execution_id}] Skipping node {node_id} (not activated by route)")
+                continue
+                
             node = graph.nodes_dict[node_id]
             
             try:
                 resolved_inputs = self._resolve_inputs(node_id, graph, state)
                 logger.info(f"[Execution: {execution_id}] Executing node {node_id}")
-                output = node.execute(resolved_inputs)
+                
+                result_obj = node.execute(resolved_inputs)
+                
+                route = None
+                if isinstance(result_obj, NodeResult):
+                    output = result_obj.output
+                    route = result_obj.route
+                else:
+                    output = result_obj
+                    
                 state.set_output(node_id, output)
+                
+                # Activate downstream branches
+                outgoing_edges = [e for e in graph.edges if e["source"] == node_id]
+                for edge in outgoing_edges:
+                    target = edge["target"]
+                    edge_route = edge.get("route")
+                    
+                    if route is not None:
+                        if edge_route == route:
+                            node_active[target] = True
+                    else:
+                        node_active[target] = True
+                        
             except Exception as e:
                 logger.error(f"[Execution: {execution_id}] Node {node_id} of type {type(node).__name__} failed: {e}")
                 state.set_error(node_id, e)

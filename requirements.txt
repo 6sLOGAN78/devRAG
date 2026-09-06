@@ -15,3 +15,4 @@ infinity-sdk==0.3.0
 litellm
 tenacity
 sentence-transformers
+RestrictedPython

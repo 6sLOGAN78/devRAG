@@ -1,5 +1,11 @@
 import abc
 from typing import Any, Dict, Optional
+from dataclasses import dataclass
+
+@dataclass
+class NodeResult:
+    output: Any
+    route: Optional[str] = None
 
 class AgentNode(abc.ABC):
     """
