@@ -17,7 +17,6 @@ class NodeRegistry:
 class MockNode(AgentNode):
     """A mock node for testing DAG topology and state propagation."""
     def execute(self, resolved_inputs: Dict[str, Any]) -> Any:
-        # Mock node simply returns its config and inputs combined, or what is specified
         ret = {}
         if self.config:
             ret.update(self.config)
@@ -26,3 +25,7 @@ class MockNode(AgentNode):
         return ret
 
 NodeRegistry.register("mock", MockNode)
+
+# Register LLM Node lazily to avoid circular imports if any, or just import here
+from .component.llm import LLMNode
+NodeRegistry.register("llm", LLMNode)
