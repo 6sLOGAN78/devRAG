@@ -63,18 +63,29 @@ def require_auth(f):
             return jsonify({"error": "Unauthorized tenant access"}), 403
             
         tenant_id = None
+        role = None
         if requested_tenant_id:
             for ut in user_tenants:
                 if ut.tenant_id == requested_tenant_id:
+                    if ut.role == 'invite':
+                        return jsonify({"error": "Unauthorized tenant access"}), 403
                     tenant_id = requested_tenant_id
+                    role = ut.role
                     break
             if not tenant_id:
                 return jsonify({"error": "Unauthorized tenant access"}), 403
         else:
-            tenant_id = user_tenants[0].tenant_id
+            for ut in user_tenants:
+                if ut.role != 'invite':
+                    tenant_id = ut.tenant_id
+                    role = ut.role
+                    break
+            if not tenant_id:
+                return jsonify({"error": "Unauthorized tenant access"}), 403
             
         g.user_id = user_id
         g.tenant_id = tenant_id
+        g.role = role
         
         return await f(*args, **kwargs)
         

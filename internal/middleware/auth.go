@@ -43,7 +43,7 @@ func Auth(cfg *config.Config) gin.HandlerFunc {
 		}
 
 		requestedTenantID := c.GetHeader("X-Tenant-ID")
-		tenantID, err := service.ResolveTenantContext(claims.UserID, requestedTenantID)
+		tenantID, role, err := service.ResolveTenantContext(claims.UserID, requestedTenantID)
 		if err != nil {
 			c.JSON(http.StatusForbidden, gin.H{"error": "Unauthorized tenant access"})
 			c.Abort()
@@ -52,6 +52,7 @@ func Auth(cfg *config.Config) gin.HandlerFunc {
 
 		c.Set("user_id", claims.UserID)
 		c.Set("tenant_id", tenantID)
+		c.Set("role", role)
 		c.Next()
 	}
 }

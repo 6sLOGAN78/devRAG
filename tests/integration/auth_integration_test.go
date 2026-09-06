@@ -99,6 +99,11 @@ func TestAuthFlow(t *testing.T) {
 	if w4.Code != http.StatusOK {
 		t.Fatalf("Expected 200 OK for protected route, got %d", w4.Code)
 	}
+	var userInfo map[string]interface{}
+	json.Unmarshal(w4.Body.Bytes(), &userInfo)
+	if userInfo["role"] != "owner" {
+		t.Fatalf("Expected role 'owner', got %v", userInfo["role"])
+	}
 
 	// Test cross-tenant access rejection (if requested invalid tenant)
 	req5, _ := http.NewRequest("GET", "/api/v1/user/info", nil)

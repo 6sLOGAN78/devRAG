@@ -11,25 +11,33 @@ var (
 	ErrUnauthorizedTenant = errors.New("unauthorized tenant access")
 )
 
-func ResolveTenantContext(userID, requestedTenantID string) (string, error) {
+func ResolveTenantContext(userID, requestedTenantID string) (string, string, error) {
 	var userTenants []dao.UserTenant
 	if err := dao.DB.Where("user_id = ?", userID).Find(&userTenants).Error; err != nil {
-		return "", err
+		return "", "", err
 	}
 
 	if len(userTenants) == 0 {
-		return "", ErrUnauthorizedTenant
+		return "", "", ErrUnauthorizedTenant
 	}
 
 	if requestedTenantID != "" {
 		for _, ut := range userTenants {
 			if ut.TenantID == requestedTenantID {
-				return requestedTenantID, nil
+				if ut.Role == "invite" {
+					return "", "", ErrUnauthorizedTenant
+				}
+				return requestedTenantID, ut.Role, nil
 			}
 		}
-		return "", ErrUnauthorizedTenant
+		return "", "", ErrUnauthorizedTenant
 	}
 
 	// Default to first tenant if none requested
-	return userTenants[0].TenantID, nil
+	for _, ut := range userTenants {
+		if ut.Role != "invite" {
+			return ut.TenantID, ut.Role, nil
+		}
+	}
+	return "", "", ErrUnauthorizedTenant
 }

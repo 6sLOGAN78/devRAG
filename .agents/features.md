@@ -43,3 +43,8 @@ This file tracks the design and behavior of features implemented by agents in th
 - Implemented `/api/v1/user/info` exposing safe user context output natively in Go.
 - Recreated identical auth/tenant evaluation rules as an async `@require_auth` decorator for Python Quart bridging `g.user_id` and `g.tenant_id`.
 - Proven strict isolation ensuring unowned `X-Tenant-ID` injections gracefully reject with 403 Forbidden.
+## Phase 02-05: Multi-Tenant Context & RBAC Foundation
+- Modified `ResolveTenantContext` in Go to correctly parse and extract `role` natively exposing `c.GetString("role")`.
+- Updated `auth_decorator.py` in Python Quart stack to extract and bind `g.role` across endpoints dynamically.
+- Deployed active prevention logic securing systems against `invite` states impersonating valid user contexts (403 Forbidden).
+- Completed and wrote extensive documentation detailing RBAC integration parameters for upcoming CRUD schemas.

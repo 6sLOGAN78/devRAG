@@ -37,5 +37,6 @@ func GetUserInfo(c *gin.Context) {
 		"email":     user.Email,
 		"nickname":  user.Nickname,
 		"tenant_id": tenantID,
+		"role":      c.GetString("role"),
 	})
 }
