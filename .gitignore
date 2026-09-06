@@ -1,4 +1,9 @@
-docs
-ragflow-doc
-docker/volumes
 venv/
+__pycache__/
+*.pyc
+.env
+temp.txt
+patch*.go
+patch*.py
+print*.py
+docker/volumes/
