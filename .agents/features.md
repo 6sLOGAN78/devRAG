@@ -53,3 +53,9 @@ This file tracks the design and behavior of features implemented by agents in th
 - Created `internal/dao/dataset.go` exclusively bounding retrieval and deletion scopes against authenticated `tenant_id` clauses to eliminate IDOR vectors.
 - Developed `internal/service/dataset.go` generating IDs correctly assigning `tenant_id`, `created_by`, and initialized states cleanly.
 - Exposed `POST /api/v1/dataset`, `GET /api/v1/dataset/list`, and `DELETE /api/v1/dataset/:id` securely over HTTP enforcing isolation contexts.
+## Phase 03-02: Document Upload API
+- Implemented `Document` models across Go and Python Peewee mapping raw MinIO locations.
+- Constructed `internal/storage/minio.go` abstracting MinIO storage operations (PutObject, GetObject, DeleteObject).
+- Engineered `internal/service/document.go` generating secure, traversal-resistant MinIO keys: `tenant/{tenant_id}/dataset/{dataset_id}/document/{document_id}/original`.
+- Validated Dataset ownership comprehensively preventing cross-tenant document injections into unowned Datasets.
+- Deployed Multipart upload endpoint `POST /api/v1/document/upload` rejecting uploads > 50MB.

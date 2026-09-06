@@ -50,3 +50,21 @@ type Dataset struct {
 func (Dataset) TableName() string {
 	return "dataset"
 }
+
+type Document struct {
+	ID          string    `gorm:"column:id;type:varchar(36);primaryKey"`
+	DatasetID   string    `gorm:"column:dataset_id;type:varchar(36);not null;index"`
+	TenantID    string    `gorm:"column:tenant_id;type:varchar(36);not null;index"`
+	Name        string    `gorm:"column:name;type:varchar(255);not null"`
+	Size        int64     `gorm:"column:size;not null"`
+	Type        string    `gorm:"column:type;type:varchar(100);not null"`
+	MinioPath   string    `gorm:"column:minio_path;type:varchar(500);not null"`
+	ParseStatus string    `gorm:"column:parse_status;type:varchar(50);not null;default:'pending'"`
+	CreatedBy   string    `gorm:"column:created_by;type:varchar(36);not null;index"`
+	CreatedAt   time.Time `gorm:"column:created_at;autoCreateTime"`
+	UpdatedAt   time.Time `gorm:"column:updated_at;autoUpdateTime"`
+}
+
+func (Document) TableName() string {
+	return "document"
+}

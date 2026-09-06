@@ -47,3 +47,19 @@ class Dataset(BaseModel):
 
     class Meta:
         table_name = 'dataset'
+
+class Document(BaseModel):
+    id = CharField(max_length=36, primary_key=True)
+    dataset_id = CharField(max_length=36, null=False)
+    tenant_id = CharField(max_length=36, null=False)
+    name = CharField(max_length=255, null=False)
+    size = CharField(max_length=20, null=False) # storing int as str to avoid 64bit issues in simple ORM
+    type = CharField(max_length=100, null=False)
+    minio_path = CharField(max_length=500, null=False)
+    parse_status = CharField(max_length=50, null=False, default='pending')
+    created_by = CharField(max_length=36, null=False)
+    created_at = DateTimeField(default=datetime.datetime.now)
+    updated_at = DateTimeField(default=datetime.datetime.now)
+
+    class Meta:
+        table_name = 'document'

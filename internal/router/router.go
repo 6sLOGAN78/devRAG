@@ -33,6 +33,14 @@ func InitRouter(cfg *config.Config) *gin.Engine {
 			dataset.GET("/list", handler.ListDatasets)
 			dataset.DELETE("/:id", handler.DeleteDataset)
 		}
+
+		document := v1.Group("/document")
+		document.Use(middleware.Auth(cfg))
+		{
+			document.POST("/upload", handler.UploadDocument)
+			document.GET("/list", handler.ListDocuments)
+			document.DELETE("/:id", handler.DeleteDocument)
+		}
 	}
 
 	return r

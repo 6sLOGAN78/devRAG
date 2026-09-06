@@ -40,3 +40,6 @@ This file tracks the implementation progress of features and tasks in devRAG.
 ## Phase 03-01: Dataset CRUD API
 - Enforced complete API isolation where queries actively map to DB states matching authenticated bounds avoiding untrusted IDs!
 - Executed Runtime and Integration verification proving cross-tenant deletion failures!
+## Phase 03-02: Document Upload API
+- Implemented transactional logic cleaning up MinIO objects if DB insertion fails minimizing orphaned objects.
+- Integration tests verified cross-tenant upload denial natively asserting `404 Not Found` for mismatched datasets.

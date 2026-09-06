@@ -6,6 +6,7 @@ import (
 
 	"github.com/6sLOGAN78/devRAG/internal/config"
 	"github.com/6sLOGAN78/devRAG/internal/dao"
+	"github.com/6sLOGAN78/devRAG/internal/storage"
 	"github.com/6sLOGAN78/devRAG/internal/router"
 )
 
@@ -21,12 +22,16 @@ func main() {
 	defer dao.CloseDB()
 
 	// AutoMigrate tables for development
-	dao.DB.AutoMigrate(&dao.Tenant{}, &dao.User{}, &dao.UserTenant{}, &dao.Dataset{})
+	dao.DB.AutoMigrate(&dao.Tenant{}, &dao.User{}, &dao.UserTenant{}, &dao.Dataset{}, &dao.Document{})
 
 	if err := dao.InitRedis(cfg); err != nil {
 		log.Fatalf("Failed to initialize Redis: %v", err)
 	}
 	defer dao.CloseRedis()
+
+	if err := storage.InitMinIO(cfg); err != nil {
+		log.Fatalf("Failed to initialize MinIO: %v", err)
+	}
 
 	r := router.InitRouter(cfg)
 
