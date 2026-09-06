@@ -75,11 +75,14 @@ class LLMNode(AgentNode):
             if self.stream:
                 accumulated_text = ""
                 # Accumulate the stream synchronously since graph runner is synchronous
+                stream_callback = resolved_inputs.get("__stream_callback__")
                 for chunk in response:
                     # Litellm handles OpenAI and Anthropic stream chunks uniformly
                     delta = chunk.choices[0].delta.content
                     if delta:
                         accumulated_text += delta
+                        if stream_callback:
+                            stream_callback(delta)
                         
                 output_text = accumulated_text
                 usage = None  # Usage not universally tracked on standard streamed chunks without callbacks

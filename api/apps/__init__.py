@@ -10,6 +10,8 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '.
 from common.settings import load_config  # noqa: F401, E402
 from api.apps.ml import ml_bp
 from api.apps.agents import agents_bp
+from api.apps.chat_handler import chat_bp
+
 
 logger = logging.getLogger(__name__)
 
@@ -43,5 +45,7 @@ def create_app():
     # Register blueprints
     app.register_blueprint(ml_bp, url_prefix='/api/v1/ml')
     app.register_blueprint(agents_bp, url_prefix='/api/v1/agents')
+    app.register_blueprint(chat_bp, url_prefix='/api/v1/chat')
+
 
     return app
