@@ -5,6 +5,9 @@ import { DashboardPage } from './pages/dashboard';
 import { MainLayout } from './layouts/main-layout';
 import { ProtectedRoute } from './components/ProtectedRoute';
 
+import { DatasetListPage } from './pages/datasets';
+import { DatasetDetailPage } from './pages/datasets/detail';
+
 export const AppRoutes = () => {
   return (
     <Routes>
@@ -15,8 +18,11 @@ export const AppRoutes = () => {
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
         <Route path="/dashboard" element={<DashboardPage />} />
         
+        {/* Knowledge Routes */}
+        <Route path="/datasets" element={<DatasetListPage />} />
+        <Route path="/datasets/:datasetId" element={<DatasetDetailPage />} />
+        
         {/* Placeholders for future routes */}
-        <Route path="/knowledge" element={<div className="p-4 bg-white shadow rounded-lg">Knowledge Base (Coming Soon)</div>} />
         <Route path="/documents" element={<div className="p-4 bg-white shadow rounded-lg">Documents (Coming Soon)</div>} />
         <Route path="/chat" element={<div className="p-4 bg-white shadow rounded-lg">Chat (Coming Soon)</div>} />
         <Route path="/agents" element={<div className="p-4 bg-white shadow rounded-lg">Agents (Coming Soon)</div>} />

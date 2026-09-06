@@ -18,7 +18,7 @@ export const MainLayout = () => {
 
   const navItems = [
     { name: 'Dashboard', path: '/dashboard', icon: Home },
-    { name: 'Knowledge', path: '/knowledge', icon: Database },
+    { name: 'Knowledge', path: '/datasets', icon: Database },
     { name: 'Documents', path: '/documents', icon: FileText },
     { name: 'Chat', path: '/chat', icon: MessageSquare },
     { name: 'Agents', path: '/agents', icon: Bot },
