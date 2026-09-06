@@ -20,3 +20,7 @@ This file tracks the implementation progress of features and tasks in devRAG.
 ## Phase 04: Core Database Models
 - Dual-ORM (GORM + Peewee) setup mapped identically to the same tables (`tenant`, `user`, `user_tenant`).
 - Enforced multi-tenancy foundation and cross-language compatibility.
+## Phase 02 (Gin): Go Gin HTTP Server
+- Established API Gateway using Gin.
+- Implemented middlewares: CORS, Logger, Recovery.
+- Added health handler at `/api/v1/health`.

@@ -23,5 +23,5 @@ nats:
   endpoints: ${NATS_ENDPOINTS:-nats:14222}
 
 ragflow:
-  go_port: ${RAGFLOW_GO_PORT:-9384}
-  python_port: ${RAGFLOW_PYTHON_PORT:-9380}
+  go_port: ${RAGFLOW_GO_PORT:-9380}
+  python_port: ${RAGFLOW_PYTHON_PORT:-9381}
