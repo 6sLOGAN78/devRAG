@@ -21,7 +21,7 @@ export const MainLayout = () => {
     { name: 'Knowledge', path: '/datasets', icon: Database },
     { name: 'Documents', path: '/documents', icon: FileText },
     { name: 'Chat', path: '/chat', icon: MessageSquare },
-    { name: 'Agents', path: '/agents', icon: Bot },
+    { name: 'Agents Canvas', path: '/agents/canvas', icon: Bot },
   ];
 
   return (

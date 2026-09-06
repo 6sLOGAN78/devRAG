@@ -1,3 +1,4 @@
+import { CanvasPage } from './pages/agents/canvas';
 import { Routes, Route, Navigate } from 'react-router';
 import { LoginNextPage } from './pages/login-next';
 import { RegisterPage } from './pages/register';
@@ -25,6 +26,7 @@ export const AppRoutes = () => {
         {/* Placeholders for future routes */}
         <Route path="/documents" element={<div className="p-4 bg-white shadow rounded-lg">Documents (Coming Soon)</div>} />
         <Route path="/chat" element={<div className="p-4 bg-white shadow rounded-lg">Chat (Coming Soon)</div>} />
+        <Route path="/agents/canvas" element={<CanvasPage />} />
         <Route path="/agents" element={<div className="p-4 bg-white shadow rounded-lg">Agents (Coming Soon)</div>} />
       </Route>
       
