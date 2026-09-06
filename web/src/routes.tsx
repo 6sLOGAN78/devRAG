@@ -8,6 +8,7 @@ import { ProtectedRoute } from './components/ProtectedRoute';
 
 import { DatasetListPage } from './pages/datasets';
 import { DatasetDetailPage } from './pages/datasets/detail';
+import { ChatPage } from './pages/chat';
 
 export const AppRoutes = () => {
   return (
@@ -25,7 +26,7 @@ export const AppRoutes = () => {
         
         {/* Placeholders for future routes */}
         <Route path="/documents" element={<div className="p-4 bg-white shadow rounded-lg">Documents (Coming Soon)</div>} />
-        <Route path="/chat" element={<div className="p-4 bg-white shadow rounded-lg">Chat (Coming Soon)</div>} />
+        <Route path="/chat" element={<ChatPage />} />
         <Route path="/agents/canvas" element={<CanvasPage />} />
         <Route path="/agents" element={<div className="p-4 bg-white shadow rounded-lg">Agents (Coming Soon)</div>} />
       </Route>
