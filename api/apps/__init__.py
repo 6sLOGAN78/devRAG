@@ -13,6 +13,8 @@ from api.apps.agents import agents_bp
 from api.apps.chat_handler import chat_bp
 
 
+from api.utils.logger import setup_logger
+setup_logger()
 logger = logging.getLogger(__name__)
 
 def create_app():
@@ -28,20 +30,22 @@ def create_app():
         asyncio.create_task(clean_task_executor_loop())
 
     @app.before_request
-    async def log_request_info():
-        from quart import request
+    async def setup_request_context():
+        import uuid
+        from quart import request, g
+        g.request_id = request.headers.get("X-Request-ID", str(uuid.uuid4()))
         logger.info(f"Request: {request.method} {request.path}")
-
     @app.errorhandler(Exception)
     async def handle_exception(e):
+        from quart import g
         # Do not expose internal stack traces in production responses.
-        logger.error(f"Unhandled Exception: {traceback.format_exc()}")
-        return jsonify({"error": "Internal Server Error"}), 500
+        logger.error(f"Unhandled Exception: {traceback.format_exc()}", extra={"event": "internal_error"})
+        return jsonify({"error": {"code": "INTERNAL_ERROR", "message": "Internal Server Error", "request_id": getattr(g, "request_id", "")}}), 500
 
     @app.errorhandler(404)
     async def not_found(e):
-        return jsonify({"error": "Not Found"}), 404
-
+        from quart import g
+        return jsonify({"error": {"code": "NOT_FOUND", "message": "Not Found", "request_id": getattr(g, "request_id", "")}}), 404
     # Register blueprints
     app.register_blueprint(ml_bp, url_prefix='/api/v1/ml')
     app.register_blueprint(agents_bp, url_prefix='/api/v1/agents')

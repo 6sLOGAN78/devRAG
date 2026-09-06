@@ -24,31 +24,31 @@ def require_auth(f):
     async def decorated_function(*args, **kwargs):
         auth_header = request.headers.get('Authorization')
         if not auth_header or not auth_header.startswith('Bearer '):
-            return jsonify({"error": "Missing or invalid Authorization header"}), 401
+            return jsonify({"error": {"code": "UNAUTHORIZED", "message": "Missing or invalid Authorization header", "request_id": getattr(g, "request_id", "")}}), 401
             
         token = auth_header.split(' ')[1]
         try:
             claims = jwt.decode(token, cfg.auth.jwt_secret, algorithms=["HS256"])
         except Exception:
-            return jsonify({"error": "Invalid or expired token"}), 401
+            return jsonify({"error": {"code": "UNAUTHORIZED", "message": "Invalid or expired token", "request_id": getattr(g, "request_id", "")}}), 401
             
         user_id = claims.get('user_id')
         session_id = claims.get('session_id')
         
         if not user_id or not session_id:
-            return jsonify({"error": "Invalid token claims"}), 401
+            return jsonify({"error": {"code": "UNAUTHORIZED", "message": "Invalid token claims", "request_id": getattr(g, "request_id", "")}}), 401
             
         session_data = await redis_client.get(f"session:{user_id}")
         if not session_data:
-            return jsonify({"error": "Session inactive or expired"}), 401
+            return jsonify({"error": {"code": "UNAUTHORIZED", "message": "Session inactive or expired", "request_id": getattr(g, "request_id", "")}}), 401
             
         try:
             session_json = json.loads(session_data)
         except Exception:
-            return jsonify({"error": "Invalid session data"}), 401
+            return jsonify({"error": {"code": "UNAUTHORIZED", "message": "Invalid session data", "request_id": getattr(g, "request_id", "")}}), 401
             
         if session_json.get('session_id') != session_id:
-            return jsonify({"error": "Session mismatch"}), 401
+            return jsonify({"error": {"code": "UNAUTHORIZED", "message": "Session mismatch", "request_id": getattr(g, "request_id", "")}}), 401
             
         # Validate Tenant Context
         requested_tenant_id = request.headers.get('X-Tenant-ID')
@@ -57,10 +57,10 @@ def require_auth(f):
         try:
             user_tenants = list(UserTenant.select().where(UserTenant.user_id == user_id))
         except Exception:
-            return jsonify({"error": "Database error"}), 500
+            return jsonify({"error": {"code": "INTERNAL_ERROR", "message": "Database error", "request_id": getattr(g, "request_id", "")}}), 500
             
         if not user_tenants:
-            return jsonify({"error": "Unauthorized tenant access"}), 403
+            return jsonify({"error": {"code": "FORBIDDEN", "message": "Unauthorized tenant access", "request_id": getattr(g, "request_id", "")}}), 403
             
         tenant_id = None
         role = None
@@ -68,12 +68,12 @@ def require_auth(f):
             for ut in user_tenants:
                 if ut.tenant_id == requested_tenant_id:
                     if ut.role == 'invite':
-                        return jsonify({"error": "Unauthorized tenant access"}), 403
+                        return jsonify({"error": {"code": "FORBIDDEN", "message": "Unauthorized tenant access", "request_id": getattr(g, "request_id", "")}}), 403
                     tenant_id = requested_tenant_id
                     role = ut.role
                     break
             if not tenant_id:
-                return jsonify({"error": "Unauthorized tenant access"}), 403
+                return jsonify({"error": {"code": "FORBIDDEN", "message": "Unauthorized tenant access", "request_id": getattr(g, "request_id", "")}}), 403
         else:
             for ut in user_tenants:
                 if ut.role != 'invite':
@@ -81,7 +81,7 @@ def require_auth(f):
                     role = ut.role
                     break
             if not tenant_id:
-                return jsonify({"error": "Unauthorized tenant access"}), 403
+                return jsonify({"error": {"code": "FORBIDDEN", "message": "Unauthorized tenant access", "request_id": getattr(g, "request_id", "")}}), 403
             
         g.user_id = user_id
         g.tenant_id = tenant_id

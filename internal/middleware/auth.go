@@ -4,10 +4,11 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/6sLOGAN78/devRAG/internal/api"
 	"github.com/6sLOGAN78/devRAG/internal/auth"
 	"github.com/6sLOGAN78/devRAG/internal/config"
+	"github.com/6sLOGAN78/devRAG/internal/service"
 	"github.com/6sLOGAN78/devRAG/internal/session"
-"github.com/6sLOGAN78/devRAG/internal/service"
 	"github.com/gin-gonic/gin"
 )
 
@@ -15,38 +16,33 @@ func Auth(cfg *config.Config) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		authHeader := c.GetHeader("Authorization")
 		if authHeader == "" {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Missing Authorization header"})
-			c.Abort()
+			api.RespondError(c, http.StatusUnauthorized, "UNAUTHORIZED", "Missing Authorization header")
 			return
 		}
 
 		parts := strings.Split(authHeader, " ")
 		if len(parts) != 2 || parts[0] != "Bearer" {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid Authorization format"})
-			c.Abort()
+			api.RespondError(c, http.StatusUnauthorized, "UNAUTHORIZED", "Invalid Authorization format")
 			return
 		}
 
 		tokenString := parts[1]
 		claims, err := auth.ValidateToken(tokenString, cfg.Auth.JWTSecret)
 		if err != nil {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid or expired token"})
-			c.Abort()
+			api.RespondError(c, http.StatusUnauthorized, "UNAUTHORIZED", "Invalid or expired token")
 			return
 		}
 
 		valid, err := session.ValidateSession(c.Request.Context(), claims.UserID, claims.SessionID)
 		if err != nil || !valid {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Session inactive or expired"})
-			c.Abort()
+			api.RespondError(c, http.StatusUnauthorized, "UNAUTHORIZED", "Session inactive or expired")
 			return
 		}
 
 		requestedTenantID := c.GetHeader("X-Tenant-ID")
 		tenantID, role, err := service.ResolveTenantContext(claims.UserID, requestedTenantID)
 		if err != nil {
-			c.JSON(http.StatusForbidden, gin.H{"error": "Unauthorized tenant access"})
-			c.Abort()
+			api.RespondError(c, http.StatusForbidden, "FORBIDDEN", "Unauthorized tenant access")
 			return
 		}
 
