@@ -24,5 +24,8 @@ You are an expert full-stack developer working on **devRAG**, a multi-tenant ent
 4. **Agent Behavior:**
    - Always think step-by-step.
    - Before making changes, ensure you understand the dependencies between the Go and Python services.
-5. **Continuous Documentation:**
-   - At the conclusion of EVERY task or feature implementation requested by the user, you MUST automatically update `README.md` and `implementation.md` in the repository root to log what was just implemented. Keep a running changelog of the progress.
+5. **Continuous Documentation & Verification:**
+   - At the conclusion of EVERY task or feature implementation requested by the user, you MUST:
+     1. Automatically update `README.md` and `implementation.md` in the repository root.
+     2. Create a dedicated documentation file for the feature inside `.agents/features/<feature_name>.md` to track its design and behavior.
+     3. Perform a repository-wide scan to find and fix any bugs or edge cases related to the feature you just implemented (using the `.agents/rules/bug-and-issue.md` prompt).
