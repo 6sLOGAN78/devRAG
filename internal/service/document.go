@@ -93,7 +93,16 @@ func UploadDocument(ctx context.Context, tenantID, userID, datasetID string, fil
 		CreatedBy:   userID,
 	}
 
-	if err := dao.CreateDocument(doc); err != nil {
+	taskID := uuid.New().String()
+	task := &dao.DocumentTask{
+		ID:         taskID,
+		DocumentID: docID,
+		TenantID:   tenantID,
+		Status:     "unstart",
+		Progress:   0,
+	}
+
+	if err := dao.CreateDocumentWithTask(doc, task); err != nil {
 		// Attempt to cleanup MinIO on DB failure
 		_ = storage.DeleteObject(context.Background(), minioPath)
 		return nil, fmt.Errorf("failed to create document record: %w", err)

@@ -38,3 +38,15 @@ func DeleteDocumentByIDAndTenant(docID, tenantID string) error {
 	}
 	return nil
 }
+
+func CreateDocumentWithTask(doc *Document, task *DocumentTask) error {
+	return DB.Transaction(func(tx *gorm.DB) error {
+		if err := tx.Create(doc).Error; err != nil {
+			return err
+		}
+		if err := tx.Create(task).Error; err != nil {
+			return err
+		}
+		return nil
+	})
+}
