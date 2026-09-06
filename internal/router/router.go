@@ -39,6 +39,7 @@ func InitRouter(cfg *config.Config) *gin.Engine {
 		{
 			document.POST("/upload", handler.UploadDocument)
 			document.GET("/list", handler.ListDocuments)
+			document.GET("/status", handler.GetDocumentStatus)
 			document.DELETE("/:id", handler.DeleteDocument)
 		}
 	}

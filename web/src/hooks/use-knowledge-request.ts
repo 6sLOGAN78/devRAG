@@ -115,3 +115,33 @@ export const useDeleteDocument = () => {
     },
   });
 };
+
+export interface DocumentStatus {
+  document_id: string;
+  task_id: string;
+  status: string;
+  progress: number;
+  error_msg: string | null;
+  updated_at: string;
+}
+
+export const useDocumentStatuses = (documentIds: string[]) => {
+  return useQuery({
+    queryKey: ['document_statuses', documentIds],
+    queryFn: async () => {
+      if (!documentIds.length) return {};
+      const response = await apiClient.get(`/document/status?document_ids=${documentIds.join(',')}`);
+      return response.data.statuses as Record<string, DocumentStatus>;
+    },
+    enabled: documentIds.length > 0,
+    // Poll every 3 seconds if any document is processing
+    refetchInterval: (query) => {
+      if (!query.state.data) return 3000;
+      
+      const statuses = Object.values(query.state.data);
+      // If any task is 'unstart' or 'running', keep polling
+      const isProcessing = statuses.some(s => s.status === 'unstart' || s.status === 'running');
+      return isProcessing ? 3000 : false;
+    }
+  });
+};

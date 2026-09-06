@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router';
-import { useDatasets, useDocuments, useDeleteDocument } from '../../hooks/use-knowledge-request';
+import { useDatasets, useDocuments, useDeleteDocument, useDocumentStatuses } from '../../hooks/use-knowledge-request';
 import { Loader2, ArrowLeft, UploadCloud, File, Trash2 } from 'lucide-react';
 import { FileUploadDialog } from '../../components/file-upload-dialog';
 
@@ -9,7 +9,15 @@ export const DatasetDetailPage = () => {
   const navigate = useNavigate();
   
   const { data: datasets, isLoading: isDatasetLoading } = useDatasets();
-  const { data: documents, isLoading: isDocsLoading, error: docsError } = useDocuments(datasetId || '');
+    const { data: documents, isLoading: isDocsLoading, error: docsError } = useDocuments(datasetId || '');
+  
+  // Extract document IDs that need status polling (pending/running)
+    
+  // We can also just poll for all docs, but polling only for non-terminal docs is better.
+  // Actually, to get the initial status, we poll for all documents.
+  const allDocIds = (documents || []).map(d => d.id);
+  const { data: statuses } = useDocumentStatuses(allDocIds);
+
   const deleteDocMutation = useDeleteDocument();
 
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
@@ -127,13 +135,49 @@ export const DatasetDetailPage = () => {
                       {(doc.size / (1024 * 1024)).toFixed(2)} MB
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                        doc.parse_status === 'completed' ? 'bg-green-100 text-green-800' :
-                        doc.parse_status === 'failed' ? 'bg-red-100 text-red-800' :
-                        'bg-yellow-100 text-yellow-800'
-                      }`}>
-                        {doc.parse_status}
-                      </span>
+                      {(() => {
+                        const taskStatus = statuses?.[doc.id];
+                        // If we have a task status from backend, use it
+                        if (taskStatus) {
+                          if (taskStatus.status === 'failed') {
+                            return (
+                              <div className="flex flex-col">
+                                <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800 self-start">Failed</span>
+                                {taskStatus.error_msg && <span className="text-xs text-red-500 mt-1 truncate max-w-xs" title={taskStatus.error_msg}>{taskStatus.error_msg}</span>}
+                              </div>
+                            );
+                          }
+                          if (taskStatus.status === 'success') {
+                            return <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Completed (100%)</span>;
+                          }
+                          
+                          // unstart or running
+                          const label = taskStatus.status === 'unstart' ? 'Queued' : 'Processing';
+                          const progress = taskStatus.progress || 0;
+                          return (
+                            <div className="flex flex-col w-32">
+                              <div className="flex justify-between text-xs mb-1">
+                                <span className="text-blue-700 font-medium">{label}</span>
+                                <span className="text-gray-500">{progress}%</span>
+                              </div>
+                              <div className="w-full bg-gray-200 rounded-full h-1.5">
+                                <div className="bg-blue-600 h-1.5 rounded-full" style={{ width: `${progress}%` }}></div>
+                              </div>
+                            </div>
+                          );
+                        }
+                        
+                        // Fallback to document parse_status if task not found yet
+                        return (
+                          <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                            doc.parse_status === 'success' || doc.parse_status === 'completed' ? 'bg-green-100 text-green-800' :
+                            doc.parse_status === 'failed' ? 'bg-red-100 text-red-800' :
+                            'bg-yellow-100 text-yellow-800'
+                          }`}>
+                            {doc.parse_status === 'pending' ? 'Queued' : doc.parse_status}
+                          </span>
+                        );
+                      })()}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <button
