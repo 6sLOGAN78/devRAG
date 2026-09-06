@@ -38,3 +38,8 @@ This file tracks the design and behavior of features implemented by agents in th
 - Implemented `/api/v1/user/login` handling JWT generation and Redis session caching.
 - Built strictly-coupled `Auth` middleware enforcing signed JWT expiration and correlated Redis `session_id` presence.
 - Updated unified configuration contracts across Go and Python to load `Auth` secrets implicitly.
+## Phase 02-04: Tenant Context & Cross-Stack Authentication
+- Expanded Go Auth middleware to strictly enforce `UserTenant` DB relationship validation and inject secure `tenant_id` context.
+- Implemented `/api/v1/user/info` exposing safe user context output natively in Go.
+- Recreated identical auth/tenant evaluation rules as an async `@require_auth` decorator for Python Quart bridging `g.user_id` and `g.tenant_id`.
+- Proven strict isolation ensuring unowned `X-Tenant-ID` injections gracefully reject with 403 Forbidden.

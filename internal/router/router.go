@@ -22,8 +22,8 @@ func InitRouter(cfg *config.Config) *gin.Engine {
 			user.POST("/register", handler.RegisterUser)
 			user.POST("/login", handler.LoginUser(cfg))
 
-			// Protected route demo
-			user.GET("/me", middleware.Auth(cfg), handler.GetMe)
+			// User info route
+			user.GET("/info", middleware.Auth(cfg), handler.GetUserInfo)
 		}
 	}
 

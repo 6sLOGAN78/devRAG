@@ -3,3 +3,4 @@ peewee
 pymysql
 hypercorn\npytest\nruff\nquart-cors\nhttpx
 pytest-asyncio
+PyJWT\nredis

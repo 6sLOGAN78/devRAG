@@ -31,3 +31,6 @@ This file tracks the implementation progress of features and tasks in devRAG.
 ## Phase 02-03: Authentication Flow
 - Completed Go authentication boundary using bcrypt, jwt-go, and go-redis.
 - Achieved complete `go test` integration coverage.
+## Phase 02-04: Tenant Context & Cross-Stack Authentication
+- Centralized auth boundaries ensuring secure mapping of `User` ↔ `Tenant` natively exposing `tenant_id`.
+- Replicated logic gracefully in Python `api/apps/auth_decorator.py`.

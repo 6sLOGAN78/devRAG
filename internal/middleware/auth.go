@@ -7,6 +7,7 @@ import (
 	"github.com/6sLOGAN78/devRAG/internal/auth"
 	"github.com/6sLOGAN78/devRAG/internal/config"
 	"github.com/6sLOGAN78/devRAG/internal/session"
+"github.com/6sLOGAN78/devRAG/internal/service"
 	"github.com/gin-gonic/gin"
 )
 
@@ -41,7 +42,16 @@ func Auth(cfg *config.Config) gin.HandlerFunc {
 			return
 		}
 
+		requestedTenantID := c.GetHeader("X-Tenant-ID")
+		tenantID, err := service.ResolveTenantContext(claims.UserID, requestedTenantID)
+		if err != nil {
+			c.JSON(http.StatusForbidden, gin.H{"error": "Unauthorized tenant access"})
+			c.Abort()
+			return
+		}
+
 		c.Set("user_id", claims.UserID)
+		c.Set("tenant_id", tenantID)
 		c.Next()
 	}
 }
