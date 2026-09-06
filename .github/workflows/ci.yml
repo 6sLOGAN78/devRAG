@@ -1,0 +1,80 @@
+name: devRAG CI Quality Gates
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+
+jobs:
+  backend-go:
+    name: Go API Tests
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: rag_test
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.23'
+      - name: Wait for MySQL
+        run: sleep 10
+      - name: Run Go Tests
+        env:
+          MYSQL_DSN: "root:root@tcp(127.0.0.1:3306)/rag_test?charset=utf8mb4&parseTime=True&loc=Local"
+        run: go test -v ./...
+
+  backend-python:
+    name: Python Integration Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Run Python Tests
+        env:
+          PYTHONPATH: .
+        run: pytest tests/integration/
+
+  frontend-e2e:
+    name: Frontend E2E Tests (Playwright)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install Dependencies & Build
+        run: |
+          cd web
+          npm ci
+          npm run build
+      - name: Start Services
+        run: |
+          docker compose -f docker/docker-compose-base.yml up -d
+          # In a real CI, we would start Go API and Python backend here
+      - name: Install Playwright
+        run: |
+          cd tests/e2e/playwright
+          npm ci
+          npx playwright install --with-deps chromium
+      - name: Run Playwright Tests
+        run: |
+          cd tests/e2e/playwright
+          # This assumes that the app is started or mocked by Playwright
+          npx playwright test
