@@ -8,3 +8,7 @@
 
 ## Unresolved Gaps
 *(Will populate as inspection continues)*
+2. **[P1] Storage Bucket Discrepancy**
+   - *Issue*: The Go API (`internal/storage/minio.go`) uploads all documents to a hardcoded `devrag-documents` bucket. The Python `parsing_service.py` incorrectly assumed the first path segment was the bucket name (e.g., `tenant`), causing MinIO `NoSuchBucket` errors during task execution.
+   - *Fix*: Patched `api/services/parsing_service.py` to correctly expect the `devrag-documents` bucket and pass the full `minio_path` as the object name.
+   - *Status*: Verified. Python worker successfully downloads from MinIO, parses, and inserts chunks into Infinity.

@@ -51,12 +51,9 @@ class ParsingService:
             # The minio_path is typically something like "ragflow/tenant/...".
             # RAGFlow conventionally uses bucket name as the first part. Let's assume bucket is extracted from path, or devRAG uses a static bucket. 
             # In Phase 01 / settings, there's no bucket. Let's assume the path stores the bucket as first segment.
-            parts = doc.minio_path.strip('/').split('/', 1)
-            if len(parts) == 2:
-                bucket_name, object_name = parts
-            else:
-                bucket_name = "devrag"
-                object_name = parts[0]
+            # devRAG hardcodes the bucket as 'devrag-documents' in Go
+            bucket_name = "devrag-documents"
+            object_name = doc.minio_path.strip('/')
 
             # 3. Download to temp file
             with tempfile.NamedTemporaryFile(delete=False, suffix=f".{ext}") as tmp:
