@@ -16,6 +16,13 @@ export const LLMForm = ({ config, onChange }: LLMFormProps) => {
           onChange={(e) => onChange({ model: e.target.value })}
         >
           <option value="">Select a model...</option>
+          <optgroup label="Google (Gemini)">
+            <option value="gemini/gemini-3.8-flash">Gemini 3.8 Flash</option>
+            <option value="gemini/gemini-3.7-flash">Gemini 3.7 Flash</option>
+            <option value="gemini/gemini-3.5-flash">Gemini 3.5 Flash</option>
+            <option value="gemini/gemini-2.5-pro">Gemini 2.5 Pro</option>
+            <option value="gemini/gemini-2.5-flash">Gemini 2.5 Flash</option>
+          </optgroup>
           <optgroup label="OpenAI">
             <option value="gpt-4o">gpt-4o</option>
             <option value="gpt-4o-mini">gpt-4o-mini</option>
