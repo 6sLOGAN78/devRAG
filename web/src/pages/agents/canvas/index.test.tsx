@@ -1,5 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
+
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { CanvasPage } from './index';
 
 // Mock ResizeObserver for React Flow
@@ -10,8 +12,15 @@ globalThis.ResizeObserver = class ResizeObserver {
 };
 
 describe('CanvasPage', () => {
+
   it('renders palette and canvas area', () => {
-    render(<CanvasPage />);
+    const queryClient = new QueryClient();
+    render(
+      <QueryClientProvider client={queryClient}>
+        <CanvasPage />
+      </QueryClientProvider>
+    );
+
     expect(screen.getByText('Node Palette')).toBeInTheDocument();
     
     // Check if the node types are in the palette

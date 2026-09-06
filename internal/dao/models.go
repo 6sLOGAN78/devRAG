@@ -103,3 +103,19 @@ type DocumentChunk struct {
 func (DocumentChunk) TableName() string {
 	return "document_chunk"
 }
+
+type AgentCanvas struct {
+	ID              string    `gorm:"column:id;type:varchar(36);primaryKey"`
+	TenantID        string    `gorm:"column:tenant_id;type:varchar(36);not null;index"`
+	Name            string    `gorm:"column:name;type:varchar(255);not null"`
+	Description     string    `gorm:"column:description;type:varchar(1000)"`
+	GraphDefinition string    `gorm:"column:graph_definition;type:text;not null"`
+	Version         int       `gorm:"column:version;not null;default:1"`
+	CreatedBy       string    `gorm:"column:created_by;type:varchar(36);not null"`
+	CreatedAt       time.Time `gorm:"column:created_at;autoCreateTime"`
+	UpdatedAt       time.Time `gorm:"column:updated_at;autoUpdateTime"`
+}
+
+func (AgentCanvas) TableName() string {
+	return "agent_canvas"
+}

@@ -1,19 +1,15 @@
 package syncer
 
 import (
-	"context"
 	"net/http"
 	"net/http/httptest"
+	"fmt"
 	"testing"
-	"time"
 
-	"github.com/6sLOGAN78/devRAG/internal/config"
-	"github.com/6sLOGAN78/devRAG/internal/dao"
-)
+	)
 
 func TestSyncerDispatch(t *testing.T) {
 	// Simple mock test to ensure HTTP dispatch is properly formed
-	var receivedPayload string
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path != "/api/v1/ml/parse_document" {
 			t.Errorf("Expected path /api/v1/ml/parse_document, got %s", r.URL.Path)
@@ -21,7 +17,7 @@ func TestSyncerDispatch(t *testing.T) {
 		
 		buf := make([]byte, 1024)
 		n, _ := r.Body.Read(buf)
-		receivedPayload = string(buf[:n])
+		_ = string(buf[:n]) // receivedPayload
 		
 		w.WriteHeader(http.StatusOK)
 	}))

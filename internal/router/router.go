@@ -44,5 +44,13 @@ func InitRouter(cfg *config.Config) *gin.Engine {
 		}
 	}
 
+	
+		agent := v1.Group("/agent")
+		agent.Use(middleware.Auth(cfg))
+		{
+			agent.POST("/canvas/save", handler.SaveCanvas)
+			agent.GET("/canvas/:id", handler.GetCanvas)
+		}
+
 	return r
 }
