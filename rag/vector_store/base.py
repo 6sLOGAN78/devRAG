@@ -46,6 +46,17 @@ class BaseVectorStore(abc.ABC):
         pass
         
     @abc.abstractmethod
+    def search_lexical(
+        self,
+        index_name: str,
+        query: str,
+        top_k: int = 10,
+        filters: Optional[Dict[str, Any]] = None
+    ) -> List[SearchResult]:
+        """Search the index using full-text BM25 search."""
+        pass
+        
+    @abc.abstractmethod
     def delete(self, index_name: str, document_id: str) -> None:
         """Delete all vectors associated with a specific document."""
         pass

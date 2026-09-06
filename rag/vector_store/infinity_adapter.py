@@ -69,7 +69,12 @@ class InfinityAdapter(BaseVectorStore):
                 }
             )
             table.create_index("vec_idx", index_info, ConflictType.Ignore)
-            logger.info(f"Index {index_name} created successfully with dimension {dimensions}")
+            
+            # Create full-text index for lexical search
+            fts_index_info = IndexInfo("content", IndexType.FullText, {})
+            table.create_index("fts_idx", fts_index_info, ConflictType.Ignore)
+            
+            logger.info(f"Index {index_name} created successfully with dimension {dimensions} and full-text support.")
         except Exception as e:
             logger.error(f"Error creating index {index_name}: {e}")
             raise
@@ -145,6 +150,45 @@ class InfinityAdapter(BaseVectorStore):
             return results
         except Exception as e:
             logger.error(f"Error searching in {index_name}: {e}")
+            raise
+
+    def search_lexical(
+        self,
+        index_name: str,
+        query: str,
+        top_k: int = 10,
+        filters: Optional[Dict[str, Any]] = None
+    ) -> List[SearchResult]:
+        try:
+            table = self._db.get_table(index_name)
+            
+            # Using _score for match_text is supported natively by Infinity
+            q = table.output(["id", "document_id", "dataset_id", "content", "_score"])
+            
+            if filters:
+                filter_strs = []
+                for k, v in filters.items():
+                    filter_strs.append(f"{k} = '{v}'")
+                filter_expr = " and ".join(filter_strs)
+                q = q.filter(filter_expr)
+                
+            q = q.match_text("content", query, top_k, None)
+            
+            res_df = q.to_pl()
+            
+            results = []
+            for row in res_df.iter_rows(named=True):
+                results.append(SearchResult(
+                    id=row["id"],
+                    document_id=row["document_id"],
+                    dataset_id=row["dataset_id"],
+                    content=row["content"],
+                    score=row["_score"],
+                    metadata={}
+                ))
+            return results
+        except Exception as e:
+            logger.error(f"Error in lexical search in {index_name}: {e}")
             raise
 
     def delete(self, index_name: str, document_id: str) -> None:
