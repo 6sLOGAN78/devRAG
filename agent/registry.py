@@ -29,3 +29,6 @@ NodeRegistry.register("mock", MockNode)
 # Register LLM Node lazily to avoid circular imports if any, or just import here
 from .component.llm import LLMNode
 NodeRegistry.register("llm", LLMNode)
+
+from .component.retrieval import RetrievalNode
+NodeRegistry.register("retrieval", RetrievalNode)
