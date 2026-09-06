@@ -119,3 +119,35 @@ class AgentCanvas(BaseModel):
         indexes = (
             (('tenant_id',), False),
         )
+
+
+class ChatSession(BaseModel):
+    id = CharField(max_length=36, primary_key=True)
+    user_id = CharField(max_length=36, null=False)
+    tenant_id = CharField(max_length=36, null=False)
+    agent_id = CharField(max_length=36, null=False)
+    title = CharField(max_length=255, null=True)
+    created_at = DateTimeField(default=datetime.datetime.now)
+    updated_at = DateTimeField(default=datetime.datetime.now)
+
+    class Meta:
+        table_name = 'chat_session'
+        indexes = (
+            (('user_id', 'tenant_id'), False),
+        )
+
+class ChatMessage(BaseModel):
+    id = CharField(max_length=36, primary_key=True)
+    session_id = CharField(max_length=36, null=False)
+    tenant_id = CharField(max_length=36, null=False)
+    role = CharField(max_length=50, null=False)
+    content = TextField(null=False)
+    citations = TextField(null=True)
+    created_at = DateTimeField(default=datetime.datetime.now)
+    updated_at = DateTimeField(default=datetime.datetime.now)
+
+    class Meta:
+        table_name = 'chat_message'
+        indexes = (
+            (('session_id', 'tenant_id'), False),
+        )

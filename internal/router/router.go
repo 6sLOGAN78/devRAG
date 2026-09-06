@@ -52,5 +52,20 @@ func InitRouter(cfg *config.Config) *gin.Engine {
 			agent.GET("/canvas/:id", handler.GetCanvas)
 		}
 
+	
+		chat := v1.Group("/chat")
+		chat.Use(middleware.Auth(cfg))
+		{
+			chat.POST("/session", handler.CreateChatSession)
+			chat.GET("/session", handler.ListChatSessions)
+			chat.GET("/session/:id", handler.GetChatSession)
+			chat.PUT("/session/:id", handler.UpdateChatSession)
+			chat.DELETE("/session/:id", handler.DeleteChatSession)
+			
+			// message endpoints
+			chat.GET("/message/:id", handler.GetMessageHistory)
+			chat.POST("/message/:id", handler.AppendChatMessage)
+		}
+
 	return r
 }

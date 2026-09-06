@@ -119,3 +119,32 @@ type AgentCanvas struct {
 func (AgentCanvas) TableName() string {
 	return "agent_canvas"
 }
+
+type ChatSession struct {
+	ID        string    `gorm:"column:id;type:varchar(36);primaryKey"`
+	UserID    string    `gorm:"column:user_id;type:varchar(36);not null;index:idx_user_session"`
+	TenantID  string    `gorm:"column:tenant_id;type:varchar(36);not null;index"`
+	AgentID   string    `gorm:"column:agent_id;type:varchar(36);not null;index"`
+	Title     string    `gorm:"column:title;type:varchar(255)"`
+	CreatedAt time.Time `gorm:"column:created_at;autoCreateTime"`
+	UpdatedAt time.Time `gorm:"column:updated_at;autoUpdateTime"`
+}
+
+func (ChatSession) TableName() string {
+	return "chat_session"
+}
+
+type ChatMessage struct {
+	ID        string    `gorm:"column:id;type:varchar(36);primaryKey"`
+	SessionID string    `gorm:"column:session_id;type:varchar(36);not null;index:idx_session_msg"`
+	TenantID  string    `gorm:"column:tenant_id;type:varchar(36);not null;index"`
+	Role      string    `gorm:"column:role;type:varchar(50);not null"`
+	Content   string    `gorm:"column:content;type:longtext;not null"`
+	Citations string    `gorm:"column:citations;type:json"`
+	CreatedAt time.Time `gorm:"column:created_at;autoCreateTime"`
+	UpdatedAt time.Time `gorm:"column:updated_at;autoUpdateTime"`
+}
+
+func (ChatMessage) TableName() string {
+	return "chat_message"
+}
