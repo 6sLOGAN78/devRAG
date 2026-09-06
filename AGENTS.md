@@ -1,31 +1,45 @@
-# devRAG Architecture & Vibe
+# devRAG — Agent Instructions
 
-You are an expert full-stack developer working on **devRAG**, a multi-tenant enterprise RAG (Retrieval-Augmented Generation) system. 
+You are working on **devRAG**, a multi-tenant enterprise RAG system.
 
-## Core Stack
-- **Edge / Ingress:** Nginx
-- **Backend (High Concurrency & Ingestion):** Go (located in `internal/`)
-- **Backend (AI/ML & API):** Python Quart/Flask (located in `api/`)
-- **Databases:** 
-  - Relational: MySQL (stores metadata, users, config)
-  - Vector/Search: Infinity / Elasticsearch (stores embeddings)
-  - Cache/Queue: Valkey/Redis, NATS JetStream
-  - Storage: MinIO / S3
+## Architecture
 
-## Global Architectural Rules
-1. **Separation of Concerns:** 
-   - Never write raw SQL in handlers. Always strictly follow the **Handler -> Service -> DAO** layered pattern.
-2. **Multi-Tenancy is Mandatory:** 
-   - Almost every database table (e.g., Knowledgebase, Document, Dialog) has a `tenant_id`. 
-   - When querying the database or vector store, you MUST always filter by `tenant_id` to prevent cross-tenant data leaks.
-3. **Language Boundaries:** 
-   - Use Python for heavy ML tasks, embedding generation, and LLM integrations.
-   - Use Go for high-throughput CRUD APIs, document parsing queues, and worker execution.
-4. **Agent Behavior:**
-   - Always think step-by-step.
-   - Before making changes, ensure you understand the dependencies between the Go and Python services.
-5. **Continuous Documentation & Verification:**
-   - At the conclusion of EVERY task or feature implementation requested by the user, you MUST:
-     1. Automatically update `README.md` and `implementation.md` in the repository root.
-     2. Update the `.agents/features.md` file to track the design and behavior of the newly implemented feature.
-     3. Perform a repository-wide scan to find and fix any bugs or edge cases related to the feature you just implemented (using the `.agents/rules/bug-and-issue.md` prompt).
+* **Go (`internal/`)** — high-concurrency APIs, ingestion, workers, queues.
+* **Python (`api/`)** — AI/ML, embeddings, LLM integrations, RAG logic.
+* **MySQL** — metadata and relational data.
+* **Redis/Valkey** — cache/session state.
+* **NATS JetStream** — asynchronous processing.
+* **MinIO/S3** — object storage.
+* **Infinity/Elasticsearch** — vector/search.
+* **Nginx** — ingress.
+
+## Core Rules
+
+1. **Use Handler → Service → DAO/Repository.** No raw SQL in handlers.
+2. **Tenant isolation is mandatory.** Tenant-owned database and vector queries must enforce the authenticated `tenant_id`.
+3. **Respect language boundaries.** Keep ML/LLM work in Python and high-concurrency/infrastructure work in Go.
+4. **Do not silently change architecture.** Record meaningful deviations in `.agents/decisions/`.
+5. **Read the relevant `.agents/` phase, architecture, and contract documentation before modifying related code.**
+
+## Superpowers
+
+This repository uses **obra/superpowers** as the engineering workflow.
+
+* Follow applicable Superpowers skills automatically.
+* Do not bypass applicable planning, TDD, debugging, review, or verification workflows.
+* Do not duplicate Superpowers workflows inside `.agents/`.
+
+**Superpowers defines HOW to work. `.agents/` defines WHAT devRAG must build.**
+
+## Completion
+
+Before declaring work complete:
+
+* Run the relevant tests.
+* Verify the implementation against the current phase/feature requirements.
+* Update relevant documentation and `.agents/features.md`.
+* Record meaningful architectural deviations.
+* Report what changed, tests run, and verification status.
+
+Never declare completion when required tests or verification are failing.
+Always push with valid commits after each update or anything big you did like something enough to commit.

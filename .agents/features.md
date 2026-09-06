@@ -10,3 +10,9 @@ This file tracks the design and behavior of features implemented by agents in th
 - Configured `.env` variables for credentials, avoiding git commits of secrets.
 - Implemented health checks, persistent volumes, and a unified Docker network (`ragflow-network`).
 - Created infrastructure test suite validating container startup and health endpoints.
+## Phase 03: Unified Configuration Management
+- Established single source of truth at `conf/service_conf.yaml` for both Go and Python backends.
+- Implemented strict custom env-interpolation to guarantee identical cross-language semantics.
+- Implemented `internal/config/config.go` with strict JSON tags and `gopkg.in/yaml.v3` parsing.
+- Implemented `common/settings.py` leveraging `pyyaml` and strict `pydantic` structural validation.
+- Verified full validation suite including missing fields, type errors, invalid ports, and overrides.

@@ -1,0 +1,27 @@
+mysql:
+  host: ${MYSQL_HOST:-mysql}
+  port: ${MYSQL_PORT:-13306}
+  user: ${MYSQL_USER:-ragflow}
+  password: ${MYSQL_PASSWORD:-ragflow}
+  db: ${MYSQL_DB:-rag_flow}
+
+redis:
+  host: ${REDIS_HOST:-redis}
+  port: ${REDIS_PORT:-16379}
+  db: ${REDIS_DB:-0}
+
+minio:
+  endpoint: ${MINIO_ENDPOINT:-minio:19000}
+  access_key: ${MINIO_ACCESS_KEY:-admin}
+  secret_key: ${MINIO_SECRET_KEY:-password}
+
+infinity:
+  host: ${INFINITY_HOST:-infinity}
+  port: ${INFINITY_PORT:-23817}
+
+nats:
+  endpoints: ${NATS_ENDPOINTS:-nats:14222}
+
+ragflow:
+  go_port: ${RAGFLOW_GO_PORT:-9384}
+  python_port: ${RAGFLOW_PYTHON_PORT:-9380}

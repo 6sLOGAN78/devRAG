@@ -1,0 +1,30 @@
+{
+  "mysql": {
+    "host": "mysql",
+    "port": 13306,
+    "user": "ragflow",
+    "password": "ragflow",
+    "db": "rag_flow"
+  },
+  "redis": {
+    "host": "redis",
+    "port": 16379,
+    "db": 0
+  },
+  "minio": {
+    "endpoint": "minio:19000",
+    "access_key": "admin",
+    "secret_key": "password"
+  },
+  "infinity": {
+    "host": "infinity",
+    "port": 23817
+  },
+  "nats": {
+    "endpoints": "nats:14222"
+  },
+  "ragflow": {
+    "go_port": 9384,
+    "python_port": 9380
+  }
+}
