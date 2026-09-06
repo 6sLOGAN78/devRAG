@@ -17,7 +17,12 @@ Required by:
 Go creates tasks in MySQL/Redis. A Go `syncer` daemon dispatches tasks to Python worker APIs, polling for status updates.
 
 ## Subphase Order
-01-task-queue-models -> 02-go-syncer-worker -> 03-python-task-executor -> 04-frontend-progress-ui
+- [x] 01-task-queue-models
+- [x] 02-go-syncer-worker
+- [x] 03-python-task-executor
+- [x] 04-frontend-progress-ui
+
+**STATUS: COMPLETED**
 
 ## Phase Deliverable
 A complete background ingestion pipeline. When a user uploads a file, it is automatically processed in the background, and status updates appear in the UI.

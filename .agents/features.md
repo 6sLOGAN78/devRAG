@@ -59,3 +59,14 @@ This file tracks the design and behavior of features implemented by agents in th
 - Engineered `internal/service/document.go` generating secure, traversal-resistant MinIO keys: `tenant/{tenant_id}/dataset/{dataset_id}/document/{document_id}/original`.
 - Validated Dataset ownership comprehensively preventing cross-tenant document injections into unowned Datasets.
 - Deployed Multipart upload endpoint `POST /api/v1/document/upload` rejecting uploads > 50MB.
+## Phase 04: Deep Document Parsing (DeepDoc)
+- Integrated PyTorch, PaddleOCR, YOLOv8 into the environment.
+- Configured DeepDoc parser logic for text and markdown files.
+- Implemented `GeneralChunker` yielding strictly formatted `DocumentChunk` models supporting NLP token limits.
+
+## Phase 05: Ingestion Pipeline & Task Synchronization
+- **Task Queue Models**: Implemented `DocumentTask` and `DocumentChunk` schemas mirroring the Go struct/Python Peewee structure to track asynchronous jobs.
+- **Go Syncer Worker**: Created background Go daemon pulling unstarted tasks securely utilizing MySQL `SELECT ... FOR UPDATE SKIP LOCKED` logic and dispatching them via internal HTTP POST calls to Python.
+- **Python Task Executor**: Implemented an async `POST /api/v1/ml/parse_document` Quart endpoint that offloads work via `run_in_executor` to avoid loop-blocking. Downloads from MinIO, parses chunks with DeepDoc, and inserts idempotently via Peewee.
+- **Redis Concurrency**: Developed `RedisDistributedLock` context manager (`common/redis_conn.py`) implementing distributed mutual exclusion with Lua release semantics. Integrated into progress updates and cleanup loops to protect against multi-worker race conditions.
+- **Frontend Progress UI**: Connected the authoritative backend task processing system into the React interface. Added a robust React Query polling mechanism pulling from a new batched Go `GET /api/v1/document/status` API mapping exact percentage metrics into the Datasets UI view.
