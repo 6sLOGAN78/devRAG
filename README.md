@@ -1,14 +1,26 @@
 # DevRAG 🚀
 
-**DevRAG** is an enterprise-grade Retrieval-Augmented Generation (RAG) platform. It features tenant isolation, role-based access control, distributed rate limiting, and a decoupled architecture designed for scale.
+**DevRAG** is a highly-scalable, multi-tenant Retrieval-Augmented Generation (RAG) platform. It seamlessly combines a high-concurrency Go API Gateway with a Python-based Machine Learning Engine to handle document ingestion, layout recognition, vector search, and LLM orchestration at scale.
+
+## ✨ Key Features
+
+- **Robust Multi-Tenancy:** Complete logical isolation for multiple tenants across all services, databases, vector stores, and object stores.
+- **Tenant-Owned AI Configuration:** Tenants can securely configure and supply their own LLM and Embedding API keys (OpenAI, Anthropic, Gemini, DeepSeek, etc.) via the TenantLLM service.
+- **Advanced Document Parsing (deepdoc):** Built-in support for PDFs, TXT, and Markdown files, leveraging PyMuPDF, OCR (PaddleOCR), and YOLOv8-based layout recognition for complex documents.
+- **Flexible Chunking Strategies:** Supports customizable parsing methods configured at the Dataset level (e.g., General Text Chunking, automated Q&A Generation chunking) to optimize retrieval.
+- **Hybrid Search Engine:** Powered by [Infinity](https://github.com/infiniflow/infinity), combining Dense Vector search and Keyword/Sparse search (BM25) with cross-encoder reranking.
+- **High Concurrency:** Separation of the ML Python workers and the Go Gateway ensures high availability and fast I/O bound routing.
 
 ## 🏗 Architecture Overview
 
 The system is split into two primary backend services for strict boundary isolation, accompanied by a modern React frontend.
 
-1. **[Go API Gateway (`/internal`, `/cmd`)](./internal/README.md):** High-concurrency routing, authentication, RBAC, tenant isolation, and MySQL database management.
-2. **[Python ML Engine (`/api`, `/rag`, `/deepdoc`)](./api/README.md):** Heavy machine learning workloads, including YOLOv8 vision parsing, semantic chunking, embeddings, hybrid search (BM25 + Dense), and LLM text generation.
-3. **[React Frontend (`/web`)](./web/README.md):** Tailwind CSS + React Query Single Page Application (SPA).
+1. **[Go API Gateway (`/internal`, `/cmd`)](./internal/README.md):** 
+   - Handles REST & WebSocket endpoints, routing, authentication, RBAC, tenant isolation, and MySQL database management.
+2. **[Python ML Engine (`/api`, `/rag`, `/deepdoc`)](./api/README.md):** 
+   - Responsible for heavy machine learning workloads, including YOLOv8 vision parsing, semantic chunking, embeddings, hybrid search, and LLM orchestration.
+3. **[React Frontend (`/web`)](./web/README.md):** 
+   - A Tailwind CSS + React Query Single Page Application (SPA).
 
 ## 📁 Repository Structure
 
@@ -56,3 +68,6 @@ npm run dev
 ```
 
 The frontend will be accessible at `http://localhost:5173`.
+
+## 🤝 Contributing
+Please ensure you run all tests before submitting PRs, maintaining strict tenant boundaries, and following the architecture guidelines where Python handles ML workloads and Go handles high-concurrency infrastructure.

@@ -16,3 +16,4 @@ litellm
 tenacity
 sentence-transformers
 RestrictedPython
+pdfplumber

@@ -10,8 +10,12 @@ from playhouse.shortcuts import model_to_dict
 from api.db.db_models import Document, DocumentTask, DocumentChunk
 from api.services.storage_service import storage_service
 from deepdoc.parsers.txt_parser import TxtParser
+from deepdoc.parsers.pdf_parser import PdfParser
 from deepdoc.parsers.md_parser import MarkdownParser
 from deepdoc.chunker.general import GeneralChunker
+from deepdoc.chunker.qa import QAChunker
+from deepdoc.chunker.manual import ManualChunker
+from api.db.db_models import Dataset
 from deepdoc.chunker.base import TokenCounter
 from api.db.connection import db
 
@@ -20,9 +24,10 @@ class ParsingService:
         self.parsers = {
             'txt': TxtParser(),
             'md': MarkdownParser(),
-            'markdown': MarkdownParser()
+            'markdown': MarkdownParser(),
+            'pdf': PdfParser()
         }
-        self.chunker = GeneralChunker()
+        # Chunker instantiated per-task based on parser_id
 
     def _get_file_extension(self, file_path: str) -> str:
         return file_path.split('.')[-1].lower() if '.' in file_path else ''
@@ -76,7 +81,17 @@ class ParsingService:
 
             # 5. Chunk
             try:
-                chunks = self.chunker.chunk(document_structure)
+                dataset = Dataset.get_or_none(Dataset.id == doc.dataset_id)
+                parser_id = dataset.parser_id if dataset else "naive"
+                
+                if parser_id == "qa":
+                    chunker = QAChunker()
+                elif parser_id == "manual":
+                    chunker = ManualChunker()
+                else:
+                    chunker = GeneralChunker()
+                    
+                chunks = chunker.chunk(document_structure)
             except Exception as e:
                 os.remove(temp_path)
                 self._fail_task(task, f"Chunking failed: {str(e)}")
