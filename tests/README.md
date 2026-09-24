@@ -1,9 +1,7 @@
-# Testing (`tests/`)
+# Testing Suite (`/tests`)
 
-Multi-layered testing strategy for DevRAG.
+This directory contains integration and end-to-end tests for **DevRAG**.
 
-## Structure
-- `e2e/`: Playwright end-to-end tests ensuring the frontend and backends integrate correctly.
-- `integration/`: Go integration tests using `net/http/httptest` simulating API flows.
-- `unit/`: Go and Python unit tests for isolated logic (like vector parsing).
-- `fixtures/`: Sample PDFs and data used by tests.
+- **E2E Playwright**: UI testing against the React frontend.
+- **Go Integrations**: Go `testing` suite testing the Gin Handlers, tenant isolation boundaries, and DAO operations.
+- **Python Pipelines**: Verification scripts to ensure `deepdoc` parsing, chunking, embedding generation, and `Infinity` insertion accurately propagate from start to finish.

@@ -1,11 +1,13 @@
-# Go Core Logic (`internal/`)
+# Go Business Logic & Gateway (`/internal`)
 
-This directory houses the private Go application code. It follows the standard Handler -> Service -> DAO architecture.
+The `internal` directory contains all proprietary Go code for the **DevRAG** API Gateway. This code enforces strict tenant isolation, authentication, and fast HTTP routing before handing off heavy ML tasks to the Python backend.
 
-## Structure
-- `api/`, `handler/`: Gin HTTP route handlers.
-- `service/`: Core business logic and validations.
-- `dao/`: Data Access Object layer; handles all MySQL and Redis queries.
-- `router/`: Gin router and middleware initialization.
-- `syncer/`: The Go background worker that syncs tasks between the database and the Python ML backend.
-- `storage/`: Object storage adapters (MinIO/S3).
+## Directory Structure
+
+- **`config/`**: Parses `service_conf.yaml` and sets up the typed Go configuration structs.
+- **`dao/`**: Data Access Objects using GORM. Defines the single source of truth for the MySQL database schema and provides methods for database operations.
+- **`handler/`**: Gin HTTP handlers. They parse requests, validate input, extract tenant context, and proxy to services.
+- **`middleware/`**: Request interceptors for Authentication (JWT), Rate Limiting (Redis), Logging, and Tenant Context extraction.
+- **`router/`**: Defines the API routes (`/api/v1/*`) and attaches middleware to specific route groups.
+- **`service/`**: Core business logic (e.g., TenantLLM resolution, Task execution, Canvas orchestrator).
+- **`syncer/`**: Background worker pool that polls MySQL tasks and dispatches them to the Python ML engine.

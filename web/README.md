@@ -1,13 +1,24 @@
-# Frontend (`web/`)
+# DevRAG Frontend (`/web`)
 
-React 18 + Vite frontend for the DevRAG system.
+This directory contains the Single Page Application (SPA) for **DevRAG**, built with React and Tailwind CSS.
 
-## Stack
-- **Framework:** React 18, Vite
-- **Styling:** Tailwind CSS, Shadcn UI
-- **Routing:** React Router v6
-- **State/Fetching:** React Query (TanStack)
-- **Language:** TypeScript
+## Technology Stack
 
-## Usage
-Run `npm install` followed by `npm run dev` to start the development server. The frontend expects the Go API gateway to be running on port `9380`.
+- **Framework**: React 18
+- **Build Tool**: Vite
+- **Styling**: Tailwind CSS
+- **State/Data Fetching**: React Query (TanStack Query)
+- **Routing**: React Router
+
+## Architecture
+
+The frontend connects directly to the Go API Gateway (running on port `9380`), which handles all authentication and proxies chat requests to the ML backend.
+
+### Running Locally
+
+```bash
+cd web
+npm install
+npm run dev
+```
+The UI will be accessible at `http://localhost:5173`.

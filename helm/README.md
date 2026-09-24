@@ -1,5 +1,6 @@
-# Kubernetes Helm Charts (`helm/`)
+# Helm Charts (`/helm`)
 
-Contains the `ragflow` Helm chart for deploying the entire platform to a Kubernetes cluster in production.
+Production Kubernetes deployment charts for **DevRAG**. 
+These charts configure the system to deploy the Go API Gateway (replicas scaled on CPU metrics) independently from the Python ML Engine (scaled on GPU metrics or long-polling I/O limits).
 
-Deploy via: `helm install devrag ./helm/ragflow -f helm/ragflow/values.yaml`
+*Note: Infrastructure dependencies (MySQL, MinIO, Redis, Infinity) should typically be managed externally (e.g., AWS RDS/S3) in a production environment, but basic StatefulSets are provided for full standalone deployment.*

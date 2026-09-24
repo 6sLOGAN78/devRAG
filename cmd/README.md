@@ -1,8 +1,16 @@
-# Go Entrypoints (`cmd/`)
+# DevRAG Go Application Entrypoints (`/cmd`)
 
-Standard Go directory structure for application entrypoints.
+This directory contains the main Go executable files for **DevRAG**. 
 
-## Structure
-- `server/`: Contains `ragflow_server.go`, the primary Go API Gateway and syncer daemon. Run this to start the Go backend.
-- `test_db/`: Utility script for testing database connectivity.
-- `config_test/`: Utility for validating YAML configurations.
+## `cmd/server/ragflow_server.go`
+
+This is the primary entrypoint for the Go API Gateway. It boots the Gin-Gonic server, establishes connections to the database (MySQL) and cache (Redis), and starts the background Task Syncer for coordinating jobs with the Python ML Engine.
+
+### Usage
+
+To build and run the Go server:
+
+```bash
+go build -o server cmd/server/ragflow_server.go
+./server -c conf/service_conf.yaml
+```

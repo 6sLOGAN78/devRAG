@@ -29,7 +29,8 @@ def require_auth(f):
         token = auth_header.split(' ')[1]
         try:
             claims = jwt.decode(token, cfg.auth.jwt_secret, algorithms=["HS256"])
-        except Exception:
+        except Exception as e:
+            print("Auth DB Error:", e)
             return jsonify({"error": {"code": "UNAUTHORIZED", "message": "Invalid or expired token", "request_id": getattr(g, "request_id", "")}}), 401
             
         user_id = claims.get('user_id')
@@ -44,7 +45,8 @@ def require_auth(f):
             
         try:
             session_json = json.loads(session_data)
-        except Exception:
+        except Exception as e:
+            print("Auth DB Error:", e)
             return jsonify({"error": {"code": "UNAUTHORIZED", "message": "Invalid session data", "request_id": getattr(g, "request_id", "")}}), 401
             
         if session_json.get('session_id') != session_id:
@@ -56,7 +58,8 @@ def require_auth(f):
         # Peewee is sync, so this blocks the loop briefly, but it's fine for MVP
         try:
             user_tenants = list(UserTenant.select().where(UserTenant.user_id == user_id))
-        except Exception:
+        except Exception as e:
+            print("Auth DB Error:", e)
             return jsonify({"error": {"code": "INTERNAL_ERROR", "message": "Database error", "request_id": getattr(g, "request_id", "")}}), 500
             
         if not user_tenants:
