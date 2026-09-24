@@ -11,10 +11,22 @@ from api.db.db_models import Document, DocumentTask, DocumentChunk
 from api.services.storage_service import storage_service
 from deepdoc.parsers.txt_parser import TxtParser
 from deepdoc.parsers.pdf_parser import PdfParser
+from deepdoc.parsers.docx_parser import DocxParser
+from deepdoc.parsers.excel_parser import ExcelParser
+from deepdoc.parsers.ppt_parser import PptParser
+from deepdoc.parsers.html_parser import HtmlParser
+from deepdoc.parsers.json_parser import JsonParser
+from deepdoc.parsers.image_parser import ImageParser
 from deepdoc.parsers.md_parser import MarkdownParser
 from deepdoc.chunker.general import GeneralChunker
 from deepdoc.chunker.qa import QAChunker
 from deepdoc.chunker.manual import ManualChunker
+from deepdoc.chunker.resume import ResumeChunker
+from deepdoc.chunker.table import TableChunker
+from deepdoc.chunker.paper import PaperChunker
+from deepdoc.chunker.laws import LawsChunker
+from deepdoc.chunker.presentation import PresentationChunker
+from deepdoc.chunker.picture import PictureChunker
 from api.db.db_models import Dataset
 from deepdoc.chunker.base import TokenCounter
 from api.db.connection import db
@@ -25,7 +37,19 @@ class ParsingService:
             'txt': TxtParser(),
             'md': MarkdownParser(),
             'markdown': MarkdownParser(),
-            'pdf': PdfParser()
+            'pdf': PdfParser(),
+            'docx': DocxParser(),
+            'xlsx': ExcelParser(),
+            'xls': ExcelParser(),
+            'pptx': PptParser(),
+            'ppt': PptParser(),
+            'html': HtmlParser(),
+            'htm': HtmlParser(),
+            'json': JsonParser(),
+            'jpg': ImageParser(),
+            'jpeg': ImageParser(),
+            'png': ImageParser(),
+            'bmp': ImageParser()
         }
         # Chunker instantiated per-task based on parser_id
 
@@ -88,6 +112,18 @@ class ParsingService:
                     chunker = QAChunker()
                 elif parser_id == "manual":
                     chunker = ManualChunker()
+                elif parser_id == "resume":
+                    chunker = ResumeChunker()
+                elif parser_id == "table":
+                    chunker = TableChunker()
+                elif parser_id == "paper":
+                    chunker = PaperChunker()
+                elif parser_id == "laws":
+                    chunker = LawsChunker()
+                elif parser_id == "presentation":
+                    chunker = PresentationChunker()
+                elif parser_id == "picture":
+                    chunker = PictureChunker()
                 else:
                     chunker = GeneralChunker()
                     

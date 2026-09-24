@@ -99,6 +99,7 @@ type DocumentChunk struct {
 	SourceBlockIDs   string    `gorm:"column:source_block_ids;type:json"`
 	Metadata         string    `gorm:"column:metadata;type:json"`
 	TokenCount       int       `gorm:"column:token_count;not null;default:0"`
+	Available        int       `gorm:"column:available;not null;default:1"`
 	CreatedAt        time.Time `gorm:"column:created_at;autoCreateTime"`
 	UpdatedAt        time.Time `gorm:"column:updated_at;autoUpdateTime"`
 }

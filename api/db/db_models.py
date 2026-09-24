@@ -103,6 +103,7 @@ class DocumentChunk(BaseModel):
     source_block_ids = TextField(null=True) # JSON array of strings
     metadata = TextField(null=True) # JSON object
     token_count = IntegerField(default=0)
+    available = IntegerField(default=1)
     created_at = DateTimeField(default=datetime.datetime.now)
     updated_at = DateTimeField(default=datetime.datetime.now)
 

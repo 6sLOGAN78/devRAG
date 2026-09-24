@@ -41,3 +41,62 @@ async def run_parsing_background(task_id: str, document_id: str):
     # Run CPU/IO bound parsing in a separate thread to avoid blocking Quart event loop
     loop = asyncio.get_event_loop()
     await loop.run_in_executor(None, parsing_service.process_task, task_id, document_id)
+
+from rag.nlp.retrieval import RetrievalService
+from api.services.indexing_service import indexing_service
+
+@ml_bp.route('/retrieval', methods=['POST'])
+@require_auth
+async def retrieval():
+    data = await request.get_json()
+    if not data or 'query' not in data or 'dataset_ids' not in data:
+        return jsonify({"error": "Missing query or dataset_ids"}), 400
+        
+    query = data['query']
+    dataset_ids = data['dataset_ids']
+    top_k = data.get('top_k', 10)
+    similarity_threshold = data.get('similarity_threshold', 0.2)
+    methods = data.get('methods', ['dense', 'lexical'])
+    
+    tenant_id = g.tenant_id
+    
+    retrieval_service = RetrievalService(indexing_service.vector_store)
+    
+    import asyncio
+    loop = asyncio.get_event_loop()
+    try:
+        results = await loop.run_in_executor(
+            None, 
+            lambda: retrieval_service.search(
+                tenant_id=tenant_id,
+                query=query,
+                dataset_ids=dataset_ids,
+                top_k=top_k,
+                similarity_threshold=similarity_threshold,
+                methods=methods
+            )
+        )
+        
+        # Convert RetrievedChunk objects to dicts
+        chunks = []
+        for r in results:
+            chunks.append({
+                "chunk_id": r.chunk_id,
+                "document_id": r.document_id,
+                "dataset_id": r.dataset_id,
+                "content": r.content,
+                "score": r.score,
+                "dense_rank": r.dense_rank,
+                "lexical_rank": r.lexical_rank,
+                "dense_score": r.dense_score,
+                "lexical_score": r.lexical_score,
+                "rerank_rank": r.rerank_rank,
+                "rerank_score": r.rerank_score,
+                "retrieval_method": r.retrieval_method,
+                "metadata": r.metadata
+            })
+            
+        return jsonify({"data": chunks}), 200
+    except Exception as e:
+        import traceback
+        return jsonify({"error": str(e), "traceback": traceback.format_exc()}), 500

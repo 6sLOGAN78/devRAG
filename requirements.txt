@@ -17,3 +17,7 @@ tenacity
 sentence-transformers
 RestrictedPython
 pdfplumber
+python-docx
+openpyxl
+python-pptx
+beautifulsoup4

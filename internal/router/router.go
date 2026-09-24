@@ -57,6 +57,7 @@ func InitRouter(cfg *config.Config) *gin.Engine {
 			dataset.POST("", handler.CreateDataset)
 			dataset.GET("/list", handler.ListDatasets)
 			dataset.DELETE("/:id", handler.DeleteDataset)
+			dataset.POST("/retrieval", handler.RetrievalTest(cfg))
 		}
 
 		document := authV1.Group("/document")
@@ -78,6 +79,13 @@ func InitRouter(cfg *config.Config) *gin.Engine {
 			tenant.GET("/llm", handler.ListTenantLLMs)
 			tenant.POST("/llm", handler.UpdateTenantLLM)
 			tenant.DELETE("/llm/:id", handler.DeleteTenantLLM)
+		}
+
+				chunk := authV1.Group("/chunk")
+		{
+			chunk.GET("", handler.ListChunks)
+			chunk.PUT("/:id", handler.UpdateChunk)
+			chunk.DELETE("/:id", handler.DeleteChunk)
 		}
 
 		chat := authV1.Group("/chat")
