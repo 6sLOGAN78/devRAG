@@ -304,7 +304,7 @@ Plans:
 
 **Wave 22** *(blocked on Wave 21 completion)*
 
-- [ ] 03-28-PLAN.md — Decision records, litellm pin in CLAUDE.md, B-09 closure
+- [x] 03-28-PLAN.md — Decision records, litellm pin in CLAUDE.md, B-09 closure
 
 **Wave 23** *(blocked on Wave 22 completion)*
 

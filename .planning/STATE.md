@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 03-26-PLAN.md
+stopped_at: Completed 03-28-PLAN.md
 last_updated: "2026-10-10T00:30:00.000Z"
 last_activity: 2026-10-10
 progress:
   total_phases: 8
   completed_phases: 2
   total_plans: 83
-  completed_plans: 81
+  completed_plans: 82
   percent: 25
 ---
 
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-10-05)
 ## Current Position
 
 Phase: 3 (Models, Knowledge Bases and Upload) — EXECUTING
-Plan: next is 03-28 of 31 (03-14 to 03-27, 03-30 and 03-31 are done; 03-28 and 03-29 remain)
+Plan: next is 03-29 of 31 (03-01 to 03-28, 03-30 and 03-31 are done; only 03-29 remains)
 Status: Ready to execute
 Last activity: 2026-10-10
 
-Progress: [█████████░] 94%
+Progress: [██████████] 99%
 
 ## Performance Metrics
 
@@ -86,6 +86,7 @@ Progress: [█████████░] 94%
 | Phase 03 P23 | 12min | 3 tasks | 10 files |
 | Phase 03 P24 | ~75min | 3 tasks | 19 files |
 | Phase 03 P31 | ~1h | 3 tasks | 20 files |
+| Phase 03 P28 | resumed after interruption | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -138,6 +139,7 @@ Recent decisions affecting current work:
 - [Phase 03]: 03-13: absent key leaves a default slot alone (model_fields_set), null clears it, a refused slot in a two-slot body writes nothing — T-03-13-05: unset vs null must never clear a default by accident; set_defaults verifies both before one UPDATE
 
 - [Phase 03]: 03-20: provider names are literals except OpenAI-compatible (key models.provider.compatible.name); no defaults card or placeholder until 03-22; model data keys on [ws, tenantId, ...] and the role comes from useActiveWorkspace; UI-37 stays pending until 03-21 and 03-22
+- [Phase 03]: 03-28: Phase 3 decisions are rows R-136..R-152 in DECISIONS.md (all accepted, auto); CLAUDE.md pins litellm 1.103.2; B-09 closed; B-31..B-33 opened; unit test pins the records and the pin
 - [Phase 03]: 03-21: a provider call is classified by HTTP status plus data.reason (only 400 provider_refused carries server text, <=300 chars); a refusal is inline and never a session event; Change key and Change address send one registered model from the provider view; dialog content is unmounted on close so the typed key, request and mutation are dropped; UI-37 now waits only on 03-22 (defaults card)
 - [Phase 03]: 03-22: defaults are an explicit choice (initial value only from a saved default whose model still exists, nothing preselected); the defaults card loads and fails independently of the providers card; members get a read-only definition list; the live Models journey uses the real OpenRouter key in the browser tier on the orchestrator's instruction (no Node fake provider, so T-03-22-04 is accepted with output scans); UI-37 complete
 - [Phase 03]: 03-24: the "Stop uploading?" confirmation is built on the Dialog primitive with role=alertdialog because ui/alert-dialog.tsx resolves a second copy of Radix focus-scope and dismissable-layer (react-dialog 1.2.0 nested under alert-dialog) and cannot layer over the upload Dialog; do not stack AlertDialog over Dialog. Uploads are one POST per file with timeout 0, two in flight; a real 401 only stops the queue; UI-12 stays Pending until 03-31 mounts the dialog
