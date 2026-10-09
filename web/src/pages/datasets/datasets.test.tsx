@@ -114,6 +114,19 @@ function serve(config: InternalAxiosRequestConfig): unknown {
     return ok(config, list);
   }
   if (key === "GET /api/v1/models/default") return ok(config, defaultsByTenant[tenant] ?? { chat: "", embedding: "" });
+  const one = /^\/api\/v1\/datasets\/([^/]+)$/.exec(config.url ?? "");
+  const found = one ? Object.values(byTenant).flat().find((d) => d.id === one[1]) : undefined;
+  if (one && config.method?.toUpperCase() === "GET") return found ? ok(config, { ...found, chunk_num: 0 }) : failure(config, { status: 404, message: "not found" });
+  if (one && config.method?.toUpperCase() === "PUT") {
+    if (!found) return failure(config, { status: 404, message: "not found" });
+    Object.assign(found, JSON.parse(String(config.data)) as Record<string, unknown>);
+    return ok(config, found);
+  }
+  if (key === "DELETE /api/v1/datasets") {
+    const sent = JSON.parse(String(config.data)) as { ids: string[]; tenant_id: string };
+    byTenant[sent.tenant_id] = (byTenant[sent.tenant_id] ?? []).filter((d) => !sent.ids.includes(d.id));
+    return ok(config, { deleted: sent.ids });
+  }
   return failure(config, { status: 404, message: "not found" });
 }
 
@@ -451,6 +464,169 @@ describe("Create dataset from the gallery", () => {
     renderPage();
     await userEvent.click(await screen.findByTestId("dataset-create"));
     expect(await screen.findByTestId("create-dataset-dialog")).toBeInTheDocument();
+  });
+});
+
+describe("Dataset actions menu: who sees it (D-09, D-27, TEN-16)", () => {
+  const ME = "u1";
+  const OTHER = "u2";
+  // [label, workspace, role in it, creator of the dataset, expected]
+  const cases: Array<[string, "t1" | "t9", "owner" | "admin" | "normal", string, boolean]> = [
+    ["the creator in their own workspace", "t1", "owner", ME, true],
+    ["the workspace owner on a dataset someone else created", "t1", "owner", OTHER, true],
+    ["an admin on a dataset someone else created", "t9", "admin", OTHER, true],
+    ["a normal member on a dataset they created themselves", "t9", "normal", ME, true],
+    ["a normal member on a team dataset someone else created", "t9", "normal", OTHER, false],
+  ];
+
+  it.each(cases)("%s", async (_label, tenant, role, creator, expected) => {
+    if (tenant === "t9") {
+      memberships = [OWN, joined(role)];
+      useWorkspaceStore.getState().initialise("u1", "t1", stored(memberships));
+      useWorkspaceStore.getState().setActive("t9");
+    }
+    byTenant[tenant] = [dataset(1, { created_by: creator, permission: "team" }, tenant)];
+    renderPage();
+    const card = await screen.findByTestId("dataset-card");
+    if (expected) expect(within(card).getByTestId("dataset-actions")).toBeInTheDocument();
+    else expect(within(card).queryByTestId("dataset-actions")).toBeNull();
+    // Absent means absent: nothing disabled and nothing hidden in the markup.
+    if (!expected) expect(card.innerHTML).not.toContain("Dataset settings");
+  });
+
+  it("shows the menu on the cards the caller may manage and not on the others of the same page", async () => {
+    memberships = [OWN, joined("normal")];
+    useWorkspaceStore.getState().initialise("u1", "t1", stored(memberships));
+    useWorkspaceStore.getState().setActive("t9");
+    byTenant.t9 = [dataset(1, { created_by: ME, permission: "team" }, "t9"), dataset(2, { created_by: OTHER, permission: "team" }, "t9")];
+    renderPage();
+    await waitFor(() => expect(cards()).toHaveLength(2));
+    expect(within(cards()[0] as HTMLElement).queryByTestId("dataset-actions")).not.toBeNull();
+    expect(within(cards()[1] as HTMLElement).queryByTestId("dataset-actions")).toBeNull();
+  });
+});
+
+describe("Dataset actions menu: settings and delete from a card", () => {
+  const card = (name: string) => cards().find((c) => within(c).queryByText(name) !== null) as HTMLElement;
+
+  it("labels the trigger 'Actions for {name}', sits above the link layer and opens 'Dataset settings' and 'Delete dataset'", async () => {
+    renderPage();
+    await screen.findByTestId("dataset-grid");
+    const trigger = within(card("Dataset 01")).getByTestId("dataset-actions");
+    expect(trigger).toHaveAccessibleName("Actions for Dataset 01");
+    expect(trigger.className.split(" ")).toContain("relative");
+    expect(trigger.className.split(" ")).toContain("z-10");
+    expect(trigger.closest("article")).toBe(card("Dataset 01"));
+    await userEvent.click(trigger);
+    const menu = await screen.findByTestId("dataset-menu");
+    expect(within(menu).getByRole("menuitem", { name: "Dataset settings" })).toBeInTheDocument();
+    expect(within(menu).getByRole("menuitem", { name: "Delete dataset" })).toBeInTheDocument();
+    expect(screen.getByTestId("dataset-menu-settings")).toBe(within(menu).getByRole("menuitem", { name: "Dataset settings" }));
+    expect(screen.getByTestId("dataset-menu-delete")).toBe(within(menu).getByRole("menuitem", { name: "Delete dataset" }));
+  });
+
+  it("opens the settings dialog from the menu, saves a rename and the card shows the new name without a reload", async () => {
+    byTenant.t1 = [dataset(1, { doc_num: 0 })];
+    renderPage();
+    await screen.findByTestId("dataset-grid");
+    await userEvent.click(screen.getByTestId("dataset-actions"));
+    await userEvent.click(await screen.findByTestId("dataset-menu-settings"));
+    const dialog = await screen.findByTestId("dataset-settings-dialog");
+    expect(within(dialog).getByRole("heading", { name: "Dataset settings" })).toBeInTheDocument();
+    const name = await within(dialog).findByTestId("field-dataset-name");
+    expect(name).toHaveValue("Dataset 01");
+    await userEvent.clear(name);
+    await userEvent.type(name, "Renamed set");
+    await userEvent.click(within(dialog).getByTestId("dataset-settings-submit"));
+    await waitFor(() => expect(screen.queryByTestId("dataset-settings-dialog")).toBeNull());
+    expect(await screen.findByText("Dataset settings saved")).toBeInTheDocument();
+    expect(await screen.findByRole("link", { name: "Renamed set" })).toBeInTheDocument();
+    expect(screen.queryByText("Dataset 01")).toBeNull();
+    const put = calls.find((c) => c.method?.toUpperCase() === "PUT");
+    expect(JSON.parse(String(put?.data))).toEqual({ name: "Renamed set" });
+  });
+
+  it("returns focus to the card's actions button when the settings dialog is dismissed", async () => {
+    renderPage();
+    await screen.findByTestId("dataset-grid");
+    const trigger = within(card("Dataset 01")).getByTestId("dataset-actions");
+    await userEvent.click(trigger);
+    await userEvent.click(await screen.findByTestId("dataset-menu-settings"));
+    await screen.findByTestId("dataset-settings-dialog");
+    await userEvent.keyboard("{Escape}");
+    await waitFor(() => expect(screen.queryByTestId("dataset-settings-dialog")).toBeNull());
+    await waitFor(() => expect(trigger).toHaveFocus());
+  });
+
+  it("opens the delete confirmation from the menu with the fresh count, defaulting focus to Keep dataset, and keeps focus on the button when kept", async () => {
+    renderPage();
+    await screen.findByTestId("dataset-grid");
+    const trigger = within(card("Dataset 02")).getByTestId("dataset-actions");
+    await userEvent.click(trigger);
+    await userEvent.click(await screen.findByTestId("dataset-menu-delete"));
+    const dialog = await screen.findByTestId("dataset-delete-dialog");
+    await within(dialog).findByText(/"Dataset 02" and its 2 documents will be permanently deleted/);
+    expect(within(dialog).getByRole("button", { name: "Keep dataset" })).toHaveFocus();
+    await userEvent.click(within(dialog).getByRole("button", { name: "Keep dataset" }));
+    await waitFor(() => expect(screen.queryByTestId("dataset-delete-dialog")).toBeNull());
+    expect(calls.some((c) => c.method?.toUpperCase() === "DELETE")).toBe(false);
+    await waitFor(() => expect(trigger).toHaveFocus());
+  });
+
+  it("deletes from the gallery: the card goes, a toast shows and focus moves to the page title", async () => {
+    renderPage();
+    await screen.findByTestId("dataset-grid");
+    await userEvent.click(within(card("Dataset 02")).getByTestId("dataset-actions"));
+    await userEvent.click(await screen.findByTestId("dataset-menu-delete"));
+    const dialog = await screen.findByTestId("dataset-delete-dialog");
+    await within(dialog).findByText(/and its 2 documents/);
+    await userEvent.click(within(dialog).getByTestId("dataset-delete-confirm"));
+    expect(await screen.findByText("Dataset deleted")).toBeInTheDocument();
+    await waitFor(() => expect(cards()).toHaveLength(2));
+    expect(screen.queryByText("Dataset 02")).toBeNull();
+    const del = calls.find((c) => c.method?.toUpperCase() === "DELETE");
+    expect(JSON.parse(String(del?.data))).toEqual({ ids: ["ds-t1-2"], tenant_id: "t1" });
+    await waitFor(() => expect(screen.getByRole("heading", { level: 1, name: "Datasets" })).toHaveFocus());
+  });
+
+  it("steps back a page when deleting the only card on the last page", async () => {
+    byTenant.t1 = many(13);
+    renderPage("/datasets?page=2");
+    await waitFor(() => expect(cards()).toHaveLength(1));
+    await userEvent.click(screen.getByTestId("dataset-actions"));
+    await userEvent.click(await screen.findByTestId("dataset-menu-delete"));
+    const dialog = await screen.findByTestId("dataset-delete-dialog");
+    await within(dialog).findByText(/and its 13 documents/);
+    await userEvent.click(within(dialog).getByTestId("dataset-delete-confirm"));
+    await waitFor(() => expect(search().has("page")).toBe(false));
+    await waitFor(() => expect(cards()).toHaveLength(12));
+    expect(screen.queryByText("No datasets yet")).toBeNull();
+    await waitFor(() => expect(screen.getByRole("heading", { level: 1, name: "Datasets" })).toHaveFocus());
+  });
+
+  it("shows the empty state after deleting the only dataset", async () => {
+    byTenant.t1 = [dataset(1, { doc_num: 0 })];
+    renderPage();
+    await screen.findByTestId("dataset-grid");
+    await userEvent.click(screen.getByTestId("dataset-actions"));
+    await userEvent.click(await screen.findByTestId("dataset-menu-delete"));
+    const dialog = await screen.findByTestId("dataset-delete-dialog");
+    await within(dialog).findByText(/has no documents/);
+    await userEvent.click(within(dialog).getByTestId("dataset-delete-confirm"));
+    expect(await screen.findByText("No datasets yet")).toBeInTheDocument();
+  });
+
+  it("shows the lost-permission alert and drops the menu when the server answers 403 to a delete after a role change", async () => {
+    forced["DELETE /api/v1/datasets"] = { status: 403, message: "forbidden" };
+    renderPage();
+    await screen.findByTestId("dataset-grid");
+    await userEvent.click(within(card("Dataset 02")).getByTestId("dataset-actions"));
+    await userEvent.click(await screen.findByTestId("dataset-menu-delete"));
+    const dialog = await screen.findByTestId("dataset-delete-dialog");
+    await within(dialog).findByText(/and its 2 documents/);
+    await userEvent.click(within(dialog).getByTestId("dataset-delete-confirm"));
+    expect(await within(dialog).findByTestId("dataset-delete-error")).toHaveTextContent("You don't have permission to do that in Ada's workspace.");
+    expect(cards()).toHaveLength(3);
   });
 });
 

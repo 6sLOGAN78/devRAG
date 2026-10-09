@@ -1,6 +1,6 @@
 import { AxiosHeaders, type AxiosAdapter, type InternalAxiosRequestConfig } from "axios";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { createDataset, getDataset, listDatasets } from "./dataset-service";
+import { createDataset, deleteDatasets, getDataset, listDatasets, updateDataset } from "./dataset-service";
 import { http } from "./http";
 
 const originalAdapter = http.defaults.adapter;
@@ -174,5 +174,53 @@ describe("createDataset (KB-01, KB-04, D-26)", () => {
     body = success(datasetDto);
     await createDataset({ tenantId: TENANT, name: "Only a name" });
     expect(JSON.parse(String(seen[0]?.data))).toEqual({ tenant_id: TENANT, name: "Only a name" });
+  });
+});
+
+describe("updateDataset (KB-06)", () => {
+  it("PUTs only the changed fields in snake_case with a 30 s timeout, silently, and maps the answer", async () => {
+    body = success(datasetDto);
+    const updated = await updateDataset("kb1", { name: "Renamed", permission: "me", embdId: "embed-two@OpenAI" });
+    expect(seen[0]?.url).toBe("/api/v1/datasets/kb1");
+    expect(seen[0]?.method).toBe("put");
+    expect(JSON.parse(String(seen[0]?.data))).toEqual({ name: "Renamed", permission: "me", embd_id: "embed-two@OpenAI" });
+    expect(seen[0]?.timeout).toBe(30000);
+    expect(seen[0]?.silent).toBe(true);
+    expect(updated).toMatchObject({ id: "kb1", name: "Reports", permission: "team" });
+  });
+
+  it("sends a cleared description as null and leaves absent changes out entirely", async () => {
+    body = success(datasetDto);
+    await updateDataset("kb1", { description: null });
+    expect(JSON.parse(String(seen[0]?.data))).toEqual({ description: null });
+    seen = [];
+    await updateDataset("kb1", { description: "New text" });
+    expect(JSON.parse(String(seen[0]?.data))).toEqual({ description: "New text" });
+  });
+
+  it("percent-encodes the id and never sends a workspace selector or an undefined field", async () => {
+    body = success(datasetDto);
+    await updateDataset("a/b c", { name: "X", description: undefined });
+    expect(seen[0]?.url).toBe("/api/v1/datasets/a%2Fb%20c");
+    const sent = JSON.parse(String(seen[0]?.data)) as Record<string, unknown>;
+    expect(Object.keys(sent)).toEqual(["name"]);
+  });
+});
+
+describe("deleteDatasets (KB-07, D-10)", () => {
+  it("DELETEs with the body {ids, tenant_id}, a 30 s timeout, silently, and resolves to the deleted ids", async () => {
+    body = success({ deleted: ["kb1", "kb2", 7] });
+    const deleted = await deleteDatasets(["kb1", "kb2"], TENANT);
+    expect(seen[0]?.url).toBe("/api/v1/datasets");
+    expect(seen[0]?.method).toBe("delete");
+    expect(JSON.parse(String(seen[0]?.data))).toEqual({ ids: ["kb1", "kb2"], tenant_id: TENANT });
+    expect(seen[0]?.timeout).toBe(30000);
+    expect(seen[0]?.silent).toBe(true);
+    expect(deleted).toEqual(["kb1", "kb2"]);
+  });
+
+  it("gives an empty list for a body without deleted ids", async () => {
+    body = success(null);
+    await expect(deleteDatasets(["kb1"], TENANT)).resolves.toEqual([]);
   });
 });
