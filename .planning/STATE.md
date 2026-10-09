@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 03-30-PLAN.md
-last_updated: "2026-10-09T20:00:00.000Z"
+stopped_at: Completed 03-25-PLAN.md
+last_updated: "2026-10-09T22:00:00.000Z"
 last_activity: 2026-10-09
 progress:
   total_phases: 8
   completed_phases: 2
   total_plans: 83
-  completed_plans: 77
+  completed_plans: 78
   percent: 25
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-10-05)
 ## Current Position
 
 Phase: 3 (Models, Knowledge Bases and Upload) — EXECUTING
-Plan: next is 03-25 of 31, then 03-31 (03-14 to 03-24, 03-27 and 03-30 are done)
+Plan: next is 03-31 of 31 (03-14 to 03-25, 03-27 and 03-30 are done)
 Status: Ready to execute
 Last activity: 2026-10-09
 
@@ -141,6 +141,7 @@ Recent decisions affecting current work:
 - [Phase 03]: 03-22: defaults are an explicit choice (initial value only from a saved default whose model still exists, nothing preselected); the defaults card loads and fails independently of the providers card; members get a read-only definition list; the live Models journey uses the real OpenRouter key in the browser tier on the orchestrator's instruction (no Node fake provider, so T-03-22-04 is accepted with output scans); UI-37 complete
 - [Phase 03]: 03-24: the "Stop uploading?" confirmation is built on the Dialog primitive with role=alertdialog because ui/alert-dialog.tsx resolves a second copy of Radix focus-scope and dismissable-layer (react-dialog 1.2.0 nested under alert-dialog) and cannot layer over the upload Dialog; do not stack AlertDialog over Dialog. Uploads are one POST per file with timeout 0, two in flight; a real 401 only stops the queue; UI-12 stays Pending until 03-31 mounts the dialog
 - [Phase 03]: 03-30: the datasets gallery and create dialog place a failed create by HTTP status plus data.reason in pages/datasets/errors.ts (duplicate_name under Name, model_unavailable and dimension_unsupported under Embedding model, no_default_embedding as the blocked form, everything else an alert; server text only in an alert, <=160 chars); the form-or-blocked choice is made once when defaults and models first arrive; a saved default whose model is gone counts as no default; Radix modal dialogs need onCloseAutoFocus from the owner because there is no DialogTrigger; the gallery error heading is the full-sentence key datasets.error.loadList because a locale value "datasets" collides with the no-hardcoded-copy scan
+- [Phase 03]: 03-25: dataset settings and delete are controlled dialogs with no trigger (owner passes onCloseAutoFocus and onSuccess); the card shows the actions menu only when canManageDataset (creator, workspace owner, admin) and owns both dialogs; the menu is non-modal so a dialog opened from it leaves no pointer-events lock; the delete dataset dialog never enables confirm from a cached count and stops fetching the detail once Delete is pressed; document-delete copy lives under datasets.documentDelete.* because the locale value of datasets.card.documents_* makes the no-hardcoded-copy scan reject any source string starting with documents. (03-31 will meet the same collision for documents.*)
 
 ### Pending Todos
 
@@ -176,6 +177,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-10-09T20:00:00.000Z
-Stopped at: Completed 03-30-PLAN.md
+Last session: 2026-10-09T22:00:00.000Z
+Stopped at: Completed 03-25-PLAN.md
 Resume file: None

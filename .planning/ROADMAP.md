@@ -292,7 +292,7 @@ Plans:
 
 **Wave 19** *(blocked on Wave 18 completion)*
 
-- [ ] 03-25-PLAN.md — Dataset settings, delete dataset and delete document dialogs, gallery actions menu
+- [x] 03-25-PLAN.md — Dataset settings, delete dataset and delete document dialogs, gallery actions menu
 
 **Wave 20** *(blocked on Wave 19 completion)*
 
