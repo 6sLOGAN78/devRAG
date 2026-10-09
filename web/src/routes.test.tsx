@@ -2,7 +2,7 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AxiosError, AxiosHeaders, type AxiosAdapter } from "axios";
 import { createMemoryRouter, RouterProvider } from "react-router";
-import { Activity, House } from "lucide-react";
+import { Activity, Database, House } from "lucide-react";
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { routes, type RouteEntry } from "@/constants/routes";
 import { ShellError } from "@/pages/route-error";
@@ -211,6 +211,11 @@ describe("the root entry redirect (UI-02)", () => {
     expect(home?.layout).toBe("standard");
     expect(home?.nav).toMatchObject({ labelKey: "nav.home", order: 1, group: "platform" });
     expect(home?.nav?.icon).toBe(House);
+    const datasets = routes.find((r) => r.path === "/datasets");
+    expect(datasets?.auth).toBe("required");
+    expect(datasets?.layout).toBe("standard");
+    expect(datasets?.nav).toMatchObject({ labelKey: "nav.datasets", order: 2, group: "platform" });
+    expect(datasets?.nav?.icon).toBe(Database);
     const status = routes.find((r) => r.path === "/system-status");
     expect(status?.auth).toBe("required");
     expect(status?.layout).toBe("standard");
@@ -270,7 +275,7 @@ describe("route table", () => {
     expect(await screen.findByTestId("layout-standard")).toBeInTheDocument();
   });
 
-  it.each(["/datasets"])("renders the honest Not Found page for unbuilt %s", async (path) => {
+  it.each(["/chat"])("renders the honest Not Found page for unbuilt %s", async (path) => {
     renderAt(path);
     expect(await screen.findByRole("heading", { name: "Page not found" })).toBeInTheDocument();
     expect(screen.getByText("404")).toBeInTheDocument();
