@@ -772,6 +772,38 @@
       "confirm": "Delete document",
       "failed": "The document wasn't deleted. Nothing was removed. Try again."
     },
-    "documentDeleted": "Document deleted"
+    "documentDeleted": "Document deleted",
+    "files": {
+      "search": "Search documents",
+      "caption": "Documents in {{name}}",
+      "loading": "Loading documents",
+      "col": {
+        "name": "Name",
+        "size": "Size",
+        "uploaded": "Uploaded",
+        "status": "Status",
+        "progress": "Progress",
+        "actions": "Actions"
+      },
+      "status": {
+        "notStarted": "Not started",
+        "unknown": "Unknown status"
+      },
+      "deleteLabel": "Delete {{name}}",
+      "empty": {
+        "heading": "No documents yet",
+        "body": "Upload PDF, Word, PowerPoint, Excel, text, Markdown, HTML, CSV, JSON, EPUB, JPG, PNG, MP3 or WAV files, up to {{size}} each."
+      },
+      "noMatch": {
+        "heading": "No documents match \"{{keywords}}\"",
+        "body": "Check the spelling or try a shorter search."
+      },
+      "error": {
+        "heading": "Couldn't load documents"
+      }
+    }
+  },
+  "dataset": {
+    "upload": "Upload files"
   }
 }

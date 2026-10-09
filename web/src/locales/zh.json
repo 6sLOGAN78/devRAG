@@ -772,6 +772,38 @@
       "confirm": "删除文档",
       "failed": "文档未被删除，未移除任何内容。请重试。"
     },
-    "documentDeleted": "文档已删除"
+    "documentDeleted": "文档已删除",
+    "files": {
+      "search": "搜索文档",
+      "caption": "{{name}} 中的文档",
+      "loading": "正在加载文档",
+      "col": {
+        "name": "名称",
+        "size": "大小",
+        "uploaded": "上传时间",
+        "status": "状态",
+        "progress": "进度",
+        "actions": "操作"
+      },
+      "status": {
+        "notStarted": "未开始",
+        "unknown": "未知状态"
+      },
+      "deleteLabel": "删除 {{name}}",
+      "empty": {
+        "heading": "还没有文档",
+        "body": "上传 PDF、Word、PowerPoint、Excel、文本、Markdown、HTML、CSV、JSON、EPUB、JPG、PNG、MP3 或 WAV 文件，每个最大 {{size}}。"
+      },
+      "noMatch": {
+        "heading": "没有与“{{keywords}}”匹配的文档",
+        "body": "请检查拼写，或试试更短的搜索词。"
+      },
+      "error": {
+        "heading": "无法加载文档"
+      }
+    }
+  },
+  "dataset": {
+    "upload": "上传文件"
   }
 }
