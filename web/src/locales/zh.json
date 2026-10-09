@@ -723,7 +723,8 @@
       "modelGone": "该嵌入模型在此工作区中已不可用。请选择其他模型。",
       "dimension": "不支持该嵌入模型的向量维度。请选择其他模型。",
       "indexDown": "搜索索引暂时不可用，因此未创建数据集。请稍后重试。",
-      "createFallback": "未能创建数据集。请重试。"
+      "createFallback": "未能创建数据集。请重试。",
+      "loadList": "无法加载数据集"
     },
     "empty": {
       "heading": "还没有数据集",
@@ -732,9 +733,6 @@
     "noMatch": {
       "heading": "没有与“{{keywords}}”匹配的数据集",
       "body": "请检查拼写，或尝试更短的关键词。"
-    },
-    "errorNoun": {
-      "list": "数据集"
     }
   }
 }

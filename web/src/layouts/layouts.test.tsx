@@ -126,6 +126,12 @@ describe("StandardLayout", () => {
     expect(links[2].querySelector("svg")).toHaveClass("text-primary");
   });
 
+  it("marks Datasets current on /datasets and nothing else", () => {
+    renderIn(StandardLayout, "/datasets");
+    expect(screen.getByTestId("nav-item-datasets")).toHaveAttribute("aria-current", "page");
+    expect(screen.getByTestId("nav-item-system-status")).not.toHaveAttribute("aria-current");
+  });
+
   it("marks Home current on /home", () => {
     renderIn(StandardLayout, "/home");
     expect(screen.getByTestId("nav-item-home")).toHaveAttribute("aria-current", "page");
@@ -133,7 +139,7 @@ describe("StandardLayout", () => {
   });
 
   it("does not mark the item current or accent its icon on another path", () => {
-    renderIn(StandardLayout, "/datasets");
+    renderIn(StandardLayout, "/chat");
     const link = screen.getByTestId("nav-item-system-status");
     expect(link).not.toHaveAttribute("aria-current");
     expect(link.querySelector("svg")).not.toHaveClass("text-primary");

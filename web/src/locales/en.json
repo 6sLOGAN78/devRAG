@@ -723,7 +723,8 @@
       "modelGone": "That embedding model is no longer available in this workspace. Choose another one.",
       "dimension": "That embedding model's vector size isn't supported. Choose another one.",
       "indexDown": "The search index isn't available right now, so the dataset wasn't created. Try again in a moment.",
-      "createFallback": "The dataset wasn't created. Try again."
+      "createFallback": "The dataset wasn't created. Try again.",
+      "loadList": "Couldn't load datasets"
     },
     "empty": {
       "heading": "No datasets yet",
@@ -732,9 +733,6 @@
     "noMatch": {
       "heading": "No datasets match \"{{keywords}}\"",
       "body": "Check the spelling or try a shorter search."
-    },
-    "errorNoun": {
-      "list": "datasets"
     }
   }
 }

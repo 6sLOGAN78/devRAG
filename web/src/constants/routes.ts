@@ -1,4 +1,4 @@
-import { Activity, Cpu, House, KeyRound, UserRound, Users, type LucideIcon } from "lucide-react";
+import { Activity, Cpu, Database, House, KeyRound, UserRound, Users, type LucideIcon } from "lucide-react";
 import type { ComponentType } from "react";
 import { HOME_PATH } from "@/utils/safe-next";
 
@@ -68,6 +68,13 @@ export const routes: readonly RouteEntry[] = [
     auth: "required",
     component: () => import("@/pages/home"),
     nav: { labelKey: "nav.home", icon: House, order: 1, group: "platform" },
+  },
+  {
+    path: "/datasets",
+    layout: "standard",
+    auth: "required",
+    component: () => import("@/pages/datasets"),
+    nav: { labelKey: "nav.datasets", icon: Database, order: 2, group: "platform" },
   },
   {
     path: "/system-status",

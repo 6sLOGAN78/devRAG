@@ -443,7 +443,7 @@ describe("Create dataset from the gallery", () => {
     expect(within(dialog).getByRole("heading", { name: "Create dataset" })).toBeInTheDocument();
     await userEvent.keyboard("{Escape}");
     await waitFor(() => expect(screen.queryByTestId("create-dataset-dialog")).toBeNull());
-    expect(button).toHaveFocus();
+    await waitFor(() => expect(button).toHaveFocus());
   });
 
   it("opens the dialog from the empty state action", async () => {

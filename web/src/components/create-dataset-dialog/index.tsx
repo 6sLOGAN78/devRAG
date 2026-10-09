@@ -11,6 +11,8 @@ import { CreateForm } from "./create-form";
 export interface CreateDatasetDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  /** Where focus goes when the dialog has closed. Radix returns it to a trigger, and this dialog has none, so the page decides. */
+  onCloseAutoFocus?: (event: Event) => void;
 }
 
 function FormSkeleton() {
@@ -95,12 +97,13 @@ function Body({ onClose, pendingRef }: BodyProps) {
  * embedding model, and in its blocked form when it does not. Plan 03-25's settings dialog reuses `schemas.ts`,
  * `ServerFieldError` and `datasetErrorTarget`.
  */
-export function CreateDatasetDialog({ open, onOpenChange }: CreateDatasetDialogProps) {
+export function CreateDatasetDialog({ open, onOpenChange, onCloseAutoFocus }: CreateDatasetDialogProps) {
   const pendingRef = useRef(false);
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
         data-testid="create-dataset-dialog"
+        onCloseAutoFocus={onCloseAutoFocus}
         onEscapeKeyDown={(event) => {
           if (pendingRef.current) event.preventDefault();
         }}
