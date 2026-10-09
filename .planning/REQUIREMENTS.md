@@ -516,8 +516,8 @@ Requirements for initial release. Each maps to exactly one roadmap phase.
 - [x] **UI-08**: Tiered state: global stores (user, agent, chat, document), server-state hooks with caching/polling, local state, URL search params — *all four tiers are in place and tested: user store (global; plan 02-12), user-info and system-config hooks (server state, plans 02-12 and 02-13), URL search params (`next`, `mode`; plans 02-12 and 02-13) and local form state (plan 02-13); the agent, chat and document stores arrive with their features*
 - [x] **UI-09**: Home dashboard
 - [x] **UI-10**: Datasets gallery with card grid and create-dataset dialog
-- [ ] **UI-11**: Dataset workspace: document table with status badges
-- [ ] **UI-12**: Upload dialog: drag-and-drop, extension and size validation, progress bars
+- [x] **UI-11**: Dataset workspace: document table with status badges
+- [x] **UI-12**: Upload dialog: drag-and-drop, extension and size validation, progress bars
 - [ ] **UI-13**: Chunking-method dialog (General, Q&A, Paper, Book, Laws, Presentation, Table, Manual)
 - [ ] **UI-14**: Parser configurator: chunk token size, delimiter, layout-model toggle, auto-keyword count
 - [ ] **UI-15**: Live parsing progress bars, status badges (UNSTART, RUNNING, SUCCESS, FAIL), error log display
@@ -1117,8 +1117,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | UI-08 | Phase 2 | Complete (tiers established) |
 | UI-09 | Phase 2 | Complete |
 | UI-10 | Phase 3 | Complete |
-| UI-11 | Phase 3 | Pending |
-| UI-12 | Phase 3 | Pending |
+| UI-11 | Phase 3 | Complete |
+| UI-12 | Phase 3 | Complete |
 | UI-13 | Phase 4 | Pending |
 | UI-14 | Phase 4 | Pending |
 | UI-15 | Phase 4 | Pending |

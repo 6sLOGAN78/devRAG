@@ -91,7 +91,7 @@ Red run (`npm run test -- --run src/pages/dataset/dataset-files.test.tsx src/pag
 
 Task 2: `dataset-files.test.tsx` plus locales, `Test Files 2 passed (2)`, `Tests 22 passed (22)`; `src/constants` (no-hardcoded-copy) 6 passed.
 
-Final, `cd web && npm run test -- --run`: `Test Files 56 passed (56)`, `Tests 1135 passed (1135)` (was 1080). `npm run typecheck` exit 0. `npm run build` exit 0 (`built in 10.71s`, the existing chunk-size advisory only). `git diff --stat -- web/package.json web/package-lock.json` empty. No `dangerouslySetInnerHTML` or `@tanstack/react-table` in sources. `grep -n boundTenantRef web/src/pages/dataset/index.tsx`: the ref definition (line 37), the write before the store update (line 61, then `bindActive` at 65) and the comparison in the leave effect (line 75). `/dataset/files` in `routes.ts` has no `nav`.
+Final, `cd web && npm run test -- --run`: `Test Files 56 passed (56)`, `Tests 1135 passed (1135)` (was 1080). `npm run typecheck` exit 0. `npm run build` exit 0 (`built in 10.71s`, the existing chunk-size advisory only). `git diff --stat -- web/package.json web/package-lock.json` empty. No `dangerouslySetInnerHTML` or `@tanstack/react-table` in sources. `grep -n boundTenantRef web/src/pages/dataset/index.tsx`: the ref definition (line 37), the write before the store update (line 61, then `bindActive` at 64) and the comparison in the leave effect (line 75). `/dataset/files` in `routes.ts` has no `nav`.
 
 Not run: the live stack and a real browser (jsdom unit work; plan 03-26 drives them). Drag and drop is simulated with synthetic events; the real file drop, the focus return after the dialogs and the window drop guard need a real browser.
 

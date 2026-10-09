@@ -296,7 +296,7 @@ Plans:
 
 **Wave 20** *(blocked on Wave 19 completion)*
 
-- [ ] 03-31-PLAN.md — Dataset workspace page, document table and workspace binding
+- [x] 03-31-PLAN.md — Dataset workspace page, document table and workspace binding
 
 **Wave 21** *(blocked on Wave 20 completion)*
 
