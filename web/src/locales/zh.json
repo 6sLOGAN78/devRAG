@@ -804,6 +804,22 @@
     }
   },
   "dataset": {
-    "upload": "上传文件"
+    "back": "数据集",
+    "upload": "上传文件",
+    "documentTitle": "{{name}} - devRag",
+    "documentTitleFallback": "数据集 - devRag",
+    "loading": "正在加载数据集",
+    "dropOverlay": "松开鼠标，将文件上传到 {{name}}",
+    "meta": {
+      "embedding": "嵌入模型"
+    },
+    "notFound": {
+      "heading": "未找到数据集",
+      "body": "它可能已被删除，或未与你共享。",
+      "action": "返回数据集"
+    },
+    "error": {
+      "heading": "无法加载此数据集"
+    }
   }
 }

@@ -28,6 +28,8 @@ export interface FileUploadDialogProps {
   onOpenChange: (open: boolean) => void;
   /** Files already dropped on the page behind the dialog; queued as soon as it opens. */
   initialFiles?: File[];
+  /** Where focus goes when the dialog has closed. There is no trigger inside it, so the owner decides. */
+  onCloseAutoFocus?: (event: Event) => void;
 }
 
 interface BatchNotice {
@@ -45,7 +47,7 @@ export function FileUploadDialog(props: FileUploadDialogProps) {
   return props.open ? <UploadSession {...props} /> : null;
 }
 
-function UploadSession({ dataset, limits: limitsView, onOpenChange, initialFiles }: FileUploadDialogProps) {
+function UploadSession({ dataset, limits: limitsView, onOpenChange, initialFiles, onCloseAutoFocus }: FileUploadDialogProps) {
   const { t, i18n } = useTranslation();
   const limits = useMemo(() => resolveUploadLimits(limitsView), [limitsView]);
   const invalidate = useInvalidateDocuments();
@@ -212,6 +214,7 @@ function UploadSession({ dataset, limits: limitsView, onOpenChange, initialFiles
       <DialogContent
         className="max-w-xl"
         data-testid="upload-dialog"
+        onCloseAutoFocus={onCloseAutoFocus}
         onOpenAutoFocus={(event) => {
           if (chooseRef.current) {
             event.preventDefault();

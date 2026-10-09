@@ -804,6 +804,22 @@
     }
   },
   "dataset": {
-    "upload": "Upload files"
+    "back": "Datasets",
+    "upload": "Upload files",
+    "documentTitle": "{{name}} - devRag",
+    "documentTitleFallback": "Dataset - devRag",
+    "loading": "Loading dataset",
+    "dropOverlay": "Drop files to upload to {{name}}",
+    "meta": {
+      "embedding": "Embedding model"
+    },
+    "notFound": {
+      "heading": "Dataset not found",
+      "body": "It may have been deleted, or it isn't shared with you.",
+      "action": "Back to datasets"
+    },
+    "error": {
+      "heading": "Couldn't load this dataset"
+    }
   }
 }

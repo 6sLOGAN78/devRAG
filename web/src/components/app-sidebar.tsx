@@ -1,4 +1,4 @@
-import { NavLink } from "react-router";
+import { Link, useLocation } from "react-router";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useTranslation } from "react-i18next";
 import { NAV_GROUPS, navEntries, pathSlug, type NavGroup, type RouteEntry } from "@/constants/routes";
@@ -7,6 +7,19 @@ import { cn } from "@/lib/utils";
 
 /** Locale key of each group caption, written out so a missing key is a typo in one visible place. */
 const GROUP_CAPTION_KEYS: Record<NavGroup, string> = { platform: "nav.groupPlatform", account: "nav.groupAccount" };
+
+/**
+ * Pages that belong to a navigation entry without having an entry of their own: the dataset workspace
+ * (`/dataset/files`) keeps Datasets highlighted. Matched on the path prefix, so `/dataset` alone and `/datasetsx` do not match.
+ */
+const NESTED_PREFIXES: Readonly<Record<string, readonly string[]>> = { "/datasets": ["/dataset/"] };
+
+/** True when `pathname` is the entry's page, a page below it, or a page registered as belonging to it. */
+export function isNavActive(entryPath: string, pathname: string): boolean {
+  if (entryPath === "/") return pathname === "/";
+  if (pathname === entryPath || pathname.startsWith(`${entryPath}/`)) return true;
+  return (NESTED_PREFIXES[entryPath] ?? []).some((prefix) => pathname.startsWith(prefix));
+}
 
 interface AppSidebarProps {
   /** Labels are always visible inside the mobile sheet; in the rail they collapse to tooltips. */
@@ -19,6 +32,7 @@ interface AppSidebarProps {
 /** Navigation generated from the route registry: only entries that have `nav`. */
 export function AppSidebar({ forceLabels = false, onNavigate, entries: source }: AppSidebarProps) {
   const { t } = useTranslation();
+  const { pathname } = useLocation();
   const entries = navEntries(source);
   const groups = NAV_GROUPS.map((group) => ({ group, items: entries.filter((e) => e.nav?.group === group) })).filter((g) => g.items.length > 0);
   const labelClass = forceLabels ? "inline" : "hidden lg:inline";
@@ -26,27 +40,22 @@ export function AppSidebar({ forceLabels = false, onNavigate, entries: source }:
     const nav = entry.nav;
     if (!nav) return null;
     const Icon = nav.icon;
+    const isActive = isNavActive(entry.path, pathname);
     const link = (
-      <NavLink
+      <Link
         to={entry.path}
-        end={entry.path === "/"}
         onClick={onNavigate}
         data-testid={`nav-item-${pathSlug(entry.path)}`}
-        className={({ isActive }) =>
-          cn(
-            "group relative flex min-h-10 items-center gap-2 rounded-md px-2 text-sm font-normal text-foreground hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
-            isActive && "font-semibold",
-          )
-        }
-      >
-        {({ isActive }) => (
-          <>
-            {isActive ? <span data-testid="nav-active-indicator" className="absolute inset-y-1 left-0 w-0.5 rounded bg-primary" /> : null}
-            <Icon className={cn("size-4 shrink-0", isActive ? "text-primary" : "text-muted-foreground")} aria-hidden="true" />
-            <span className={labelClass}>{t(nav.labelKey)}</span>
-          </>
+        aria-current={isActive ? "page" : undefined}
+        className={cn(
+          "group relative flex min-h-10 items-center gap-2 rounded-md px-2 text-sm font-normal text-foreground hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+          isActive && "font-semibold",
         )}
-      </NavLink>
+      >
+        {isActive ? <span data-testid="nav-active-indicator" className="absolute inset-y-1 left-0 w-0.5 rounded bg-primary" /> : null}
+        <Icon className={cn("size-4 shrink-0", isActive ? "text-primary" : "text-muted-foreground")} aria-hidden="true" />
+        <span className={labelClass}>{t(nav.labelKey)}</span>
+      </Link>
     );
     return forceLabels ? (
       <div key={entry.path}>{link}</div>

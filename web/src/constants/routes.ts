@@ -77,6 +77,13 @@ export const routes: readonly RouteEntry[] = [
     nav: { labelKey: "nav.datasets", icon: Database, order: 2, group: "platform" },
   },
   {
+    // The dataset workspace has no navigation entry: Datasets stays highlighted through the sidebar's nested-path match.
+    path: "/dataset/files",
+    layout: "standard",
+    auth: "required",
+    component: () => import("@/pages/dataset"),
+  },
+  {
     path: "/system-status",
     layout: "standard",
     auth: "required",

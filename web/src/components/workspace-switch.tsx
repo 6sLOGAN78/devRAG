@@ -1,5 +1,5 @@
 import { Building2, ChevronsUpDown } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
 import { Button } from "@/components/ui/button";
@@ -27,7 +27,17 @@ export function WorkspaceSwitch() {
   const workspaces = useWorkspaces();
   const active = useActiveWorkspace();
   const setActive = useWorkspaceStore((state) => state.setActive);
+  const bound = useWorkspaceStore((state) => state.bound);
   const [announcement, setAnnouncement] = useState("");
+
+  // A page that belongs to another joined workspace (a deep link) made it the active one: say so, once.
+  useEffect(() => {
+    if (bound === null) return;
+    const name = workspaces.find((workspace) => workspace.tenantId === bound)?.name;
+    if (name === undefined) return;
+    setAnnouncement(t("workspace.switched", { workspace: name }));
+    useWorkspaceStore.getState().clearBound();
+  }, [bound, workspaces, t]);
 
   if (active === null) return null;
 

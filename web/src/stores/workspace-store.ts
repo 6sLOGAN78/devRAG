@@ -98,14 +98,23 @@ interface WorkspaceState {
   memberships: Membership[];
   /** Name of the workspace the caller just lost access to; the toast reads and clears it. */
   lost: string | null;
+  /** Workspace a page switched to on its own (a deep link); the header selector announces it once and clears it. */
+  bound: string | null;
   initialise: (userId: string, ownTenantId: string, memberships: readonly Membership[]) => void;
   setActive: (tenantId: string) => void;
+  /**
+   * Makes `tenantId` the active workspace because the open page belongs to it (a deep link into a joined workspace),
+   * without the user having chosen it. Returns false, changing nothing, when the caller may not act in it. A real change
+   * sets `bound` so the selector announces it.
+   */
+  bindActive: (tenantId: string) => boolean;
+  clearBound: () => void;
   setMemberships: (memberships: readonly Membership[]) => void;
   clearLost: () => void;
   reset: () => void;
 }
 
-const EMPTY = { activeTenantId: null, initialisedFor: null, ownTenantId: null, memberships: [], lost: null } as const;
+const EMPTY = { activeTenantId: null, initialisedFor: null, ownTenantId: null, memberships: [], lost: null, bound: null } as const;
 
 export const useWorkspaceStore = create<WorkspaceState>()((set, get) => ({
   ...EMPTY,
@@ -116,7 +125,7 @@ export const useWorkspaceStore = create<WorkspaceState>()((set, get) => ({
     const stored = readStored();
     // Only this user's own entry counts, and only for a workspace the server still lists (T-03-03-01, -02).
     const remembered = stored !== null && stored.userId === userId && allowed.has(stored.tenantId) ? stored.tenantId : null;
-    set({ activeTenantId: remembered ?? ownTenantId, initialisedFor: userId, ownTenantId, memberships: [...memberships], lost: null });
+    set({ activeTenantId: remembered ?? ownTenantId, initialisedFor: userId, ownTenantId, memberships: [...memberships], lost: null, bound: null });
   },
 
   setActive: (tenantId) => {
@@ -127,6 +136,16 @@ export const useWorkspaceStore = create<WorkspaceState>()((set, get) => ({
     set({ activeTenantId: tenantId });
     writeStored({ userId: initialisedFor, tenantId });
   },
+
+  bindActive: (tenantId) => {
+    const before = get().activeTenantId;
+    get().setActive(tenantId);
+    if (get().activeTenantId !== tenantId) return false;
+    if (before !== tenantId) set({ bound: tenantId });
+    return true;
+  },
+
+  clearBound: () => set({ bound: null }),
 
   setMemberships: (next) => {
     const { activeTenantId, ownTenantId, memberships: previous, initialisedFor } = get();

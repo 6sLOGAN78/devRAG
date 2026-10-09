@@ -84,6 +84,28 @@ describe("workspace store", () => {
     expect(stored()).toEqual({ userId: "u1", tenantId: "t1" });
   });
 
+  it("bindActive switches to a joined workspace for a page that belongs to it, flags it once, and refuses a workspace the caller did not join", () => {
+    const store = useWorkspaceStore.getState();
+    store.initialise("u1", "t1", [OWN, ADMIN_IN, INVITED]);
+    expect(useWorkspaceStore.getState().bindActive("t9")).toBe(true);
+    expect(useWorkspaceStore.getState().activeTenantId).toBe("t9");
+    expect(useWorkspaceStore.getState().bound).toBe("t9");
+    expect(stored()).toEqual({ userId: "u1", tenantId: "t9" });
+    useWorkspaceStore.getState().clearBound();
+    expect(useWorkspaceStore.getState().bound).toBeNull();
+    expect(useWorkspaceStore.getState().bindActive("t9")).toBe(true);
+    expect(useWorkspaceStore.getState().bound).toBeNull();
+    expect(useWorkspaceStore.getState().bindActive("t8")).toBe(false);
+    expect(useWorkspaceStore.getState().bindActive("t666")).toBe(false);
+    expect(useWorkspaceStore.getState().activeTenantId).toBe("t9");
+  });
+
+  it("bindActive does nothing before the store is initialised", () => {
+    expect(useWorkspaceStore.getState().bindActive("t9")).toBe(false);
+    expect(useWorkspaceStore.getState().activeTenantId).toBeNull();
+    expect(useWorkspaceStore.getState().bound).toBeNull();
+  });
+
   it("falls back to the own workspace and reports the lost workspace name once when it leaves the list", () => {
     const store = useWorkspaceStore.getState();
     store.initialise("u1", "t1", [OWN, ADMIN_IN]);

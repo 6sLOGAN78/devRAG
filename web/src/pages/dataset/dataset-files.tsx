@@ -26,7 +26,8 @@ export interface DatasetFilesProps {
   /** Current page (1-based) and search, both owned by the caller (the URL). */
   page: number;
   keywords: string;
-  onPageChange: (page: number) => void;
+  /** `replace` is true when the table steps back by itself (the page emptied), so Back does not return to an empty page. */
+  onPageChange: (page: number, options?: { replace?: boolean }) => void;
   onSearch: (keywords: string) => void;
   /** The empty state's "Upload files" action. */
   onUpload: () => void;
@@ -85,7 +86,7 @@ export function DatasetFiles({ dataset, limits, page, keywords, onPageChange, on
 
   // After the last page empties (a delete, or a delete elsewhere) step back to the last page that exists.
   useEffect(() => {
-    if (pastEnd) onPageChange(pages);
+    if (pastEnd) onPageChange(pages, { replace: true });
   }, [pastEnd, pages, onPageChange]);
 
   // After a delete the row (and the dialog that had focus) is gone: focus the caption once the table is shown again.
