@@ -7,10 +7,10 @@
  * There is no reveal and no copy. A missing or short tail gives the bullets alone, and no input ever yields more than
  * four visible characters, so a malformed value cannot leak more than a well formed one.
  */
-export const SECRET_BULLETS = "•".repeat(8);
+export const MASK_BULLETS = "•".repeat(8);
 export const SECRET_TAIL_LENGTH = 4;
 
 export function maskSecret(last4: string): string {
-  if (typeof last4 !== "string" || last4.length < SECRET_TAIL_LENGTH) return SECRET_BULLETS;
-  return `${SECRET_BULLETS}${last4.slice(-SECRET_TAIL_LENGTH)}`;
+  if (typeof last4 !== "string" || last4.length < SECRET_TAIL_LENGTH) return MASK_BULLETS;
+  return `${MASK_BULLETS}${last4.slice(-SECRET_TAIL_LENGTH)}`;
 }
