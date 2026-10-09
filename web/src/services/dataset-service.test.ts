@@ -108,7 +108,7 @@ describe("listDatasets (KB-02, TEN-13)", () => {
 
   it("coerces strings, numbers and missing values, and gives an empty page for a bad body", async () => {
     body = success({
-      items: [{ id: 7, name: null, description: undefined, permission: 3, embd_id: null, embedding_dimension: "x", doc_num: "4", created_by: 1, tenant_id: null, update_time: "9" }, "junk", null],
+      items: [{ id: 7, name: null, description: undefined, permission: { x: 1 }, embd_id: null, embedding_dimension: "x", doc_num: "4", created_by: 1, tenant_id: null, update_time: "9" }, "junk", null],
       total: "2",
     });
     const result = await listDatasets({ tenantId: TENANT, page: 1, pageSize: 12, keywords: "" });

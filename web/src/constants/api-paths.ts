@@ -78,3 +78,16 @@ export function providerInstancePath(provider: string, instance: string): string
 export const modelsPath = resolve("python", "/api/v1/models");
 /** The workspace's default chat and embedding model (GET; PATCH arrives with the defaults card). */
 export const modelsDefaultPath = resolve("python", "/api/v1/models/default");
+
+/** Datasets of one workspace (GET list, POST create, DELETE a batch). The workspace goes in `tenant_id`. */
+export const datasetsPath = resolve("python", "/api/v1/datasets");
+/** One dataset (GET with its upload limits, PUT settings). The id is percent-encoded. */
+export function datasetPath(id: string): string {
+  return resolveUnder("python", "/api/v1/datasets/", encodeURIComponent(id));
+}
+/** The documents of one dataset (GET list, DELETE a batch). */
+export function datasetDocumentsPath(id: string): string {
+  return resolveUnder("python", "/api/v1/datasets/", `${encodeURIComponent(id)}/documents`);
+}
+/** Multipart upload of files into a dataset (POST). */
+export const documentUploadPath = resolve("python", "/api/v1/documents/upload");
