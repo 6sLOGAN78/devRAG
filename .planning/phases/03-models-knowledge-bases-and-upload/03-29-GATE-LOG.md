@@ -7,3 +7,6 @@ A gate interrupted by a host restart must be restarted from run 1.
 - 23:26Z Task 1: test/unit_test/test_phase3_traceability.py committed; 5 pass + 1 PHASE3_GATE-guarded summary test; gen_routes --check ok; ci/run_all 7/7.
 - 23:26Z pre-gate: preflight PASS (key present, map-count override, RAM 7231 MB, disk 17.0 GB, port 8088)
 - 23:27Z pre-gate: ci/run_all 7/7, gen_routes --check, go vet + common tests, web typecheck, vitest unit (56 files, 1135 tests, 26.8 s), web build, PHASE3_GATE=1 traceability 6 passed: all PASS
+- 23:27Z GATE ATTEMPT 1 started (log in scratchpad gate1.log)
+- 23:39Z GATE ATTEMPT 1 run 1 FAILED at step go-tiers (after PASS unit, integration, e2e, e2e-serial, live-model, go-race): Go cross-tenant matrix (internal/e2e) has no fixture builder / isolation check for 17 Phase 3 registry rows. Fixing at source.
+- 23:41Z FIX committed: fix(03-19) Go cross-tenant matrix scoped to owner:go rows (R-153); full go-tiers command then run by hand against the live stack: all ok. Restarting the WHOLE gate from run 1 (attempt 2).
