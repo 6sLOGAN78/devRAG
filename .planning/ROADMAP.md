@@ -288,7 +288,7 @@ Plans:
 
 **Wave 18** *(blocked on Wave 17 completion)*
 
-- [ ] 03-30-PLAN.md — Datasets gallery, create dialog, route and nav entry
+- [x] 03-30-PLAN.md — Datasets gallery, create dialog, route and nav entry
 
 **Wave 19** *(blocked on Wave 18 completion)*
 
