@@ -22,6 +22,8 @@ import { useActiveWorkspace } from "./use-workspaces";
  */
 export const providersQueryKey = (tenantId: string | null) => ["ws", tenantId, "providers"] as const;
 export const modelsQueryKey = (tenantId: string | null, type?: ModelType) => ["ws", tenantId, "models", type ?? "all"] as const;
+/** Prefix of every model list of one workspace, whatever the type filter. */
+export const modelsKeyRoot = (tenantId: string | null) => ["ws", tenantId, "models"] as const;
 export const defaultsQueryKey = (tenantId: string | null) => ["ws", tenantId, "defaults"] as const;
 
 /** The workspace the model settings act in, or null while signed out. */

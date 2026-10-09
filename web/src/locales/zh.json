@@ -13,7 +13,8 @@
     "profile": "个人资料",
     "models": "模型",
     "apiTokens": "API 令牌",
-    "team": "团队"
+    "team": "团队",
+    "datasets": "数据集"
   },
   "header": {
     "accountMenu": "账户菜单",
@@ -239,6 +240,12 @@
       "idRequired": "请输入模型 ID。",
       "idInvalid": "模型 ID 不能包含空格或 @。",
       "idMax": "请使用 128 个字符或更少。"
+    },
+    "dataset": {
+      "nameRequired": "请输入名称。",
+      "nameMax": "最多 128 个字符。",
+      "descriptionMax": "最多 500 个字符。",
+      "embeddingRequired": "请选择嵌入模型。"
     }
   },
   "home": {
@@ -665,6 +672,69 @@
       "started_one": "正在上传 {{count}} 个文件",
       "started_other": "正在上传 {{count}} 个文件",
       "summary": "{{done}} 个已上传,{{failed}} 个失败"
+    }
+  },
+  "datasets": {
+    "documentTitle": "数据集 - devRag",
+    "title": "数据集",
+    "intro": "{{workspace}} 中的数据集。你可以看到自己创建的数据集，以及与团队共享的数据集。",
+    "loading": "正在加载数据集",
+    "search": "搜索数据集",
+    "create": "创建数据集",
+    "created": "数据集已创建",
+    "card": {
+      "documents_one": "{{count}} 个文档",
+      "documents_other": "{{count}} 个文档",
+      "updated": "更新于 {{date}}"
+    },
+    "visibility": {
+      "me": "仅自己",
+      "team": "团队",
+      "meTitle": "仅自己",
+      "meBody": "只有你可以查看和使用此数据集。",
+      "teamTitle": "整个团队",
+      "teamBody": "{{workspace}} 中的所有人都可以查看并上传文档。只有你、所有者和管理员可以修改或删除它。"
+    },
+    "missingDefault": {
+      "manager": "此工作区还没有默认的嵌入模型，因此无法创建数据集。",
+      "member": "此工作区还没有默认的嵌入模型，因此无法创建数据集。请联系所有者或管理员进行选择。",
+      "link": "打开模型设置"
+    },
+    "blocked": {
+      "title": "请先选择默认嵌入模型",
+      "body": "数据集需要嵌入模型来为其文档建立索引，而此工作区还没有默认模型。",
+      "member": "请联系工作区所有者或管理员进行选择。"
+    },
+    "form": {
+      "createTitle": "创建数据集",
+      "createBody": "为数据集命名，选择为其文档建立索引的模型以及可见范围。",
+      "loading": "正在加载模型设置"
+    },
+    "field": {
+      "name": "名称",
+      "description": "描述（可选）",
+      "descriptionCount": "{{count}}/500",
+      "embedding": "嵌入模型",
+      "embeddingHelp": "用于为此数据集的文档建立索引。数据集包含文档后无法更改。",
+      "visibility": "谁可以查看"
+    },
+    "error": {
+      "duplicate": "此工作区中已存在名为“{{name}}”的数据集。请换一个名称。",
+      "modelGone": "该嵌入模型在此工作区中已不可用。请选择其他模型。",
+      "dimension": "不支持该嵌入模型的向量维度。请选择其他模型。",
+      "indexDown": "搜索索引暂时不可用，因此未创建数据集。请稍后重试。",
+      "createFallback": "未能创建数据集。请重试。"
+    },
+    "empty": {
+      "heading": "还没有数据集",
+      "body": "数据集用于存放你想要搜索并提问的文档。先创建一个，然后向其中上传文件。"
+    },
+    "noMatch": {
+      "heading": "没有与“{{keywords}}”匹配的数据集",
+      "body": "请检查拼写，或尝试更短的关键词。"
+    },
+    "errorNoun": {
+      "list": "数据集"
     }
   }
 }

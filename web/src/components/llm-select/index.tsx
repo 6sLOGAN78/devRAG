@@ -14,18 +14,19 @@ interface LlmSelectProps {
   /** Overrides the "Not set" first option. */
   notSetLabel?: string;
   "aria-describedby"?: string;
+  "aria-invalid"?: boolean | "true" | "false";
   "data-testid"?: string;
 }
 
 /** Models of one type, grouped by provider. The option value is the composite id the API uses. */
-export function LlmSelect({ models, type, value, onChange, id, disabled, notSetLabel, "aria-describedby": describedBy, "data-testid": testId }: LlmSelectProps) {
+export function LlmSelect({ models, type, value, onChange, id, disabled, notSetLabel, "aria-describedby": describedBy, "aria-invalid": invalid, "data-testid": testId }: LlmSelectProps) {
   const { t } = useTranslation();
   const offered = models.filter((model) => model.type === type);
   const groups = new Map<string, ModelView[]>();
   for (const model of offered) groups.set(model.provider, [...(groups.get(model.provider) ?? []), model]);
   const current = offered.some((model) => model.id === value) ? value : "";
   return (
-    <NativeSelect id={id} value={current} disabled={disabled} aria-describedby={describedBy} data-testid={testId} onChange={(event) => onChange(event.target.value)}>
+    <NativeSelect id={id} value={current} disabled={disabled} aria-describedby={describedBy} aria-invalid={invalid} data-testid={testId} onChange={(event) => onChange(event.target.value)}>
       <option value="">{notSetLabel ?? t("common.notSet")}</option>
       {[...groups.entries()].map(([provider, items]) => (
         <optgroup key={provider} label={provider}>

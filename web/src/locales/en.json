@@ -13,7 +13,8 @@
     "profile": "Profile",
     "models": "Models",
     "apiTokens": "API tokens",
-    "team": "Team"
+    "team": "Team",
+    "datasets": "Datasets"
   },
   "header": {
     "accountMenu": "Account menu",
@@ -239,6 +240,12 @@
       "idRequired": "Enter the model id.",
       "idInvalid": "Model ids can't contain spaces or @.",
       "idMax": "Use 128 characters or fewer."
+    },
+    "dataset": {
+      "nameRequired": "Enter a name.",
+      "nameMax": "Use 128 characters or fewer.",
+      "descriptionMax": "Use 500 characters or fewer.",
+      "embeddingRequired": "Choose an embedding model."
     }
   },
   "home": {
@@ -665,6 +672,69 @@
       "started_one": "Uploading {{count}} file",
       "started_other": "Uploading {{count}} files",
       "summary": "{{done}} uploaded, {{failed}} failed"
+    }
+  },
+  "datasets": {
+    "documentTitle": "Datasets - devRag",
+    "title": "Datasets",
+    "intro": "Datasets in {{workspace}}. You see the ones you created and the ones shared with the team.",
+    "loading": "Loading datasets",
+    "search": "Search datasets",
+    "create": "Create dataset",
+    "created": "Dataset created",
+    "card": {
+      "documents_one": "{{count}} document",
+      "documents_other": "{{count}} documents",
+      "updated": "Updated {{date}}"
+    },
+    "visibility": {
+      "me": "Only me",
+      "team": "Team",
+      "meTitle": "Only me",
+      "meBody": "Only you can see and use this dataset.",
+      "teamTitle": "Whole team",
+      "teamBody": "Everyone in {{workspace}} can see it and upload documents. Only you, the owner and admins can change or delete it."
+    },
+    "missingDefault": {
+      "manager": "This workspace has no default embedding model yet, so datasets can't be created.",
+      "member": "This workspace has no default embedding model yet, so datasets can't be created. Ask the owner or an admin to choose one.",
+      "link": "Open model settings"
+    },
+    "blocked": {
+      "title": "Choose a default embedding model first",
+      "body": "A dataset needs an embedding model to index its documents, and this workspace has no default yet.",
+      "member": "Ask the workspace owner or an admin to choose one."
+    },
+    "form": {
+      "createTitle": "Create dataset",
+      "createBody": "Name the dataset, choose the model that indexes its documents and who can see it.",
+      "loading": "Loading model settings"
+    },
+    "field": {
+      "name": "Name",
+      "description": "Description (optional)",
+      "descriptionCount": "{{count}}/500",
+      "embedding": "Embedding model",
+      "embeddingHelp": "Used to index this dataset's documents. It can't be changed once the dataset has documents.",
+      "visibility": "Who can see it"
+    },
+    "error": {
+      "duplicate": "A dataset named \"{{name}}\" already exists in this workspace. Choose another name.",
+      "modelGone": "That embedding model is no longer available in this workspace. Choose another one.",
+      "dimension": "That embedding model's vector size isn't supported. Choose another one.",
+      "indexDown": "The search index isn't available right now, so the dataset wasn't created. Try again in a moment.",
+      "createFallback": "The dataset wasn't created. Try again."
+    },
+    "empty": {
+      "heading": "No datasets yet",
+      "body": "A dataset holds the documents you want to search and ask questions about. Create one, then upload files into it."
+    },
+    "noMatch": {
+      "heading": "No datasets match \"{{keywords}}\"",
+      "body": "Check the spelling or try a shorter search."
+    },
+    "errorNoun": {
+      "list": "datasets"
     }
   }
 }
