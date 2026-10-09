@@ -335,7 +335,7 @@ describe("runner: cancel, retry and stop", () => {
   });
 
   it("can start again after stop (a remounted dialog reuses the runner)", () => {
-    const { store, runner } = setup(["a.pdf"]);
+    const { store, runner } = setup([]);
     runner.stop();
     store.dispatch({ type: "add", entries: [{ file: file("b.pdf"), rejection: null }] });
     runner.start();

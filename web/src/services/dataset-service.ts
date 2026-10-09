@@ -1,5 +1,6 @@
 import { datasetPath, datasetsPath } from "@/constants/api-paths";
 import { request } from "./http";
+import { asRecord, clampWhole, count, text } from "./mapping";
 
 /**
  * Dataset APIs (plans 03-14 and 03-18). Every mapper copies an explicit field list and coerces what it reads, so an
@@ -69,17 +70,6 @@ export const MAX_KEYWORDS_LENGTH = 128;
 /** The create call may wait on index provisioning (D-26). */
 export const CREATE_TIMEOUT_MS = 30000;
 
-const text = (value: unknown): string => {
-  if (typeof value === "string") return value;
-  if (typeof value === "number" && Number.isFinite(value)) return String(value);
-  return "";
-};
-const count = (value: unknown): number => {
-  const n = typeof value === "string" && value.trim() !== "" ? Number(value) : value;
-  return typeof n === "number" && Number.isFinite(n) ? n : 0;
-};
-const asRecord = (value: unknown): Record<string, unknown> => (typeof value === "object" && value !== null && !Array.isArray(value) ? (value as Record<string, unknown>) : {});
-
 function toDataset(raw: unknown): DatasetView {
   const dto = asRecord(raw);
   return {
@@ -118,11 +108,6 @@ function toDetail(raw: unknown): DatasetDetailView {
     createTime: count(dto.create_time),
     uploadLimits: toLimits(dto.upload_limits),
   };
-}
-
-function clampWhole(value: number, low: number, high: number): number {
-  if (!Number.isFinite(value)) return low;
-  return Math.min(high, Math.max(low, Math.floor(value)));
 }
 
 /** GET /api/v1/datasets: one page of the workspace's datasets. Silent: the gallery renders its own error state. */
