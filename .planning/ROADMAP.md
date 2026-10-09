@@ -280,7 +280,7 @@ Plans:
 
 **Wave 16** *(blocked on Wave 15 completion)*
 
-- [ ] 03-23-PLAN.md — Datasets UI parts, dataset service and workspace-scoped hooks
+- [x] 03-23-PLAN.md — Datasets UI parts, dataset service and workspace-scoped hooks
 
 **Wave 17** *(blocked on Wave 16 completion)*
 
