@@ -1,7 +1,7 @@
 import { AxiosHeaders, type AxiosAdapter, type InternalAxiosRequestConfig } from "axios";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { http } from "./http";
-import { addModel, deleteProvider, getDefaults, listModels, listProviders, registeredModelFor, saveProvider, type ProviderView } from "./model-service";
+import { addModel, deleteProvider, getDefaults, listModels, listProviders, registeredModelFor, saveDefaults, saveProvider, type ProviderView } from "./model-service";
 
 const originalAdapter = http.defaults.adapter;
 let body: unknown;
@@ -172,6 +172,22 @@ describe("model service writes (plan 03-21)", () => {
     expect(seen[0]?.params).toEqual({ tenant_id: "t1" });
     expect(seen[0]?.timeout).toBe(30000);
     expect(seen[0]?.silent).toBe(true);
+  });
+
+  it("saves defaults with PATCH, the tenant and only the named fields, and maps the answer", async () => {
+    body = success({ chat: "c@P", embedding: "", api_key: "sk-FAKE-never-mapped" });
+    await expect(saveDefaults("t1", { chat: "c@P" })).resolves.toEqual({ chat: "c@P", embedding: "" });
+    expect(seen[0]?.method).toBe("patch");
+    expect(seen[0]?.url).toBe("/api/v1/models/default");
+    expect(seen[0]?.silent).toBe(true);
+    expect(JSON.parse(String(seen[0]?.data))).toEqual({ tenant_id: "t1", chat: "c@P" });
+  });
+
+  it("sends null to clear a default and leaves an unchanged field out of the body", async () => {
+    body = success({ chat: "", embedding: "e@P" });
+    await saveDefaults("t1", { chat: null });
+    expect(JSON.parse(String(seen[0]?.data))).toEqual({ tenant_id: "t1", chat: null });
+    expect(String(seen[0]?.data)).not.toContain("embedding");
   });
 
   describe("registeredModelFor", () => {
