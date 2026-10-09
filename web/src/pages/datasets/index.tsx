@@ -66,6 +66,8 @@ export default function DatasetsPage() {
   const previousTenant = useRef(tenantId);
   const trigger = useRef<HTMLElement | null>(null);
   const pageRoot = useRef<HTMLDivElement | null>(null);
+  const title = useRef<HTMLHeadingElement | null>(null);
+  const [focusTitleFor, setFocusTitleFor] = useState<string | null>(null);
 
   useEffect(() => {
     document.title = t("datasets.documentTitle");
@@ -89,6 +91,17 @@ export default function DatasetsPage() {
 
   const total = datasets.data?.total ?? 0;
   const items = datasets.data?.items ?? [];
+
+  // After a delete the card (and the dialog that had focus) is gone: focus goes to the page title (D-27). Done once the
+  // card has left the list and the dialog has released its focus trap, i.e. after the current task.
+  useEffect(() => {
+    if (focusTitleFor === null || items.some((item) => item.id === focusTitleFor)) return;
+    const timer = window.setTimeout(() => {
+      title.current?.focus();
+      setFocusTitleFor(null);
+    }, 0);
+    return () => window.clearTimeout(timer);
+  }, [focusTitleFor, items]);
   const pages = Math.max(1, Math.ceil(total / DATASETS_PAGE_SIZE));
   const pastEnd = datasets.data !== undefined && items.length === 0 && total > 0 && page > pages;
 
@@ -172,7 +185,7 @@ export default function DatasetsPage() {
       <>
         <div data-testid="dataset-grid" className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {items.map((dataset) => (
-            <DatasetCard key={dataset.id} dataset={dataset} />
+            <DatasetCard key={dataset.id} dataset={dataset} onDeleted={() => setFocusTitleFor(dataset.id)} />
           ))}
         </div>
         <Pagination
@@ -198,7 +211,7 @@ export default function DatasetsPage() {
 
   return (
     <div ref={pageRoot} data-testid="datasets-page" className="flex flex-col gap-6">
-      <PageHeader title={t("datasets.title")} actions={showCreate ? createButton : undefined} />
+      <PageHeader title={t("datasets.title")} titleRef={title} actions={showCreate ? createButton : undefined} />
       <p className="max-w-prose text-sm font-normal text-muted-foreground">{t("datasets.intro", { workspace: workspace?.name ?? "" })}</p>
       {missingDefault ? (
         <Alert variant="info" data-testid="datasets-missing-default">

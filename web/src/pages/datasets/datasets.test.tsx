@@ -232,7 +232,8 @@ describe("Datasets gallery structure (UI-10)", () => {
     expect(within(beta).getByText("Only me")).toBeInTheDocument();
     expect(within(beta).getByText("1 document")).toBeInTheDocument();
     expect(beta.querySelectorAll("p.line-clamp-2")).toHaveLength(0);
-    expect(within(alpha).queryByRole("button")).toBeNull();
+    // Plan 03-25: the creator's card carries exactly one control besides the link, the actions menu (one button).
+    expect(within(alpha).getAllByRole("button").map((b) => b.getAttribute("data-testid"))).toEqual(["dataset-actions"]);
   });
 
   it("renders dataset names and descriptions as text, never as markup", async () => {
