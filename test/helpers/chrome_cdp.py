@@ -222,3 +222,24 @@ class ChromeSession:
                 return None  # the document is mid-navigation; try again
 
         return wait_until(_probe, timeout=timeout, interval=0.1, describe=lambda: describe)
+
+    def set_file_input(self, selector: str, paths: list[str]) -> None:
+        """Attach local files to the page's file input the way a person's file picker does (fires the real change event)."""
+        root = self.call("DOM.getDocument", {"depth": 0})["root"]["nodeId"]
+        node = self.call("DOM.querySelector", {"nodeId": root, "selector": selector})["nodeId"]
+        if not node:
+            raise ChromeError(f"no element matches {selector}")
+        self.call("DOM.setFileInputFiles", {"nodeId": node, "files": paths})
+
+    def throttle_upload(self, bytes_per_second: int | None) -> None:
+        """Limit the page's upload bandwidth to ``bytes_per_second``; ``None`` (or -1) clears the limit."""
+        self.call("Network.enable")
+        self.call(
+            "Network.emulateNetworkConditions",
+            {
+                "offline": False,
+                "latency": 0,
+                "downloadThroughput": -1,
+                "uploadThroughput": -1 if bytes_per_second is None else bytes_per_second,
+            },
+        )

@@ -5,14 +5,23 @@ The browser is driven over the DevTools pipe by ``test.helpers.chrome_cdp`` (sta
 from __future__ import annotations
 
 import json
+import os
+import tempfile
+import time
 from collections.abc import Iterator
+from pathlib import Path
 
 import httpx
 import pytest
 
 from test.helpers.accounts import Account, AccountRegistry, delete_accounts, unique_email, unique_name
 from test.helpers.chrome_cdp import ChromeSession, chrome_path
+from test.helpers.fake_provider import FakeProvider, fake_provider_stack  # noqa: F401  (fixture)
+from test.helpers.uploads import sql, tenant_object_keys, text_bytes
 from test.testcases.conftest import BASE_URL, HTTP_PORT
+from test.testcases.test_dataset_flow import DATASETS, EMBED_ID, create, workspace
+from test.testcases.test_dataset_lifecycle_flow import chunk_count, raw_es  # noqa: F401  (raw_es is a fixture)
+from test.testcases.test_provider_flow import api, ok, registry  # noqa: F401  (registry is a fixture)
 
 pytestmark = pytest.mark.e2e
 
@@ -60,11 +69,11 @@ def test_status_page_renders_healthy_cards_in_real_browser(stack_ready: object, 
 @pytest.fixture
 def signout_account(stack_ready: object) -> Iterator[Account]:
     """Sign out ends the shared token for the whole account (D-10), so it must not use the session-wide account."""
-    registry = AccountRegistry(BASE_URL)
+    accounts = AccountRegistry(BASE_URL)
     try:
-        yield registry.register(prefix="signout")
+        yield accounts.register(prefix="signout")
     finally:
-        registry.cleanup()
+        accounts.cleanup()
 
 
 def test_sign_out_from_the_account_menu_lands_on_a_bare_login_in_real_browser(
@@ -171,3 +180,158 @@ def test_register_land_on_home_reload_and_guard_in_real_browser(stack_ready: obj
         assert browser.evaluate("location.pathname") == "/login"
     finally:
         delete_accounts(created)
+
+
+# --- datasets and uploads in a real Chrome (plan 03-26: UI-10, UI-11, UI-12, E2E-03, E2E-04, DOC-15, KB-07) ---------------------------------
+
+
+def _by_id(test_id: str) -> str:
+    return f"document.querySelector('[data-testid=\"{test_id}\"]')"
+
+
+def _set_viewport(browser: ChromeSession) -> None:
+    """A desktop-sized window: headless Chrome's default layout viewport is smaller than the dialogs' centred position, which puts buttons off-screen."""
+    browser.call("Emulation.setDeviceMetricsOverride", {"width": 1280, "height": 900, "deviceScaleFactor": 1, "mobile": False})
+
+
+def _wait_testid(browser: ChromeSession, test_id: str, timeout: float = 60.0) -> None:
+    browser.wait_for(f"{_by_id(test_id)} !== null", f"the element {test_id}", timeout=timeout)
+
+
+def _press(browser: ChromeSession, test_id: str) -> None:
+    """Click the element with a real mouse press at its centre (fires pointer events, which Radix menus listen for)."""
+    # A dialog or menu that is still animating in has not reached its place: a press at the measured centre would miss.
+    browser.wait_for("document.getAnimations().every(a => a.playState !== 'running')", f"animations to settle before pressing {test_id}", timeout=10)
+    box = browser.evaluate(
+        f"(() => {{ const e = {_by_id(test_id)}; e.scrollIntoView({{block: 'center'}}); const r = e.getBoundingClientRect();"
+        " return {x: r.left + r.width / 2, y: r.top + r.height / 2}; })()"
+    )
+    point = {"x": box["x"], "y": box["y"], "button": "left", "clickCount": 1}
+    browser.call("Input.dispatchMouseEvent", {"type": "mouseMoved", "x": point["x"], "y": point["y"]})
+    browser.call("Input.dispatchMouseEvent", {"type": "mousePressed", **point})
+    browser.call("Input.dispatchMouseEvent", {"type": "mouseReleased", **point})
+
+
+def _text_of(browser: ChromeSession, test_id: str) -> str:
+    return str(browser.evaluate(f"({_by_id(test_id)} || {{textContent: ''}}).textContent"))
+
+
+def _upload_through_dialog(browser: ChromeSession, path: str, expected_rows: int, *, timeout: float) -> float:
+    """Open the upload dialog, attach the file to the real input, press Upload and wait for 'Uploaded'. Returns the seconds the upload took."""
+    _wait_testid(browser, "dataset-upload")
+    _press(browser, "dataset-upload")
+    _wait_testid(browser, "upload-input")
+    browser.set_file_input('[data-testid="upload-input"]', [path])
+    browser.wait_for(f"document.querySelectorAll('[data-testid=\"upload-row\"]').length === {expected_rows}", "the file queued in the dialog")
+    browser.wait_for(f"{_by_id('upload-submit')}.textContent === 'Upload {expected_rows} file'", "the Upload button naming the file")
+    started = time.monotonic()
+    _press(browser, "upload-submit")
+    try:
+        browser.wait_for(
+            "(() => { const s = document.querySelectorAll('[data-testid=\"upload-row-state\"]');"
+            " return s.length > 0 && Array.from(s).every(e => e.textContent.startsWith('Uploaded')); })()",
+            "every upload row reading Uploaded",
+            timeout=timeout,
+        )
+    except TimeoutError as exc:
+        seen = browser.evaluate("(document.querySelector('[data-testid=\"upload-dialog\"]') || document.body).innerText.slice(0, 600)")
+        raise AssertionError(f"the upload did not finish; the page showed: {seen!r}") from exc
+    return time.monotonic() - started
+
+
+def _close_upload_dialog(browser: ChromeSession) -> None:
+    _press(browser, "upload-close")
+    browser.wait_for(f"{_by_id('upload-dialog')} === null", "the upload dialog closed")
+
+
+def _sign_in_to_dataset_page(browser: ChromeSession, owner: Account, dataset_id: str) -> None:
+    _set_viewport(browser)
+    _store_token(browser, owner.token)
+    browser.navigate(f"{ORIGIN}/dataset/files?id={dataset_id}")
+    _wait_testid(browser, "dataset-page")
+
+
+def test_a_real_browser_creates_a_dataset_uploads_through_the_real_input_and_the_blob_is_stored(
+    stack_ready: httpx.Client, registry: AccountRegistry, fake_provider_stack: FakeProvider, browser: ChromeSession  # noqa: F811
+) -> None:
+    owner = workspace(stack_ready, registry, fake_provider_stack, "webds")
+    name = unique_name("Chrome dataset")
+    with tempfile.TemporaryDirectory(prefix="devrag-upload-") as folder:
+        small = Path(folder) / "chrome-note.txt"
+        small.write_bytes(text_bytes("browser journey"))
+        _set_viewport(browser)
+        _store_token(browser, owner.token)
+        browser.navigate(f"{ORIGIN}/datasets")
+        _wait_testid(browser, "dataset-create")
+        _press(browser, "dataset-create")
+        _wait_testid(browser, "create-dataset-form")
+        _type_into(browser, "field-dataset-name", name)
+        _press(browser, "create-dataset-submit")
+        browser.wait_for("location.pathname === '/dataset/files' && location.search.startsWith('?id=')", "navigation to the new dataset", timeout=60)
+        dataset_id = str(browser.evaluate("new URLSearchParams(location.search).get('id')"))
+        assert len(dataset_id) == 32
+        _wait_testid(browser, "dataset-page")
+
+        _upload_through_dialog(browser, str(small), 1, timeout=60)
+        assert "chrome-note.txt" in browser.evaluate("document.body.innerText")
+        _close_upload_dialog(browser)
+        browser.wait_for("document.querySelectorAll('[data-testid=\"document-row\"]').length === 1", "the document in the table", timeout=60)
+        assert _text_of(browser, "document-status").strip() == "Not started"
+        assert _text_of(browser, "document-progress").strip() == "0%"
+
+    listed = ok(api(stack_ready, "GET", f"{DATASETS}/{dataset_id}/documents", owner.token))
+    assert listed["total"] == 1 and listed["items"][0]["name"] == "chrome-note.txt"
+    assert listed["items"][0]["run"] == "0" and listed["items"][0]["progress"] == 0
+    rows = sql("SELECT `run`, `progress`, `name` FROM `document` WHERE `kb_id` = %s", (dataset_id,))
+    assert [(r[0], float(r[1]), r[2]) for r in rows] == [("0", 0.0, "chrome-note.txt")]
+    keys = tenant_object_keys(owner.tenant_id)
+    assert len(keys) == 1 and keys[0].startswith(f"{owner.tenant_id}/") and len(keys[0].split("/", 1)[1]) == 32, keys
+    assert fake_provider_stack.hits("/v1/embeddings"), "the dataset's embedding model was tested through the fake provider, not a real one"
+
+
+def test_a_slow_large_upload_outlives_the_default_timeout_and_the_delete_removes_everything(
+    stack_ready: httpx.Client, registry: AccountRegistry, fake_provider_stack: FakeProvider, raw_es: object, browser: ChromeSession  # noqa: F811
+) -> None:
+    owner = workspace(stack_ready, registry, fake_provider_stack, "webbig")
+    dataset = ok(create(stack_ready, owner, unique_name("Large upload")))
+    dataset_id = str(dataset["id"])
+    assert dataset["embd_id"] == EMBED_ID
+    with tempfile.TemporaryDirectory(prefix="devrag-upload-") as folder:
+        big = Path(folder) / "twelve-mebibytes.txt"
+        with big.open("wb") as handle:
+            block = text_bytes("large", 1 << 20)
+            for _ in range(12):
+                handle.write(block)
+        assert big.stat().st_size == 12 * 1024 * 1024
+        _sign_in_to_dataset_page(browser, owner, dataset_id)
+        try:
+            browser.throttle_upload(1_048_576)
+            elapsed = _upload_through_dialog(browser, str(big), 1, timeout=90)
+        finally:
+            browser.throttle_upload(None)
+        assert elapsed > 10, f"the upload took {elapsed:.1f}s; a throttle that does not slow the upload proves nothing about the 10 s client timeout"
+        assert "The connection was lost" not in browser.evaluate("document.body.innerText")
+        assert _text_of(browser, "upload-row-state").startswith("Uploaded")
+        _close_upload_dialog(browser)
+        browser.wait_for("document.querySelectorAll('[data-testid=\"document-row\"]').length === 1", "the large document in the table", timeout=60)
+        assert _text_of(browser, "document-status").strip() == "Not started"
+        browser.wait_for("document.querySelector('[data-testid=\"dataset-meta\"]').textContent.includes('1 document')", "the meta line counting the document", timeout=60)
+        assert len(tenant_object_keys(owner.tenant_id)) == 1
+        assert os.path.getsize(big) == 12 * 1024 * 1024
+
+    # Delete the dataset through the dialog after reading the count it states.
+    _press(browser, "dataset-actions")
+    _wait_testid(browser, "dataset-menu-delete")
+    _press(browser, "dataset-menu-delete")
+    browser.wait_for(
+        "(document.querySelector('[data-testid=\"dataset-delete-count\"]') || {textContent: ''})"
+        ".textContent.includes('and its 1 document will be permanently deleted')",
+        "the delete dialog stating the count",
+        timeout=60,
+    )
+    _press(browser, "dataset-delete-confirm")
+    browser.wait_for("location.pathname === '/datasets'", "the gallery after the delete", timeout=90)
+    assert tenant_object_keys(owner.tenant_id) == [], "the blob left storage"
+    assert sql("SELECT COUNT(*) FROM `knowledgebase` WHERE `tenant_id` = %s", (owner.tenant_id,))[0][0] == 0
+    assert sql("SELECT COUNT(*) FROM `document` WHERE `kb_id` = %s", (dataset_id,))[0][0] == 0
+    assert chunk_count(raw_es, owner.tenant_id, dataset_id) == 0  # type: ignore[arg-type]
