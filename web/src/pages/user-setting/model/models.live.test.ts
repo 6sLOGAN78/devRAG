@@ -245,7 +245,7 @@ describe("live Models page through the SPA and the real provider (UI-37, TEN-12,
     expect(document.querySelector("[data-sonner-toast]")).toBeNull();
 
     // Nothing was stored: the row, after the refetch, still shows the old mask.
-    await user.click(within(screen.getByTestId("provider-dialog")).getByRole("button", { name: "Close" }));
+    await user.keyboard("{Escape}");
     await waitUntil(() => screen.queryByTestId("provider-dialog") === null, { describe: "the dialog to close", timeout: 15_000 });
     expect(within(openrouterRow()).getByTestId("provider-mask").textContent).toBe(maskBefore);
     expect(within(openrouterRow()).getAllByTestId("model-row")).toHaveLength(2);
