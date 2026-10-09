@@ -20,6 +20,7 @@ Each entry has: ID `B-NN`, Title, Status (`open` | `mitigated` | `closed`), Affe
 - Workaround in repo: preflight fails by default; `PREFLIGHT_ALLOW_LOW_MAP_COUNT=1` records an override.
 - Update 2026-10-06 (plan 01-15): still 65530. The phase-exit gate ran with `PREFLIGHT_ALLOW_LOW_MAP_COUNT=1` on all three runs (recorded in `ragflow-logs/preflight-overrides.log`); Elasticsearch reached healthy each time.
 - Update 2026-10-08 (plan 02-26): still 65530 (measured). The Phase 2 exit gate ran with `PREFLIGHT_ALLOW_LOW_MAP_COUNT=1` on all three runs; the override was recorded each time in `ragflow-logs/preflight-overrides.log`; Elasticsearch reached healthy each time (35, 37 and 44 s).
+- Update 2026-10-10 (plan 03-28): the summaries of Phase 3 plans 03-03, 03-12, 03-13, 03-14, 03-22 and 03-26 record the same reset (the value returns to 65530 after a host restart), so every `make up` on this host needs `PREFLIGHT_ALLOW_LOW_MAP_COUNT=1`; see B-33 for the other host overrides.
 
 ## B-03 Disk space
 - Status: open
@@ -68,11 +69,12 @@ Each entry has: ID `B-NN`, Title, Status (`open` | `mitigated` | `closed`), Affe
 - Workaround in repo: boot logger, DB verify (no DDL), the superuser hook, hooks and serve are real and tested in order. The two missing items are deliberately not stubbed: `register_startup_hook` is the extension point for them. API-13 complete with blocker.
 
 ## B-09 Real model source for Phase 3+
-- Status: open
+- Status: closed
 - Affects: R-50, D-31, Core Value verification
-- Evidence: no API key is configured; host `ollama` binary exists with no models pulled.
+- Evidence: no API key was configured when this was opened; host `ollama` binary exists with no models pulled.
 - Needed from user: an OpenAI-compatible key, or approval to pull one small chat and one small embedding model.
 - Workaround in repo: Ollama service in compose with one small chat and one small embedding model unless a key is supplied.
+- Closed 2026-10-10 (plan 03-28): OpenRouter serves chat and embeddings on one key (D-01, D-06); the live tier (plan 03-27, `live_model` marker and `live-model` gate step) runs it; live Ollama and the other providers are deferred (D-03). Plan 03-27 observed `meta-llama/llama-3.1-8b-instruct` and `baai/bge-m3` working with 1024 embedding dimensions, and a bad key refused as 400 `provider_refused`. The key stays in the git-ignored `docker/.env`; see R-147. Not run yet: the full `clean_room.sh` gate with the live step (plan 03-29).
 
 ## B-10 TLS only verified with a self-signed certificate
 - Status: open
@@ -238,3 +240,24 @@ Also this phase: WR-16, WR-19, WR-26 (plan 02-02) and CR-02, WR-04, WR-24 (plan 
 - Evidence: see the Fix status table in 02-REVIEW-frontend.md. IN-F01: `DELETE /api/v1/system/tokens/{token}` puts a live API token in the URL path; `docs/04-api/system-api.md` mandates it and R-127 and R-131 mask it in server logs, so the residual exposure is browser devtools and any intermediary or future client telemetry that records full URLs. IN-F02: the access token lives in `localStorage` as `docs/02-frontend/api-client.md` requires, and `web/index.html` ships no Content-Security-Policy, so an XSS would exfiltrate the session; no XSS sink exists today. The copied API token also stays on the clipboard. IN-F10: `web/tsconfig.json` adds Node types to the whole `src` tree; splitting them into a tooling tsconfig touches the `tsc -b` build graph and was left alone. IN-F13 (part): the hidden avatar file input is not `aria-hidden` because an existing test asserts it has an accessible name, and `aria-hidden` removes the name; the language and colour fields mirrored into the user store are kept because tests assert them.
 - Needed from user: a decision on a strict CSP at the Nginx layer (script-src self, no inline scripts beyond the hashed theme bootstrap) in a hardening phase; whether the avatar-input test may be changed to match an `aria-hidden` input.
 - Workaround in repo: no `dangerouslySetInnerHTML`, no raw HTML rendering, strict avatar data-URL regex; client telemetry that records URLs must not be added without redacting `/system/tokens/`.
+
+## B-31 Browser behaviours covered by jsdom tests only (Phase 3 UI)
+- Status: open
+- Affects: UI-10, UI-11, UI-12 (datasets, upload dialog), WCAG focus handling
+- Evidence: plan 03-26 ran the real-Chrome journeys (deep link into a joined workspace, real file input, real file drop onto the dataset page, a throttled 12 MiB upload) and they pass, but two things could not be confirmed in a real browser. (1) The window drop guard (a file dropped on the header must not make the browser open it): headless Chrome driven through `Input.dispatchDragEvent` does not navigate an unguarded page to the dropped file (a control run failed to fail), so an assertion could never go red and was removed rather than kept as a vacuous check. The folder-drop-ignored case is in the same position. (2) Focus return after the upload, settings and delete dialogs. Both are covered by jsdom tests only.
+- Needed from user: a manual check in a headed browser (drop a file on the header; open and close each dialog with the keyboard), or a harness that can reproduce the navigation.
+- Workaround in repo: jsdom tests for the guard and for every dialog's `onCloseAutoFocus`.
+
+## B-32 Phase 2 `forgot-password.test.tsx` can hit its 5 s timeout under heavy host load
+- Status: open
+- Affects: web unit tier (Phase 2 tests), gate reliability
+- Evidence: plan 03-26 saw one or two timing-bound tests in the forgot-password tests under `web/src/pages/forgot-password/` fail with the default 5 s test timeout when all 56 web test files run at the default vitest worker count while the host load average was about 14 (16 CPUs, other projects running). With `--maxWorkers=4` the same suite passed (1135 tests) and the forgot-password files pass alone (50 tests) on every run. Not caused by Phase 3 code and not fixed.
+- Needed from user: none; a decision whether to raise those tests' timeout or cap workers in the gate if it flakes on a loaded host.
+- Workaround in repo: run the web unit tier with `--maxWorkers=4` when the host is busy.
+
+## B-33 Host overrides needed to run the Phase 3 commands on this machine
+- Status: open (info)
+- Affects: local gate and live web tests
+- Evidence: (1) `vm.max_map_count` returns to 65530 after a host restart, so `make up` and the gate need `PREFLIGHT_ALLOW_LOW_MAP_COUNT=1` (B-02). (2) `make up` on an already running stack fails the preflight port check against this checkout's own containers, so it needs `PREFLIGHT_PORTS=` (empty). (3) The live web tests default to port 8080, but this checkout's ingress is on 8088, so they need `LIVE_BASE_URL=http://127.0.0.1:8088` (the integration tests that talk to the stack need it too). Each override is recorded by the script in `ragflow-logs/preflight-overrides.log` where applicable. (4) The host restarted about five times during Phase 3 (count reported by the orchestrator, not logged anywhere), and each restart stopped the stack, so plans rebuilt it with the overrides above.
+- Needed from user: `sudo sysctl -w vm.max_map_count=262144` (B-02) and, if wanted, a default web port that matches `.env`.
+- Workaround in repo: the three overrides above, passed on the command line; no file was changed to hide a failure.

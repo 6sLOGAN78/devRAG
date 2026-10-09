@@ -57,8 +57,8 @@ It is for teams who need an enterprise RAG engine: knowledge-base management, do
 | Peewee | 3.19.0 | ORM, pooled retrying DBs, `playhouse.migrate` | `docs/08-database/database-overview.md`, `migrations.md` | HIGH |
 | PyMySQL | 1.1.2 | MySQL driver for Peewee | Implied by Peewee MySQL | MEDIUM |
 | itsdangerous | 2.2.0 | Access-token signing (`URLSafeTimedSerializer`) | `docs/16-auth/`, `docs/03-backend/authentication.md` | HIGH |
-| LiteLLM | 1.84.0 (exact pin) | Chat provider abstraction (`LiteLLMBase`) | `docs/11-llm/provider-abstraction.md`. Exact pin is mandatory: 1.82.7/1.82.8 were malicious PyPI releases (Mar 2026); ref notes regressions at 1.88.0 and CVEs below 1.84.0. | HIGH |
-| openai SDK | 2.41.0 | Direct OpenAI/Azure/OpenAI-compatible embed + chat | `docs/11-llm/openai.md` | HIGH |
+| LiteLLM | 1.103.2 (exact pin) | Chat provider abstraction (`LiteLLMBase`) | `docs/11-llm/provider-abstraction.md`. Exact pin is mandatory: 1.82.7/1.82.8 were malicious PyPI releases (Mar 2026); ref notes regressions at 1.88.0 and CVEs below 1.84.0. Moved from the 1.84.0 baseline in Phase 3 (D-24, R-138): two OSV advisories on 1.84.0, none on 1.103.2. Fallback order if a regression appears: 1.96.2, then 1.84.0. | HIGH |
+| openai SDK | `>=2.20,<3` (locked 2.54.0) | Direct OpenAI/Azure/OpenAI-compatible embed + chat | `docs/11-llm/openai.md`; range approved in Phase 3 (D-24, R-138) | HIGH |
 | ollama SDK | 0.6.1 | `OllamaEmbed` (`client.embed`) | `docs/11-llm/ollama.md` | HIGH |
 | tiktoken | 0.12.0 | Token counting / truncation (`cl100k_base`) | `docs/11-llm/embeddings.md`, `llm-request-flow.md` | HIGH |
 | langfuse | 4.7.1 | LLM tracing / token accounting | `docs/11-llm/llm-architecture.md`, `docs/04-api/langfuse-api.md` | MEDIUM |
@@ -118,8 +118,8 @@ It is for teams who need an enterprise RAG engine: knowledge-base management, do
 |---|---|---|---|
 | eventsource-parser | 1.1.2 | Parse SSE over `fetch` (POST + `Authorization` header) | Chat/agent streaming. `docs/02-frontend/api-client.md` says "`fetchEventSource` or native `EventSource`"; native `EventSource` cannot send headers or POST bodies, so use fetch + this parser. |
 | react-hook-form + zod + @hookform/resolvers | 7.69.0 / 3.25.76 / 3.9.x | Forms + validation | All config forms. Keep zod 3 with resolvers 3. |
-| @tanstack/react-table | 8.20.x | Document/chunk tables | Dataset UI |
-| react-dropzone | 14.3.x | Upload dialog | `docs/02-frontend/document-upload-ui.md` |
+| @tanstack/react-table | 8.20.x | Document/chunk tables | Dataset UI. Not installed in Phase 3: a plain table block is used (R-139). |
+| react-dropzone | 14.3.x | Upload dialog | `docs/02-frontend/document-upload-ui.md`. Not installed in Phase 3: native drag events are used (R-139). |
 | react-pdf-highlighter | 6.1.0 | Chunk bbox highlights on PDF pages | `docs/02-frontend/components.md` (`document-preview`) |
 | react-syntax-highlighter (or highlight.js) | 15.5.x | Code blocks in chat | technology-stack.md names `highlight.js`; ref uses react-syntax-highlighter. Either satisfies the doc's intent. |
 | dompurify | 3.3.2 | Sanitise rendered HTML from `rehype-raw` | Required whenever raw HTML is rendered |
@@ -194,7 +194,7 @@ It is for teams who need an enterprise RAG engine: knowledge-base management, do
 | Celery, RQ, Kafka, RabbitMQ | Docs define a Redis Streams worker protocol with specific keys and consumer groups | Custom task executor on Redis Streams |
 | LangChain / LlamaIndex as the pipeline core | Docs define their own chunkers, retriever, prompt generator, and canvas engine | Own `rag/`, `agent/` modules. (Ref pins `langgraph`; docs do not mention it — do not add.) |
 | `minio/minio` image | No longer published; repo archived Feb 2026 | `pgsty/minio` (docs) |
-| litellm unpinned or `>=` | 1.82.7/1.82.8 were malicious; frequent regressions | `litellm==1.84.0`, hash-locked in `uv.lock` |
+| litellm unpinned or `>=` | 1.82.7/1.82.8 were malicious; frequent regressions; 1.84.0 carries two OSV advisories | `litellm==1.103.2`, hash-locked in `uv.lock` (fallbacks 1.96.2, then 1.84.0) |
 | PyMuPDF | AGPL licence; not used by the ref | pdfplumber + pypdfium2 |
 | UmiJS, Ant Design, Redux | Ref removed Umi; antd absent from ref; docs name Zustand | Vite, shadcn/ui, Zustand |
 | Tailwind v4, React 19, zod 4, Zustand 5 | Major versions not called for by docs and not what the companion libraries here were resolved against | The pinned majors above |
