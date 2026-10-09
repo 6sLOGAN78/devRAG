@@ -2,7 +2,7 @@
 
 package e2e
 
-// Fixtures for the registry-driven cross-tenant matrix (plan 02-25), the Go twin of
+// Fixtures for the registry-driven cross-tenant matrix (plan 02-25), the Go-owned half of
 // test/testcases/_matrix_fixtures.py. The rows are read from conf/routes.yaml: every row with scope
 // tenant and implemented true. A row with path parameters needs an entry in matrixBuilders, a row
 // without needs an entry in matrixNoID; a row in neither fails the matrix (matrixCoverageProblems).
@@ -31,6 +31,7 @@ const tokensRoute = "/api/v1/system/tokens"
 
 type registryRow struct {
 	Method      string   `yaml:"method"`
+	Owner       string   `yaml:"owner"`
 	Path        string   `yaml:"path"`
 	Auth        string   `yaml:"auth"`
 	Roles       []string `yaml:"roles"`
@@ -66,7 +67,10 @@ func registryFile(t *testing.T) string {
 	return filepath.Join(repoRoot(t), "conf", "routes.yaml")
 }
 
-// loadTenantRows reads the endpoints registry and returns the implemented rows with scope tenant.
+// loadTenantRows reads the endpoints registry and returns the implemented rows with scope tenant that the Go engine owns.
+// The Python-owned rows (Phase 3: providers, models, datasets, documents) are covered by their own fixtures in
+// test/testcases/_matrix_fixtures.py, which builds the provider, dataset and MinIO world they need and has the same
+// registry-wide coverage guard; the Python matrix is a superset of this one (it also covers every Go-owned row).
 func loadTenantRows(t *testing.T, path string) []registryRow {
 	t.Helper()
 	raw, err := os.ReadFile(path) // #nosec G304 -- the repository's own registry
@@ -81,7 +85,7 @@ func loadTenantRows(t *testing.T, path string) []registryRow {
 	}
 	var rows []registryRow
 	for _, e := range doc.Endpoints {
-		if e.Scope == "tenant" && e.Implemented {
+		if e.Scope == "tenant" && e.Implemented && e.Owner == "go" {
 			e.Method = strings.ToUpper(e.Method)
 			rows = append(rows, e)
 		}
