@@ -10,6 +10,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useDefaultsRequest, useProvidersRequest } from "@/hooks/use-llm-request";
 import { useActiveWorkspace } from "@/hooks/use-workspaces";
 import { AddModelDialog } from "./add-model-dialog";
+import { DefaultsCard } from "./defaults-card";
 import { DeleteProviderDialog } from "./delete-provider-dialog";
 import { ProviderDialog } from "./provider-dialog";
 import { ProviderRow, type RowAction } from "./provider-row";
@@ -129,6 +130,7 @@ export default function ModelsPage() {
         </CardHeader>
         {body}
       </Card>
+      <DefaultsCard role={workspace?.role} />
       {elevated && dialog !== null && (dialog.action === "setup" || dialog.action === "change") ? (
         <ProviderDialog spec={dialog.spec} mode={dialog.action === "setup" ? "setup" : "change"} current={current} open={open} onOpenChange={setOpen} onCloseAutoFocus={restoreFocus} />
       ) : null}

@@ -103,6 +103,11 @@ function serve(config: InternalAxiosRequestConfig): unknown {
   if (stop) return failure(config, stop);
   if (key === "GET /v1/tenant/list") return ok(config, memberships);
   if (key === "GET /api/v1/providers") return ok(config, providersByTenant[tenantOf(config)] ?? []);
+  if (key === "GET /api/v1/models") {
+    const type = (config.params as { type?: string } | undefined)?.type;
+    const all = ((providersByTenant[tenantOf(config)] ?? []) as Array<{ models: Array<{ type: string }> }>).flatMap((provider) => provider.models);
+    return ok(config, type === undefined ? all : all.filter((m) => m.type === type));
+  }
   if (key === "GET /api/v1/models/default") return ok(config, defaultsByTenant[tenantOf(config)] ?? { chat: "", embedding: "" });
   return failure(config, { status: 404, message: "not found" });
 }
@@ -189,7 +194,9 @@ describe("Models page structure (UI-37, D-15)", () => {
       "Change the key for OpenRouter",
       "Delete OpenRouter credentials",
       "Set up OpenAI-compatible",
+      null,
     ]);
+    expect(screen.getByTestId("defaults-submit")).toHaveTextContent("Save defaults");
   });
 });
 
@@ -293,7 +300,7 @@ describe("States", () => {
     hold = new Promise<void>((resolve) => (release = resolve));
     renderPage();
     expect(screen.getByTestId("providers-skeleton")).toBeInTheDocument();
-    expect(screen.getByRole("status")).toHaveTextContent("Loading model providers");
+    expect(within(screen.getByTestId("providers-skeleton")).getByRole("status")).toHaveTextContent("Loading model providers");
     await act(async () => release());
     expect(await screen.findByTestId("provider-row-openai")).toBeInTheDocument();
     expect(screen.queryByTestId("providers-skeleton")).toBeNull();
@@ -311,12 +318,24 @@ describe("States", () => {
     expect(screen.queryByTestId("error-state")).toBeNull();
   });
 
-  it("keeps the provider rows when only the defaults request fails, just without default badges", async () => {
+  it("keeps the provider rows when only the defaults request fails, without default badges and with the defaults card failing in place", async () => {
     forced["GET /api/v1/models/default"] = { status: 500, message: "boom" };
     renderPage();
     await screen.findByTestId("provider-row-openai");
     await waitFor(() => expect(within(rowOf("openrouter")).getAllByTestId("model-row")).toHaveLength(2));
-    expect(screen.queryByTestId("error-state")).toBeNull();
+    const state = await screen.findByTestId("error-state");
+    expect(within(state).getByRole("heading", { name: "Couldn't load default models" })).toBeInTheDocument();
+    expect(within(screen.getByTestId("defaults-card")).getByTestId("error-state")).toBe(state);
     expect(screen.queryByText("Default embedding")).toBeNull();
+    expect(screen.getByRole("heading", { level: 2, name: "Providers" })).toBeInTheDocument();
+  });
+
+  it("keeps the Default models card when only the providers request fails", async () => {
+    forced["GET /api/v1/providers"] = { status: 500, message: "boom" };
+    renderPage();
+    const state = await screen.findByTestId("error-state");
+    expect(within(state).getByRole("heading", { name: "Couldn't load model providers" })).toBeInTheDocument();
+    expect(await screen.findByTestId("defaults-form")).toBeInTheDocument();
+    expect(screen.getAllByTestId("error-state")).toHaveLength(1);
   });
 });
