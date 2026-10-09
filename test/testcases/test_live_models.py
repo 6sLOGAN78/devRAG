@@ -102,6 +102,15 @@ def live_env() -> LiveEnv:
 
 
 @pytest.fixture(scope="module")
+def ingress(live_env: LiveEnv, ingress: httpx.Client) -> httpx.Client:
+    """Overrides the session ``ingress`` so the missing-key failure is raised before the stack wait or any network use (D-04).
+
+    ``live_env`` is listed first, so without the key the file fails at once with the fixed message, with the stack down and offline too.
+    """
+    return ingress
+
+
+@pytest.fixture(scope="module")
 def recorder() -> Recorder:
     return Recorder()
 
