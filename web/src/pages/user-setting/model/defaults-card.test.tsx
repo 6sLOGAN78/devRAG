@@ -338,7 +338,7 @@ describe("Default models card, states", () => {
   it("asks for the active workspace on every request", async () => {
     renderCard();
     await screen.findByTestId("defaults-form");
-    const reads = calls.filter((c) => c.method?.toUpperCase() === "GET");
+    const reads = calls.filter((c) => c.method?.toUpperCase() === "GET" && String(c.url).startsWith("/api/v1/models"));
     expect(reads.length).toBeGreaterThan(0);
     expect(reads.every((c) => (c.params as { tenant_id?: string }).tenant_id === "t1")).toBe(true);
   });

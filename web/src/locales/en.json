@@ -513,7 +513,9 @@
       "body": "Ask the workspace owner or an admin to add a model provider."
     },
     "errorNoun": {
-      "providers": "model providers"
+      "providers": "model providers",
+      "defaults": "default models",
+      "settings": "model settings"
     },
     "refused": {
       "generic": "The configuration wasn't saved. Try again.",
@@ -580,6 +582,18 @@
     "savedHint": "Choose default models below so datasets and chat can use them.",
     "updated": "{{provider}} updated",
     "modelAdded": "Model added",
-    "deleted": "{{provider}} credentials deleted"
+    "deleted": "{{provider}} credentials deleted",
+    "defaults": {
+      "title": "Default models",
+      "chat": "Default chat model",
+      "embedding": "Default embedding model",
+      "embeddingHelp": "New datasets start with this model. Existing datasets keep the model they were created with.",
+      "noChat": "Add a provider with a chat model first.",
+      "noEmbedding": "Add a provider with an embedding model first.",
+      "submit": "Save defaults",
+      "saved": "Default models saved",
+      "loading": "Loading default models",
+      "failed": "The default models weren't saved. Try again."
+    }
   }
 }

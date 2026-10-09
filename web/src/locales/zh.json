@@ -513,7 +513,9 @@
       "body": "请联系工作区所有者或管理员添加模型提供商。"
     },
     "errorNoun": {
-      "providers": "模型提供商"
+      "providers": "模型提供商",
+      "defaults": "默认模型",
+      "settings": "模型设置"
     },
     "refused": {
       "generic": "配置未保存。请重试。",
@@ -580,6 +582,18 @@
     "savedHint": "请在下方选择默认模型,以便数据集和对话使用。",
     "updated": "{{provider}} 已更新",
     "modelAdded": "模型已添加",
-    "deleted": "{{provider}} 凭据已删除"
+    "deleted": "{{provider}} 凭据已删除",
+    "defaults": {
+      "title": "默认模型",
+      "chat": "默认聊天模型",
+      "embedding": "默认嵌入模型",
+      "embeddingHelp": "新建的数据集将使用此模型。已有的数据集保留创建时所用的模型。",
+      "noChat": "请先添加带有聊天模型的提供商。",
+      "noEmbedding": "请先添加带有嵌入模型的提供商。",
+      "submit": "保存默认设置",
+      "saved": "默认模型已保存",
+      "loading": "正在加载默认模型",
+      "failed": "默认模型未能保存,请重试。"
+    }
   }
 }

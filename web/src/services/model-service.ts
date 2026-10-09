@@ -224,3 +224,22 @@ export async function deleteProvider(tenantId: string, provider: string, signal?
   await request<unknown>({ url: providerPath(provider), method: "DELETE", params: { tenant_id: tenantId }, timeout: DELETE_TIMEOUT_MS, signal }, { silent: true });
   return { deleted: true };
 }
+
+/** The fields of a defaults save. A missing field is left as it is; `null` clears that default back to "Not set". */
+export interface DefaultsChanges {
+  chat?: string | null;
+  embedding?: string | null;
+}
+
+/**
+ * PATCH /api/v1/models/default: sets or clears the explicit default chat and embedding model with composite ids. Only
+ * the fields named in `changes` are sent. Silent: the card shows the answer inline.
+ */
+export async function saveDefaults(tenantId: string, changes: DefaultsChanges): Promise<DefaultsView> {
+  const data: Record<string, unknown> = { tenant_id: tenantId };
+  if (changes.chat !== undefined) data.chat = changes.chat;
+  if (changes.embedding !== undefined) data.embedding = changes.embedding;
+  const raw = await request<unknown>({ url: modelsDefaultPath, method: "PATCH", data }, { silent: true });
+  const record = asRecord(raw) as Partial<DefaultsDto>;
+  return { chat: text(record.chat), embedding: text(record.embedding) };
+}

@@ -5,8 +5,11 @@ import {
   getDefaults,
   listModels,
   listProviders,
+  saveDefaults,
   saveProvider,
   type AddModelInput,
+  type DefaultsChanges,
+  type DefaultsView,
   type ModelType,
   type SaveProviderInput,
 } from "@/services/model-service";
@@ -123,4 +126,25 @@ export function useDeleteProviderRequest() {
 /** Drops a settled mutation's variables from the cache. The dialogs call this in a `finally`, so a typed key never lingers. */
 export function clearMutation(mutation: { reset: () => void }): void {
   mutation.reset();
+}
+
+export interface SaveDefaultsVariables {
+  tenantId: string;
+  changes: DefaultsChanges;
+}
+
+/**
+ * Saves the explicit default models. The answer is written straight into the defaults cache so the card and the
+ * provider rows show it at once; a settled call also refetches, so the server stays the source of truth.
+ */
+export function useSaveDefaultsRequest() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ tenantId, changes }: SaveDefaultsVariables) => saveDefaults(tenantId, changes),
+    retry: false,
+    onSuccess: (data: DefaultsView, variables) => {
+      queryClient.setQueryData(defaultsQueryKey(variables.tenantId), data);
+    },
+    onSettled: (_data, _error, variables) => queryClient.invalidateQueries({ queryKey: defaultsQueryKey(variables.tenantId) }),
+  });
 }
