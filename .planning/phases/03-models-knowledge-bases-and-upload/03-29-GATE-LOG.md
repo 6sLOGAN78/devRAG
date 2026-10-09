@@ -10,3 +10,6 @@ A gate interrupted by a host restart must be restarted from run 1.
 - 23:27Z GATE ATTEMPT 1 started (log in scratchpad gate1.log)
 - 23:39Z GATE ATTEMPT 1 run 1 FAILED at step go-tiers (after PASS unit, integration, e2e, e2e-serial, live-model, go-race): Go cross-tenant matrix (internal/e2e) has no fixture builder / isolation check for 17 Phase 3 registry rows. Fixing at source.
 - 23:41Z FIX committed: fix(03-19) Go cross-tenant matrix scoped to owner:go rows (R-153); full go-tiers command then run by hand against the live stack: all ok. Restarting the WHOLE gate from run 1 (attempt 2).
+- 23:41Z GATE ATTEMPT 2 started from run 1 (gate2.log)
+- 23:53Z GATE ATTEMPT 2 run 1 FAILED at step live-model (PASS project-guard stop preflight up wait_stack[61s] unit integration e2e e2e-serial): PUT /api/v1/providers returned 504 in the live tier (6 setup errors). Investigating cause (attempt 1 passed this step).
+- 23:53Z cause: app log shows embedding call OpenRouter baai/bge-m3 code=ERROR_TIMEOUT at the 30 s embedding timeout -> product answered provider_timeout (504). Two direct timed calls straight after returned 200 in 1.9 s each: transient provider latency, not a product defect and nothing to loosen. No code change. Restarting whole gate (attempt 3) from run 1.
