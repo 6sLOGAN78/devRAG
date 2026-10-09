@@ -55,7 +55,7 @@ const adapter: AxiosAdapter = (config) => {
     return new Promise((resolve, reject) => {
       const sent = (config.data as FormData).get("file") as File;
       const entry: Pending = { config, name: sent.name, aborted: false, resolve: (data) => resolve(ok(config, data)), reject };
-      config.signal?.addEventListener("abort", () => {
+      config.signal?.addEventListener?.("abort", () => {
         entry.aborted = true;
         reject(new CanceledError(undefined, config));
       });
@@ -88,8 +88,21 @@ const entryFor = (name: string): Pending => {
   if (!found) throw new Error(`no upload for ${name}; saw ${pending.map((p) => p.name).join(", ")}`);
   return found;
 };
-const succeed = (name: string, savedAs = name) => act(() => entryFor(name).resolve([documentDto(savedAs)]));
-const fail = (name: string, status: number, message = "", reason?: string) => act(() => entryFor(name).reject(failure(entryFor(name).config, status, message, reason)));
+/** Lets the transport's promise chain reach the queue; microtasks only. */
+const settle = async () => {
+  for (let i = 0; i < 20; i += 1) await Promise.resolve();
+};
+const succeed = (name: string, savedAs = name) =>
+  act(async () => {
+    entryFor(name).resolve([documentDto(savedAs)]);
+    await settle();
+  });
+const failWith = (name: string, error: unknown) =>
+  act(async () => {
+    entryFor(name).reject(error);
+    await settle();
+  });
+const fail = (name: string, status: number, message = "", reason?: string) => failWith(name, failure(entryFor(name).config, status, message, reason));
 const sendProgress = (name: string, loaded: number, total: number) => act(() => entryFor(name).config.onUploadProgress?.({ loaded, total } as never));
 
 let lastModified = 1;
@@ -449,7 +462,7 @@ describe("server answers per file", () => {
     await uploadOne("a.pdf", ["b.pdf"]);
     await fail("a.pdf", 503, "busy", "busy");
     expect(stateOf("a.pdf")).toBe("The server couldn't store this file. Try again.");
-    await act(() => entryFor("b.pdf").reject(new AxiosError("Network Error", "ERR_NETWORK", entryFor("b.pdf").config)));
+    await failWith("b.pdf", new AxiosError("Network Error", "ERR_NETWORK", entryFor("b.pdf").config));
     expect(stateOf("b.pdf")).toBe("The connection was lost. Try again.");
   });
 
@@ -540,9 +553,35 @@ describe("cancelling and closing", () => {
     await close(user);
     const stop = await screen.findByTestId("upload-stop-dialog");
     expect(within(stop).getByText("Stop uploading?")).toBeInTheDocument();
+    expect(stop).toHaveAttribute("role", "alertdialog");
     expect(stop).toHaveTextContent("2 files haven't finished. Files that already uploaded stay in the dataset.");
     expect(onOpenChange).not.toHaveBeenCalled();
     await waitFor(() => expect(within(stop).getByRole("button", { name: "Keep uploading" })).toHaveFocus());
+  });
+
+  it("asks before closing while an upload runs when the overlay is clicked", async () => {
+    const user = userEvent.setup();
+    renderDialog();
+    dropFiles([makeFile("a.pdf")]);
+    await user.click(submit());
+    const overlay = document.querySelector<HTMLElement>('div.fixed.inset-0[data-state="open"]');
+    expect(overlay).not.toBeNull();
+    await user.click(overlay!);
+    expect(await screen.findByTestId("upload-stop-dialog")).toBeInTheDocument();
+    expect(onOpenChange).not.toHaveBeenCalled();
+  });
+
+  it("does not close the question when its own backdrop is clicked", async () => {
+    const user = userEvent.setup();
+    renderDialog();
+    dropFiles([makeFile("a.pdf")]);
+    await user.click(submit());
+    await user.keyboard("{Escape}");
+    await screen.findByTestId("upload-stop-dialog");
+    const overlays = document.querySelectorAll<HTMLElement>('div.fixed.inset-0[data-state="open"]');
+    await user.click(overlays[overlays.length - 1]!);
+    expect(screen.getByTestId("upload-stop-dialog")).toBeInTheDocument();
+    expect(onOpenChange).not.toHaveBeenCalled();
   });
 
   it("Keep uploading dismisses the question and the uploads carry on", async () => {
@@ -575,6 +614,31 @@ describe("cancelling and closing", () => {
     await user.click(submit());
     view.unmount();
     expect(entryFor("a.pdf").aborted).toBe(true);
+  });
+});
+
+describe("focus management (UI-SPEC accessibility)", () => {
+  it("moves focus to the next row's action after a row is removed, and to Choose files when none is left", async () => {
+    const user = userEvent.setup();
+    renderDialog();
+    dropFiles([makeFile("a.pdf"), makeFile("b.pdf")]);
+    await user.click(screen.getByRole("button", { name: "Remove a.pdf" }));
+    await waitFor(() => expect(screen.getByRole("button", { name: "Remove b.pdf" })).toHaveFocus());
+    await user.click(screen.getByRole("button", { name: "Remove b.pdf" }));
+    await waitFor(() => expect(screen.getByTestId("upload-choose")).toHaveFocus());
+  });
+
+  it("starts a fresh, empty dialog at every opening", () => {
+    const view = renderDialog({ initialFiles: [makeFile("first.pdf")] });
+    expect(screen.getAllByTestId("upload-row")).toHaveLength(1);
+    const element = (open: boolean) => (
+      <QueryClientProvider client={client}>
+        <FileUploadDialog dataset={{ id: "kb1", name: "Reports", docNum: 3 }} limits={LIMITS} open={open} onOpenChange={onOpenChange} />
+      </QueryClientProvider>
+    );
+    view.rerender(element(false));
+    view.rerender(element(true));
+    expect(screen.queryByTestId("upload-row")).toBeNull();
   });
 });
 

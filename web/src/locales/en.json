@@ -595,5 +595,76 @@
       "loading": "Loading default models",
       "failed": "The default models weren't saved. Try again."
     }
+  },
+  "upload": {
+    "title": "Upload files to {{dataset}}",
+    "description": "PDF, Word, PowerPoint, Excel, text, Markdown, HTML, CSV, JSON, EPUB, JPG, PNG, MP3 or WAV. Up to {{size}} per file, {{maxFiles}} files at a time.",
+    "drop": {
+      "idle": "Drag files here, or",
+      "active": "Drop to add files"
+    },
+    "choose": "Choose files",
+    "full": "This dataset already holds the maximum of {{max}} documents. Delete some before uploading more.",
+    "reject": {
+      "folder": "Folders can't be uploaded. Add the files inside it instead.",
+      "nameLong": "This file name is too long. Rename it to 255 characters or fewer.",
+      "extension": "{{ext}} files aren't supported.",
+      "noExtension": "Files without an extension aren't supported.",
+      "empty": "This file is empty.",
+      "size": "This file is {{size}}. The limit is {{max}} per file."
+    },
+    "batch": {
+      "tooMany_one": "You can upload {{max}} files at a time. {{count}} file wasn't added.",
+      "tooMany_other": "You can upload {{max}} files at a time. {{count}} files weren't added.",
+      "datasetFull_one": "This dataset can hold {{max}} documents and has {{current}}. {{count}} file wasn't added.",
+      "datasetFull_other": "This dataset can hold {{max}} documents and has {{current}}. {{count}} files weren't added."
+    },
+    "renamed_one": "{{count}} file was renamed because a file with the same name was already in this dataset. Nothing was overwritten.",
+    "renamed_other": "{{count}} files were renamed because a file with the same name was already in this dataset. Nothing was overwritten.",
+    "state": {
+      "ready": "Ready to upload",
+      "percent": "{{percent}}%",
+      "finishing": "Finishing",
+      "done": "Uploaded",
+      "renamed": "Uploaded as {{name}}",
+      "cancelled": "Cancelled"
+    },
+    "row": {
+      "remove": "Remove {{name}}",
+      "cancel": "Cancel upload of {{name}}",
+      "retry": "Try again",
+      "retryLabel": "Try uploading {{name}} again",
+      "progress": "Upload progress for {{name}}"
+    },
+    "submit_one": "Upload {{count}} file",
+    "submit_other": "Upload {{count}} files",
+    "submitting": "Uploading {{done}} of {{total}}",
+    "done": "Done",
+    "closeDialog": "Close upload dialog",
+    "error": {
+      "rejected": "The server didn't accept this file.",
+      "tooLarge": "This file is larger than the {{max}} limit.",
+      "limit": "This dataset can't take more documents.",
+      "network": "The connection was lost. Try again.",
+      "server": "The server couldn't store this file. Try again.",
+      "gone": "This dataset no longer exists or isn't shared with you. Nothing more was uploaded.",
+      "forbidden": "You don't have permission to upload to this dataset."
+    },
+    "stop": {
+      "title": "Stop uploading?",
+      "body_one": "{{count}} file hasn't finished. Files that already uploaded stay in the dataset.",
+      "body_other": "{{count}} files haven't finished. Files that already uploaded stay in the dataset.",
+      "keep": "Keep uploading",
+      "confirm": "Stop uploads"
+    },
+    "live": {
+      "added_one": "{{count}} file added",
+      "added_other": "{{count}} files added",
+      "tooMany_one": "{{count}} file wasn't added",
+      "tooMany_other": "{{count}} files weren't added",
+      "started_one": "Uploading {{count}} file",
+      "started_other": "Uploading {{count}} files",
+      "summary": "{{done}} uploaded, {{failed}} failed"
+    }
   }
 }

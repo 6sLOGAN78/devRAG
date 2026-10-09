@@ -595,5 +595,76 @@
       "loading": "正在加载默认模型",
       "failed": "默认模型未能保存,请重试。"
     }
+  },
+  "upload": {
+    "title": "上传文件到 {{dataset}}",
+    "description": "PDF、Word、PowerPoint、Excel、文本、Markdown、HTML、CSV、JSON、EPUB、JPG、PNG、MP3 或 WAV。每个文件最大 {{size}},一次最多 {{maxFiles}} 个文件。",
+    "drop": {
+      "idle": "将文件拖到此处,或",
+      "active": "松开以添加文件"
+    },
+    "choose": "选择文件",
+    "full": "此数据集已达到 {{max}} 个文档的上限。请先删除一些文档再上传。",
+    "reject": {
+      "folder": "无法上传文件夹。请改为添加其中的文件。",
+      "nameLong": "文件名过长。请将其缩短到 255 个字符以内。",
+      "extension": "不支持 {{ext}} 文件。",
+      "noExtension": "不支持没有扩展名的文件。",
+      "empty": "此文件为空。",
+      "size": "此文件大小为 {{size}},每个文件的上限为 {{max}}。"
+    },
+    "batch": {
+      "tooMany_one": "一次最多上传 {{max}} 个文件。有 {{count}} 个文件未添加。",
+      "tooMany_other": "一次最多上传 {{max}} 个文件。有 {{count}} 个文件未添加。",
+      "datasetFull_one": "此数据集最多可容纳 {{max}} 个文档,目前已有 {{current}} 个。有 {{count}} 个文件未添加。",
+      "datasetFull_other": "此数据集最多可容纳 {{max}} 个文档,目前已有 {{current}} 个。有 {{count}} 个文件未添加。"
+    },
+    "renamed_one": "有 {{count}} 个文件因数据集中已有同名文件而被重命名。没有任何文件被覆盖。",
+    "renamed_other": "有 {{count}} 个文件因数据集中已有同名文件而被重命名。没有任何文件被覆盖。",
+    "state": {
+      "ready": "等待上传",
+      "percent": "{{percent}}%",
+      "finishing": "正在完成",
+      "done": "已上传",
+      "renamed": "已上传为 {{name}}",
+      "cancelled": "已取消"
+    },
+    "row": {
+      "remove": "移除 {{name}}",
+      "cancel": "取消上传 {{name}}",
+      "retry": "重试",
+      "retryLabel": "重新上传 {{name}}",
+      "progress": "{{name}} 的上传进度"
+    },
+    "submit_one": "上传 {{count}} 个文件",
+    "submit_other": "上传 {{count}} 个文件",
+    "submitting": "正在上传 {{done}}/{{total}}",
+    "done": "完成",
+    "closeDialog": "关闭上传对话框",
+    "error": {
+      "rejected": "服务器未接受此文件。",
+      "tooLarge": "此文件超过 {{max}} 的上限。",
+      "limit": "此数据集无法容纳更多文档。",
+      "network": "连接已中断。请重试。",
+      "server": "服务器无法保存此文件。请重试。",
+      "gone": "此数据集已不存在,或未与你共享。之后没有再上传任何文件。",
+      "forbidden": "你没有向此数据集上传文件的权限。"
+    },
+    "stop": {
+      "title": "停止上传?",
+      "body_one": "有 {{count}} 个文件尚未完成。已上传的文件会保留在数据集中。",
+      "body_other": "有 {{count}} 个文件尚未完成。已上传的文件会保留在数据集中。",
+      "keep": "继续上传",
+      "confirm": "停止上传"
+    },
+    "live": {
+      "added_one": "已添加 {{count}} 个文件",
+      "added_other": "已添加 {{count}} 个文件",
+      "tooMany_one": "有 {{count}} 个文件未添加",
+      "tooMany_other": "有 {{count}} 个文件未添加",
+      "started_one": "正在上传 {{count}} 个文件",
+      "started_other": "正在上传 {{count}} 个文件",
+      "summary": "{{done}} 个已上传,{{failed}} 个失败"
+    }
   }
 }

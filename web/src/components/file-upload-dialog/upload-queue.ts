@@ -228,8 +228,11 @@ export interface UploadCall {
   onProgress: (loaded: number, total: number | undefined) => void;
 }
 
-/** Uploads one file and resolves to the stored document (only its final name is read). */
-export type UploadFn = (file: File, call: UploadCall) => Promise<{ name: string }>;
+/** What an upload resolves to: the stored document, of which only the final name is read. */
+export type UploadResult = Promise<{ name: string }>;
+
+/** Uploads one file. */
+export type UploadFn = (file: File, call: UploadCall) => UploadResult;
 
 export type Outcome = "done" | "failed" | "cancelled";
 
