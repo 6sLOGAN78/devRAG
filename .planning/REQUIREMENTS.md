@@ -542,7 +542,7 @@ Requirements for initial release. Each maps to exactly one roadmap phase.
 - [x] **UI-34**: User settings: profile
 - [x] **UI-35**: User settings: API key management dialog
 - [x] **UI-36**: User settings: team management
-- [ ] **UI-37**: User settings: model provider credentials and default models
+- [x] **UI-37**: User settings: model provider credentials and default models
 - [ ] **UI-38**: Admin pages: users, services
 - [ ] **UI-39**: Compilation templates studio and pipeline operator tabs
 - [ ] **UI-40**: Knowledge-graph structure visualization
@@ -1143,7 +1143,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | UI-34 | Phase 2 | Complete |
 | UI-35 | Phase 2 | Complete |
 | UI-36 | Phase 2 | Complete |
-| UI-37 | Phase 3 | Pending |
+| UI-37 | Phase 3 | Complete |
 | UI-38 | Phase 8 | Pending |
 | UI-39 | Phase 8 | Pending |
 | UI-40 | Phase 8 | Pending |

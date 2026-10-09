@@ -276,7 +276,7 @@ Plans:
 
 **Wave 15** *(blocked on Wave 14 completion)*
 
-- [ ] 03-22-PLAN.md — Default models card and live Models-page journey
+- [x] 03-22-PLAN.md — Default models card and live Models-page journey
 
 **Wave 16** *(blocked on Wave 15 completion)*
 
