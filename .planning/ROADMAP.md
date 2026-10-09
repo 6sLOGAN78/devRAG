@@ -284,7 +284,7 @@ Plans:
 
 **Wave 17** *(blocked on Wave 16 completion)*
 
-- [ ] 03-24-PLAN.md — Upload dialog
+- [x] 03-24-PLAN.md — Upload dialog
 
 **Wave 18** *(blocked on Wave 17 completion)*
 
