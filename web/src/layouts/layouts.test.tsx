@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { render, screen, within } from "@testing-library/react";
+import { cleanup, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import type { ComponentType } from "react";
 import { createMemoryRouter, RouterProvider } from "react-router";
@@ -132,6 +132,22 @@ describe("StandardLayout", () => {
     expect(screen.getByTestId("nav-item-system-status")).not.toHaveAttribute("aria-current");
   });
 
+  it("marks Datasets current on the dataset workspace /dataset/files, which has no entry of its own", () => {
+    renderIn(StandardLayout, "/dataset/files?id=0123456789abcdef0123456789abcdef");
+    expect(screen.getByTestId("nav-item-datasets")).toHaveAttribute("aria-current", "page");
+    expect(within(screen.getByTestId("nav-item-datasets")).getByTestId("nav-active-indicator")).toBeInTheDocument();
+    expect(screen.getByTestId("nav-item-system-status")).not.toHaveAttribute("aria-current");
+    expect(screen.queryByTestId("nav-item-dataset-files")).toBeNull();
+  });
+
+  it("does not mark Datasets current on a path that only starts with the same letters", () => {
+    renderIn(StandardLayout, "/datasetsx");
+    expect(screen.getByTestId("nav-item-datasets")).not.toHaveAttribute("aria-current");
+    cleanup();
+    renderIn(StandardLayout, "/dataset");
+    expect(screen.getByTestId("nav-item-datasets")).not.toHaveAttribute("aria-current");
+  });
+
   it("marks Home current on /home", () => {
     renderIn(StandardLayout, "/home");
     expect(screen.getByTestId("nav-item-home")).toHaveAttribute("aria-current", "page");
@@ -229,8 +245,11 @@ describe("FullBleedLayout and BareLayout", () => {
 });
 
 describe("registry", () => {
-  it("contains exactly the entries /, /login, /forgot-password, /home, /datasets, /system-status, /user-setting/profile, /user-setting/model, /user-setting/api, /user-setting/team and *", () => {
-    expect(routes.map((r) => r.path)).toEqual(["/", "/login", "/forgot-password", "/home", "/datasets", "/system-status", "/user-setting/profile", "/user-setting/model", "/user-setting/api", "/user-setting/team", "*"]);
+  it("contains exactly the entries /, /login, /forgot-password, /home, /datasets, /dataset/files, /system-status, /user-setting/profile, /user-setting/model, /user-setting/api, /user-setting/team and *", () => {
+    expect(routes.map((r) => r.path)).toEqual(["/", "/login", "/forgot-password", "/home", "/datasets", "/dataset/files", "/system-status", "/user-setting/profile", "/user-setting/model", "/user-setting/api", "/user-setting/team", "*"]);
+    const files = routes.find((r) => r.path === "/dataset/files");
+    expect(files).toMatchObject({ layout: "standard", auth: "required" });
+    expect(files?.nav).toBeUndefined();
     expect(navEntries().map((r) => i18n.t(r.nav?.labelKey ?? ""))).toEqual(["Home", "Datasets", "System status", "Profile", "Models", "API tokens", "Team"]);
     expect(navEntries().map((r) => r.nav?.order)).toEqual([1, 2, 3, 4, 5, 6, 7]);
   });
