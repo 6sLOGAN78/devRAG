@@ -300,7 +300,7 @@ Plans:
 
 **Wave 21** *(blocked on Wave 20 completion)*
 
-- [ ] 03-26-PLAN.md — Live and real-Chrome journeys
+- [x] 03-26-PLAN.md — Live and real-Chrome journeys
 
 **Wave 22** *(blocked on Wave 21 completion)*
 
