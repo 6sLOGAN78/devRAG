@@ -21,7 +21,7 @@ from test.helpers.uploads import sql, tenant_object_keys, text_bytes
 from test.testcases.conftest import BASE_URL, HTTP_PORT
 from test.testcases.test_dataset_flow import DATASETS, EMBED_ID, create, workspace
 from test.testcases.test_dataset_lifecycle_flow import chunk_count, raw_es  # noqa: F401  (raw_es is a fixture)
-from test.testcases.test_provider_flow import api, ok, registry  # noqa: F401  (registry is a fixture)
+from test.testcases.test_provider_flow import api, join, ok, registry  # noqa: F401  (registry is a fixture)
 
 pytestmark = pytest.mark.e2e
 
@@ -335,3 +335,56 @@ def test_a_slow_large_upload_outlives_the_default_timeout_and_the_delete_removes
     assert sql("SELECT COUNT(*) FROM `knowledgebase` WHERE `tenant_id` = %s", (owner.tenant_id,))[0][0] == 0
     assert sql("SELECT COUNT(*) FROM `document` WHERE `kb_id` = %s", (dataset_id,))[0][0] == 0
     assert chunk_count(raw_es, owner.tenant_id, dataset_id) == 0  # type: ignore[arg-type]
+
+
+def test_a_deep_link_into_a_joined_workspace_opens_the_dataset_on_a_fresh_load(
+    stack_ready: httpx.Client, registry: AccountRegistry, fake_provider_stack: FakeProvider, browser: ChromeSession  # noqa: F811
+) -> None:
+    """The workspace store initialises from the real membership request on a fresh load, then binds the dataset's workspace without looping (D-26)."""
+    owner = workspace(stack_ready, registry, fake_provider_stack, "webdeep")
+    teammate = registry.register(prefix="webmate")
+    join(stack_ready, owner, teammate)
+    dataset = ok(create(stack_ready, owner, unique_name("Shared handbook"), permission="team"))
+    _set_viewport(browser)
+    _store_token(browser, teammate.token)
+    browser.navigate(f"{ORIGIN}/dataset/files?id={dataset['id']}")
+    _wait_testid(browser, "dataset-page")
+    browser.wait_for(f"document.body.innerText.includes({json.dumps(dataset['name'])})", "the shared dataset's name", timeout=60)
+    assert browser.evaluate("location.pathname") == "/dataset/files"
+    assert browser.evaluate("location.search") == f"?id={dataset['id']}"
+    assert browser.evaluate("document.querySelector('[data-testid=\"dataset-not-found\"]') === null") is True
+    browser.wait_for("document.querySelector('[data-testid=\"workspace-announcer\"]').textContent.startsWith('Switched to')", "the switch announced", timeout=30)
+    # A member has no management menu on a dataset they did not create, and can still reach the upload action.
+    assert browser.evaluate("document.querySelector('[data-testid=\"dataset-actions\"]') === null") is True
+    assert browser.evaluate("document.querySelector('[data-testid=\"dataset-upload\"]') !== null") is True
+
+
+def _drag(browser: ChromeSession, kind: str, x: float, y: float, path: str) -> None:
+    browser.call("Input.dispatchDragEvent", {"type": kind, "x": x, "y": y, "data": {"items": [], "files": [path], "dragOperationsMask": 1}})
+
+
+def test_dropping_a_file_on_the_dataset_page_shows_the_overlay_and_opens_the_dialog_with_the_file_queued(
+    stack_ready: httpx.Client, registry: AccountRegistry, fake_provider_stack: FakeProvider, browser: ChromeSession  # noqa: F811
+) -> None:
+    owner = workspace(stack_ready, registry, fake_provider_stack, "webdrop")
+    dataset = ok(create(stack_ready, owner, unique_name("Drop target")))
+    with tempfile.TemporaryDirectory(prefix="devrag-drop-") as folder:
+        dropped = Path(folder) / "dropped-note.txt"
+        dropped.write_bytes(text_bytes("dropped"))
+        _sign_in_to_dataset_page(browser, owner, str(dataset["id"]))
+        _wait_testid(browser, "dataset-upload")
+
+        # A drag over the content shows the overlay.
+        _drag(browser, "dragEnter", 700, 500, str(dropped))
+        _drag(browser, "dragOver", 700, 500, str(dropped))
+        browser.wait_for(f"{_by_id('dataset-drop-overlay')} !== null", "the drop overlay while a file is dragged over the page", timeout=10)
+
+        # Dropping opens the upload dialog with the file queued; nothing is uploaded until the person confirms.
+        _drag(browser, "drop", 700, 500, str(dropped))
+        _wait_testid(browser, "upload-dialog", 10)
+        browser.wait_for("document.querySelectorAll('[data-testid=\"upload-row\"]').length === 1", "the dropped file queued in the dialog", timeout=10)
+        assert "dropped-note.txt" in _text_of(browser, "upload-dialog")
+        assert browser.evaluate(f"{_by_id('dataset-drop-overlay')} === null") is True
+        assert sql("SELECT COUNT(*) FROM `document` WHERE `kb_id` = %s", (str(dataset["id"]),))[0][0] == 0
+        _close_upload_dialog(browser)
+
