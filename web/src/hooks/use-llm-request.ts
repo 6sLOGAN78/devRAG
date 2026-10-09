@@ -42,14 +42,14 @@ export function useProvidersRequest() {
   });
 }
 
-/** The active workspace's models, optionally one type. */
-export function useModelsRequest(type?: ModelType) {
+/** The active workspace's models, optionally one type. `enabled` false keeps the query idle (a form that needs no list). */
+export function useModelsRequest(type?: ModelType, enabled = true) {
   const tenantId = useModelTenantId();
   return useQuery({
     queryKey: modelsQueryKey(tenantId, type),
     queryFn: () => listModels(tenantId ?? "", type),
     retry: false,
-    enabled: tenantId !== null,
+    enabled: enabled && tenantId !== null,
   });
 }
 

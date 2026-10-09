@@ -685,7 +685,8 @@
     "card": {
       "documents_one": "{{count}} document",
       "documents_other": "{{count}} documents",
-      "updated": "Updated {{date}}"
+      "updated": "Updated {{date}}",
+      "actions": "Actions for {{name}}"
     },
     "visibility": {
       "me": "Only me",
@@ -693,7 +694,8 @@
       "meTitle": "Only me",
       "meBody": "Only you can see and use this dataset.",
       "teamTitle": "Whole team",
-      "teamBody": "Everyone in {{workspace}} can see it and upload documents. Only you, the owner and admins can change or delete it."
+      "teamBody": "Everyone in {{workspace}} can see it and upload documents. Only you, the owner and admins can change or delete it.",
+      "narrowing": "Teammates will lose access to this dataset. Documents they uploaded stay in it."
     },
     "missingDefault": {
       "manager": "This workspace has no default embedding model yet, so datasets can't be created.",
@@ -708,7 +710,9 @@
     "form": {
       "createTitle": "Create dataset",
       "createBody": "Name the dataset, choose the model that indexes its documents and who can see it.",
-      "loading": "Loading model settings"
+      "loading": "Loading model settings",
+      "settingsTitle": "Dataset settings",
+      "settingsBody": "Change the name, description, who can see it or the embedding model."
     },
     "field": {
       "name": "Name",
@@ -716,7 +720,8 @@
       "descriptionCount": "{{count}}/500",
       "embedding": "Embedding model",
       "embeddingHelp": "Used to index this dataset's documents. It can't be changed once the dataset has documents.",
-      "visibility": "Who can see it"
+      "visibility": "Who can see it",
+      "embeddingFixed": "The embedding model is fixed once a dataset has documents."
     },
     "error": {
       "duplicate": "A dataset named \"{{name}}\" already exists in this workspace. Choose another name.",
@@ -724,7 +729,8 @@
       "dimension": "That embedding model's vector size isn't supported. Choose another one.",
       "indexDown": "The search index isn't available right now, so the dataset wasn't created. Try again in a moment.",
       "createFallback": "The dataset wasn't created. Try again.",
-      "loadList": "Couldn't load datasets"
+      "loadList": "Couldn't load datasets",
+      "locked": "This dataset has documents now, so its embedding model can't be changed."
     },
     "empty": {
       "heading": "No datasets yet",
@@ -733,6 +739,39 @@
     "noMatch": {
       "heading": "No datasets match \"{{keywords}}\"",
       "body": "Check the spelling or try a shorter search."
-    }
+    },
+    "menu": {
+      "label": "Dataset actions",
+      "settings": "Dataset settings",
+      "delete": "Delete dataset"
+    },
+    "settings": {
+      "submit": "Save settings",
+      "saved": "Dataset settings saved",
+      "failed": "The settings weren't saved. Try again.",
+      "indexDown": "The search index isn't available right now, so the settings weren't saved. Try again in a moment.",
+      "gone": "This dataset no longer exists, or it isn't shared with you anymore."
+    },
+    "delete": {
+      "title": "Delete dataset?",
+      "body_one": "\"{{name}}\" and its {{count}} document will be permanently deleted, together with its stored file and the dataset's search index. This can't be undone.",
+      "body_other": "\"{{name}}\" and its {{count}} documents will be permanently deleted, together with their stored files and the dataset's search index. This can't be undone.",
+      "bodyEmpty": "\"{{name}}\" has no documents. The dataset and its search index will be permanently deleted. This can't be undone.",
+      "loading": "Loading the document count",
+      "countError": "Couldn't load the document count.",
+      "keep": "Keep dataset",
+      "confirm": "Delete dataset",
+      "failed": "The dataset wasn't deleted. Nothing was removed. Try again.",
+      "indexDown": "The search index isn't available right now, so nothing was deleted. Try again in a moment."
+    },
+    "deleted": "Dataset deleted",
+    "documentDelete": {
+      "title": "Delete document?",
+      "body": "\"{{name}}\" will be removed from {{dataset}}. This can't be undone.",
+      "keep": "Keep document",
+      "confirm": "Delete document",
+      "failed": "The document wasn't deleted. Nothing was removed. Try again."
+    },
+    "documentDeleted": "Document deleted"
   }
 }

@@ -44,6 +44,7 @@ let calls: InternalAxiosRequestConfig[] = [];
 let forced: Record<string, Forced> = {};
 let docNum = 3;
 let hold: Promise<void> | null = null;
+let deleteGate: Promise<void> | null = null;
 
 const ok = (config: InternalAxiosRequestConfig, data: unknown) =>
   ({ data: { code: 0, message: "", data }, status: 200, statusText: "OK", headers: new AxiosHeaders(), config }) as never;
@@ -73,6 +74,7 @@ function detail(config: InternalAxiosRequestConfig) {
 async function serve(config: InternalAxiosRequestConfig): Promise<unknown> {
   const key = `${String(config.method).toUpperCase()} ${config.url}`;
   if (key === "GET /api/v1/datasets/ds-1" && hold) await hold;
+  if (key === "DELETE /api/v1/datasets" && deleteGate) await deleteGate;
   const stop = forced[key];
   if (stop) return failure(config, stop);
   if (key === "GET /v1/tenant/list") return ok(config, []);
@@ -131,6 +133,7 @@ beforeEach(() => {
   forced = {};
   docNum = 3;
   hold = null;
+  deleteGate = null;
   useUserStore.getState().reset();
   useWorkspaceStore.getState().reset();
   useUserStore.getState().setUser(OWNER);
@@ -252,14 +255,9 @@ describe("Delete dataset dialog: deleting (KB-07, D-10)", () => {
 
   it("keeps the dialog open and the button busy while the server answers, and sends one request for a double press", async () => {
     let release: () => void = () => {};
-    const gate = new Promise<void>((resolve) => {
+    deleteGate = new Promise<void>((resolve) => {
       release = resolve;
     });
-    const inner = adapter;
-    http.defaults.adapter = async (config) => {
-      if (config.method?.toUpperCase() === "DELETE") await gate;
-      return inner(config);
-    };
     renderWith(<DatasetHarness />);
     await screen.findByText(/and its 3 documents/);
     await userEvent.click(confirmButton());

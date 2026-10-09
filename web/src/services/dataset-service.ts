@@ -64,6 +64,14 @@ export interface CreateDatasetInput {
   permission?: string;
 }
 
+/** The fields a settings save may change (plan 03-18). An absent key is no change; a null description clears it. */
+export interface DatasetChanges {
+  name?: string;
+  description?: string | null;
+  permission?: string;
+  embdId?: string;
+}
+
 /** Bounds the API enforces; the service applies them first so a bad value never becomes a request. */
 export const MAX_PAGE_SIZE = 100;
 export const MAX_KEYWORDS_LENGTH = 128;
@@ -138,4 +146,27 @@ export async function createDataset(input: CreateDatasetInput): Promise<DatasetV
   if (input.embdId !== undefined) data.embd_id = input.embdId;
   if (input.permission !== undefined) data.permission = input.permission;
   return toDataset(await request<unknown>({ url: datasetsPath, method: "POST", data, timeout: CREATE_TIMEOUT_MS }, { silent: true }));
+}
+
+/**
+ * PUT /api/v1/datasets/{id}: only the changed fields, in snake_case. An undefined field is left out, so an unchanged
+ * value is never resent, and no workspace selector is sent (the server takes the workspace from the dataset). Silent:
+ * the dialog shows the refusal inline.
+ */
+export async function updateDataset(id: string, changes: DatasetChanges): Promise<DatasetView> {
+  const data: Record<string, string | null> = {};
+  if (changes.name !== undefined) data.name = changes.name;
+  if (changes.description !== undefined) data.description = changes.description;
+  if (changes.permission !== undefined) data.permission = changes.permission;
+  if (changes.embdId !== undefined) data.embd_id = changes.embdId;
+  return toDataset(await request<unknown>({ url: datasetPath(id), method: "PUT", data, timeout: CREATE_TIMEOUT_MS }, { silent: true }));
+}
+
+/**
+ * DELETE /api/v1/datasets with `{ids, tenant_id}`. Authorisation is all or nothing, so callers delete one dataset per
+ * request. Silent: the confirmation shows the refusal. Resolves to the ids the server removed.
+ */
+export async function deleteDatasets(ids: string[], tenantId: string): Promise<string[]> {
+  const data = asRecord(await request<unknown>({ url: datasetsPath, method: "DELETE", data: { ids, tenant_id: tenantId }, timeout: CREATE_TIMEOUT_MS }, { silent: true }));
+  return Array.isArray(data.deleted) ? data.deleted.filter((id): id is string => typeof id === "string") : [];
 }

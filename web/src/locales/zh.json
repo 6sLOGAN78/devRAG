@@ -685,7 +685,8 @@
     "card": {
       "documents_one": "{{count}} 个文档",
       "documents_other": "{{count}} 个文档",
-      "updated": "更新于 {{date}}"
+      "updated": "更新于 {{date}}",
+      "actions": "{{name}} 的操作"
     },
     "visibility": {
       "me": "仅自己",
@@ -693,7 +694,8 @@
       "meTitle": "仅自己",
       "meBody": "只有你可以查看和使用此数据集。",
       "teamTitle": "整个团队",
-      "teamBody": "{{workspace}} 中的所有人都可以查看并上传文档。只有你、所有者和管理员可以修改或删除它。"
+      "teamBody": "{{workspace}} 中的所有人都可以查看并上传文档。只有你、所有者和管理员可以修改或删除它。",
+      "narrowing": "团队成员将无法再访问此数据集。他们上传的文档会保留在其中。"
     },
     "missingDefault": {
       "manager": "此工作区还没有默认的嵌入模型，因此无法创建数据集。",
@@ -708,7 +710,9 @@
     "form": {
       "createTitle": "创建数据集",
       "createBody": "为数据集命名，选择为其文档建立索引的模型以及可见范围。",
-      "loading": "正在加载模型设置"
+      "loading": "正在加载模型设置",
+      "settingsTitle": "数据集设置",
+      "settingsBody": "修改名称、描述、可见范围或嵌入模型。"
     },
     "field": {
       "name": "名称",
@@ -716,7 +720,8 @@
       "descriptionCount": "{{count}}/500",
       "embedding": "嵌入模型",
       "embeddingHelp": "用于为此数据集的文档建立索引。数据集包含文档后无法更改。",
-      "visibility": "谁可以查看"
+      "visibility": "谁可以查看",
+      "embeddingFixed": "数据集有文档后，嵌入模型不能再更改。"
     },
     "error": {
       "duplicate": "此工作区中已存在名为“{{name}}”的数据集。请换一个名称。",
@@ -724,7 +729,8 @@
       "dimension": "不支持该嵌入模型的向量维度。请选择其他模型。",
       "indexDown": "搜索索引暂时不可用，因此未创建数据集。请稍后重试。",
       "createFallback": "未能创建数据集。请重试。",
-      "loadList": "无法加载数据集"
+      "loadList": "无法加载数据集",
+      "locked": "此数据集现在已有文档，嵌入模型不能再更改。"
     },
     "empty": {
       "heading": "还没有数据集",
@@ -733,6 +739,39 @@
     "noMatch": {
       "heading": "没有与“{{keywords}}”匹配的数据集",
       "body": "请检查拼写，或尝试更短的关键词。"
-    }
+    },
+    "menu": {
+      "label": "数据集操作",
+      "settings": "数据集设置",
+      "delete": "删除数据集"
+    },
+    "settings": {
+      "submit": "保存设置",
+      "saved": "数据集设置已保存",
+      "failed": "设置未保存。请重试。",
+      "indexDown": "搜索索引暂时不可用，设置未保存。请稍后重试。",
+      "gone": "此数据集已不存在，或已不再与你共享。"
+    },
+    "delete": {
+      "title": "删除数据集？",
+      "body_one": "“{{name}}”及其 {{count}} 个文档将被永久删除，包括已存储的文件和该数据集的搜索索引。此操作无法撤销。",
+      "body_other": "“{{name}}”及其 {{count}} 个文档将被永久删除，包括已存储的文件和该数据集的搜索索引。此操作无法撤销。",
+      "bodyEmpty": "“{{name}}”没有文档。该数据集及其搜索索引将被永久删除。此操作无法撤销。",
+      "loading": "正在加载文档数量",
+      "countError": "无法加载文档数量。",
+      "keep": "保留数据集",
+      "confirm": "删除数据集",
+      "failed": "数据集未被删除，未移除任何内容。请重试。",
+      "indexDown": "搜索索引暂时不可用，未删除任何内容。请稍后重试。"
+    },
+    "deleted": "数据集已删除",
+    "documentDelete": {
+      "title": "删除文档？",
+      "body": "“{{name}}”将从 {{dataset}} 中移除。此操作无法撤销。",
+      "keep": "保留文档",
+      "confirm": "删除文档",
+      "failed": "文档未被删除，未移除任何内容。请重试。"
+    },
+    "documentDeleted": "文档已删除"
   }
 }
