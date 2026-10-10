@@ -88,8 +88,10 @@ def test_wrong_key_fails():
 
 def test_tampered_envelope_fails():
     env = seal(KEY, "k1", PLAIN, AAD)
-    last = env[-1]
-    flipped = env[:-1] + ("A" if last != "A" else "B")
+    # The second-to-last character is always fully significant; the last one can carry base64 padding bits that a decoder ignores
+    # (a flip there was accepted about 1 % of the time).
+    char = env[-2]
+    flipped = env[:-2] + ("A" if char != "A" else "B") + env[-1]
     with pytest.raises(SecretBoxError) as err:
         open_({"k1": KEY}, flipped, AAD)
     _assert_clean(err.value)
