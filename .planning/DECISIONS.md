@@ -193,16 +193,16 @@ D-21: add each dependency only in the phase that builds the feature needing it; 
 
 ## Dev memory budget (measured)
 
-Measured with `docker stats --no-stream` on 2026-10-08, on this development host only (run 3, after the full suites). Not a portable figure.
+Measured with `docker stats --no-stream` on 2026-10-10, on this development host only (run 3, after the full suites). Not a portable figure.
 
 | Container | Limit MiB | Measured MiB |
 |---|---|---|
-| app | 768 | 108.0 |
-| es01 | 2048 | 1498.1 |
+| app | 768 | 266.9 |
+| es01 | 2048 | 1532.9 |
 | init | 256 | not running (one-shot, exited) |
-| mailpit | 64 | 28.8 |
-| minio | 256 | 95.3 |
-| mysql | 640 | 288.4 |
-| redis | 160 | 7.8 |
+| mailpit | 64 | 27.9 |
+| minio | 256 | 122.2 |
+| mysql | 640 | 287.5 |
+| redis | 160 | 4.6 |
 
-Total measured: 2026.4 MiB (budget 3891 MiB). Host available RAM at measurement: 5682 MiB. Host free disk after the run: 7G.
+Total measured: 2242.0 MiB (budget 3891 MiB). Host available RAM at measurement: 8722 MiB. Host free disk after the run: 17G.
