@@ -67,7 +67,9 @@ def test_python_cookie_only_unsafe_request_needs_a_matching_origin(ingress: http
 def test_tampered_and_foreign_tokens_are_401_on_python(ingress: httpx.Client, fresh_account: Account) -> None:
     token = fresh_account.token
     head, _, tail = token.rpartition(".")
-    tampered = f"{head}.{tail[:-1]}{'A' if tail[-1] != 'A' else 'B'}"
+    # Flip the FIRST signature character: the last base64 character of a 20-byte HMAC carries two padding bits, and a decoder that
+    # ignores them (itsdangerous does) accepts a changed last character about 7 % of the time.
+    tampered = f"{head}.{'A' if tail[0] != 'A' else 'B'}{tail[1:]}"
     for bad in (tampered, "garbage", "INVALID_" + "0" * 32):
         resp = ingress.get(PYTHON_PROTECTED, headers=_bearer(bad))
         assert resp.status_code == 401 and resp.json() == UNAUTHORIZED
