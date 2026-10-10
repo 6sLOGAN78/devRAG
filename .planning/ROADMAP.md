@@ -17,7 +17,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Reconciliation, Guardrails and Dual-Stack Foundation** - Decision register and CI guardrails committed; infrastructure, shared schema and both API servers healthy behind Nginx (completed 2026-10-06)
 - [x] **Phase 2: Identity, Tenancy and Authorization** - Users register and log in through Go, the same token works on Python, tenants are isolated and roles enforced (28 of 28 plans done 2026-10-08; awaiting phase verification; TEN-01, TEN-05, UI-42 partial, see BLOCKERS B-18, B-22) (completed 2026-10-08)
-- [ ] **Phase 3: Models, Knowledge Bases and Upload** - Tenants configure a real model provider, create datasets backed by a real index, and upload documents to object storage
+- [x] **Phase 3: Models, Knowledge Bases and Upload** - Tenants configure a real model provider, create datasets backed by a real index, and upload documents to object storage (completed 2026-10-10)
 - [ ] **Phase 4: Ingestion Pipeline** - Uploaded documents are parsed, chunked, embedded and indexed by a reliable background worker with live progress
 - [ ] **Phase 5: Retrieval and Cited Chat (Core Value Gate)** - A question about an uploaded document yields a streamed, cited answer in the UI with no mocked stage
 - [ ] **Phase 6: Deep Parsing and Chunking Breadth** - Layout analysis, OCR, table recognition, every documented file type and chunker, LLM enrichment and RAPTOR
@@ -308,7 +308,7 @@ Plans:
 
 **Wave 23** *(blocked on Wave 22 completion)*
 
-- [ ] 03-29-PLAN.md — Traceability test and phase exit gate (three clean-room runs)
+- [x] 03-29-PLAN.md — Traceability test and phase exit gate (three clean-room runs)
 
 **UI hint**: yes
 

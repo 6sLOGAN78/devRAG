@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 03-28-PLAN.md
-last_updated: "2026-10-10T00:30:00.000Z"
+stopped_at: Completed 03-29-PLAN.md (Phase 3 exit gate passed)
+last_updated: "2026-10-10T01:00:00.000Z"
 last_activity: 2026-10-10
 progress:
   total_phases: 8
-  completed_phases: 2
+  completed_phases: 3
   total_plans: 83
-  completed_plans: 82
-  percent: 25
+  completed_plans: 83
+  percent: 38
 ---
 
 # Project State
@@ -25,12 +25,12 @@ See: .planning/PROJECT.md (updated 2026-10-05)
 
 ## Current Position
 
-Phase: 3 (Models, Knowledge Bases and Upload) — EXECUTING
-Plan: next is 03-29 of 31 (03-01 to 03-28, 03-30 and 03-31 are done; only 03-29 remains)
-Status: Ready to execute
+Phase: 3 (Models, Knowledge Bases and Upload) — all 31 plans executed; exit gate passed
+Plan: 31 of 31 done (03-29 completed 2026-10-10)
+Status: Ready for Phase 3 verification (`/gsd:verify-work 3`)
 Last activity: 2026-10-10
 
-Progress: [██████████] 99%
+Progress: [██████████] 100% of Phase 3 plans
 
 ## Performance Metrics
 
@@ -87,6 +87,7 @@ Progress: [██████████] 99%
 | Phase 03 P24 | ~75min | 3 tasks | 19 files |
 | Phase 03 P31 | ~1h | 3 tasks | 20 files |
 | Phase 03 P28 | resumed after interruption | 2 tasks | 5 files |
+| Phase 03 P29 | ~5h (4 gate attempts) | 2 tasks | 9 files |
 
 ## Accumulated Context
 
@@ -147,6 +148,7 @@ Recent decisions affecting current work:
 - [Phase 03]: 03-25: dataset settings and delete are controlled dialogs with no trigger (owner passes onCloseAutoFocus and onSuccess); the card shows the actions menu only when canManageDataset (creator, workspace owner, admin) and owns both dialogs; the menu is non-modal so a dialog opened from it leaves no pointer-events lock; the delete dataset dialog never enables confirm from a cached count and stops fetching the detail once Delete is pressed; document-delete copy lives under datasets.documentDelete.* because the locale value of datasets.card.documents_* makes the no-hardcoded-copy scan reject any source string starting with documents. (03-31 will meet the same collision for documents.*)
 - [Phase 03]: 03-31: the dataset workspace page binds the workspace by ref (boundTenantRef is written before the store switch; the leave-for-/datasets effect reads the store and compares it with the ref, so a deep link into a joined workspace stays and only a user switch navigates); a deep-link switch goes through the store's bindActive/bound flag so the header selector announces it; the sidebar marks Datasets on /dataset/ paths through Link plus isNavActive (NavLink cannot); document-table copy is under datasets.files.* (documents.* collides with the copy scan); UI-11 and UI-12 complete
 - [Phase 03]: 03-26: the browser tiers never see the real provider key (Node fake provider for vitest, Python fake_provider_stack for Chrome; 0 real provider calls); real-Chrome presses are real mouse events that wait for document.getAnimations() to settle and run in a 1280x900 metrics override (headless default viewport put dialog buttons off-screen); the throttled 12 MiB upload (1 MiB/s, >10 s) proves the upload call's timeout 0; the window drop guard could not be confirmed in headless Chrome (an unguarded page does not navigate on a CDP drop) and stays jsdom-only; SECRET_BULLETS renamed MASK_BULLETS so the secrets gate stays 7/7
+- [Phase 03]: 03-29: the phase exit gate (`scripts/clean_room.sh --runs 3`, port 8088, key present, `live-model` included) passed three consecutive runs on attempt 4 (746, 782, 762 s); the Go cross-tenant matrix covers owner-go rows only (R-153, Python matrix is the superset); tamper tests flip a fully significant base64 character; a provider ERROR_TIMEOUT on the first gate attempt was transient and nothing was loosened
 
 ### Pending Todos
 
@@ -182,6 +184,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-10-10T00:30:00.000Z
-Stopped at: Completed 03-26-PLAN.md
+Last session: 2026-10-10T01:00:00.000Z
+Stopped at: Completed 03-29-PLAN.md
 Resume file: None
