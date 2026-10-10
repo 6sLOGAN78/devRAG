@@ -1,7 +1,8 @@
 ---
 phase: 4
 slug: ingestion-pipeline
-status: draft
+status: approved
+reviewed_at: 2026-10-10
 shadcn_initialized: true
 preset: none
 created: 2026-10-10
@@ -1119,11 +1120,56 @@ What the API must return for these screens, and the server-side rules the contra
 
 ## Checker Sign-Off
 
-- [ ] Dimension 1 Copywriting: PASS
-- [ ] Dimension 2 Visuals: PASS
-- [ ] Dimension 3 Color: PASS
-- [ ] Dimension 4 Typography: PASS
-- [ ] Dimension 5 Spacing: PASS
-- [ ] Dimension 6 Registry Safety: PASS
+- [x] Dimension 1 Copywriting: FLAG (non-blocking)
+- [x] Dimension 2 Visuals: PASS
+- [x] Dimension 3 Color: FLAG (non-blocking)
+- [x] Dimension 4 Typography: PASS
+- [x] Dimension 5 Spacing: PASS
+- [x] Dimension 6 Registry Safety: PASS
 
-**Approval:** pending
+**Approval:** approved 2026-10-10
+
+---
+
+## Checker Flags (non-blocking, 2026-10-10)
+
+The UI checker approved this contract (no blocking dimension). The planner must apply these.
+
+### Rulings on the two points that touch locked decisions
+
+- **A not-started document that has hand-added chunks.** "Add a chunk by hand" stays available on never-parsed and unparseable documents. Because D-03 and D-04 say a document that already has chunks always gets the confirmation, the `confirm_required` rule and the status map are extended to `run = "0"` with chunks: the row shows its chunk count, and Parse goes through the confirmation with the hand-added count. (Orchestrator ruling, not user-reviewed; record in `.planning/DECISIONS.md`.)
+- **UI-14 is delivered in part.** Chunk token size and delimiter work; the layout-model toggle and auto-keyword count are shown as "Not available yet". Record UI-14 as partial in `REQUIREMENTS.md` and the Phase 6 roadmap entry, alongside CHUNK-17, PARSE-09 and PARSE-11 (D-27). The "Overlap (%)" control is an addition this contract makes; keep it only if the `naive` chunker in the docs has an overlap setting, otherwise drop it.
+- **RESEARCH Pattern 6 contradicts D-26; this contract is right.** Re-enabling a document must not turn every chunk on. The document switch cannot be a bulk rewrite of each chunk's own on/off field.
+
+### Copywriting
+
+1. **Single-word CTAs.** "Parse", "Details", "Download", "Edit", "Close", "On" and "Off" have no noun; keep the declared accessible names (planner note 18) in the plan.
+2. **Chunk on/off failure.** Only one toast key exists. Map 403, 404, 409 `parse_running` and 503 `index_unavailable` as the editor table does.
+3. **Parse rate limit.** Add a 429 row with "wait a moment" copy; the generic "Try again" invites an immediate retry.
+4. **Dataset-default mode of the chunking dialog** reuses document copy ("This document no longer exists", "This document is set to {method}"). Add dataset variants.
+5. **Add chunk, 404.** The reason says the chunk no longer exists; for an add, the document is what is gone.
+6. **Failed polls.** "Live updates are paused" exists only on the dataset workspace. The inspector, the parsing log and the open details sheet also poll and need the same treatment.
+7. **Selection bar.** Declare a pending state for "Parse {count} documents" and "Cancel parsing for {count} documents".
+8. **Unmapped codes.** `document_deleted` has no row in the failure-reason table; `provider_unreachable` and `dimension_mismatch` have none in the editor table.
+
+### Color
+
+9. **Accent list is incomplete.** Add or restyle: the primary "Parse again" in the inspector's cancelled state; the link-buttons "Add a chunk by hand", "Parsing details" (inspector failed state) and "Back to documents"; "View chunks" as an `outline` button in the viewer.
+
+### Other notes
+
+10. **"Not available yet" text beyond D-13 and D-15.** The read-only rows for layout recognition and auto-keywords are a third place such text appears; the scope sentence is amended to allow it for UI-14's two unavailable controls only.
+11. **Table row height.** Phase 3's "table row 48px" becomes "table row minimum 48px" here, because rows now hold a badge, up to two detail lines and a link. This is a deliberate change to an inherited exception.
+12. **KB-16 and DOC-22 have no UI surface** in this phase; they are API-only.
+
+### Routes and API shapes this contract relies on that RESEARCH.md does not give
+
+13. **Per-document chunking settings write.** No route exists for a document's `parser_id` and parser config in RESEARCH, `conf/routes.yaml` or `docs/04-api/`. Choose one from the docs' route families and record it in `DECISIONS.md`; the same for carrying the dataset default on the dataset update route.
+14. **Text preview.** The viewer needs decoded text capped at 262,144 characters with a cut flag; RESEARCH's content route only streams the original file.
+15. **Document list rows** need `last_log_id`, `parseable`, `enabled`, `pages_total`, `pages_without_text` and `error` on every row.
+16. **Log entry fields:** `retried`, `max_attempts`, `error.detail`, page counts and a per-entry `log`. `pipeline_operation_log.progress_msg` exists, so no schema change; the roll-up copies the log there when it closes the entry.
+17. **409 `confirm_required` payload** needs `chunk_count`, `edited_count` and `manual_count` per document.
+18. **Reasons and codes introduced here** must be defined server-side: refusal reasons `already_running`, `queue_unavailable`, `parse_running`, `parser_config_invalid`, `chunk_too_long`; failure codes `file_damaged`, `worker_lost`, `storage_unavailable`, `index_unavailable`, `provider_timeout`, `provider_rate_limited`, `provider_unreachable`; and the `error.step` values.
+19. **Naming to settle once, in the API:** `keywords` versus `keyword`; `page_sizes` versus `page_size[page]`; whether the page-image number is 1-based while task page ranges are 0-based.
+20. **Routes `/chunk`, `/document` and `/dataset/logs`** are not in `docs/02-frontend/routing.md`; record them in `DECISIONS.md` (planner note 19).
+21. **Document switch.** Bind it to `POST …/documents/batch-update-status` (DOC-13).
