@@ -4,13 +4,13 @@ milestone: v1.0
 milestone_name: milestone
 status: executing
 stopped_at: Completed 04-11-PLAN.md
-last_updated: "2026-10-16T21:29:01.073Z"
+last_updated: "2026-10-16T21:45:28.359Z"
 last_activity: 2026-10-16
 progress:
   total_phases: 8
   completed_phases: 3
   total_plans: 118
-  completed_plans: 95
+  completed_plans: 96
   percent: 38
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-10-05)
 ## Current Position
 
 Phase: 4 (ingestion-pipeline) — EXECUTING
-Plan: 13 of 35
+Plan: 14 of 35
 Status: Ready to execute
 Last activity: 2026-10-16
 
@@ -98,6 +98,7 @@ Progress: [████████░░] 81%
 | Phase 04 P09 | 25min | - tasks | - files |
 | Phase 04 P10 | 55min | - tasks | - files |
 | Phase 4 P11 | ~2h | - tasks | - files |
+| Phase 04 P12 | 2h | - tasks | - files |
 
 ## Accumulated Context
 
@@ -162,6 +163,7 @@ Recent decisions affecting current work:
 - [Phase 04]: Phase 4 Plan 03: too_many_chunks is a terminal failure code (R-155)
 - [Phase 04]: 04-10: start refuses in a fixed order across all ids, re-checks not-running under the dataset lock before pruning the index; cancel settles totals only for cancelled documents
 - [Phase 4]: 04-11: run_pipeline is synchronous and leaves task_limiter and mark_task_done/failure-line persistence to the 04-12 executor; PLAIN_MESSAGES lives in common/ingest_codes.py
+- [Phase ?]: 04-12: user cancel keeps indexed chunks; lock released before republish; roll-up reads latest [pages]/[skipped] per task
 
 ### Pending Todos
 
@@ -197,6 +199,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-10-16T21:29:01.056Z
+Last session: 2026-10-16T21:45:28.348Z
 Stopped at: Completed 04-11-PLAN.md
 Resume file: None

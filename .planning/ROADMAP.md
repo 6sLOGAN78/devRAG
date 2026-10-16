@@ -359,7 +359,7 @@ Plans:
 
 **Wave 6** *(blocked on Wave 5 completion)*
 
-- [ ] 04-12-PLAN.md — Executor loop, heartbeat, roll-up daemon, reconciler, recovery
+- [x] 04-12-PLAN.md — Executor loop, heartbeat, roll-up daemon, reconciler, recovery
 
 **Wave 7** *(blocked on Wave 6 completion)*
 
