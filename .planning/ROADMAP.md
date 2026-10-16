@@ -469,6 +469,8 @@ Scope notes: this is the PROJECT.md Core Value. No Phase 6, 7 or 8 work starts u
 
 Scope notes: highest research risk in the project (DeepDoc ONNX model acquisition, licence, CPU throughput, coordinate conventions); needs `--research-phase`. Models are provisioned in a build/init step, never downloaded at first parse. PARSE-26 and CHUNK-28 are satisfied by their Python implementations per the user decision; the Go mirrors are v2. Docs to read first: `06-document-processing` (all parser, OCR, layout, chunking files), `05-rag-pipeline`, `20-security/file-security.md`.
 
+Moved from Phase 4 (D-27): traditional-to-simplified conversion and a dictionary Chinese tokenizer (CHUNK-17), embedded-image handling in DOCX and PPTX (PARSE-09, PARSE-11), the layout toggle and auto-keyword count of the parser configurator (UI-14).
+
 ### Phase 7: Agents and Workflows
 
 **Goal**: Users can build an agent workflow on a canvas, run it and watch each node execute, give agents tools and sandboxed code, and trigger runs from outside

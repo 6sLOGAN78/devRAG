@@ -129,9 +129,9 @@ Requirements for initial release. Each maps to exactly one roadmap phase.
 - [ ] **PARSE-06**: OCR fallback (text detection plus recognition) runs when a page's text layer is missing or corrupt
 - [ ] **PARSE-07**: Table structure recognition reconstructs cropped tables into HTML `<table>`
 - [ ] **PARSE-08**: Headers and footers are filtered from chunk content
-- [ ] **PARSE-09**: DOCX parser: paragraphs, headings, embedded images, tables as HTML *(Python implementation in v1; Go mirror deferred to v2)*
+- [ ] **PARSE-09**: DOCX parser: paragraphs, headings, embedded images, tables as HTML *(Python implementation in v1; Go mirror deferred to v2)* — *partly delivered in Phase 4 (R-160, D-27): paragraphs, headings and tables as HTML; embedded images are skipped and counted in the log; image handling moves to Phase 6*
 - [ ] **PARSE-10**: XLSX parser: sheets to HTML/Markdown tables with header-row context
-- [ ] **PARSE-11**: PPTX parser: slide titles, text frames, shape tables, speaker notes, images
+- [ ] **PARSE-11**: PPTX parser: slide titles, text frames, shape tables, speaker notes, images — *partly delivered in Phase 4 (R-160, D-27): slide titles, text frames, shape tables and speaker notes; images are skipped and counted in the log; image handling moves to Phase 6*
 - [ ] **PARSE-12**: HTML parser: DOM extraction with script/style stripping
 - [ ] **PARSE-13**: TXT parser with encoding auto-detection
 - [ ] **PARSE-14**: Markdown parser
@@ -166,7 +166,7 @@ Requirements for initial release. Each maps to exactly one roadmap phase.
 - [ ] **CHUNK-14**: `one`: whole document as a single chunk
 - [ ] **CHUNK-15**: `audio`: ASR transcript segmented into timestamped chunks
 - [ ] **CHUNK-16**: Every chunk carries content, page number, position `[page, x0, top, x1, bottom]`, and image ids
-- [ ] **CHUNK-17**: Text preprocessing: full-to-half-width, traditional-to-simplified Chinese, URL/email stripping, tokenize, fine-grained tokenize, token positions
+- [ ] **CHUNK-17**: Text preprocessing: full-to-half-width, traditional-to-simplified Chinese, URL/email stripping, tokenize, fine-grained tokenize, token positions — *partly delivered in Phase 4 (R-160, D-27): full-to-half-width, URL/email stripping, tokenize and token positions through the in-repo stdlib tokenizer; traditional-to-simplified conversion and the dictionary fine-grained tokenizer move to Phase 6*
 - [ ] **CHUNK-18**: User can list a document's chunks with text, bounding boxes, status, paging, keyword filter via `GET .../documents/<doc_id>/chunks`
 - [ ] **CHUNK-19**: User can create a manual chunk via `POST .../documents/<doc_id>/chunks`
 - [ ] **CHUNK-20**: User can edit a chunk's text
@@ -519,7 +519,7 @@ Requirements for initial release. Each maps to exactly one roadmap phase.
 - [x] **UI-11**: Dataset workspace: document table with status badges
 - [x] **UI-12**: Upload dialog: drag-and-drop, extension and size validation, progress bars
 - [ ] **UI-13**: Chunking-method dialog (General, Q&A, Paper, Book, Laws, Presentation, Table, Manual)
-- [ ] **UI-14**: Parser configurator: chunk token size, delimiter, layout-model toggle, auto-keyword count
+- [ ] **UI-14**: Parser configurator: chunk token size, delimiter, layout-model toggle, auto-keyword count — *partly delivered in Phase 4 (R-160, D-27): chunk token size and delimiter; the layout-model toggle and the auto-keyword count move to Phase 6*
 - [ ] **UI-15**: Live parsing progress bars, status badges (UNSTART, RUNNING, SUCCESS, FAIL), error log display
 - [ ] **UI-16**: Chunk inspector: original document with highlighted bounding boxes beside chunk text
 - [ ] **UI-17**: Chunk editor: edit text, toggle availability, add chunk
@@ -784,9 +784,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | PARSE-06 | Phase 6 | Pending |
 | PARSE-07 | Phase 6 | Pending |
 | PARSE-08 | Phase 6 | Pending |
-| PARSE-09 | Phase 4 | Pending |
+| PARSE-09 | Phase 4 | Partial (Phase 4 part; rest in Phase 6, D-27) |
 | PARSE-10 | Phase 4 | Pending |
-| PARSE-11 | Phase 4 | Pending |
+| PARSE-11 | Phase 4 | Partial (Phase 4 part; rest in Phase 6, D-27) |
 | PARSE-12 | Phase 4 | Pending |
 | PARSE-13 | Phase 4 | Pending |
 | PARSE-14 | Phase 6 | Pending |
@@ -818,7 +818,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | CHUNK-14 | Phase 6 | Pending |
 | CHUNK-15 | Phase 6 | Pending |
 | CHUNK-16 | Phase 4 | Pending |
-| CHUNK-17 | Phase 4 | Pending |
+| CHUNK-17 | Phase 4 | Partial (Phase 4 part; rest in Phase 6, D-27) |
 | CHUNK-18 | Phase 4 | Pending |
 | CHUNK-19 | Phase 4 | Pending |
 | CHUNK-20 | Phase 4 | Pending |
@@ -1120,7 +1120,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | UI-11 | Phase 3 | Complete |
 | UI-12 | Phase 3 | Complete |
 | UI-13 | Phase 4 | Pending |
-| UI-14 | Phase 4 | Pending |
+| UI-14 | Phase 4 | Partial (Phase 4 part; rest in Phase 6, D-27) |
 | UI-15 | Phase 4 | Pending |
 | UI-16 | Phase 4 | Pending |
 | UI-17 | Phase 4 | Pending |

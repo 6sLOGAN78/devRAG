@@ -50,8 +50,20 @@ def test_detector_flags_a_violation(tmp_path, monkeypatch):
 
 
 # --- Phase 3 packages (03-01): rag/ and the adapters stay free of the web framework and the API layer ---
-def test_rag_package_is_independent_of_the_api_layer_and_the_web_framework():
-    assert _violations("rag", ("api.apps", "api.db", "quart", "quart_schema", "quart_cors")) == []
+def test_rag_never_imports_the_web_framework_or_the_handlers():
+    assert _violations("rag", ("api.apps", "quart", "quart_schema", "quart_cors")) == []
+
+
+def test_rag_utils_and_llm_do_not_import_the_database_layer():
+    # rag/svr alone may import api.db (R-154); the adapters stay free of it.
+    assert _violations("rag/utils", ("api.db",)) == []
+    assert _violations("rag/llm", ("api.db",)) == []
+
+
+def test_pure_rag_packages_import_nothing_from_api():
+    # R-154: parsers, chunking, nlp and queue import neither api nor quart.
+    for package in ("rag/parsers", "rag/chunking", "rag/nlp", "rag/queue"):
+        assert _violations(package, ("api", "quart", "quart_schema", "quart_cors")) == [], package
 
 
 def test_doc_store_and_net_do_not_import_api_rag_or_quart():
