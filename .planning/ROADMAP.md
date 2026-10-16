@@ -346,7 +346,7 @@ Plans:
 **Wave 3** *(blocked on Wave 2 completion)*
 
 - [x] 04-07-PLAN.md — Queue interface, Valkey Streams, owner-token task lock, reclaim
-- [ ] 04-08-PLAN.md — pypdfium2 PDF parser with aligned boxes, zoom-3 raster, thumbnail, PDF generator
+- [x] 04-08-PLAN.md — pypdfium2 PDF parser with aligned boxes, zoom-3 raster, thumbnail, PDF generator
 - [ ] 04-09-PLAN.md — DOCX, XLSX, PPTX, HTML parsers, archive and XML guard
 
 **Wave 4** *(blocked on Wave 3 completion)*
