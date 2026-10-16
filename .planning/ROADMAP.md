@@ -364,7 +364,7 @@ Plans:
 **Wave 7** *(blocked on Wave 6 completion)*
 
 - [x] 04-13-PLAN.md — Executor container, scaling, health, overrides, Valkey policy
-- [ ] 04-15-PLAN.md — `ParserConfig` validation, document list rows, document detail and PDF page count (service level)
+- [x] 04-15-PLAN.md — `ParserConfig` validation, document list rows, document detail and PDF page count (service level)
 
 **Wave 8** *(blocked on Wave 7 completion)*
 
