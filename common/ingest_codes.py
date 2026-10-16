@@ -11,6 +11,12 @@ RUN_CANCELLED = "2"
 RUN_DONE = "3"
 RUN_FAILED = "4"
 
+# Status of a pipeline_operation_log row (plan 04-10).
+LOG_RUNNING = "running"
+LOG_DONE = "done"
+LOG_FAILED = "failed"
+LOG_CANCELLED = "cancelled"
+
 STEPS: tuple[str, ...] = ("queue", "fetch", "parse", "chunk", "embed", "index")
 
 FAILURE_CODES: tuple[str, ...] = (
@@ -30,6 +36,7 @@ FAILURE_CODES: tuple[str, ...] = (
     "index_unavailable",
     "storage_unavailable",
     "worker_lost",
+    "queue_unavailable",
     "document_deleted",
 )
 
