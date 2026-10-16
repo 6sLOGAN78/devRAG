@@ -323,6 +323,15 @@ def list_view(principal: Principal, dataset_id: str, *, page: int, page_size: in
     return {"items": items, "total": total}
 
 
+def list_rows_view(principal: Principal, dataset_id: str, *, page: int, page_size: int, keywords: str | None) -> dict[str, Any]:
+    """Like ``list_view`` with the Phase 4 row facts (``document_view.ROW_KEYS``). Plan 04-16 points the handler here."""
+    from api.db.services import document_view  # local: document_view imports this module
+
+    visible = load_visible_dataset(principal, dataset_id)
+    items, total = document_view.list_rows(visible, page=page, page_size=page_size, keywords=keywords)
+    return {"items": items, "total": total}
+
+
 # ----------------------------------------------------------------------------- delete
 
 

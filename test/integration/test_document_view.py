@@ -156,6 +156,7 @@ def test_a_page_of_twenty_rows_costs_at_most_four_statements_and_no_doc_store_ca
         if i % 2:
             set_doc(doc["id"], run="1", progress_msg="line a\nline b")
         add_log(owner, dataset, doc, status="running")
+    visible = visible_of(owner, dataset)
     seen: list[str] = []
     real = DB.obj.execute_sql
 
@@ -168,7 +169,7 @@ def test_a_page_of_twenty_rows_costs_at_most_four_statements_and_no_doc_store_ca
 
     monkeypatch.setattr(DB.obj, "execute_sql", counting)
     monkeypatch.setattr("rag.utils.es_conn.get_doc_store", forbidden)
-    rows, total = view.list_rows(visible_of(owner, dataset), page=1, page_size=20, keywords=None)
+    rows, total = view.list_rows(visible, page=1, page_size=20, keywords=None)
     assert len(rows) == 20 and total == 20
     selects = [s for s in seen if s.lstrip().upper().startswith("SELECT")]
     assert len(selects) <= 4, selects
