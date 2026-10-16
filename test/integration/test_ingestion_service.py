@@ -16,24 +16,26 @@ from typing import Any
 import pytest
 import valkey
 
+from api.db.database import DB
+from api.db.models import PipelineOperationLog
 from api.db.services import ingestion_service as ing
 from api.db.services.auth_service import AUTH_API, Principal
-from api.db.services.service_errors import Kind, ServiceError
+from api.db.services.service_errors import Kind
 from common.doc_store.doc_store_base import index_name
 from rag.queue.queue_base import QueueUnavailable
 from rag.utils.es_conn import get_doc_store
+from test.helpers.accounts import AccountRegistry
 from test.helpers.doc_store_contract import row
 from test.helpers.pdf_files import garbage_bytes, thirteen_page_pdf
 from test.helpers.uploads import sql, text_bytes
 from test.integration import test_upload_service as base
 from test.integration.test_document_service import chunk_ids, team_dataset_of
 from test.integration.test_knowledgebase_service import configure, join, principal_of
+from test.testcases.conftest import BASE_URL
 
 pytestmark = pytest.mark.integration
 
 _bound_database = base._bound_database
-llm = base.llm
-registry = base.registry
 storage = base.storage
 space = base.space
 item = base.item
@@ -60,6 +62,25 @@ def settings() -> Iterator[Any]:
     from rag.queue.factory import reset_queue_cache
 
     reset_queue_cache()
+
+
+@pytest.fixture
+def llm(settings):
+    """The upload tests' module-scoped ``llm`` depends on a module-scoped settings; this module's settings carry a per-test queue prefix."""
+    return dataclasses.replace(settings.llm, encryption_key=base.urlsafe_b64encode(base.os.urandom(32)).decode(), key_id="k1")
+
+
+@pytest.fixture
+def registry() -> Iterator[AccountRegistry]:
+    """Like the upload tests' registry, and it also removes the task and log rows of the accounts' documents (account cleanup does not)."""
+    accounts = AccountRegistry(BASE_URL)
+    try:
+        yield accounts
+    finally:
+        for acc in accounts.created:
+            sql("DELETE FROM `task` WHERE `doc_id` IN (SELECT `id` FROM `document` WHERE `kb_id` IN (SELECT `id` FROM `knowledgebase` WHERE `tenant_id` = %s))", (acc.tenant_id,))
+            sql("DELETE FROM `pipeline_operation_log` WHERE `tenant_id` = %s", (acc.tenant_id,))
+        accounts.cleanup()
 
 
 def stream(cfg) -> list[dict]:
@@ -178,19 +199,20 @@ def test_a_confirmed_reparse_replaces_everything(settings, space, storage):
     doc = one_doc(settings, owner, dataset, storage)
     index_chunks(settings, owner, dataset, doc["id"], plain=3, edited=1, manual=1)
     sql("UPDATE `document` SET `run` = '3', `progress` = 1 WHERE `id` = %s", (doc["id"],))
-    sql("INSERT INTO `task` (`id`, `doc_id`, `from_page`, `to_page`, `progress`, `create_time`) VALUES (%s, %s, 0, 1000000, 1, 1)", ("f" * 32, doc["id"]))
-    sql(
-        "INSERT INTO `pipeline_operation_log` (`id`, `document_id`, `tenant_id`, `kb_id`, `parser_id`, `document_name`, `document_suffix`, `document_type`, `source_from`, `operation_status`, `create_time`)"
-        " VALUES (%s, %s, %s, %s, 'naive', 'a.txt', 'txt', 'doc', 'local', 'done', 1)",
-        ("e" * 32, doc["id"], owner.tenant_id, dataset.id),
-    )
+    old_task = uuid.uuid4().hex
+    sql("INSERT INTO `task` (`id`, `doc_id`, `from_page`, `to_page`, `progress`, `create_time`) VALUES (%s, %s, 0, 1000000, 1, 1)", (old_task, doc["id"]))
+    with DB.connection_context():
+        PipelineOperationLog.create(
+            id=uuid.uuid4().hex, document_id=doc["id"], tenant_id=owner.tenant_id, kb_id=dataset.id, parser_id="naive", document_name="a.txt",
+            document_suffix="txt", document_type="doc", source_from="local", operation_status="done", task_type="parse",
+        )  # fmt: skip
     chunks_before = dataset_chunks(dataset.id)
 
     start(settings, owner, dataset, [doc["id"]], True)
     assert chunk_ids(settings, owner, dataset, doc["id"]) == []
     assert doc_state(doc["id"]) == ("1", 0.0, 0, 0)
     assert dataset_chunks(dataset.id) == chunks_before - 5
-    assert "f" * 32 not in [r[0] for r in sql("SELECT `id` FROM `task` WHERE `doc_id` = %s", (doc["id"],))]
+    assert old_task not in [r[0] for r in sql("SELECT `id` FROM `task` WHERE `doc_id` = %s", (doc["id"],))]
     assert len(tasks(doc["id"])) == 1 and len(stream(settings)) == 1
     assert logs(doc["id"]) == ["done", "running"]
 
