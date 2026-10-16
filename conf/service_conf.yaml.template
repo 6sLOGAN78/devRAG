@@ -88,3 +88,29 @@ upload:
   max_documents_per_dataset: ${DATASET_MAX_DOCUMENTS:-10000}
   body_timeout_seconds: ${UPLOAD_BODY_TIMEOUT_SECONDS:-600}
   allowed_extensions: '${UPLOAD_ALLOWED_EXTENSIONS:-}'
+
+# Ingestion worker (D-05, R-165). reclaim_idle_ms must be at least twice lock_ttl_seconds * 1000.
+ingest:
+  task_page_size: ${TASK_PAGE_SIZE:-12}
+  batch_size: ${INGEST_BATCH_SIZE:-64}
+  max_attempts: ${INGEST_MAX_ATTEMPTS:-3}
+  lock_ttl_seconds: ${TASK_LOCK_TTL_SECONDS:-60}
+  reclaim_idle_ms: ${RECLAIM_IDLE_MS:-120000}
+  reclaim_interval_seconds: ${RECLAIM_INTERVAL_SECONDS:-15}
+  worker_heartbeat_timeout: ${WORKER_HEARTBEAT_TIMEOUT:-120}
+  progress_interval_seconds: ${PROGRESS_INTERVAL_SECONDS:-2}
+  cancel_poll_seconds: ${CANCEL_POLL_SECONDS:-1}
+  retry_backoff_max_seconds: ${INGEST_RETRY_BACKOFF_MAX_SECONDS:-30}
+  reconcile_after_seconds: ${RECONCILE_AFTER_SECONDS:-300}
+  xlsx_max_cells: ${XLSX_MAX_CELLS:-1000000}
+  text_preview_chars: ${TEXT_PREVIEW_CHARS:-262144}
+  parse_rate_max: ${PARSE_RATE_MAX:-120}
+  parse_rate_window_seconds: ${PARSE_RATE_WINDOW_SECONDS:-60}
+  task_concurrency: ${INGEST_TASK_CONCURRENCY:-1}
+  chunk_concurrency: ${INGEST_CHUNK_CONCURRENCY:-1}
+  embed_concurrency: ${INGEST_EMBED_CONCURRENCY:-2}
+  storage_concurrency: ${INGEST_STORAGE_CONCURRENCY:-4}
+  kg_concurrency: ${INGEST_KG_CONCURRENCY:-1}
+  pdf_render_threads: ${PDF_RENDER_THREADS:-2}
+  queue_prefix: '${INGEST_QUEUE_PREFIX:-te}'
+  consumer_group: '${INGEST_CONSUMER_GROUP:-ragflow_consumer_group}'

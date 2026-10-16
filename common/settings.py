@@ -198,6 +198,35 @@ class UploadSettings:
 
 
 @dataclass(frozen=True)
+class IngestSettings:
+    """Ingestion worker tunables (D-05, R-165). Every number is bounded in ``_parse_ingest``."""
+
+    task_page_size: int = 12
+    batch_size: int = 64
+    max_attempts: int = 3
+    lock_ttl_seconds: int = 60
+    reclaim_idle_ms: int = 120000
+    reclaim_interval_seconds: int = 15
+    worker_heartbeat_timeout: int = 120
+    progress_interval_seconds: int = 2
+    cancel_poll_seconds: int = 1
+    retry_backoff_max_seconds: int = 30
+    reconcile_after_seconds: int = 300
+    xlsx_max_cells: int = 1000000
+    text_preview_chars: int = 262144
+    parse_rate_max: int = 120
+    parse_rate_window_seconds: int = 60
+    task_concurrency: int = 1
+    chunk_concurrency: int = 1
+    embed_concurrency: int = 2
+    storage_concurrency: int = 4
+    kg_concurrency: int = 1
+    pdf_render_threads: int = 2
+    queue_prefix: str = "te"
+    consumer_group: str = "ragflow_consumer_group"
+
+
+@dataclass(frozen=True)
 class RateLimitSettings:
     """Every rate-limit number (D-29). Defaults are the R-94 production values."""
 
@@ -231,6 +260,7 @@ class Settings:
     llm: LlmSettings = field(default_factory=LlmSettings)
     storage: StorageSettings = field(default_factory=StorageSettings)
     upload: UploadSettings = field(default_factory=UploadSettings)
+    ingest: IngestSettings = field(default_factory=IngestSettings)
 
 
 def _section(data: dict[str, Any], name: str) -> dict[str, Any]:
@@ -394,6 +424,49 @@ def _parse_upload(data: dict[str, Any]) -> UploadSettings:
     )
 
 
+_INGEST_NAME = re.compile(r"[a-z0-9_.-]{1,32}")
+
+
+def _ingest_name(sec: dict[str, Any], key: str, default: str) -> str:
+    value = _optional(sec, key, default).strip()
+    if not _INGEST_NAME.fullmatch(value):
+        raise ConfigError(f"invalid value for config key: ingest.{key}")
+    return value
+
+
+def _parse_ingest(data: dict[str, Any]) -> IngestSettings:
+    sec = data.get("ingest") or {}
+    defaults = IngestSettings()
+    parsed = IngestSettings(
+        task_page_size=_bounded(sec, "ingest", "task_page_size", defaults.task_page_size, 1000, lo=1),
+        batch_size=_bounded(sec, "ingest", "batch_size", defaults.batch_size, 256, lo=1),
+        max_attempts=_bounded(sec, "ingest", "max_attempts", defaults.max_attempts, 10, lo=1),
+        lock_ttl_seconds=_bounded(sec, "ingest", "lock_ttl_seconds", defaults.lock_ttl_seconds, 600, lo=5),
+        reclaim_idle_ms=_bounded(sec, "ingest", "reclaim_idle_ms", defaults.reclaim_idle_ms, 3600000, lo=1000),
+        reclaim_interval_seconds=_bounded(sec, "ingest", "reclaim_interval_seconds", defaults.reclaim_interval_seconds, 300, lo=1),
+        worker_heartbeat_timeout=_bounded(sec, "ingest", "worker_heartbeat_timeout", defaults.worker_heartbeat_timeout, 3600, lo=10),
+        progress_interval_seconds=_bounded(sec, "ingest", "progress_interval_seconds", defaults.progress_interval_seconds, 60, lo=1),
+        cancel_poll_seconds=_bounded(sec, "ingest", "cancel_poll_seconds", defaults.cancel_poll_seconds, 30, lo=1),
+        retry_backoff_max_seconds=_bounded(sec, "ingest", "retry_backoff_max_seconds", defaults.retry_backoff_max_seconds, 600, lo=1),
+        reconcile_after_seconds=_bounded(sec, "ingest", "reconcile_after_seconds", defaults.reconcile_after_seconds, 86400, lo=30),
+        xlsx_max_cells=_bounded(sec, "ingest", "xlsx_max_cells", defaults.xlsx_max_cells, 10000000, lo=1000),
+        text_preview_chars=_bounded(sec, "ingest", "text_preview_chars", defaults.text_preview_chars, 1048576, lo=1024),
+        parse_rate_max=_bounded(sec, "ingest", "parse_rate_max", defaults.parse_rate_max, 100000, lo=1),
+        parse_rate_window_seconds=_bounded(sec, "ingest", "parse_rate_window_seconds", defaults.parse_rate_window_seconds, 3600, lo=1),
+        task_concurrency=_bounded(sec, "ingest", "task_concurrency", defaults.task_concurrency, 64, lo=1),
+        chunk_concurrency=_bounded(sec, "ingest", "chunk_concurrency", defaults.chunk_concurrency, 64, lo=1),
+        embed_concurrency=_bounded(sec, "ingest", "embed_concurrency", defaults.embed_concurrency, 64, lo=1),
+        storage_concurrency=_bounded(sec, "ingest", "storage_concurrency", defaults.storage_concurrency, 64, lo=1),
+        kg_concurrency=_bounded(sec, "ingest", "kg_concurrency", defaults.kg_concurrency, 64, lo=1),
+        pdf_render_threads=_bounded(sec, "ingest", "pdf_render_threads", defaults.pdf_render_threads, 8, lo=1),
+        queue_prefix=_ingest_name(sec, "queue_prefix", defaults.queue_prefix),
+        consumer_group=_ingest_name(sec, "consumer_group", defaults.consumer_group),
+    )
+    if parsed.reclaim_idle_ms < 2 * parsed.lock_ttl_seconds * 1000:
+        raise ConfigError("invalid value for config key: ingest.reclaim_idle_ms")
+    return parsed
+
+
 def parse_settings(data: dict[str, Any]) -> Settings:
     if not isinstance(data, dict):
         raise ConfigError("configuration file is empty or not a mapping")
@@ -441,6 +514,7 @@ def parse_settings(data: dict[str, Any]) -> Settings:
         llm=_parse_llm(data),
         storage=_parse_storage(data),
         upload=_parse_upload(data),
+        ingest=_parse_ingest(data),
     )
 
 

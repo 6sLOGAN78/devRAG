@@ -140,3 +140,40 @@ def test_compose_passes_phase3_variables_but_never_the_live_key() -> None:
     for name in sorted(NOT_IN_CONTAINER):
         assert name not in text, f"{name} must not reach the container"
     assert "LLM_KEY_ENCRYPTION_KEY: ${LLM_KEY_ENCRYPTION_KEY:?" in text
+
+
+PHASE4_VARIABLES = (
+    "TASK_PAGE_SIZE",
+    "INGEST_BATCH_SIZE",
+    "INGEST_MAX_ATTEMPTS",
+    "TASK_LOCK_TTL_SECONDS",
+    "RECLAIM_IDLE_MS",
+    "RECLAIM_INTERVAL_SECONDS",
+    "WORKER_HEARTBEAT_TIMEOUT",
+    "PROGRESS_INTERVAL_SECONDS",
+    "CANCEL_POLL_SECONDS",
+    "INGEST_RETRY_BACKOFF_MAX_SECONDS",
+    "RECONCILE_AFTER_SECONDS",
+    "XLSX_MAX_CELLS",
+    "TEXT_PREVIEW_CHARS",
+    "PARSE_RATE_MAX",
+    "PARSE_RATE_WINDOW_SECONDS",
+    "INGEST_TASK_CONCURRENCY",
+    "INGEST_CHUNK_CONCURRENCY",
+    "INGEST_EMBED_CONCURRENCY",
+    "INGEST_STORAGE_CONCURRENCY",
+    "INGEST_KG_CONCURRENCY",
+    "PDF_RENDER_THREADS",
+    "INGEST_QUEUE_PREFIX",
+    "INGEST_CONSUMER_GROUP",
+)
+
+
+def test_phase4_variables_are_catalogued_and_passed_to_the_app() -> None:
+    values, secrets = parse_env(EXAMPLE)
+    assert set(PHASE4_VARIABLES) <= set(values), sorted(set(PHASE4_VARIABLES) - set(values))
+    assert not (set(PHASE4_VARIABLES) & secrets)
+    assert values["INGEST_MAX_ATTEMPTS"] == "3"
+    text = (ROOT / "docker" / "docker-compose.yml").read_text(encoding="utf-8")
+    for name in PHASE4_VARIABLES:
+        assert f"  {name}:" in text, f"{name} is not passed to the app service"
