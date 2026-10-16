@@ -140,3 +140,27 @@ services:
     networks:
       ragflow:
         aliases: [ragflow-app]
+
+  # Parsing worker: same image as app, no port, no name, so `--scale task-executor=N` needs no configuration (ING-04).
+  # Each replica registers its own consumer (te_<host>_<pid>_<rand>) in the shared group. Dev-only settings live in the dev file.
+  task-executor:
+    profiles: [cpu]
+    image: ${RAGFLOW_IMAGE:-devrag-app:local}
+    pull_policy: never
+    restart: unless-stopped
+    entrypoint: ["tini", "--", "/ragflow/docker/entrypoint_task_executor.sh"]
+    environment:
+      <<: *app-env
+      APP_UID: ${APP_UID:-1000}
+      APP_GID: ${APP_GID:-1000}
+    depends_on:
+      init:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD", "/ragflow/docker/healthcheck_task_executor.sh"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    networks:
+      - ragflow

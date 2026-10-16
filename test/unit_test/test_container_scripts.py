@@ -263,3 +263,50 @@ def test_init_env_generates_a_32_byte_urlsafe_base64_encryption_key_and_leaves_o
 
 def test_dockerfile_copies_the_rag_package() -> None:
     assert "COPY rag ./rag" in (ROOT / "Dockerfile").read_text().splitlines()
+
+
+# --- task executor container (04-13, DEPLOY-17, ING-16, ING-10) ---
+EXEC_ENTRY = ROOT / "docker" / "entrypoint_task_executor.sh"
+EXEC_HEALTH = ROOT / "docker" / "healthcheck_task_executor.sh"
+
+
+def test_dockerfile_copies_the_executor_scripts_on_the_docker_scripts_line() -> None:
+    line = next(x for x in (ROOT / "Dockerfile").read_text().splitlines() if x.startswith("COPY docker/entrypoint.sh"))
+    assert line == (
+        "COPY docker/entrypoint.sh docker/entrypoint_init.sh docker/healthcheck.sh docker/prepare_runtime.sh "
+        "docker/entrypoint_task_executor.sh docker/healthcheck_task_executor.sh /ragflow/docker/"
+    )
+
+
+@pytest.mark.parametrize("script", [EXEC_ENTRY, EXEC_HEALTH])
+def test_executor_scripts_are_valid_bash(script: Path) -> None:
+    result = subprocess.run(["bash", "-n", str(script)], capture_output=True, text=True, check=False)
+    assert result.returncode == 0, result.stderr
+
+
+def test_executor_entrypoint_renders_config_drops_privileges_and_execs_python() -> None:
+    text = EXEC_ENTRY.read_text()
+    assert "render_conf.py" in text
+    assert "setpriv" in text
+    last = [x for x in text.splitlines() if x.strip() and not x.startswith("#")][-1]
+    assert last.startswith("exec ")
+    assert last.endswith("python -m rag.svr.task_executor")
+
+
+def test_executor_healthcheck_runs_the_python_probe() -> None:
+    assert "exec python -m rag.svr.healthcheck" in EXEC_HEALTH.read_text()
+
+
+def _evaluate(rows: str) -> int:
+    script = WAIT.read_text()
+    start = script.index("evaluate() {")
+    end = script.index("\n}\n", start) + 3
+    code = script[start:end] + f'\nevaluate "$1"\n'
+    return subprocess.run(["bash", "-c", code, "x", rows], capture_output=True, text=True, check=False).returncode
+
+
+def test_wait_stack_evaluate_with_two_executors() -> None:
+    base = "init exited - 0\napp running healthy 0\n"
+    assert _evaluate(base + "task-executor running healthy 0\ntask-executor running healthy 0\n") == 0
+    assert _evaluate(base + "task-executor running healthy 0\ntask-executor running unhealthy 0\n") != 0
+    assert _evaluate(base + "task-executor restarting - 1\n") != 0

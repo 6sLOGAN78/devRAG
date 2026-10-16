@@ -41,6 +41,15 @@ services:
       LLM_ALLOW_PRIVATE_BASE_URLS: ${DEV_LLM_ALLOW_PRIVATE_BASE_URLS:-true}
     extra_hosts:
       - "host.docker.internal:host-gateway"
+  # Parsing worker: starting limit 768m (D-29), measured in plan 04-35. Same dev-only SSRF relaxation as app; never copy into docker-compose.yml.
+  task-executor:
+    profiles: [cpu]
+    image: ${RAGFLOW_IMAGE:-devrag-app:local}
+    mem_limit: 768m
+    environment:
+      LLM_ALLOW_PRIVATE_BASE_URLS: ${DEV_LLM_ALLOW_PRIVATE_BASE_URLS:-true}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
   # Dev-only mail catcher for the password-reset flow (D-05, D-20, R-95, R-96). It lives in this file only: production
   # compose and docker-compose-base.yml carry SMTP settings but no mail service. SMTP (1025) is reachable inside the
   # network as mailpit:1025; only the HTTP API is published, on loopback, for test read-back.

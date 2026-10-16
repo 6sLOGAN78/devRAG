@@ -46,7 +46,7 @@ COPY docker/nginx/nginx.conf /etc/nginx/nginx.conf
 COPY docker/nginx/proxy.conf /etc/nginx/proxy.conf
 COPY docker/nginx/ragflow.conf /etc/nginx/conf.d/ragflow.conf
 COPY docker/nginx/ragflow.https.conf /etc/nginx/ragflow.https.conf
-COPY docker/entrypoint.sh docker/entrypoint_init.sh docker/healthcheck.sh docker/prepare_runtime.sh /ragflow/docker/
+COPY docker/entrypoint.sh docker/entrypoint_init.sh docker/healthcheck.sh docker/prepare_runtime.sh docker/entrypoint_task_executor.sh docker/healthcheck_task_executor.sh /ragflow/docker/
 RUN chmod 0755 /ragflow/docker/*.sh /ragflow/bin/ragflow_server \
     && mkdir -p /ragflow/logs /ragflow/conf
 EXPOSE 80 443

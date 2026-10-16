@@ -36,7 +36,7 @@ services:
   redis:
     image: valkey/valkey:8
     command: >
-      sh -c 'exec valkey-server --requirepass "$$REDIS_PASSWORD" --maxmemory 128mb --maxmemory-policy allkeys-lru'
+      sh -c 'exec valkey-server --requirepass "$$REDIS_PASSWORD" --maxmemory 128mb --maxmemory-policy volatile-lru'
     environment:
       REDIS_PASSWORD: ${REDIS_PASSWORD:?REDIS_PASSWORD is unset; run scripts/init_env.sh}
     ports:

@@ -1,0 +1,12 @@
+# Crash-test timing for the task executor only (04-13). Applied as a third -f file by the tests that need short
+# timeouts; never part of `make up`. Values are strings because compose environment values are.
+services:
+  task-executor:
+    environment:
+      INGEST_BATCH_SIZE: "2"
+      TASK_LOCK_TTL_SECONDS: "8"
+      RECLAIM_IDLE_MS: "16000"
+      RECLAIM_INTERVAL_SECONDS: "3"
+      CANCEL_POLL_SECONDS: "1"
+      PROGRESS_INTERVAL_SECONDS: "1"
+      INGEST_RETRY_BACKOFF_MAX_SECONDS: "2"
