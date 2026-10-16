@@ -212,6 +212,14 @@ class SearchResult:
     aggregations: dict
 
 
+@dataclass(frozen=True)
+class StatsResult:
+    """Engine-neutral count and sum over the rows one condition matches inside a single dataset."""
+
+    count: int
+    total: float
+
+
 class DocStoreConnection(ABC):
     @abstractmethod
     def db_type(self) -> str: ...
@@ -259,6 +267,10 @@ class DocStoreConnection(ABC):
     @abstractmethod
     def delete(self, condition: dict, index_name: str, dataset_id: str) -> int:
         """Delete the matching rows of one dataset and return how many."""
+
+    @abstractmethod
+    def stats(self, condition: dict, index_name: str, dataset_id: str, sum_field: str | None = None) -> StatsResult:
+        """Count the matching rows of one dataset and sum ``sum_field`` over them (0.0 when no field is given)."""
 
     def sql(self, *args: Any, **kwargs: Any) -> Any:
         """Text-to-SQL arrives in a later phase."""

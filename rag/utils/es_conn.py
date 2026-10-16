@@ -32,6 +32,7 @@ from common.doc_store.doc_store_base import (
     NotSupported,
     OrderByExpr,
     SearchResult,
+    StatsResult,
     check_row_vectors,
     check_vector,
     require_condition,
@@ -55,6 +56,7 @@ AVAILABILITY_WAIT_SECONDS = 10
 FIELD_RE = CONDITION_KEY_RE
 MATCH_FIELD_RE = re.compile(r"[A-Za-z0-9_.]{1,64}(\^[0-9]+(\.[0-9]+)?)?")
 RANK_FEATURE_RE = re.compile(r"[A-Za-z0-9_.]{1,128}")
+SIMPLE_QUERY_FLAGS = "AND|OR|PHRASE|PREFIX"
 IMMUTABLE_FIELDS = ("id", "kb_id")
 UPDATE_SCRIPT = "for (entry in params.fields.entrySet()) { ctx._source[entry.getKey()] = entry.getValue(); }"
 
@@ -114,11 +116,18 @@ def _text_query(expr: MatchTextExpr, boost: float) -> dict[str, Any]:
         raise InvalidFilter("invalid text match fields")
     if not isinstance(expr.matching_text, str) or not expr.matching_text.strip():
         raise InvalidFilter("empty match text")
-    body: dict[str, Any] = {"fields": expr.fields, "query": expr.matching_text, "type": "best_fields", "default_operator": "OR", "lenient": True, "boost": boost}
+    body: dict[str, Any] = {
+        "fields": expr.fields,
+        "query": expr.matching_text,
+        "default_operator": "or",
+        "flags": SIMPLE_QUERY_FLAGS,
+        "lenient": True,
+        "boost": boost,
+    }
     minimum = (expr.extra_options or {}).get("minimum_should_match")
     if minimum is not None:
         body["minimum_should_match"] = minimum
-    return {"query_string": body}
+    return {"simple_query_string": body}
 
 
 def _knn(expr: MatchDenseExpr, boost: float, filters: list[dict[str, Any]]) -> dict[str, Any]:
@@ -223,9 +232,14 @@ class ESConnection(DocStoreConnection):
         if not prepared:
             return []
         check_row_vectors(prepared)
+        vector_fields = sorted({key for item in prepared for key in item if VECTOR_FIELD_RE.fullmatch(key)})
         with _guard("insert"):
             if not self._client.indices.exists(index=index).body:
                 raise DocStoreError("document store insert failed: index does not exist")
+            for field in vector_fields:
+                mapped = self._field_mapping(index, field)
+                if mapped is None or mapped.get("type") != "dense_vector":
+                    raise DocStoreError("document store insert failed: vector field is not provisioned")
             actions = ({"_op_type": "index", "_index": index, "_id": row["id"], "_source": row} for row in prepared)
             _, errors = helpers.bulk(self._client, actions, raise_on_error=False, stats_only=False)
             self._client.indices.refresh(index=index)
@@ -264,6 +278,22 @@ class ESConnection(DocStoreConnection):
         with _guard("update"):
             body = self._client.update_by_query(index=index, query=query, script=script, refresh=True, conflicts="proceed").body
         return not body.get("failures")
+
+    def stats(self, condition: dict, index_name: str, dataset_id: str, sum_field: str | None = None) -> StatsResult:
+        index = validate_single_index(index_name)
+        require_dataset_id(dataset_id)
+        require_condition(condition)
+        if sum_field is not None and (not isinstance(sum_field, str) or FIELD_RE.fullmatch(sum_field) is None):
+            raise InvalidFilter("invalid field name")
+        query = {"bool": {"filter": _filter_clauses(condition, [dataset_id])}}
+        aggs = {"total": {"sum": {"field": sum_field}}} if sum_field else None
+        with _guard("stats"):
+            try:
+                body = self._client.search(index=index, query=query, size=0, track_total_hits=True, aggs=aggs).body if aggs else self._client.search(index=index, query=query, size=0, track_total_hits=True).body
+            except NotFoundError:
+                return StatsResult(count=0, total=0.0)
+        total = float((body.get("aggregations", {}).get("total", {}) or {}).get("value") or 0.0)
+        return StatsResult(count=int(body["hits"]["total"]["value"]), total=total)
 
     def delete(self, condition: dict, index_name: str, dataset_id: str) -> int:
         index = validate_single_index(index_name)
@@ -337,8 +367,10 @@ class ESConnection(DocStoreConnection):
         if select_fields:
             body["_source"] = list(select_fields)
         if highlight_fields:
-            body["highlight"] = {"fields": {name: {} for name in highlight_fields}, "pre_tags": ["<em>"], "post_tags": ["</em>"]}
+            body["highlight"] = {"fields": {name: {} for name in highlight_fields}, "pre_tags": ["<em>"], "post_tags": ["</em>"], "encoder": "html"}
         if order_by is not None and order_by.fields:
+            if not all(isinstance(name, str) and FIELD_RE.fullmatch(name) for name, _ in order_by.fields):
+                raise InvalidFilter("invalid field name")
             body["sort"] = [{field: {"order": "desc" if direction else "asc", "unmapped_type": "long"}} for field, direction in order_by.fields]
         if agg_fields:
             body["aggs"] = {name: {"terms": {"field": name, "size": 100}} for name in agg_fields}

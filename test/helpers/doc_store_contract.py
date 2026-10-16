@@ -22,6 +22,7 @@ from common.doc_store.doc_store_base import (
     MatchTextExpr,
     OrderByExpr,
     SearchResult,
+    StatsResult,
     ZeroVectorError,
 )
 
@@ -46,10 +47,10 @@ def row(chunk_id: str, doc_id: str, text: str, axis: int, position: int = 0) -> 
     }
 
 
-def search(store, index, dataset_ids, *, condition=None, matches=None, order_by=None, offset=0, limit=20, select=None):
+def search(store, index, dataset_ids, *, condition=None, matches=None, order_by=None, offset=0, limit=20, select=None, highlight=None):
     return store.search(
         select_fields=select or [],
-        highlight_fields=[],
+        highlight_fields=highlight or [],
         condition=condition or {},
         match_expressions=matches or [],
         order_by=order_by,
@@ -315,3 +316,87 @@ class DocStoreContract:
         assert "127.0.0.1" not in str(err.value) and "http" not in str(err.value).lower()
         assert store.index_exist(tenant_index) is False
 
+
+    # --- stats, query hardening, mapping check (plan 04-04) --------------------------------------------------------
+    def test_stats_counts_and_sums_one_dataset_only(self, store, tenant_index, dataset_ids):
+        a, b = dataset_ids
+        store.create_idx(tenant_index, a, DIM)
+        rows = [{**row(f"a{i}", "d1", "x", i), "token_num_int": 10 * (i + 1)} for i in range(3)]
+        store.insert(rows, tenant_index, a)
+        store.insert([{**row("b1", "d1", "x", 3), "token_num_int": 1000}], tenant_index, b)
+        counted = store.stats({"doc_id": "d1"}, tenant_index, a)
+        assert counted == StatsResult(count=3, total=0.0)
+        summed = store.stats({"doc_id": "d1"}, tenant_index, a, sum_field="token_num_int")
+        assert summed.count == 3 and summed.total == 60.0
+        assert store.stats({"doc_id": "nope"}, tenant_index, a, sum_field="token_num_int") == StatsResult(count=0, total=0.0)
+
+    def test_stats_refuses_an_empty_condition_and_bad_field_names(self, store, tenant_index, dataset_ids):
+        ds = dataset_ids[0]
+        store.create_idx(tenant_index, ds, DIM)
+        with pytest.raises(InvalidFilter):
+            store.stats({}, tenant_index, ds)
+        with pytest.raises(InvalidFilter):
+            store.stats({"doc id": "d1"}, tenant_index, ds)
+        with pytest.raises(InvalidFilter):
+            store.stats({"doc_id": "d1"}, tenant_index, ds, sum_field="a b")
+
+    @pytest.mark.parametrize("keyword", ["what is (revenue", "AND", "foo:", '"unclosed', "*a*b*c*", "a OR", "[x TO"])
+    def test_punctuation_in_a_keyword_never_raises(self, store, tenant_index, dataset_ids, keyword):
+        ds = dataset_ids[0]
+        store.create_idx(tenant_index, ds, DIM)
+        store.insert([row("c1", "d1", "revenue grew", 0)], tenant_index, ds)
+        result = search(store, tenant_index, [ds], matches=[MatchTextExpr(["content_ltks"], keyword, 10)])
+        assert isinstance(result, SearchResult)
+
+    def test_a_leading_wildcard_produces_no_match(self, store, tenant_index, dataset_ids):
+        ds = dataset_ids[0]
+        store.create_idx(tenant_index, ds, DIM)
+        store.insert([row("c1", "d1", "abcde", 0)], tenant_index, ds)
+        result = search(store, tenant_index, [ds], matches=[MatchTextExpr(["content_ltks"], "*bcd*", 10)])
+        assert result.total == 0
+
+    def test_insert_refuses_an_unprovisioned_vector_dimension(self, store, tenant_index, dataset_ids):
+        ds = dataset_ids[0]
+        store.create_idx(tenant_index, ds, DIM)
+        bad = row("c1", "d1", "alpha", 0)
+        bad["q_16_vec"] = [0.5] * 16
+        with pytest.raises(DocStoreError):
+            store.insert([bad], tenant_index, ds)
+        assert search(store, tenant_index, [ds]).total == 0
+        assert store.insert([row("c2", "d1", "beta", 1)], tenant_index, ds) == []
+
+    def test_highlights_are_html_encoded(self, store, tenant_index, dataset_ids):
+        ds = dataset_ids[0]
+        store.create_idx(tenant_index, ds, DIM)
+        store.insert([row("c1", "d1", "<script>x</script> revenue", 0)], tenant_index, ds)
+        result = search(store, tenant_index, [ds], matches=[MatchTextExpr(["content_ltks"], "revenue", 10)], highlight=["content_ltks"])
+        text = " ".join(result.hits[0]["_highlight"]["content_ltks"])
+        assert "<script>" not in text and "&lt;script&gt;" in text and "<em>revenue</em>" in text
+
+    @pytest.mark.parametrize("bad", ["position int", "a[0]", "x;y", ""])
+    def test_order_by_field_names_are_validated(self, store, tenant_index, dataset_ids, bad):
+        ds = dataset_ids[0]
+        store.create_idx(tenant_index, ds, DIM)
+        with pytest.raises(InvalidFilter):
+            search(store, tenant_index, [ds], order_by=OrderByExpr().asc(bad))
+
+    def test_nested_position_array_is_stored_and_read_back(self, store, tenant_index, dataset_ids):
+        ds = dataset_ids[0]
+        store.create_idx(tenant_index, ds, DIM)
+        nested = [[1, 10, 20, 30, 40], [2, 5, 6, 7, 8]]
+        chunk = row("c1", "d1", "alpha", 0)
+        chunk["position_int"] = nested
+        assert store.insert([chunk], tenant_index, ds) == []
+        assert store.get("c1", tenant_index, [ds])["position_int"] == nested
+
+    def test_mixed_doc_and_task_conditions_scope_delete_and_update(self, store, tenant_index, dataset_ids):
+        ds = dataset_ids[0]
+        store.create_idx(tenant_index, ds, DIM)
+        rows = [{**row("c1", "d1", "x", 0), "task_id": "t1"}, {**row("c2", "d1", "x", 1), "task_id": "t2"}]
+        store.insert(rows, tenant_index, ds)
+        assert store.delete({"doc_id": ["d1"], "task_id": ["t1"]}, tenant_index, ds) == 1
+        assert store.get("c1", tenant_index, [ds]) is None and store.get("c2", tenant_index, [ds]) is not None
+        store.insert([{**row("c3", "d1", "x", 2), "task_id": "t3"}], tenant_index, ds)
+        assert store.update({"doc_id": ["d1"]}, {"doc_enabled_int": 0}, tenant_index, ds) is True
+        assert store.get("c2", tenant_index, [ds])["doc_enabled_int"] == 0
+        assert store.get("c3", tenant_index, [ds])["doc_enabled_int"] == 0

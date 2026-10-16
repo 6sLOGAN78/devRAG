@@ -123,7 +123,7 @@ def test_order_by_chains_and_lists_fields():
 def test_the_port_is_abstract_and_sql_is_not_supported_by_default():
     with pytest.raises(TypeError):
         port.DocStoreConnection()  # type: ignore[abstract]
-    names = {"db_type", "health", "create_idx", "delete_idx", "index_exist", "search", "get", "insert", "update", "delete"}
+    names = {"db_type", "health", "create_idx", "delete_idx", "index_exist", "search", "get", "insert", "update", "delete", "stats"}
     assert names <= port.DocStoreConnection.__abstractmethods__
 
     class Minimal(port.DocStoreConnection):
@@ -156,6 +156,9 @@ def test_the_port_is_abstract_and_sql_is_not_supported_by_default():
 
         def delete(self, *a, **k):
             return 0
+
+        def stats(self, *a, **k):
+            return port.StatsResult(0, 0.0)
 
     with pytest.raises(port.NotSupported):
         Minimal().sql("select 1")
