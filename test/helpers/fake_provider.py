@@ -56,6 +56,7 @@ class FakeProvider:
     requests: list[Recorded] = field(default_factory=list)
     embedding_dim: int = 8
     shuffle_embeddings: bool = False
+    delay_ms: int = 0  # embedding endpoints answer after this many milliseconds (plan 04-11: slows a call so a cancel can land mid-request)
     _counters: dict[str, int] = field(default_factory=dict)
     _loop: asyncio.AbstractEventLoop | None = None
     _release: asyncio.Event | None = None
@@ -268,6 +269,11 @@ def build_app(state: FakeProvider) -> Quart:
     async def embeddings() -> Response:
         body = await request.get_json(force=True, silent=True) or {}
         model = str(body.get("model", ""))
+        if state.delay_ms:
+            await asyncio.sleep(state.delay_ms / 1000)
+        if model == "fake-timeout":
+            assert state._release is not None
+            await state._release.wait()
         failure = _scripted_failure(state, model)
         if model == "fake-redirect":
             return _redirect()
