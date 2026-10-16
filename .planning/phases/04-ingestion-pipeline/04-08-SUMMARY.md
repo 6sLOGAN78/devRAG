@@ -58,3 +58,8 @@ None. Mitigations T-04-08-01..05 applied: 1,000,000 page cap, per-range opening,
 
 ## Self-Check: PASSED
 - Files exist; commits 1b6695c and 372d01b present.
+
+
+## Security hardening (post-review)
+
+PDF findings 1 and 2: render scale clamped (40 MP, 12000 px per side, 14400 pt page refusal), thumbnail scale from target width, `ParseLimits.max_pages` (20000) and `max_text_bytes` honoured, document opened once per range. Commits 6a6eaf1 (tests) and 96d0c91 (fix). Decision R-168.

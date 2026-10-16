@@ -58,3 +58,8 @@ None. T-04-09-01 to -04 mitigated and tested (ratio bomb at 3 MiB, `file:///` en
 
 ## Self-Check: PASSED
 - All created files exist; commits 0db7116, 3b79e84, 87cac4c, cfc9e7a present.
+
+
+## Security hardening (post-review)
+
+OOXML findings 3 to 5: every XML-looking member scanned whole in overlapping 1 MiB windows regardless of extension, UTF-16/32 and non-UTF-8 declared encodings rejected. Commits 6a6eaf1 (tests) and 96d0c91 (fix). Decision R-168.
