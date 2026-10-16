@@ -33,6 +33,7 @@ from rag.utils.storage_factory import get_storage
 
 SERVICE_NAME = "task_executor"
 logger = logging.getLogger(SERVICE_NAME)
+QUIET_LOGGERS = ("elastic_transport", "urllib3", "httpx", "httpcore")
 
 
 class BootError(Exception):
@@ -69,6 +70,8 @@ def main() -> int:
         logger.error("configuration error: %s", exc)
         return 1
     init_root_logger(SERVICE_NAME, None, settings.logging.level)
+    for noisy in QUIET_LOGGERS:  # transport debug logs can carry request headers
+        logging.getLogger(noisy).setLevel(logging.WARNING)
     try:
         verify_database(settings)
         executor, daemon, daemon_stop = build_executor(settings)
