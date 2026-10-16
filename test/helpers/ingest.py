@@ -71,6 +71,7 @@ class World:
     owner: Account
     dataset: kb.DatasetRecord
     fake: FakeProvider
+    api_key: str = ""
 
     @property
     def index(self) -> str:
@@ -114,14 +115,15 @@ def make_pipeline_world(registry: AccountRegistry, fake: FakeProvider, *, embedd
     real, renamed = world_settings()
     fake.embedding_dim = DIMENSION
     owner = registry.register(prefix="pipe")
+    api_key = "-".join(("sk", "fake", uuid.uuid4().hex[:24]))
     structure.save_instance(
-        real.llm, owner.tenant_id, COMPAT, "default", api_key="-".join(("sk", "fake", uuid.uuid4().hex[:24])), api_base=fake.base_url, api_version=None,
+        real.llm, owner.tenant_id, COMPAT, "default", api_key=api_key, api_base=fake.base_url, api_version=None,
         models=list(EMBED_MODELS), replace_key=True,
     )
     structure.set_defaults(owner.tenant_id, embedding=ModelRef(embedding_model, "default", COMPAT))
     scope = ActingScope(tenant_id=owner.tenant_id, role="owner", subject="owner")
     dataset = kb.create_dataset(real, scope, owner.user_id, kb.CreateRequest(name=f"pipe-{uuid.uuid4().hex[:8]}"))
-    return World(real, renamed, owner, dataset, fake)
+    return World(real, renamed, owner, dataset, fake, api_key)
 
 
 def add_document(world: World, name: str, data: bytes, parser_config: dict[str, Any] | None = None) -> str:
