@@ -71,7 +71,7 @@ def test_build_row_has_the_documented_fields():
     assert row["content_ltks"] == " ".join(tokenize(text))
     assert row["docnm_kwd"] == "report.pdf" and row["content_with_weight"] == text
     assert row["q_2_vec"] == [1.0, 0.0] and row["task_id"] == "t" * 32
-    expected = {
+    expected = (
         "id doc_id kb_id docnm_kwd content_with_weight content_ltks content_sm_ltks title_tks title_sm_tks position_int page_num_int top_int "
         "available_int q_2_vec create_time create_timestamp_flt order_int task_id origin_kwd token_num_int doc_enabled_int page_dims_flt"
     ).split()

@@ -12,12 +12,9 @@ from valkey.exceptions import LockError, LockNotOwnedError, ValkeyError
 from valkey.lock import Lock
 
 from rag.queue.queue_base import QueueUnavailable
+from rag.svr.control import LockLost  # defined with the other task control signals; re-exported here
 
 UNAVAILABLE = "task queue unavailable"
-
-
-class LockLost(Exception):
-    """The lock is no longer held by this owner (expired or taken over)."""
 
 
 class LockNotAcquired(Exception):
