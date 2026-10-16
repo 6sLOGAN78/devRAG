@@ -1,0 +1,17 @@
+"""The chunker contract (D-17): every chunker yields ``Chunk``."""
+
+from __future__ import annotations
+
+from collections.abc import Mapping
+from dataclasses import dataclass
+
+from rag.parsers.types import PageBox
+
+
+@dataclass(frozen=True)
+class Chunk:
+    text: str
+    positions: tuple[PageBox, ...]
+    page_sizes: Mapping[int, tuple[float, float]]
+    token_num: int
+    index: int

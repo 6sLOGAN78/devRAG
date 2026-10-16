@@ -76,6 +76,11 @@ def _encoding() -> Any:
     return tiktoken.get_encoding("cl100k_base")
 
 
+def cl100k_encoding() -> Any:
+    """The shared cl100k_base encoding (vendored ranks, no download); public so other packages count tokens the same way."""
+    return _encoding()
+
+
 def truncate_to_tokens(text: str, limit: int, model: str) -> str:
     """Cut ``text`` to at most ``limit`` cl100k_base tokens. ``model`` is kept for a later per-model tokenizer."""
     del model
