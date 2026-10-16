@@ -240,3 +240,75 @@ def log_state(doc_id: str) -> dict[str, Any]:
 def task_state(task_id: str) -> dict[str, Any]:
     progress, retry, msg = sql("SELECT `progress`, `retry_count`, `progress_msg` FROM `task` WHERE `id` = %s", (task_id,))[0]
     return {"progress": float(progress), "retry_count": int(retry), "progress_msg": msg or ""}
+
+
+# ----------------------------------------------------------------------------- stack-side helpers (plan 04-14)
+# These drive the running stack through Nginx (upload, parse, list) and read the index and the task table from the host.
+# The ``api`` argument is the ``api(ingress, method, path, token, body=..., params=...)`` callable of test_provider_flow.
+
+_DATASETS = "/api/v1/datasets"
+
+
+def upload_text(
+    ingress: Any, who: Any, dataset_id: str, data: bytes, name: str | None = None, *, params: dict[str, str] | None = None, mime: str = "text/plain"
+) -> dict[str, Any]:
+    """Upload one text file through the real route and return its document view."""
+    ingress.cookies.clear()
+    file_name = name or f"doc-{uuid.uuid4().hex[:8]}.txt"
+    resp = ingress.post(
+        "/api/v1/documents/upload",
+        headers={"Authorization": f"Bearer {who.token}"},
+        params={"dataset_id": dataset_id, **(params or {})},
+        files=[("file", (file_name, data, mime))],
+        timeout=60.0,
+    )
+    assert resp.status_code == 200 and resp.json()["code"] == 0, resp.text
+    return resp.json()["data"][0]
+
+
+def start_parse(ingress: Any, who: Any, dataset_id: str, doc_ids: Any, run: str = "1", confirm: bool = False) -> Any:
+    """The raw parse (or, with ``run="2"``, cancel) response."""
+    ingress.cookies.clear()
+    body: dict[str, Any] = {"doc_ids": doc_ids, "run": run}
+    if confirm:
+        body["confirm_replace"] = True
+    return ingress.post(f"{_DATASETS}/{dataset_id}/documents/parse", headers={"Authorization": f"Bearer {who.token}"}, json=body, timeout=60.0)
+
+
+def doc_row(ingress: Any, who: Any, dataset_id: str, doc_id: str) -> dict[str, Any]:
+    ingress.cookies.clear()
+    resp = ingress.get(f"{_DATASETS}/{dataset_id}/documents", headers={"Authorization": f"Bearer {who.token}"}, params={"page_size": "100"}, timeout=30.0)
+    assert resp.status_code == 200, resp.text
+    for item in resp.json()["data"]["items"]:
+        if item["id"] == doc_id:
+            return item
+    raise AssertionError(f"document {doc_id} not listed")
+
+
+def dataset_row(ingress: Any, who: Any, dataset_id: str) -> dict[str, Any]:
+    ingress.cookies.clear()
+    resp = ingress.get(f"{_DATASETS}/{dataset_id}", headers={"Authorization": f"Bearer {who.token}"}, timeout=30.0)
+    assert resp.status_code == 200, resp.text
+    return resp.json()["data"]
+
+
+def index_count(settings: Settings, tenant_id: str, dataset_id: str, doc_id: str) -> int:
+    """Chunks of one document in Elasticsearch, read from the host."""
+    return int(get_doc_store(settings).stats({"doc_id": [doc_id]}, index_name(tenant_id), dataset_id).count)
+
+
+def task_rows(doc_id: str) -> list[str]:
+    """Ids of the task rows of a document (host-side MySQL read)."""
+    return [str(r[0]) for r in sql("SELECT `id` FROM `task` WHERE `doc_id` = %s", (doc_id,))]
+
+
+def wait_run(ingress: Any, who: Any, dataset_id: str, doc_id: str, run: str, timeout: float = 120.0) -> dict[str, Any]:
+    """Poll the document list until ``run`` is reached; returns the row."""
+    from test.helpers.wait import wait_until
+
+    return wait_until(
+        lambda: (lambda row: row if row["run"] == run else None)(doc_row(ingress, who, dataset_id, doc_id)),
+        timeout=timeout,
+        interval=1.0,
+        describe=lambda: f"document {doc_id} never reached run {run}",
+    )
