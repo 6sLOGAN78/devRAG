@@ -4,13 +4,13 @@ milestone: v1.0
 milestone_name: milestone
 status: executing
 stopped_at: Phase 4 context gathered
-last_updated: "2026-10-16T20:15:11.616Z"
+last_updated: "2026-10-16T20:19:46.338Z"
 last_activity: 2026-10-16
 progress:
   total_phases: 8
   completed_phases: 3
   total_plans: 118
-  completed_plans: 84
+  completed_plans: 85
   percent: 38
 ---
 
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-10-05)
 ## Current Position
 
 Phase: 4 (ingestion-pipeline) — EXECUTING
-Plan: 2 of 35
+Plan: 3 of 35
 Status: Ready to execute
 Last activity: 2026-10-16
 
-Progress: [███████░░░] 71%
+Progress: [███████░░░] 72%
 
 ## Performance Metrics
 
@@ -88,6 +88,7 @@ Progress: [███████░░░] 71%
 | Phase 03 P31 | ~1h | 3 tasks | 20 files |
 | Phase 03 P28 | resumed after interruption | 2 tasks | 5 files |
 | Phase 03 P29 | ~5h (4 gate attempts) | 2 tasks | 9 files |
+| Phase 04 P03 | 15min | 2 tasks | 10 files |
 
 ## Accumulated Context
 
@@ -149,6 +150,7 @@ Recent decisions affecting current work:
 - [Phase 03]: 03-31: the dataset workspace page binds the workspace by ref (boundTenantRef is written before the store switch; the leave-for-/datasets effect reads the store and compares it with the ref, so a deep link into a joined workspace stays and only a user switch navigates); a deep-link switch goes through the store's bindActive/bound flag so the header selector announces it; the sidebar marks Datasets on /dataset/ paths through Link plus isNavActive (NavLink cannot); document-table copy is under datasets.files.* (documents.* collides with the copy scan); UI-11 and UI-12 complete
 - [Phase 03]: 03-26: the browser tiers never see the real provider key (Node fake provider for vitest, Python fake_provider_stack for Chrome; 0 real provider calls); real-Chrome presses are real mouse events that wait for document.getAnimations() to settle and run in a 1280x900 metrics override (headless default viewport put dialog buttons off-screen); the throttled 12 MiB upload (1 MiB/s, >10 s) proves the upload call's timeout 0; the window drop guard could not be confirmed in headless Chrome (an unguarded page does not navigate on a CDP drop) and stays jsdom-only; SECRET_BULLETS renamed MASK_BULLETS so the secrets gate stays 7/7
 - [Phase 03]: 03-29: the phase exit gate (`scripts/clean_room.sh --runs 3`, port 8088, key present, `live-model` included) passed three consecutive runs on attempt 4 (746, 782, 762 s); the Go cross-tenant matrix covers owner-go rows only (R-153, Python matrix is the superset); tamper tests flip a fully significant base64 character; a provider ERROR_TIMEOUT on the first gate attempt was transient and nothing was loosened
+- [Phase 04]: Phase 4 Plan 03: too_many_chunks is a terminal failure code (R-155)
 
 ### Pending Todos
 
@@ -184,6 +186,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-10-16T20:15:11.601Z
+Last session: 2026-10-16T20:19:42.319Z
 Stopped at: Phase 4 context gathered
 Resume file: None
