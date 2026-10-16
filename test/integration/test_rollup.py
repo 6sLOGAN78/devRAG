@@ -125,7 +125,7 @@ def test_merged_message_keeps_at_most_3000_lines(world):
 def test_every_task_done_with_chunks_finishes_the_document(world):
     doc, (a, b) = running_doc(world, tasks=2)
     set_task(a, 1.0, f"10:00:01  done\n10:00:01  {PAGES}\n10:00:01  {SKIPPED}", retry_count=1)
-    set_task(b, 1.0, f"10:00:02  done\n10:00:02  [pages] total=1 without_text=0\n10:00:02  [skipped] images=0", retry_count=2)
+    set_task(b, 1.0, "10:00:02  done\n10:00:02  [pages] total=1 without_text=0\n10:00:02  [skipped] images=0", retry_count=2)
     put_chunks(world, doc, 5)
     stats = roll(world, doc)
     assert stats.finished == 1

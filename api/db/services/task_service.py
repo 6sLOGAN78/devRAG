@@ -234,3 +234,35 @@ def task_is_current(task_id: str) -> bool:
 def tasks_of(doc_id: str) -> list[Task]:
     with DB.connection_context():
         return list(Task.select().where(Task.doc_id == doc_id).order_by(Task.from_page))
+
+
+def watch_state(task_id: str) -> tuple[bool, str | None]:
+    """``(task exists, document run)``; the run is None when the document is gone."""
+    with DB.connection_context():
+        task = Task.select(Task.doc_id).where(Task.id == task_id).first()
+        if task is None:
+            return False, None
+        doc = Document.select(Document.run).where(Document.id == task.doc_id).first()
+    return True, (doc.run or "0") if doc is not None else None
+
+
+def unfinished_tasks_for_reconcile(older_than_ms: int, limit: int) -> list[tuple[str, str]]:
+    """``(task_id, digest)`` of unfinished tasks of running documents whose row has not changed for ``older_than_ms``.
+
+    Tasks with every attempt used are included on purpose: their next delivery fails them as ``worker_lost``.
+    """
+    cutoff = current_timestamp_ms() - older_than_ms
+    with DB.connection_context():
+        rows = (
+            Task.select(Task.id, Task.digest)
+            .join(Document, on=(Task.doc_id == Document.id))
+            .where((Document.run == "1") & (Task.progress >= 0) & (Task.progress < 1) & ((Task.update_time.is_null()) | (Task.update_time < cutoff)))
+            .order_by(Task.update_time)
+            .limit(limit)
+        )
+        return [(r.id, r.digest or "") for r in rows]
+
+
+def touch_task(task_id: str) -> None:
+    with DB.connection_context():
+        Task.update(**_stamp()).where(Task.id == task_id).execute()

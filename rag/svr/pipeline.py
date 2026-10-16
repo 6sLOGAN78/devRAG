@@ -221,4 +221,7 @@ def run_pipeline(ctx: TaskContext, control: TaskControl, deps: PipelineDeps) -> 
         task_service.set_progress(ctx.task_id, PARSED_PROGRESS, f"{report.pages_without_text} of {pages_total} pages in this range had no readable text.")
     ids = _index_batches(ctx, deps, control, chunks, dimension, index) if chunks else []
     deps.embedder.forget(ctx.task_id)
+    # Single machine lines the roll-up reads back (the latest of each wins when a task is retried).
+    task_service.set_progress(ctx.task_id, 1.0, f"[pages] total={pages_total} without_text={report.pages_without_text}")
+    task_service.set_progress(ctx.task_id, 1.0, f"[skipped] images={report.images_skipped}")
     return PipelineResult(tuple(ids), len(ids), pages_total, report.pages_without_text, report.images_skipped)

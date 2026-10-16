@@ -1,6 +1,7 @@
 """Cancellation and lock-loss signals for one running task (ING-12, D-06).
 
-``TaskControl`` carries two events set by the executor: ``cancel`` (the user cancelled) and ``lost`` (the task lock was lost). The pipeline
+``TaskControl`` carries three events set by the executor: ``cancel`` (the user cancelled), ``lost`` (the task lock was lost) and ``shutdown``
+(the worker is stopping). The pipeline
 calls :meth:`TaskControl.check` between steps and uses :func:`wait_for` around blocking calls so a cancel is noticed without waiting for the call.
 """
 
@@ -19,6 +20,10 @@ class TaskCancelled(Exception):
     """The task was cancelled, replaced or deleted; stop without marking failure."""
 
 
+class ShutdownRequested(TaskCancelled):
+    """The worker was asked to stop; the task is handed on rather than cancelled."""
+
+
 class LockLost(Exception):
     """The lock is no longer held by this owner (expired or taken over)."""
 
@@ -27,10 +32,16 @@ class TaskControl:
     def __init__(self) -> None:
         self.cancel = threading.Event()
         self.lost = threading.Event()
+        self.shutdown = threading.Event()
+
+    def stopped(self) -> bool:
+        return self.lost.is_set() or self.shutdown.is_set() or self.cancel.is_set()
 
     def check(self) -> None:
         if self.lost.is_set():
             raise LockLost("task lock lost")
+        if self.shutdown.is_set():
+            raise ShutdownRequested("worker is shutting down")
         if self.cancel.is_set():
             raise TaskCancelled("task cancelled")
 
@@ -41,6 +52,6 @@ def wait_for(future: Future[T], control: TaskControl) -> T:
         done, _ = futures_wait([future], timeout=POLL_SECONDS)
         if done:
             return future.result()
-        if control.lost.is_set() or control.cancel.is_set():
+        if control.stopped():
             future.cancel()
             control.check()
