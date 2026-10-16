@@ -76,7 +76,7 @@ Requirements for initial release. Each maps to exactly one roadmap phase.
 - [ ] **KB-16**: User can check embedding-model compatibility for a dataset via `POST /datasets/<dataset_id>/embedding/check`
 - [ ] **KB-17**: User can delete a derived index of a dataset by type via `DELETE /datasets/<dataset_id>/<index_type>` and trace it via `GET /datasets/<dataset_id>/artifacts/alteration`
 - [ ] **KB-18**: User can run a retrieval test against a dataset with similarity threshold and vector/keyword weight controls
-- [ ] **KB-19**: Dataset document counts and token/chunk totals are maintained
+- [x] **KB-19**: Dataset document counts and token/chunk totals are maintained
 
 ### DOC — Document upload, lifecycle, management
 
@@ -165,9 +165,9 @@ Requirements for initial release. Each maps to exactly one roadmap phase.
 - [ ] **CHUNK-13**: `tag`: extracts tag features and tag weights
 - [ ] **CHUNK-14**: `one`: whole document as a single chunk
 - [ ] **CHUNK-15**: `audio`: ASR transcript segmented into timestamped chunks
-- [ ] **CHUNK-16**: Every chunk carries content, page number, position `[page, x0, top, x1, bottom]`, and image ids
+- [x] **CHUNK-16**: Every chunk carries content, page number, position `[page, x0, top, x1, bottom]`, and image ids
 - [ ] **CHUNK-17**: Text preprocessing: full-to-half-width, traditional-to-simplified Chinese, URL/email stripping, tokenize, fine-grained tokenize, token positions — *partly delivered in Phase 4 (R-160, D-27): full-to-half-width, URL/email stripping, tokenize and token positions through the in-repo stdlib tokenizer; traditional-to-simplified conversion and the dictionary fine-grained tokenizer move to Phase 6*
-- [ ] **CHUNK-18**: User can list a document's chunks with text, bounding boxes, status, paging, keyword filter via `GET .../documents/<doc_id>/chunks`
+- [x] **CHUNK-18**: User can list a document's chunks with text, bounding boxes, status, paging, keyword filter via `GET .../documents/<doc_id>/chunks`
 - [ ] **CHUNK-19**: User can create a manual chunk via `POST .../documents/<doc_id>/chunks`
 - [ ] **CHUNK-20**: User can edit a chunk's text
 - [ ] **CHUNK-21**: User can enable/disable individual chunks
@@ -211,11 +211,11 @@ Requirements for initial release. Each maps to exactly one roadmap phase.
 - [x] **IDX-04**: Vector field is named `q_{dim}_vec`, allowing multiple embedding dimensions in one index
 - [x] **IDX-05**: Unified `DocStoreConnection` interface (create/drop index, insert, update, delete, search with text + dense + fusion expressions)
 - [x] **IDX-06**: Index schema: `id`, `doc_id`, `kb_id`, `content_ltks`, `title_tks`, `important_kwd`, `question_tks`, `position_int`, `q_{dim}_vec`, `available_int` (plus `title_sm_tks`, `important_tks`, `content_sm_ltks` from query fields)
-- [ ] **IDX-07**: Chunks are bulk-upserted in batches of 64 with deterministic id `doc_id + "_" + order`
+- [x] **IDX-07**: Chunks are bulk-upserted in batches of 64 with deterministic id `doc_id + "_" + order`
 - [x] **IDX-08**: Vector index is HNSW with cosine metric, `m=16`, `ef_construction=200`
 - [x] **IDX-09**: Elasticsearch 8 adapter
 - [ ] **IDX-10**: Infinity adapter
-- [ ] **IDX-14**: Document and dataset deletion remove their chunks from the index
+- [x] **IDX-14**: Document and dataset deletion remove their chunks from the index
 - [ ] **IDX-15**: Go docstore drivers (Elasticsearch, Infinity, OceanBase) *(Python implementation in v1; Go mirror deferred to v2)*
 
 ### RETR — Retrieval, filters, reranking
@@ -740,7 +740,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | KB-16 | Phase 4 | Pending |
 | KB-17 | Phase 6 | Pending |
 | KB-18 | Phase 5 | Pending |
-| KB-19 | Phase 4 | Pending |
+| KB-19 | Phase 4 | Complete |
 | DOC-01 | Phase 3 | Complete |
 | DOC-02 | Phase 3 | Complete |
 | DOC-03 | Phase 3 | Complete |
@@ -817,9 +817,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | CHUNK-13 | Phase 6 | Pending |
 | CHUNK-14 | Phase 6 | Pending |
 | CHUNK-15 | Phase 6 | Pending |
-| CHUNK-16 | Phase 4 | Pending |
+| CHUNK-16 | Phase 4 | Complete |
 | CHUNK-17 | Phase 4 | Partial (Phase 4 part; rest in Phase 6, D-27) |
-| CHUNK-18 | Phase 4 | Pending |
+| CHUNK-18 | Phase 4 | Complete |
 | CHUNK-19 | Phase 4 | Pending |
 | CHUNK-20 | Phase 4 | Pending |
 | CHUNK-21 | Phase 4 | Pending |
@@ -857,11 +857,11 @@ Which phases cover which requirements. Updated during roadmap creation.
 | IDX-04 | Phase 3 | Complete |
 | IDX-05 | Phase 3 | Complete |
 | IDX-06 | Phase 3 | Complete |
-| IDX-07 | Phase 4 | Pending |
+| IDX-07 | Phase 4 | Complete |
 | IDX-08 | Phase 3 | Complete |
 | IDX-09 | Phase 3 | Complete |
 | IDX-10 | Phase 8 | Pending |
-| IDX-14 | Phase 4 | Pending |
+| IDX-14 | Phase 4 | Complete |
 | IDX-15 | Phase 8 | Pending |
 | RETR-01 | Phase 5 | Pending |
 | RETR-02 | Phase 5 | Pending |
