@@ -341,7 +341,7 @@ Plans:
 **Wave 2** *(blocked on Wave 1 completion)*
 
 - [x] 04-06-PLAN.md — `ParsedBlock`, `Chunk`, router, TXT parser, stdlib tokenizer, `naive` chunker, refusing factory
-- [ ] 04-23-PLAN.md — SPA merged locale trees per area and glob-discovered test-server handler areas (R-167)
+- [x] 04-23-PLAN.md — SPA merged locale trees per area and glob-discovered test-server handler areas (R-167)
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
