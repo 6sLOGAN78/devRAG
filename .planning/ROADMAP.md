@@ -336,7 +336,7 @@ Plans:
 - [ ] 04-02-PLAN.md — Package audit table, blocking human checkpoint, seven approved packages at exact pins
 - [x] 04-03-PLAN.md — `ingest` settings section, env catalogue, shared run/step/failure codes, new reasons
 - [x] 04-04-PLAN.md — Doc-store `stats`, query escaping, vector mapping check, html highlight, log redaction of non-strings
-- [ ] 04-05-PLAN.md — Switch, checkbox, segmented control, choice-group options, right sheet, `canChangeDocument`
+- [x] 04-05-PLAN.md — Switch, checkbox, segmented control, choice-group options, right sheet, `canChangeDocument`
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
