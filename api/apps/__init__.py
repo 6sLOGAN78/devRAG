@@ -50,6 +50,7 @@ def create_app(
     from api.apps.restful_apis.dataset_api import dataset_bp
     from api.apps.restful_apis.document_api import document_bp
     from api.apps.restful_apis.models_api import models_bp
+    from api.apps.restful_apis.parse_api import parse_bp
     from api.apps.restful_apis.provider_api import provider_bp
     from api.apps.restful_apis.system_api import system_bp
 
@@ -58,6 +59,7 @@ def create_app(
     app.register_blueprint(models_bp)
     app.register_blueprint(dataset_bp)
     app.register_blueprint(document_bp)
+    app.register_blueprint(parse_bp)
     for blueprint in extra_blueprints:
         app.register_blueprint(blueprint)
     return app

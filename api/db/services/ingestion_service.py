@@ -43,6 +43,7 @@ from api.utils import reasons
 from common.constants import BUCKET_NAME
 from common.doc_store.doc_store_base import DocStoreConnection, DocStoreError, index_name
 from common.ingest_codes import LOG_CANCELLED, LOG_FAILED, LOG_RUNNING, RUN_CANCELLED, RUN_DONE, RUN_FAILED, RUN_NOT_STARTED, RUN_RUNNING
+from common.ratelimit import FixedWindowLimiter, RateLimited, RateLimitUnavailable
 from common.settings import Settings
 from rag.chunking.factory import available as chunker_available
 from rag.parsers.errors import ParserError
@@ -87,6 +88,18 @@ def _index_unavailable() -> ServiceError:
 
 def _queue_unavailable() -> ServiceError:
     return ServiceError(Kind.UNAVAILABLE, reasons.QUEUE_UNAVAILABLE, "the task queue is not available, try again shortly")
+
+
+def parse_rate_guard(settings: Settings, tenant_id: str, limiter: FixedWindowLimiter | None = None) -> None:
+    """Count one parse request for the workspace; over ``parse_rate_max`` per window is ``RATE_LIMITED``, an unreachable counter store refuses (D-19)."""
+    window = limiter or FixedWindowLimiter(settings.redis)
+    try:
+        window.hit(f"parse:{tenant_id}", settings.ingest.parse_rate_max, settings.ingest.parse_rate_window_seconds)
+    except RateLimited as limited:
+        raise ServiceError(Kind.RATE_LIMITED, "rate_limited", "too many parse requests, try again shortly", retry_after=limited.retry_after) from None
+    except RateLimitUnavailable:
+        logger.warning("parse rate limit store unavailable tenant=%s", tenant_id)
+        raise _queue_unavailable() from None
 
 
 def authorize_parse(principal: Principal, dataset_id: str) -> VisibleDataset:
