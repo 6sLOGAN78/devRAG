@@ -37,7 +37,7 @@ from test.helpers.accounts import Account, AccountRegistry
 from test.helpers.doc_store_contract import search
 from test.helpers.fake_provider import FakeProvider
 from test.helpers.office_files import make_docx, make_html, make_pptx, make_xlsx, poison_docx  # noqa: F401  (re-exported)
-from test.helpers.pdf_files import garbage_bytes, thirteen_page_pdf, text_pdf, truncated  # noqa: F401  (re-exported)
+from test.helpers.pdf_files import garbage_bytes, text_pdf, thirteen_page_pdf, truncated  # noqa: F401  (re-exported)
 from test.helpers.uploads import sql
 from test.integration.test_knowledgebase_service import principal_of
 

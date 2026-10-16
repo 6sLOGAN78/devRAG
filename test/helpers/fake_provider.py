@@ -270,7 +270,9 @@ def build_app(state: FakeProvider) -> Quart:
         body = await request.get_json(force=True, silent=True) or {}
         model = str(body.get("model", ""))
         if state.delay_ms:
-            await asyncio.sleep(state.delay_ms / 1000)
+            assert state._release is not None
+            with contextlib.suppress(TimeoutError):  # answer after the delay, or at once when teardown releases
+                await asyncio.wait_for(state._release.wait(), state.delay_ms / 1000)
         if model == "fake-timeout":
             assert state._release is not None
             await state._release.wait()

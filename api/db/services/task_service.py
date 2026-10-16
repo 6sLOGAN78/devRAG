@@ -128,6 +128,34 @@ def load_task_context(task_id: str) -> TaskContext | None:
     )
 
 
+@dataclass(frozen=True)
+class DocSwitch:
+    enabled: bool
+    run: str
+
+
+def document_switch(doc_id: str) -> DocSwitch | None:
+    """The document's current search switch (``status``) and run state, read fresh; None when the document is gone."""
+    with DB.connection_context():
+        row = Document.select(Document.status, Document.run).where(Document.id == doc_id).first()
+    if row is None:
+        return None
+    return DocSwitch(enabled=(row.status or "1") == "1", run=row.run or "0")
+
+
+def store_thumbnail(doc_id: str, data_url: str) -> bool:
+    """Write the thumbnail only when the document has none (the first task wins). True when written."""
+    with DB.connection_context():
+        changed = Document.update(thumbnail=data_url, **_stamp()).where((Document.id == doc_id) & ((Document.thumbnail.is_null()) | (Document.thumbnail == ""))).execute()
+    return bool(changed)
+
+
+def has_thumbnail(doc_id: str) -> bool:
+    with DB.connection_context():
+        row = Document.select(Document.thumbnail).where(Document.id == doc_id).first()
+    return bool(row and row.thumbnail)
+
+
 def claim_attempt(task_id: str, cap: int) -> Claim:
     """Count one attempt, atomically and only while the task is unfinished and below ``cap``.
 

@@ -121,7 +121,9 @@ def test_a_pdf_in_two_tasks_uses_page_based_ids_and_one_thumbnail(world):
     assert result.chunk_count == len(late) >= 1
     assert all(re.fullmatch(rf"{doc}_12\d{{3}}", h["id"]) for h in late)
     assert all(h["page_num_int"] == [13] and h["position_int"][0][0] == 13 and h["page_dims_flt"] for h in late)
-    assert len(indexed(world, task_id=[first])) >= 12
+    early = indexed(world, task_id=[first])
+    assert early and all(re.fullmatch(rf"{doc}_\d{{1,3}}", h["id"]) for h in early)
+    assert {p for h in early for p in h["page_num_int"]} == set(range(1, 13))
 
 
 def test_a_document_switched_off_stores_disabled_chunks(world):
