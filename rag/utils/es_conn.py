@@ -286,10 +286,12 @@ class ESConnection(DocStoreConnection):
         if sum_field is not None and (not isinstance(sum_field, str) or FIELD_RE.fullmatch(sum_field) is None):
             raise InvalidFilter("invalid field name")
         query = {"bool": {"filter": _filter_clauses(condition, [dataset_id])}}
-        aggs = {"total": {"sum": {"field": sum_field}}} if sum_field else None
+        request: dict[str, Any] = {"index": index, "query": query, "size": 0, "track_total_hits": True}
+        if sum_field:
+            request["aggs"] = {"total": {"sum": {"field": sum_field}}}
         with _guard("stats"):
             try:
-                body = self._client.search(index=index, query=query, size=0, track_total_hits=True, aggs=aggs).body if aggs else self._client.search(index=index, query=query, size=0, track_total_hits=True).body
+                body = self._client.search(**request).body
             except NotFoundError:
                 return StatsResult(count=0, total=0.0)
         total = float((body.get("aggregations", {}).get("total", {}) or {}).get("value") or 0.0)

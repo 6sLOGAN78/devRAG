@@ -11,6 +11,7 @@ adapter's responsibility (every write refreshes before it returns).
 from __future__ import annotations
 
 import pytest
+
 from common.doc_store.doc_store_base import (
     DimensionConflict,
     DocStoreError,
