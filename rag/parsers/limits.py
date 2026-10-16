@@ -7,8 +7,8 @@ declaration outright instead of relying on parser settings. Messages never carry
 from __future__ import annotations
 
 import zipfile
-from zlib import error as zlib_error
 from pathlib import Path
+from zlib import error as zlib_error
 
 from rag.parsers.errors import ArchiveLimitsExceeded, FileDamaged
 
