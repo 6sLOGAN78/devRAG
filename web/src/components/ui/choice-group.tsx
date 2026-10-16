@@ -5,6 +5,10 @@ export interface ChoiceOption {
   value: string;
   title: string;
   description: string;
+  /** The option cannot be picked; a `badge` says why. */
+  disabled?: boolean;
+  /** Short trailing word (for example "Later"); a disabled radio points at it with `aria-describedby`. */
+  badge?: string;
 }
 
 export interface ChoiceGroupProps {
@@ -30,6 +34,8 @@ function ChoiceGroup({ legend, name, value, onChange, options, disabled = false,
       {options.map((option, index) => {
         const id = `${base}-${index}`;
         const checked = option.value === value;
+        const badgeId = `${id}-badge`;
+        const optionDisabled = option.disabled === true;
         return (
           <label
             key={option.value}
@@ -37,7 +43,7 @@ function ChoiceGroup({ legend, name, value, onChange, options, disabled = false,
             className={cn(
               "flex cursor-pointer items-start gap-3 rounded-md border bg-background p-3 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ring has-[:focus-visible]:ring-offset-2 has-[:focus-visible]:ring-offset-background",
               checked ? "border-primary" : "border-input",
-              disabled && "cursor-not-allowed opacity-50",
+              (disabled || optionDisabled) && "cursor-not-allowed opacity-50",
             )}
           >
             <input
@@ -46,6 +52,8 @@ function ChoiceGroup({ legend, name, value, onChange, options, disabled = false,
               name={name}
               value={option.value}
               checked={checked}
+              disabled={optionDisabled}
+              aria-describedby={optionDisabled && option.badge ? badgeId : undefined}
               onChange={() => onChange(option.value)}
               className="mt-1 size-4 shrink-0 accent-primary"
             />
@@ -53,6 +61,11 @@ function ChoiceGroup({ legend, name, value, onChange, options, disabled = false,
               <span className="text-sm font-semibold text-foreground">{option.title}</span>
               <span className="text-xs font-normal text-muted-foreground">{option.description}</span>
             </span>
+            {option.badge ? (
+              <span id={badgeId} className="ml-auto shrink-0 rounded border border-input px-2 text-xs font-normal text-muted-foreground">
+                {option.badge}
+              </span>
+            ) : null}
           </label>
         );
       })}

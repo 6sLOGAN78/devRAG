@@ -2,9 +2,13 @@ import { act, fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { useState } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { Checkbox } from "./checkbox";
 import { ChoiceGroup } from "./choice-group";
 import { Pagination } from "./pagination";
 import { SearchInput } from "./search-input";
+import { SegmentedControl } from "./segmented-control";
+import { Sheet, SheetContent, SheetTitle } from "./sheet";
+import { Switch } from "./switch";
 import { Textarea } from "./textarea";
 
 // The parts hold no copy: every label below is what a caller would pass from its own locale keys.
@@ -204,5 +208,164 @@ describe("ChoiceGroup (UI-10)", () => {
     expect(screen.getByText("<b>bold</b>")).toBeInTheDocument();
     expect(document.querySelector("img")).toBeNull();
     expect(document.querySelector("b")).toBeNull();
+  });
+});
+
+describe("Switch", () => {
+  function Harness({ busy = false, disabled = false, onChange }: { busy?: boolean; disabled?: boolean; onChange?: (v: boolean) => void }) {
+    const [on, setOn] = useState(false);
+    return (
+      <Switch
+        aria-label="Search"
+        checked={on}
+        onLabel="On"
+        offLabel="Off"
+        busy={busy}
+        disabled={disabled}
+        onChange={(next) => {
+          setOn(next);
+          onChange?.(next);
+        }}
+      />
+    );
+  }
+
+  it("is a native switch showing the current word", async () => {
+    render(<Harness />);
+    const control = screen.getByRole("switch", { name: "Search" });
+    expect(control.tagName).toBe("INPUT");
+    expect(control).toHaveAttribute("aria-checked", "false");
+    expect(screen.getByText("Off")).toBeInTheDocument();
+    await userEvent.click(control);
+    expect(control).toHaveAttribute("aria-checked", "true");
+    expect(screen.getByText("On")).toBeInTheDocument();
+  });
+
+  it("toggles with Space", async () => {
+    const onChange = vi.fn();
+    render(<Harness onChange={onChange} />);
+    screen.getByRole("switch").focus();
+    await userEvent.keyboard(" ");
+    expect(onChange).toHaveBeenCalledWith(true);
+  });
+
+  it("ignores clicks while busy or disabled and marks busy", async () => {
+    const onChange = vi.fn();
+    const { unmount } = render(<Harness busy onChange={onChange} />);
+    expect(screen.getByRole("switch")).toHaveAttribute("aria-busy", "true");
+    await userEvent.click(screen.getByRole("switch"));
+    expect(onChange).not.toHaveBeenCalled();
+    unmount();
+    render(<Harness disabled onChange={onChange} />);
+    await userEvent.click(screen.getByRole("switch"));
+    expect(onChange).not.toHaveBeenCalled();
+  });
+});
+
+describe("Checkbox", () => {
+  it("sets indeterminate on the DOM node and reports changes", async () => {
+    const onChange = vi.fn();
+    render(<Checkbox aria-label="Select all" checked={false} indeterminate onChange={onChange} />);
+    const box = screen.getByRole("checkbox", { name: "Select all" }) as HTMLInputElement;
+    expect(box.indeterminate).toBe(true);
+    await userEvent.click(box);
+    expect(onChange).toHaveBeenCalledWith(true);
+  });
+});
+
+describe("SegmentedControl", () => {
+  const options = [
+    { value: "all", label: "All" },
+    { value: "on", label: "On" },
+    { value: "off", label: "Off" },
+  ] as const;
+
+  function Harness({ onChange }: { onChange?: (v: string) => void }) {
+    const [value, setValue] = useState("all");
+    return (
+      <SegmentedControl
+        legend="Filter"
+        name="filter"
+        value={value}
+        options={options}
+        onChange={(next) => {
+          setValue(next);
+          onChange?.(next);
+        }}
+      />
+    );
+  }
+
+  it("is a labelled radio group sharing a name", () => {
+    render(<Harness />);
+    const group = screen.getByRole("group", { name: "Filter" });
+    expect(group.tagName).toBe("FIELDSET");
+    expect(screen.getAllByRole("radio")).toHaveLength(3);
+    for (const radio of screen.getAllByRole("radio")) expect(radio).toHaveAttribute("name", "filter");
+    expect(screen.getByRole("radio", { name: "All" })).toBeChecked();
+  });
+
+  it("moves with the arrow keys", async () => {
+    const onChange = vi.fn();
+    render(<Harness onChange={onChange} />);
+    screen.getByRole("radio", { name: "All" }).focus();
+    await userEvent.keyboard("{ArrowRight}");
+    expect(onChange).toHaveBeenLastCalledWith("on");
+    expect(screen.getByRole("radio", { name: "On" })).toBeChecked();
+  });
+});
+
+describe("ChoiceGroup options", () => {
+  it("disables an option and points it at its badge", () => {
+    render(
+      <ChoiceGroup
+        legend="Method"
+        name="m"
+        value="a"
+        onChange={() => {}}
+        options={[
+          { value: "a", title: "Naive", description: "Plain" },
+          { value: "b", title: "Paper", description: "Layout", disabled: true, badge: "Later" },
+        ]}
+      />,
+    );
+    const radio = screen.getByRole("radio", { name: /Paper/ });
+    expect(radio).toBeDisabled();
+    const badge = screen.getByText("Later");
+    expect(badge.id).not.toBe("");
+    expect(radio).toHaveAttribute("aria-describedby", badge.id);
+    expect(screen.getByRole("radio", { name: /Naive/ })).not.toHaveAttribute("aria-describedby");
+    expect(screen.getByRole("radio", { name: /Naive/ })).not.toBeDisabled();
+  });
+});
+
+describe("Sheet side", () => {
+  it("keeps the left navigation drawer by default", () => {
+    render(
+      <Sheet open>
+        <SheetContent aria-describedby={undefined}>
+          <SheetTitle>Menu</SheetTitle>
+        </SheetContent>
+      </Sheet>,
+    );
+    expect(screen.getByRole("dialog").className).toContain("left-0");
+    expect(screen.getByText("Close")).toBeInTheDocument();
+  });
+
+  it("draws a right sheet with a caller close label", () => {
+    render(
+      <Sheet open>
+        <SheetContent side="right" closeLabel="Close details" aria-describedby={undefined}>
+          <SheetTitle>Details</SheetTitle>
+        </SheetContent>
+      </Sheet>,
+    );
+    const dialog = screen.getByRole("dialog");
+    expect(dialog.className).toContain("right-0");
+    expect(dialog.className).toContain("max-w-xl");
+    expect(dialog.className).toContain("slide-in-from-right");
+    expect(dialog.className).not.toContain("w-60");
+    expect(screen.getByText("Close details")).toBeInTheDocument();
+    expect(screen.queryByText("Close")).toBeNull();
   });
 });

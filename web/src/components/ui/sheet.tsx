@@ -23,10 +23,20 @@ const SheetOverlay = React.forwardRef<
 ));
 SheetOverlay.displayName = SheetPrimitive.Overlay.displayName;
 
-const SheetContent = React.forwardRef<
-  React.ElementRef<typeof SheetPrimitive.Content>,
-  React.ComponentPropsWithoutRef<typeof SheetPrimitive.Content>
->(({ className, children, ...props }, ref) => {
+const SIDE_CLASSES = {
+  left: "inset-y-0 left-0 w-60 border-r data-[state=closed]:slide-out-to-left data-[state=open]:slide-in-from-left",
+  right: "inset-y-0 right-0 w-full max-w-xl border-l data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right",
+} as const;
+
+type SheetContentProps = React.ComponentPropsWithoutRef<typeof SheetPrimitive.Content> & {
+  /** Edge the sheet slides from; the default is the left navigation drawer. */
+  side?: "left" | "right";
+  /** Accessible name of the close control; defaults to the navigation drawer's `nav.closeMenu`. */
+  closeLabel?: string;
+};
+
+const SheetContent = React.forwardRef<React.ElementRef<typeof SheetPrimitive.Content>, SheetContentProps>(
+  ({ className, children, side = "left", closeLabel, ...props }, ref) => {
   const { t } = useTranslation();
   return (
   <SheetPrimitive.Portal>
@@ -34,7 +44,8 @@ const SheetContent = React.forwardRef<
     <SheetPrimitive.Content
       ref={ref}
       className={cn(
-        "fixed inset-y-0 left-0 z-50 flex h-full w-60 flex-col border-r bg-card p-4 transition ease-out data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:slide-out-to-left data-[state=open]:slide-in-from-left data-[state=closed]:duration-150 data-[state=open]:duration-150",
+        "fixed z-50 flex h-full flex-col bg-card p-4 transition ease-out data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:duration-150 data-[state=open]:duration-150",
+        SIDE_CLASSES[side],
         className,
       )}
       {...props}
@@ -42,12 +53,13 @@ const SheetContent = React.forwardRef<
       {children}
       <SheetPrimitive.Close className="absolute right-4 top-4 rounded-sm focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background">
         <X className="size-4" />
-        <span className="sr-only">{t("nav.closeMenu")}</span>
+        <span className="sr-only">{closeLabel ?? t("nav.closeMenu")}</span>
       </SheetPrimitive.Close>
     </SheetPrimitive.Content>
   </SheetPrimitive.Portal>
   );
-});
+  },
+);
 SheetContent.displayName = SheetPrimitive.Content.displayName;
 
 const SheetHeader = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
