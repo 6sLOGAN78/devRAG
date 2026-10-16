@@ -8,8 +8,10 @@ Elasticsearch. The loopback provider is the other end of the wire, not a stub of
 from __future__ import annotations
 
 import dataclasses
+import datetime
 import io
 import os
+import time
 import uuid
 from base64 import urlsafe_b64encode
 from dataclasses import dataclass
@@ -167,3 +169,74 @@ def progress_msg(task_id: str) -> str:
 def cleanup_tasks(registry: AccountRegistry) -> None:
     for acc in registry.created:
         sql("DELETE FROM `task` WHERE `doc_id` IN (SELECT `id` FROM `document` WHERE `kb_id` IN (SELECT `id` FROM `knowledgebase` WHERE `tenant_id` = %s))", (acc.tenant_id,))
+
+
+# ----------------------------------------------------------------------------- roll-up and executor helpers (plan 04-12)
+
+
+def put_chunks(world: World, doc_id: str, count: int, *, task_id: str = "", tokens: int = 10, enabled: bool = True) -> list[str]:
+    """Insert ``count`` chunk rows straight into the index (no pipeline), with the fields the roll-up reads."""
+    from common.doc_store.doc_store_base import vector_field
+
+    store = world.store()
+    store.create_idx(world.index, world.dataset.id, DIMENSION, "naive")
+    rows = []
+    for i in range(count):
+        vector = [1.0] + [0.0] * (DIMENSION - 1)
+        rows.append(
+            {
+                "id": f"{doc_id}_{i}", "doc_id": doc_id, "content_ltks": f"chunk {i}", "title_tks": "title", "position_int": [[1, 0, 0, 1, 1]],
+                "available_int": 1, vector_field(DIMENSION): vector, "task_id": task_id, "token_num_int": tokens, "origin_kwd": "parsed",
+                "doc_enabled_int": 1 if enabled else 0, "order_int": i,
+            }
+        )
+    assert store.insert(rows, world.index, world.dataset.id) == []
+    return [r["id"] for r in rows]
+
+
+def set_task(task_id: str, progress: float, msg: str = "", retry_count: int = 0) -> None:
+    sql("UPDATE `task` SET `progress` = %s, `progress_msg` = %s, `retry_count` = %s WHERE `id` = %s", (progress, msg, retry_count, task_id))
+
+
+def age_task(task_id: str, seconds: int) -> None:
+    """Make the task row look untouched for ``seconds`` (the reconciler reads ``update_time``)."""
+    sql("UPDATE `task` SET `update_time` = %s WHERE `id` = %s", (int(time.time() * 1000) - seconds * 1000, task_id))
+
+
+def begin_run(doc_id: str, tasks: int = 1) -> str:
+    """The open log row and the begin time a real ``start_parse`` leaves behind. Returns the log row id."""
+    from api.db.models import PipelineOperationLog
+    from api.db.models.base import current_timestamp_ms
+
+    began = datetime.datetime.now() - datetime.timedelta(seconds=3)
+    sql("UPDATE `document` SET `process_begin_at` = %s WHERE `id` = %s", (began, doc_id))
+    owner = sql("SELECT `kb_id`, `parser_id`, `name`, `suffix`, `type` FROM `document` WHERE `id` = %s", (doc_id,))[0]
+    tenant = sql("SELECT `tenant_id` FROM `knowledgebase` WHERE `id` = %s", (owner[0],))[0][0]
+    log_id = uuid.uuid4().hex
+    with DB.connection_context():
+        PipelineOperationLog.create(
+            id=log_id, document_id=doc_id, tenant_id=tenant, kb_id=owner[0], parser_id=owner[1], document_name=owner[2], document_suffix=owner[3],
+            document_type=owner[4], source_from="local", progress=0.0, process_begin_at=began, dsl={"tasks": tasks}, task_type="parse",
+            operation_status="running", update_time=current_timestamp_ms(),
+        )
+    return log_id
+
+
+def doc_state(doc_id: str) -> dict[str, Any]:
+    run, progress, msg, chunks, duration = sql("SELECT `run`, `progress`, `progress_msg`, `chunk_num`, `process_duration` FROM `document` WHERE `id` = %s", (doc_id,))[0]
+    return {"run": run, "progress": float(progress), "progress_msg": msg or "", "chunk_num": int(chunks), "process_duration": float(duration or 0)}
+
+
+def log_state(doc_id: str) -> dict[str, Any]:
+    import json
+
+    status, progress, msg, dsl = sql(
+        "SELECT `operation_status`, `progress`, `progress_msg`, `dsl` FROM `pipeline_operation_log` WHERE `document_id` = %s ORDER BY `create_time` DESC LIMIT 1", (doc_id,)
+    )[0]
+    parsed = json.loads(dsl) if isinstance(dsl, (str, bytes)) else dict(dsl or {})
+    return {"status": status, "progress": float(progress or 0), "progress_msg": msg or "", "dsl": parsed}
+
+
+def task_state(task_id: str) -> dict[str, Any]:
+    progress, retry, msg = sql("SELECT `progress`, `retry_count`, `progress_msg` FROM `task` WHERE `id` = %s", (task_id,))[0]
+    return {"progress": float(progress), "retry_count": int(retry), "progress_msg": msg or ""}
