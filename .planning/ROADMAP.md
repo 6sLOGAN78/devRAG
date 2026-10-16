@@ -333,7 +333,7 @@ Plans:
 **Wave 1**
 
 - [x] 04-01-PLAN.md — Phase 4 decision rows R-154..R-167, partial requirements, layering carve-out for `rag/svr`
-- [ ] 04-02-PLAN.md — Package audit table, blocking human checkpoint, seven approved packages at exact pins
+- [x] 04-02-PLAN.md — Package audit table, blocking human checkpoint, seven approved packages at exact pins
 - [x] 04-03-PLAN.md — `ingest` settings section, env catalogue, shared run/step/failure codes, new reasons
 - [x] 04-04-PLAN.md — Doc-store `stats`, query escaping, vector mapping check, html highlight, log redaction of non-strings
 - [x] 04-05-PLAN.md — Switch, checkbox, segmented control, choice-group options, right sheet, `canChangeDocument`
