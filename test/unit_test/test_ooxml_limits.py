@@ -2,6 +2,9 @@
 
 from __future__ import annotations
 
+import base64
+import io
+import os
 import zipfile
 
 import pytest
@@ -78,7 +81,20 @@ _HOSTILE = '<?xml version="1.0"?><!DOCTYPE x [<!ENTITY e SYSTEM "file:///etc/hos
 
 
 def _with_part(name: str, payload: bytes) -> bytes:
-    return office_files._rezip(office_files.make_docx(["x"]), {name: payload})
+    """A DOCX with ``name`` set to ``payload`` (replaced when present, added otherwise)."""
+    data = office_files._rezip(office_files.make_docx(["x"]), {name: payload})
+    with zipfile.ZipFile(io.BytesIO(data)) as zf:
+        if name in zf.namelist():
+            return data
+    out = io.BytesIO(data)
+    with zipfile.ZipFile(out, "a", zipfile.ZIP_DEFLATED) as zf:
+        zf.writestr(name, payload)
+    return out.getvalue()
+
+
+def _filler(n: int) -> bytes:
+    """Incompressible ASCII filler, so the ratio guard does not fire before the XML guard."""
+    return base64.b64encode(os.urandom(n * 3 // 4 + 3))[:n]
 
 
 @pytest.mark.parametrize("encoding", ["utf-16", "utf-16-le", "utf-16-be"])
@@ -97,7 +113,7 @@ def test_non_utf8_declared_encoding_refused(tmp_path):
 
 
 def test_doctype_after_scan_window_refused(tmp_path):
-    pad = b"<!-- " + b"a" * (8 * 2**20 + 1024) + b" -->"
+    pad = b"<!-- " + _filler(8 * 2**20 + 1024) + b" -->"
     payload = b'<?xml version="1.0"?><r>' + pad + _HOSTILE.encode().split(b"?>", 1)[1] + b"</r>"
     with pytest.raises(FileDamaged):
         check_ooxml_limits(_write(tmp_path, _with_part("word/document.xml", payload)))
@@ -105,7 +121,7 @@ def test_doctype_after_scan_window_refused(tmp_path):
 
 def test_token_straddling_chunk_boundary_refused(tmp_path):
     for offset in range(-12, 12):
-        filler = b"a" * (1024 * 1024 + offset)
+        filler = _filler(1024 * 1024 + offset)
         payload = b"<r><!--" + filler + b"--><!DOCTYPE x></r>"
         with pytest.raises(FileDamaged):
             check_ooxml_limits(_write(tmp_path, _with_part("word/document.xml", payload)))

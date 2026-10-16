@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import base64
 import io
+import math
 import threading
 from collections.abc import Iterator
 from pathlib import Path
@@ -20,7 +21,11 @@ from rag.parsers.errors import FileDamaged, FileTooLarge
 from rag.parsers.types import PageBox, ParsedBlock, ParseLimits, ParseReport, SourceFile
 
 PDFIUM_LOCK = threading.RLock()
-MAX_PAGES = 1_000_000
+MAX_PAGES = 1_000_000  # hard ceiling for count_pages(); parse() applies the tighter ParseLimits.max_pages
+MAX_PIXELS = 40_000_000  # render budget: zoom 3 on A4 is 4.5 MP, on A0 about 36 MP
+MAX_SIDE = 12_000  # px per side
+MAX_PAGE_POINTS = 14_400  # 200 in, the practical PDF page limit; larger pages are refused
+THUMB_TARGET_WIDTH = 320  # px rendered before the 160 px downscale
 GAP_RATIO = 0.8
 
 
@@ -108,40 +113,65 @@ def _page_blocks(page: pdfium.PdfPage, number: int) -> list[ParsedBlock] | None:
 
 def parse(source: SourceFile, report: ParseReport, *, page_range: tuple[int, int] | None = None, limits: ParseLimits | None = None) -> Iterator[ParsedBlock]:
     """Yield text blocks of the page range (0-based, end exclusive, clamped). Errors are raised when the call is made."""
+    limits = limits or ParseLimits()
     total = count_pages(source.path)
+    if total > limits.max_pages:
+        raise FileTooLarge()
     start, end = (0, total) if page_range is None else (max(0, page_range[0]), min(total, page_range[1]))
     end = max(start, end)
     report.pages_total = end - start
-    return _iter_pages(source.path, start, end, report)
+    return _iter_pages(source.path, start, end, report, limits.max_text_bytes)
 
 
-def _iter_pages(path: Path, start: int, end: int, report: ParseReport) -> Iterator[ParsedBlock]:
-    for index in range(start, end):
-        with PDFIUM_LOCK:
-            pdf = _open(path)
-            try:
-                page = pdf[index]
+def _iter_pages(path: Path, start: int, end: int, report: ParseReport, max_text_bytes: int) -> Iterator[ParsedBlock]:
+    """Open the document once for the range; every pdfium call (including close) runs under PDFIUM_LOCK."""
+    with PDFIUM_LOCK:
+        pdf = _open(path)
+    produced = 0
+    try:
+        for index in range(start, end):
+            with PDFIUM_LOCK:
                 try:
-                    blocks = _page_blocks(page, index + 1)
-                finally:
-                    page.close()
-            except PdfiumError:
-                raise FileDamaged() from None
-            finally:
-                pdf.close()
-        if blocks is None:
-            report.pages_without_text += 1
-            continue
-        yield from blocks
+                    page = pdf[index]
+                    try:
+                        blocks = _page_blocks(page, index + 1)
+                    finally:
+                        page.close()
+                except PdfiumError:
+                    raise FileDamaged() from None
+            if blocks is None:
+                report.pages_without_text += 1
+                continue
+            for block in blocks:
+                produced += len(block.text.encode("utf-8"))
+                if produced > max_text_bytes:
+                    raise FileTooLarge()
+                yield block
+    finally:
+        with PDFIUM_LOCK:
+            pdf.close()
 
 
-def rasterize_page(path: Path, index: int, zoom: float = 3.0) -> Image.Image:
+def _render_scale(page: pdfium.PdfPage, zoom: float) -> float:
+    """Scale not above ``zoom`` that keeps the bitmap within MAX_PIXELS and MAX_SIDE; absurd page sizes raise FileTooLarge."""
+    width, height = page.get_size()
+    if not (math.isfinite(width) and math.isfinite(height)) or width <= 0 or height <= 0:
+        raise FileDamaged()
+    if max(width, height) > MAX_PAGE_POINTS:
+        raise FileTooLarge()
+    return min(zoom, math.sqrt(MAX_PIXELS / (width * height)), MAX_SIDE / max(width, height))
+
+
+def rasterize_page(path: Path, index: int, zoom: float = 3.0, *, target_width: int | None = None) -> Image.Image:
+    """Render a page at ``zoom`` (or at ``target_width`` px when given), clamped to the pixel budget."""
     with PDFIUM_LOCK:
         pdf = _open(path)
         try:
             page = pdf[index]
             try:
-                bitmap = page.render(scale=zoom)
+                if target_width is not None:
+                    zoom = target_width / max(page.get_size()[0], 1.0)
+                bitmap = page.render(scale=_render_scale(page, zoom))
                 try:
                     return bitmap.to_pil().copy()
                 finally:
@@ -155,7 +185,7 @@ def rasterize_page(path: Path, index: int, zoom: float = 3.0) -> Image.Image:
 
 
 def thumbnail_data_url(path: Path, max_chars: int = 16384) -> str:
-    image = rasterize_page(path, 0, 0.5).convert("RGB")
+    image = rasterize_page(path, 0, target_width=THUMB_TARGET_WIDTH).convert("RGB")
     height = max(1, round(image.height * 160 / image.width))
     image = image.resize((160, height))
     prefix = "data:image/jpeg;base64,"

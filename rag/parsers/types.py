@@ -60,4 +60,5 @@ class SourceFile:
 @dataclass(frozen=True)
 class ParseLimits:
     max_text_bytes: int = 104857600
+    max_pages: int = 20000
     xlsx_max_cells: int = 1000000
