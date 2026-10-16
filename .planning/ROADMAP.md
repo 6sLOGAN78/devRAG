@@ -351,7 +351,7 @@ Plans:
 
 **Wave 4** *(blocked on Wave 3 completion)*
 
-- [ ] 04-10-PLAN.md — Task rows and attempts, parse/cancel/re-parse with confirmation, set-to-truth totals
+- [x] 04-10-PLAN.md — Task rows and attempts, parse/cancel/re-parse with confirmation, set-to-truth totals
 
 **Wave 5** *(blocked on Wave 4 completion)*
 

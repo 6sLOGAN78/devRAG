@@ -4,13 +4,13 @@ milestone: v1.0
 milestone_name: milestone
 status: executing
 stopped_at: Completed 04-05-PLAN.md
-last_updated: "2026-10-16T20:56:10.868Z"
+last_updated: "2026-10-16T21:10:18.820Z"
 last_activity: 2026-10-16
 progress:
   total_phases: 8
   completed_phases: 3
   total_plans: 118
-  completed_plans: 93
+  completed_plans: 94
   percent: 38
 ---
 
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-10-05)
 ## Current Position
 
 Phase: 4 (ingestion-pipeline) — EXECUTING
-Plan: 11 of 35
+Plan: 12 of 35
 Status: Ready to execute
 Last activity: 2026-10-16
 
-Progress: [████████░░] 79%
+Progress: [████████░░] 80%
 
 ## Performance Metrics
 
@@ -96,6 +96,7 @@ Progress: [████████░░] 79%
 | Phase 04 P07 | 25min | - tasks | - files |
 | Phase 4 P08 | 25min | 2 tasks | 3 files |
 | Phase 04 P09 | 25min | - tasks | - files |
+| Phase 04 P10 | 55min | - tasks | - files |
 
 ## Accumulated Context
 
@@ -158,6 +159,7 @@ Recent decisions affecting current work:
 - [Phase 03]: 03-26: the browser tiers never see the real provider key (Node fake provider for vitest, Python fake_provider_stack for Chrome; 0 real provider calls); real-Chrome presses are real mouse events that wait for document.getAnimations() to settle and run in a 1280x900 metrics override (headless default viewport put dialog buttons off-screen); the throttled 12 MiB upload (1 MiB/s, >10 s) proves the upload call's timeout 0; the window drop guard could not be confirmed in headless Chrome (an unguarded page does not navigate on a CDP drop) and stays jsdom-only; SECRET_BULLETS renamed MASK_BULLETS so the secrets gate stays 7/7
 - [Phase 03]: 03-29: the phase exit gate (`scripts/clean_room.sh --runs 3`, port 8088, key present, `live-model` included) passed three consecutive runs on attempt 4 (746, 782, 762 s); the Go cross-tenant matrix covers owner-go rows only (R-153, Python matrix is the superset); tamper tests flip a fully significant base64 character; a provider ERROR_TIMEOUT on the first gate attempt was transient and nothing was loosened
 - [Phase 04]: Phase 4 Plan 03: too_many_chunks is a terminal failure code (R-155)
+- [Phase 04]: 04-10: start refuses in a fixed order across all ids, re-checks not-running under the dataset lock before pruning the index; cancel settles totals only for cancelled documents
 
 ### Pending Todos
 
@@ -193,6 +195,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-10-16T20:56:10.854Z
+Last session: 2026-10-16T21:10:18.803Z
 Stopped at: Completed 04-05-PLAN.md
 Resume file: None
