@@ -18,7 +18,7 @@ from api.db.services.service_errors import ServiceError
 from rag.svr import healthcheck
 from rag.svr.executor_loop import Outcome
 from test.helpers.accounts import AccountRegistry
-from test.helpers.executor_rig import Rig, rig_for
+from test.helpers.executor_rig import rig_for
 from test.helpers.fake_provider import FakeProvider, running_fake_provider
 from test.helpers.ingest import (
     World,

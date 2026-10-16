@@ -141,13 +141,14 @@ def test_a_vanished_task_row_removes_the_chunks_of_that_task(world, fake):
     assert indexed(world, task_id=[task]) == []
 
 
-def test_a_document_no_longer_running_stops_the_task_and_removes_its_chunks(world, fake):
+@pytest.mark.parametrize(("run", "kept"), [("2", True), ("0", False)])
+def test_a_document_no_longer_running_stops_the_task_and_only_a_cancel_keeps_its_chunks(world, fake, run, kept):
     fake.delay_ms = 300
     doc = add_document(world, "rerun.txt", paragraphs(40))
     task = add_task(doc)
-    error, _, _ = run_with_signal(world, task, doc, lambda c: sql("UPDATE `document` SET `run` = '2' WHERE `id` = %s", (doc,)))
+    error, _, _ = run_with_signal(world, task, doc, lambda c: sql("UPDATE `document` SET `run` = %s WHERE `id` = %s", (run, doc)))
     assert isinstance(error, TaskCancelled)
-    assert indexed(world, task_id=[task]) == []
+    assert bool(indexed(world, task_id=[task])) is kept
 
 
 def test_a_deleted_document_leaves_no_orphan_chunk(world, fake):

@@ -20,6 +20,7 @@ from api.db.services import task_service, tenant_model_service
 from api.db.services.task_service import TaskContext
 from common.constants import BUCKET_NAME
 from common.doc_store.doc_store_base import DocStoreConnection, index_name
+from common.ingest_codes import RUN_CANCELLED
 from common.settings import Settings
 from rag.chunking.factory import get_chunker
 from rag.chunking.naive import NaiveConfig
@@ -137,8 +138,10 @@ def _drop_task_chunks(ctx: TaskContext, deps: PipelineDeps, index: str) -> None:
 
 
 def _current_switch(ctx: TaskContext, deps: PipelineDeps, index: str) -> task_service.DocSwitch:
-    """Fresh document state; a replaced task, a deleted document or a run state other than running removes this task's chunks and stops."""
+    """Fresh document state. A cancelled document stops and keeps its chunks; a replaced task, a deleted document or any other run state removes this task's chunks and stops."""
     switch = task_service.document_switch(ctx.doc_id)
+    if switch is not None and switch.run == RUN_CANCELLED and task_service.task_is_current(ctx.task_id):
+        raise TaskCancelled("document cancelled")  # a user cancel keeps the chunks indexed so far (D-06)
     if switch is None or switch.run != "1" or not task_service.task_is_current(ctx.task_id):
         with _step("index", ctx):
             _drop_task_chunks(ctx, deps, index)
