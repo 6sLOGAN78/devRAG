@@ -11,7 +11,7 @@ import { ThemeToggle } from "@/components/theme-toggle";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { navEntries } from "@/constants/routes";
 import i18n, { setLanguage } from "@/i18n";
-import zh from "@/locales/zh.json";
+import { zh } from "@/locales";
 
 describe("shared shell follows the language (UI-42)", () => {
   it("renders English by default through the real i18n instance", () => {

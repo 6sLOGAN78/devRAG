@@ -1,6 +1,6 @@
 /// <reference types="vite/client" />
 import { describe, expect, it } from "vitest";
-import en from "@/locales/en.json";
+import { en } from "@/locales";
 
 /**
  * Grep-style gate for the string system (UI-42, D-23): constants/copy.ts is gone, nothing imports it, and the

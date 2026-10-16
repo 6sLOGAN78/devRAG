@@ -1,8 +1,5 @@
 import { describe, expect, it } from "vitest";
-import en from "@/locales/en.json";
-import zh from "@/locales/zh.json";
-
-type Tree = { [k: string]: string | Tree };
+import { en, zh, type Tree } from "@/locales";
 
 export function flatten(tree: Tree, prefix = ""): Record<string, string> {
   const out: Record<string, string> = {};
@@ -25,8 +22,8 @@ export function diffLocales(a: Record<string, string>, b: Record<string, string>
 }
 
 describe("locale parity (D-23)", () => {
-  const flatEn = flatten(en as Tree);
-  const flatZh = flatten(zh as Tree);
+  const flatEn = flatten(en);
+  const flatZh = flatten(zh);
   it("has the same keys in en and zh, no empty values, same placeholders", () => {
     expect(diffLocales(flatEn, flatZh)).toEqual({ missingInA: [], missingInB: [], empty: [], placeholderMismatch: [] });
   });

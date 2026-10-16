@@ -1,7 +1,7 @@
 import { AxiosError, CanceledError } from "axios";
 import { describe, expect, it } from "vitest";
 import i18n from "@/i18n";
-import en from "@/locales/en.json";
+import { en } from "@/locales";
 import { ApiError } from "@/services/http";
 import { deleteFailureKey, isAborted, providerErrorKey } from "./errors";
 
