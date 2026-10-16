@@ -73,5 +73,5 @@ def test_doc_store_and_net_do_not_import_api_rag_or_quart():
 
 
 def test_new_packages_exist():
-    for package in ("rag", "rag/utils", "common/doc_store", "common/net"):
+    for package in ("rag", "rag/utils", "common/doc_store", "common/net", "rag/parsers", "rag/chunking", "rag/nlp"):
         assert (ROOT / package / "__init__.py").is_file(), package
