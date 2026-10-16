@@ -143,6 +143,18 @@ def test_listing_pages_newest_first_and_reports_the_total(settings, space, stora
     assert count == 5 and len(everything) == 5, "page below 1 is page 1; an oversized page is capped, not an error"
 
 
+def test_list_rows_view_carries_the_phase_four_row_keys_and_no_storage_detail(settings, space, storage):
+    from api.db.services import document_view
+
+    owner, dataset = space
+    upload(settings, owner, dataset, [item("a.pdf", pdf_bytes("a"))], storage=storage)
+    body = docs.list_rows_view(principal_of(owner), dataset.id, page=1, page_size=20, keywords=None)
+    assert body["total"] == 1 and set(body["items"][0]) == set(document_view.ROW_KEYS)
+    assert {"location", "status", "source", "source_type", "content_hash"}.isdisjoint(body["items"][0])
+    assert re.search(r"[0-9a-f]{32}/[0-9a-f]{32}", str(body["items"][0])) is None, "no storage key shape"
+    assert set(docs.list_view(principal_of(owner), dataset.id, page=1, page_size=20, keywords=None)["items"][0]) == DTO_KEYS, "the Phase 3 list is unchanged until plan 04-16"
+
+
 def test_list_rows_carry_exactly_the_allowed_keys_and_no_storage_detail(settings, space, storage):
     owner, dataset = space
     upload(settings, owner, dataset, [item("a.pdf", pdf_bytes("a"))], storage=storage)
