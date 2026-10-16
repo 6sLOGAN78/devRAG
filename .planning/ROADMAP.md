@@ -328,11 +328,11 @@ Scope notes: the `DocStoreConnection` port and the Elasticsearch adapter are pul
   4. Killing the worker mid-task leads to the task being reclaimed and completed with no duplicate chunks; a poison file fails terminally after the retry cap with its error visible in the UI; re-parsing a document leaves an identical chunk count; cancelling a running parse stops the worker and marks the document cancelled
   5. The task executor runs as its own container, a second executor can be added without configuration changes, and deleting a document or dataset removes its chunks from the index
 
-**Plans**: 31 plans
+**Plans**: 35 plans
 Plans:
 **Wave 1**
 
-- [ ] 04-01-PLAN.md — Phase 4 decision rows R-154..R-166, partial requirements, layering carve-out for `rag/svr`
+- [ ] 04-01-PLAN.md — Phase 4 decision rows R-154..R-167, partial requirements, layering carve-out for `rag/svr`
 - [ ] 04-02-PLAN.md — Package audit table, blocking human checkpoint, seven approved packages at exact pins
 - [ ] 04-03-PLAN.md — `ingest` settings section, env catalogue, shared run/step/failure codes, new reasons
 - [ ] 04-04-PLAN.md — Doc-store `stats`, query escaping, vector mapping check, html highlight, log redaction of non-strings
@@ -341,6 +341,7 @@ Plans:
 **Wave 2** *(blocked on Wave 1 completion)*
 
 - [ ] 04-06-PLAN.md — `ParsedBlock`, `Chunk`, router, TXT parser, stdlib tokenizer, `naive` chunker, refusing factory
+- [ ] 04-23-PLAN.md — SPA merged locale trees per area and glob-discovered test-server handler areas (R-167)
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
@@ -363,6 +364,7 @@ Plans:
 **Wave 7** *(blocked on Wave 6 completion)*
 
 - [ ] 04-13-PLAN.md — Executor container, scaling, health, overrides, Valkey policy
+- [ ] 04-15-PLAN.md — `ParserConfig` validation, document list rows, document detail and PDF page count (service level)
 
 **Wave 8** *(blocked on Wave 7 completion)*
 
@@ -370,62 +372,61 @@ Plans:
 
 **Wave 9** *(blocked on Wave 8 completion)*
 
-- [ ] 04-15-PLAN.md — `ParserConfig` validation, document rows and detail, per-document settings route
+- [ ] 04-16-PLAN.md — Document detail and settings routes, list handler on the new rows, pins, matrix and leak coverage
 
 **Wave 10** *(blocked on Wave 9 completion)*
 
-- [ ] 04-16-PLAN.md — Document search switch (D-26), deletion with real chunks and running workers
+- [ ] 04-17-PLAN.md — Document search switch (D-26), deletion with real chunks and running workers
 
 **Wave 11** *(blocked on Wave 10 completion)*
 
-- [ ] 04-17-PLAN.md — Chunk list, add, edit and switch with embed-before-write
+- [ ] 04-18-PLAN.md — Chunk list, add, edit and switch with embed-before-write
 
 **Wave 12** *(blocked on Wave 11 completion)*
 
-- [ ] 04-18-PLAN.md — Ingestion summary, runs, run details, embedding check, task status
+- [ ] 04-19-PLAN.md — Ingestion summary, runs, run details, embedding check, task status
 
 **Wave 13** *(blocked on Wave 12 completion)*
 
-- [ ] 04-19-PLAN.md — Page images, original content, text preview
+- [ ] 04-20-PLAN.md — Page images, original content, text preview
 
 **Wave 14** *(blocked on Wave 13 completion)*
 
-- [ ] 04-20-PLAN.md — Format matrix and 13-page PDF journeys on the real stack
-- [ ] 04-22-PLAN.md — SPA services, polling hooks, workspace binding, failure placement
+- [ ] 04-21-PLAN.md — Format matrix and 13-page PDF journeys on the real stack
+- [ ] 04-24-PLAN.md — SPA services, mappers and the screen path builders
 
 **Wave 15** *(blocked on Wave 14 completion)*
 
-- [ ] 04-21-PLAN.md — Kill, reclaim, poison, cancel, partial failure, re-parse, scaling
-- [ ] 04-23-PLAN.md — Dataset page: parse controls, live progress, selection, summary, Parse again dialog
+- [ ] 04-22-PLAN.md — Kill, reclaim, poison, cancel, partial failure, re-parse, scaling
+- [ ] 04-25-PLAN.md — SPA polling hooks, workspace binding, failure placement and failure strings
 
 **Wave 16** *(blocked on Wave 15 completion)*
 
-- [ ] 04-24-PLAN.md — Parsing details sheet and parsing log page
-- [ ] 04-29-PLAN.md — Live ingestion tier with the real embedding model
+- [ ] 04-26-PLAN.md — Dataset page: parse controls, live progress, selection, summary, Parse again dialog
+- [ ] 04-33-PLAN.md — Live ingestion tier with the real embedding model
 
 **Wave 17** *(blocked on Wave 16 completion)*
 
-- [ ] 04-25-PLAN.md — Chunking-method dialog and parser configurator
+- [ ] 04-27-PLAN.md — Real-stack live journey: parse a TXT to Finished from the dataset page, no reload
+- [ ] 04-28-PLAN.md — Parsing details sheet and parsing log page
 
 **Wave 18** *(blocked on Wave 17 completion)*
 
-- [ ] 04-26-PLAN.md — Chunk inspector with page preview and box overlay
+- [ ] 04-29-PLAN.md — Chunking-method dialog and parser configurator
+- [ ] 04-30-PLAN.md — Chunk inspector with page preview and box overlay
 
 **Wave 19** *(blocked on Wave 18 completion)*
 
-- [ ] 04-27-PLAN.md — Chunk editor, add flow and unsaved-changes guard
+- [ ] 04-31-PLAN.md — Chunk editor, add flow and unsaved-changes guard
+- [ ] 04-32-PLAN.md — Document viewer
 
 **Wave 20** *(blocked on Wave 19 completion)*
 
-- [ ] 04-28-PLAN.md — Document viewer
+- [ ] 04-34-PLAN.md — vitest live and real-Chrome journeys
 
 **Wave 21** *(blocked on Wave 20 completion)*
 
-- [ ] 04-30-PLAN.md — vitest live and real-Chrome journeys
-
-**Wave 22** *(blocked on Wave 21 completion)*
-
-- [ ] 04-31-PLAN.md — Traceability, memory measurement, records, phase exit gate (clean_room x3)
+- [ ] 04-35-PLAN.md — Traceability, memory measurement, records, phase exit gate (clean_room x3)
 
 **UI hint**: yes
 

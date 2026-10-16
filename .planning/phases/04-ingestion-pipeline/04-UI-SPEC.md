@@ -407,6 +407,7 @@ Failure reasons (`error.code`), used for the row's short reason and the sheet's 
 | `index_unavailable` | The search index wasn't available. |
 | `storage_unavailable` | The stored file couldn't be read. |
 | `worker_lost` | The worker stopped while parsing this document. |
+| `too_many_chunks` | This document produced more chunks than one parsing task can store. |
 | anything else, no usable message | Parsing failed for an unexpected reason. |
 
 States: loading (skeleton lines for the list and a 160px skeleton for the log); error ("Couldn't load the parsing details." with "Try again"); entry gone (404: "This log entry no longer exists."); empty log ("No progress messages were recorded."). Nothing in the sheet is ever a stack trace, a key, a path or a host name; the sheet renders only the fields named here.
@@ -821,6 +822,7 @@ The scan in `no-hardcoded-copy.test.ts` takes every English value, drops the int
 | `datasets.details.reason.indexDown` | The search index wasn't available. |
 | `datasets.details.reason.storage` | The stored file couldn't be read. |
 | `datasets.details.reason.workerLost` | The worker stopped while parsing this document. |
+| `datasets.details.reason.tooManyChunks` | This document produced more chunks than one parsing task can store. |
 | `datasets.details.reason.unknown` | Parsing failed for an unexpected reason. |
 
 ### Chunking-method keys

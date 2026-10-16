@@ -467,17 +467,17 @@ D-08 storage: the plain reason and step live in the log row's `dsl.error`; the d
 | A9 | `token_num` as tiktoken chunk-text tokens is acceptable (vs embedding usage) | Pattern 5 | Different totals than reference users expect |
 | A10 | Pass a 12-page task budget of up to 1000 chunks per page is never exceeded | Pattern 1 | Order overflow; worker raises a terminal error |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **Poison-file classification.** Recommended: damaged Office/PDF files are retryable (3 attempts) so criterion 4 is provable with a zero-cost file. Alternative: terminal "file is damaged" and prove the cap with a different deterministic fault. Needs the planner's/user's call.
-2. **chardet vs charset-normalizer.** Docs/CLAUDE.md name chardet; charset-normalizer avoids a new package. Which does the user want at the approval checkpoint?
-3. **CHUNK-17 coverage in Phase 4.** English and mixed text are covered; traditional-to-simplified conversion and a dictionary Chinese tokenizer are deferred to Phase 6 (character n-grams for CJK now). Confirm that partial coverage is acceptable.
-4. **Document on/off versus per-chunk switches.** Reference behaviour overrides individual switches on re-enable. Alternative: a second field. Decide before the UI copy is fixed.
-5. **Memory budget.** Adding a 768m executor lifts the sum of container limits to about 4.6 GB while the gate requires 4096 MB available RAM; confirm or lower the limit after measuring.
-6. **BE-07** (async `LLMBundle` blocks the loop) is not hit by the sync worker path; recommended to defer to Phase 5. **BE-06, BE-08, BE-09, BE-13 (insert mapping check)** are recommended to be taken on in Phase 4 (listed with their trigger above).
-7. **PARSE-09/PARSE-11 "embedded images":** images are not stored or captioned until Phase 6; only text is extracted now. Confirm the requirement is satisfied by listing them as skipped in the log.
-8. **Crash-test determinism:** the plan assumes the config knob `INGEST_BATCH_SIZE=2` in a test compose override and a TXT file of about 40 chunks; confirm that about 40 chunks per kill test is within D-16's "few dozen".
-9. **D-14 wording:** the "N of M pages had no readable text" figure is per task range; the roll-up can sum them for the document-level log line.
+1. **Poison-file classification.** Recommended: damaged Office/PDF files are retryable (3 attempts) so criterion 4 is provable with a zero-cost file. Alternative: terminal "file is damaged" and prove the cap with a different deterministic fault. Needs the planner's/user's call. RESOLVED: D-25.
+2. **chardet vs charset-normalizer.** Docs/CLAUDE.md name chardet; charset-normalizer avoids a new package. Which does the user want at the approval checkpoint? RESOLVED: D-28.
+3. **CHUNK-17 coverage in Phase 4.** English and mixed text are covered; traditional-to-simplified conversion and a dictionary Chinese tokenizer are deferred to Phase 6 (character n-grams for CJK now). Confirm that partial coverage is acceptable. RESOLVED: D-27.
+4. **Document on/off versus per-chunk switches.** Reference behaviour overrides individual switches on re-enable. Alternative: a second field. Decide before the UI copy is fixed. RESOLVED: D-26.
+5. **Memory budget.** Adding a 768m executor lifts the sum of container limits to about 4.6 GB while the gate requires 4096 MB available RAM; confirm or lower the limit after measuring. RESOLVED: D-29.
+6. **BE-07** (async `LLMBundle` blocks the loop) is not hit by the sync worker path; recommended to defer to Phase 5. **BE-06, BE-08, BE-09, BE-13 (insert mapping check)** are recommended to be taken on in Phase 4 (listed with their trigger above). RESOLVED: D-31.
+7. **PARSE-09/PARSE-11 "embedded images":** images are not stored or captioned until Phase 6; only text is extracted now. Confirm the requirement is satisfied by listing them as skipped in the log. RESOLVED: D-27.
+8. **Crash-test determinism:** the plan assumes the config knob `INGEST_BATCH_SIZE=2` in a test compose override and a TXT file of about 40 chunks; confirm that about 40 chunks per kill test is within D-16's "few dozen". RESOLVED: D-30.
+9. **D-14 wording:** the "N of M pages had no readable text" figure is per task range; the roll-up can sum them for the document-level log line. RESOLVED: plans 04-12 and 04-15. RESOLVED: plans 04-12 (roll-up sums pages_total/pages_without_text) and 04-15 (document view reports both).
 
 ## Environment Availability
 
