@@ -73,5 +73,9 @@ def test_doc_store_and_net_do_not_import_api_rag_or_quart():
 
 
 def test_new_packages_exist():
-    for package in ("rag", "rag/utils", "common/doc_store", "common/net", "rag/parsers", "rag/chunking", "rag/nlp"):
+    for package in ("rag", "rag/utils", "common/doc_store", "common/net", "rag/parsers", "rag/chunking", "rag/nlp", "rag/queue", "rag/svr"):
         assert (ROOT / package / "__init__.py").is_file(), package
+
+
+def test_queue_does_not_import_api_or_quart():
+    assert _violations("rag/queue", ("api", "quart", "quart_schema", "quart_cors")) == []
