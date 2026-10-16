@@ -38,10 +38,23 @@ Notes:
 3. Pillow's licence field reads `MIT-CMU` (the HPND-compatible permissive licence the research assumed).
 4. openpyxl and et-xmlfile are hosted on Heptapod (foss.heptapod.net), not GitHub; this is the project's long-standing home.
 
-## Install command (runs only after the human answers "approved")
+## Human decision (checkpoint answer, 2026-10-17)
+
+Verbatim: "approved, pin soupsieve<3 and use pypdfium2==5.13.0".
+
+Two variants against the table above, both re-checked:
+
+| Package | Pin used | Uploaded | Licence | OSV advisories | Yanked |
+|---|---|---|---|---|---|
+| pypdfium2 | 5.13.0 (instead of 5.14.0) | 2026-08-13 | BSD-3-Clause, Apache-2.0, dependency licences | none | no |
+| soupsieve | `<3` direct constraint, resolves to 2.10 (instead of 3.0.3) | 2026-09-24 | MIT | none | no |
+
+All other pins and `charset-normalizer==3.5.2` are unchanged.
+
+## Install command (approved)
 
 ```
-uv add "pypdfium2==5.14.0" "Pillow==12.3.0" "python-docx==1.2.0" "python-pptx==1.0.2" "openpyxl==3.1.5" "lxml==6.1.3" "beautifulsoup4==4.15.0" "charset-normalizer==3.5.2"
+uv add "pypdfium2==5.13.0" "Pillow==12.3.0" "python-docx==1.2.0" "python-pptx==1.0.2" "openpyxl==3.1.5" "lxml==6.1.3" "beautifulsoup4==4.15.0" "soupsieve<3" "charset-normalizer==3.5.2"
 uv lock --check
 ```
 
