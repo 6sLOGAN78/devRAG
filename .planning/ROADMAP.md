@@ -355,7 +355,7 @@ Plans:
 
 **Wave 5** *(blocked on Wave 4 completion)*
 
-- [ ] 04-11-PLAN.md — Pipeline: fetch, parse, chunk, embed, index; failure classifier; limiters
+- [x] 04-11-PLAN.md — Pipeline: fetch, parse, chunk, embed, index; failure classifier; limiters
 
 **Wave 6** *(blocked on Wave 5 completion)*
 
