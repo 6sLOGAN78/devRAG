@@ -144,3 +144,65 @@ def test_lock_is_reentrant_and_router_loads_module():
             pass
     assert parser_for_suffix("pdf").load().parse is parse
     assert pdfium.PdfDocument(thirteen_page_pdf())
+
+
+# --- security hardening (post-review): bounded rendering, honoured limits ---------------------------------------------------
+
+
+def test_huge_mediabox_refused_without_rendering(tmp_path, monkeypatch):
+    from rag.parsers.errors import FileTooLarge
+
+    def boom(*args, **kwargs):  # pragma: no cover - must never be reached
+        raise AssertionError("render was called for an absurd page")
+
+    monkeypatch.setattr(pdfium.PdfPage, "render", boom)
+    path = _write(tmp_path, text_pdf([["x"]], mediabox=(0, 0, 200000, 200000)))
+    with pytest.raises(FileTooLarge):
+        rasterize_page(path, 0)
+    with pytest.raises(FileTooLarge):
+        thumbnail_data_url(path)
+
+
+def test_large_but_legal_page_is_scaled_into_budget(tmp_path):
+    from rag.parsers.pdf import MAX_PIXELS, MAX_SIDE
+
+    path = _write(tmp_path, text_pdf([["x"]], mediabox=(0, 0, 14000, 14000)))
+    image = rasterize_page(path, 0)
+    assert image.width * image.height <= MAX_PIXELS * 1.01
+    assert max(image.size) <= MAX_SIDE
+
+
+def test_thumbnail_scale_follows_target_width(tmp_path, monkeypatch):
+    scales: list[float] = []
+    real = pdfium.PdfPage.render
+
+    def spy(self, *args, **kwargs):
+        scales.append(kwargs.get("scale", args[0] if args else 1))
+        return real(self, *args, **kwargs)
+
+    monkeypatch.setattr(pdfium.PdfPage, "render", spy)
+    path = _write(tmp_path, text_pdf([["x"]], mediabox=(0, 0, 2000, 2000)))
+    assert thumbnail_data_url(path).startswith("data:image/jpeg;base64,")
+    assert scales and scales[0] < 0.5
+
+
+def test_page_cap_enforced(tmp_path):
+    from rag.parsers.errors import FileTooLarge
+    from rag.parsers.types import ParseLimits
+
+    path = _write(tmp_path, thirteen_page_pdf())
+    with pytest.raises(FileTooLarge):
+        parse(SourceFile(path, "pdf", path.stat().st_size), ParseReport(), limits=ParseLimits(max_pages=12))
+    assert ParseLimits().max_pages == 20000
+    assert list(parse(SourceFile(path, "pdf", path.stat().st_size), ParseReport(), limits=ParseLimits(max_pages=13)))
+
+
+def test_max_text_bytes_enforced(tmp_path):
+    from rag.parsers.errors import FileTooLarge
+    from rag.parsers.types import ParseLimits
+
+    path = _write(tmp_path, thirteen_page_pdf())
+    report = ParseReport()
+    blocks = parse(SourceFile(path, "pdf", path.stat().st_size), report, limits=ParseLimits(max_text_bytes=100))
+    with pytest.raises(FileTooLarge):
+        list(blocks)

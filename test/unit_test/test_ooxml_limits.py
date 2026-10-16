@@ -70,3 +70,58 @@ def test_doctype_case_insensitive(tmp_path):
     data = office_files._rezip(office_files.make_docx(["x"]), {"word/document.xml": b"<!doctype x><a/>"})
     with pytest.raises(FileDamaged):
         check_ooxml_limits(_write(tmp_path, data))
+
+
+# --- security hardening (post-review): encoding, scan window and extension bypasses ----------------------------------------
+
+_HOSTILE = '<?xml version="1.0"?><!DOCTYPE x [<!ENTITY e SYSTEM "file:///etc/hostname">]><r>&e;</r>'
+
+
+def _with_part(name: str, payload: bytes) -> bytes:
+    return office_files._rezip(office_files.make_docx(["x"]), {name: payload})
+
+
+@pytest.mark.parametrize("encoding", ["utf-16", "utf-16-le", "utf-16-be"])
+def test_utf16_doctype_refused(tmp_path, encoding):
+    payload = _HOSTILE.encode(encoding)
+    if encoding != "utf-16":
+        payload = b"\xff\xfe" + payload if encoding == "utf-16-le" else payload
+    with pytest.raises(FileDamaged):
+        check_ooxml_limits(_write(tmp_path, _with_part("word/document.xml", payload)))
+
+
+def test_non_utf8_declared_encoding_refused(tmp_path):
+    payload = '<?xml version="1.0" encoding="UTF-32"?><r/>'.encode("utf-8")
+    with pytest.raises(FileDamaged):
+        check_ooxml_limits(_write(tmp_path, _with_part("word/document.xml", payload)))
+
+
+def test_doctype_after_scan_window_refused(tmp_path):
+    pad = b"<!-- " + b"a" * (8 * 2**20 + 1024) + b" -->"
+    payload = b'<?xml version="1.0"?><r>' + pad + _HOSTILE.encode().split(b"?>", 1)[1] + b"</r>"
+    with pytest.raises(FileDamaged):
+        check_ooxml_limits(_write(tmp_path, _with_part("word/document.xml", payload)))
+
+
+def test_token_straddling_chunk_boundary_refused(tmp_path):
+    for offset in range(-12, 12):
+        filler = b"a" * (1024 * 1024 + offset)
+        payload = b"<r><!--" + filler + b"--><!DOCTYPE x></r>"
+        with pytest.raises(FileDamaged):
+            check_ooxml_limits(_write(tmp_path, _with_part("word/document.xml", payload)))
+
+
+@pytest.mark.parametrize("name", ["word/evil.bin", "word/evil", "customXml/item1.data"])
+def test_doctype_in_member_without_xml_suffix_refused(tmp_path, name):
+    with pytest.raises(FileDamaged):
+        check_ooxml_limits(_write(tmp_path, _with_part(name, _HOSTILE.encode())))
+
+
+def test_binary_member_with_doctype_text_is_not_scanned(tmp_path):
+    payload = b"\x89PNG\r\n" + b"<!DOCTYPE inside a png chunk"
+    assert check_ooxml_limits(_write(tmp_path, _with_part("word/media/image1.png", payload))) is None
+
+
+def test_other_normal_office_files_pass(tmp_path):
+    assert check_ooxml_limits(_write(tmp_path, office_files.make_xlsx({"S": [[1, "a"]]}), "a.xlsx")) is None
+    assert check_ooxml_limits(_write(tmp_path, office_files.make_pptx([{"title": "t"}]), "a.pptx")) is None
