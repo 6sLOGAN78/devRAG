@@ -61,4 +61,4 @@ def test_dev_overlay_raises_only_the_three_per_ip_keys() -> None:
 def test_dev_overlay_values_do_not_appear_in_production_compose() -> None:
     text = COMPOSE.read_text(encoding="utf-8")
     assert "DEV_RATE_LIMIT_PER_IP_MAX" not in text
-    assert "100000" not in text
+    assert not re.search(r"(?<!\d)100000(?!\d)", text)
