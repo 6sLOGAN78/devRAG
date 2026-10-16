@@ -133,7 +133,13 @@ def redact_value(key: str, value: Any) -> Any:
         return tuple(redact_value("", v) for v in value)
     if isinstance(value, str):
         return redact_text(value)
-    return value
+    if isinstance(value, (bytes, bytearray)):
+        return redact_text(bytes(value).decode("utf-8", errors="replace"))
+    if isinstance(value, BaseException):
+        return redact_text(f"{type(value).__name__}: {value}")
+    if value is None or isinstance(value, (int, float, bool)):
+        return value
+    return redact_text(str(value))
 
 
 class RedactingFilter(logging.Filter):

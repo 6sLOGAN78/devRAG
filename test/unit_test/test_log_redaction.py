@@ -91,6 +91,31 @@ def test_x_api_key_header_extra_masked():
     assert out["headers"]["x-api-key"] == "***" and out["headers"]["ok"] == "fine"
 
 
+def test_exception_extra_is_redacted():
+    out = emit("x", err=ValueError("api_key=abc123def456"))
+    assert "abc123def456" not in json.dumps(out)
+
+
+def test_redact_value_handles_non_primitives():
+    from pathlib import PurePosixPath
+
+    from common.log_utils import redact_value
+
+    assert "abc123def456" not in redact_value("err", ValueError("api_key=abc123def456"))
+    assert "hunter2xyz" not in redact_value("raw", b"password=hunter2xyz")
+    assert "hunter2xyz" not in redact_value("raw", bytearray(b"password=hunter2xyz"))
+    assert "hunter2xyz" not in redact_value("s", {"password=hunter2xyz"})
+
+    class Obj:
+        def __str__(self):
+            return "token=zzzsecret99"
+
+    assert "zzzsecret99" not in redact_value("o", Obj())
+    assert redact_value("p", PurePosixPath("/a/b")) == "/a/b"
+    for plain in (3, 1.5, True, None):
+        assert redact_value("n", plain) is plain
+
+
 _HOSTILE = {
     "a_run": "a" * 100000,
     "token_repeat": "token" * 20000,

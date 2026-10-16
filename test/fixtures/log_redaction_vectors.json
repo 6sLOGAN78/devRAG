@@ -32,5 +32,6 @@
   {"id": "key_glued_to_a_word_is_masked", "input": "GET /api/v1/logmask-probe-0123456789abcdef0123456789abcdef", "uri": "/api/v1/logmask-probe-0123456789abcdef0123456789abcdef", "secrets": ["probe-0123456789abcdef0123456789abcdef", "0123456789abcdef0123456789abcdef"], "keep": ["/api/v1/logma"]},
   {"id": "key_after_equals", "input": "upstream key=sk-FAKEFAKEFAKEFAKEFAKEFAKE0007 end", "secrets": ["FAKEFAKEFAKEFAKEFAKEFAKE0007"], "keep": ["upstream", "end"]},
   {"id": "key_after_quote", "input": "rejected \"sk-FAKEFAKEFAKEFAKEFAKEFAKE0008\" end", "secrets": ["FAKEFAKEFAKEFAKEFAKEFAKE0008"], "keep": ["rejected", "end"]},
-  {"id": "key_after_underscore", "input": "id_sk-FAKEFAKEFAKEFAKEFAKEFAKE0009 end", "secrets": ["FAKEFAKEFAKEFAKEFAKEFAKE0009"], "keep": ["end"]}
+  {"id": "key_after_underscore", "input": "id_sk-FAKEFAKEFAKEFAKEFAKEFAKE0009 end", "secrets": ["FAKEFAKEFAKEFAKEFAKEFAKE0009"], "keep": ["end"]},
+  {"id": "exception_repr_api_key", "input": "ValueError: api_key=abc123def456", "secrets": ["abc123def456"], "keep": ["ValueError", "api_key"]}
 ]
