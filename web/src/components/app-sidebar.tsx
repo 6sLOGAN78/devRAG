@@ -14,10 +14,14 @@ const GROUP_CAPTION_KEYS: Record<NavGroup, string> = { platform: "nav.groupPlatf
  */
 const NESTED_PREFIXES: Readonly<Record<string, readonly string[]>> = { "/datasets": ["/dataset/"] };
 
+/** Nested pages matched when the path equals them or continues with `/`, so `/chunk` matches and `/chunks-x` does not. */
+const NESTED_PATHS: Readonly<Record<string, readonly string[]>> = { "/datasets": ["/chunk", "/document"] };
+
 /** True when `pathname` is the entry's page, a page below it, or a page registered as belonging to it. */
 export function isNavActive(entryPath: string, pathname: string): boolean {
   if (entryPath === "/") return pathname === "/";
   if (pathname === entryPath || pathname.startsWith(`${entryPath}/`)) return true;
+  if ((NESTED_PATHS[entryPath] ?? []).some((p) => pathname === p || pathname.startsWith(`${p}/`))) return true;
   return (NESTED_PREFIXES[entryPath] ?? []).some((prefix) => pathname.startsWith(prefix));
 }
 

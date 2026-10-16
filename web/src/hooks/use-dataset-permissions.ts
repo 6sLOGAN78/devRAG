@@ -22,6 +22,11 @@ export function canRemoveDocument(datasetCreatedBy: string, documentCreatedBy: s
   return canManageDataset(datasetCreatedBy, userId, role) || (userId !== null && userId !== "" && documentCreatedBy !== "" && documentCreatedBy === userId);
 }
 
+/** Parsing, switching search on or off and editing a document: the same rule as deleting it (D-02, D-10). */
+export function canChangeDocument(datasetCreatedBy: string, documentCreatedBy: string, userId: string | null, role: string): boolean {
+  return canRemoveDocument(datasetCreatedBy, documentCreatedBy, userId, role);
+}
+
 /** The caller's role in one workspace: `owner`, `admin`, `normal`, or an empty string when they are not a member. */
 export function useRoleIn(tenantId: string): string {
   return useWorkspaces().find((workspace) => workspace.tenantId === tenantId)?.role ?? "";
@@ -44,4 +49,11 @@ export function useCanRemoveDocument(dataset: { createdBy: string; tenantId: str
   const userId = useUserStore((state) => state.user?.id ?? null);
   const role = useRoleIn(dataset.tenantId);
   return canRemoveDocument(dataset.createdBy, document.createdBy, userId, role);
+}
+
+/** True when the signed-in user may parse, switch or edit this document. */
+export function useCanChangeDocument(dataset: { createdBy: string; tenantId: string }, document: { createdBy: string }): boolean {
+  const userId = useUserStore((state) => state.user?.id ?? null);
+  const role = useRoleIn(dataset.tenantId);
+  return canChangeDocument(dataset.createdBy, document.createdBy, userId, role);
 }

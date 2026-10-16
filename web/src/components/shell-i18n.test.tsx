@@ -3,7 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router";
 import { describe, expect, it } from "vitest";
 import { act } from "react";
-import { AppSidebar } from "@/components/app-sidebar";
+import { AppSidebar, isNavActive } from "@/components/app-sidebar";
 import { EmptyState } from "@/components/empty-state";
 import { ErrorState } from "@/components/error-state";
 import { SkipLink } from "@/components/skip-link";
@@ -67,5 +67,15 @@ describe("shared shell follows the language (UI-42)", () => {
     expect(screen.getByRole("navigation", { name: "主导航" })).toBeInTheDocument();
     expect(screen.getByText("首页")).toBeInTheDocument();
     expect(screen.getByText("系统状态")).toBeInTheDocument();
+  });
+});
+
+describe("sidebar nested paths (D-02)", () => {
+  it("keeps Datasets active on the chunk and document pages", () => {
+    for (const path of ["/dataset/logs", "/chunk", "/chunk/x", "/document", "/document/x"]) expect(isNavActive("/datasets", path)).toBe(true);
+  });
+
+  it("does not capture look-alike routes", () => {
+    for (const path of ["/chunks-x", "/documents", "/documentation"]) expect(isNavActive("/datasets", path)).toBe(false);
   });
 });
