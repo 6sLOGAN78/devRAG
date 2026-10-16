@@ -1,3 +1,4 @@
+/// <reference types="vite/client" />
 import { AxiosError, AxiosHeaders, type AxiosAdapter, type InternalAxiosRequestConfig } from "axios";
 
 /**
@@ -96,16 +97,33 @@ export interface Forced {
   reason?: string;
 }
 
-const ok = (config: InternalAxiosRequestConfig, data: unknown) =>
+export const ok = (config: InternalAxiosRequestConfig, data: unknown) =>
   ({ data: { code: 0, message: "", data }, status: 200, statusText: "OK", headers: new AxiosHeaders(), config }) as never;
 
-function failure(config: InternalAxiosRequestConfig, f: Forced) {
+export function failure(config: InternalAxiosRequestConfig, f: Forced) {
   const data = f.reason === undefined ? null : { reason: f.reason };
   const response = { data: { code: f.status, message: f.message, data }, status: f.status, statusText: String(f.status), headers: new AxiosHeaders(), config } as never;
   return Promise.reject(new AxiosError(`status ${f.status}`, "ERR_BAD_RESPONSE", config, null, response));
 }
 
+export interface AreaContext {
+  server: DatasetServer;
+  config: InternalAxiosRequestConfig;
+  method: string;
+  url: string;
+  params: Record<string, string | number>;
+  ok: (data: unknown) => unknown;
+  failure: (forced: Forced) => Promise<never>;
+}
+
+/** Returns `undefined` to pass, anything else (or a promise of it) answers the request. */
+export type AreaHandler = (ctx: AreaContext) => unknown;
+
 export interface DatasetServer {
+  /** Register a handler that answers before the core routes. */
+  use: (handler: AreaHandler) => void;
+  /** Per-server state for area handlers, cleared by `reset()`. */
+  areaState: <T>(key: string, init: () => T) => T;
   calls: InternalAxiosRequestConfig[];
   forced: Record<string, Forced>;
   /** Requests whose `METHOD url` key is here wait for the promise before they are answered. */
@@ -120,8 +138,19 @@ export interface DatasetServer {
   callsTo: (method: string, url: string) => InternalAxiosRequestConfig[];
 }
 
+const areaModules = import.meta.glob<{ handle?: AreaHandler }>("./server-areas/*.ts", { eager: true });
+
 export function createDatasetServer(): DatasetServer {
+  const handlers: AreaHandler[] = [];
+  const state = new Map<string, unknown>();
   const server: DatasetServer = {
+    use: (handler) => {
+      handlers.push(handler);
+    },
+    areaState: <T,>(key: string, init: () => T): T => {
+      if (!state.has(key)) state.set(key, init());
+      return state.get(key) as T;
+    },
     calls: [],
     forced: {},
     holds: {},
@@ -138,6 +167,7 @@ export function createDatasetServer(): DatasetServer {
       server.datasets = {};
       server.documents = {};
       server.uploader = "u1";
+      state.clear();
     },
     callsTo: (method, url) => server.calls.filter((c) => c.method?.toUpperCase() === method && c.url === url),
   };
@@ -153,6 +183,10 @@ export function createDatasetServer(): DatasetServer {
     const stop = server.forced[key];
     if (stop) return failure(config, stop);
     const params = (config.params ?? {}) as Record<string, string | number>;
+    for (const handler of handlers) {
+      const answer = await handler({ server, config, method, url, params, ok: (data) => ok(config, data), failure: (f) => failure(config, f) as Promise<never> });
+      if (answer !== undefined) return answer;
+    }
     if (key === "GET /v1/tenant/list") return ok(config, server.memberships);
     if (key === "GET /api/v1/models") return ok(config, []);
     if (key === "GET /api/v1/models/default") return ok(config, { chat: "", embedding: "" });
@@ -199,6 +233,12 @@ export function createDatasetServer(): DatasetServer {
       }
     }
     return failure(config, { status: 404, message: "not found" });
+  }
+
+  for (const path of Object.keys(areaModules).sort()) {
+    const handle = areaModules[path]?.handle;
+    if (typeof handle !== "function") throw new Error(`test server area ${path} must export handle`);
+    server.use(handle);
   }
 
   server.adapter = (config) => {
