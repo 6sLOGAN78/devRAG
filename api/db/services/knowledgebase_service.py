@@ -27,7 +27,6 @@ This module imports no web framework. Messages in ``ServiceError`` never hold a 
 
 from __future__ import annotations
 
-import json
 import logging
 import re
 import uuid
@@ -44,6 +43,7 @@ from api.db.models import Connector2Kb, Document, Knowledgebase, PipelineOperati
 from api.db.models.base import current_timestamp_ms, timestamp_to_date
 from api.db.services import file_service, tenant_model_service
 from api.db.services.auth_service import Principal
+from api.db.services.parser_config import MAX_PARSER_CONFIG, require_buildable, validate_parser_config  # noqa: F401  (MAX_PARSER_CONFIG is re-exported)
 from api.db.services.service_errors import Kind, ServiceError
 from api.db.services.tenant_scope import PERMISSION_ME, PERMISSION_TEAM, ActingScope, can_manage_dataset, dataset_visible, scope_for_tenant
 from api.utils import reasons
@@ -74,7 +74,6 @@ MAX_NAME = 128  # knowledgebase.name is VARCHAR(128)
 MAX_LANGUAGE = 32  # knowledgebase.language is VARCHAR(32)
 MAX_DESCRIPTION = 2000
 MAX_AVATAR = 200_000
-MAX_PARSER_CONFIG = 4096
 MAX_PAGE_SIZE = 100
 LOCK_PREFIX = "kb-create:"
 LOCK_TIMEOUT_SECONDS = 10
@@ -196,13 +195,7 @@ def _validate(req: CreateRequest) -> _Fields:
     if req.parser_config is not None:
         if not isinstance(req.parser_config, Mapping):
             raise _invalid("the parser configuration must be an object")
-        try:
-            encoded = json.dumps(dict(req.parser_config), ensure_ascii=False)
-        except (TypeError, ValueError):
-            raise _invalid("the parser configuration is not valid") from None
-        if len(encoded) > MAX_PARSER_CONFIG:
-            raise _invalid(f"the parser configuration is over {MAX_PARSER_CONFIG} characters")
-        config = dict(req.parser_config)
+        config = validate_parser_config(dict(req.parser_config), structural=_invalid)
     return _Fields(
         name=name,
         parser_id=parser_id,
@@ -482,6 +475,8 @@ def update_dataset(settings: Settings, visible: VisibleDataset, user_id: str, ch
     dataset, tenant_id = visible.dataset, visible.scope.tenant_id
     _require_manage(visible, user_id)
     fields = _validated_changes(dataset, changes)
+    if "parser_id" in changes and changes["parser_id"] != dataset.parser_id:
+        require_buildable(fields.parser_id)
     renamed = "name" in changes and fields.name != dataset.name
     wanted = changes.get("embd_id") if "embd_id" in changes else None
     swap = "embd_id" in changes and wanted != dataset.embd_id

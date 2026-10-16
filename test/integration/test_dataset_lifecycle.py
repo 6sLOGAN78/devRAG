@@ -313,6 +313,32 @@ def test_bad_values_are_refused_as_dataset_invalid_and_change_nothing(settings, 
     assert state_of(owner, dataset) == before
 
 
+@pytest.mark.parametrize(
+    ("changes", "field"),
+    [
+        pytest.param({"parser_config": {"chunk_token_num": 9000}}, "chunk_token_num", id="too-many-tokens"),
+        pytest.param({"parser_config": {"delimiter": ""}}, "delimiter", id="empty-delimiter"),
+        pytest.param({"parser_config": {"overlapped_percent": 51}}, "overlapped_percent", id="overlap"),
+    ],
+)
+def test_a_bad_parser_setting_is_typed_with_its_field_and_changes_nothing(settings, space, changes, field):
+    owner, dataset = space
+    before = state_of(owner, dataset)
+    err = refused(lambda: update(settings, owner, dataset, changes))
+    assert err.kind is Kind.INVALID and err.reason == "parser_config_invalid" and err.data == {"field": field}
+    assert state_of(owner, dataset) == before
+
+
+def test_an_unbuilt_chunking_method_cannot_be_set_on_a_dataset(settings, space):
+    owner, dataset = space
+    before = state_of(owner, dataset)
+    err = refused(lambda: update(settings, owner, dataset, {"parser_id": "qa"}))
+    assert err.kind is Kind.INVALID and err.reason == "chunker_unavailable"
+    assert state_of(owner, dataset) == before
+    err = refused(lambda: update(settings, owner, dataset, {"parser_id": "bogus"}))
+    assert err.reason == "dataset_invalid"
+
+
 def test_the_view_of_an_updated_dataset_never_carries_status_or_source(settings, space):
     owner, dataset = space
     view = kb.view_of(update(settings, owner, dataset, {"description": "v"}))

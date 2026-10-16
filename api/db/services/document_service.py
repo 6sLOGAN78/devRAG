@@ -29,7 +29,6 @@ executor with an explicit deadline.
 
 from __future__ import annotations
 
-import json
 import logging
 import re
 import uuid
@@ -45,7 +44,8 @@ from api.db.models import Document, File, File2Document, Knowledgebase
 from api.db.models.base import current_timestamp_ms, timestamp_to_date
 from api.db.services import file_service
 from api.db.services.auth_service import Principal
-from api.db.services.knowledgebase_service import MAX_PARSER_CONFIG, PARSER_IDS, DatasetRecord, VisibleDataset, load_visible_dataset, upload_lock_name
+from api.db.services.knowledgebase_service import PARSER_IDS, DatasetRecord, VisibleDataset, load_visible_dataset, upload_lock_name
+from api.db.services.parser_config import validate_parser_config
 from api.db.services.service_errors import Kind, ServiceError
 from api.db.services.tenant_scope import can_remove_document
 from api.db.services.upload_rules import (
@@ -122,13 +122,7 @@ def _parser_for(dataset: DatasetRecord, parser_id: object, parser_config: object
     if parser_config is not None:
         if not isinstance(parser_config, Mapping):
             raise _parser_invalid("the parser configuration must be an object")
-        try:
-            encoded = json.dumps(dict(parser_config), ensure_ascii=False)
-        except (TypeError, ValueError):
-            raise _parser_invalid("the parser configuration is not valid") from None
-        if len(encoded) > MAX_PARSER_CONFIG:
-            raise _parser_invalid(f"the parser configuration is over {MAX_PARSER_CONFIG} characters")
-        config = {**config, **dict(parser_config)}
+        config = {**config, **validate_parser_config(dict(parser_config), structural=_parser_invalid)}
     return (dataset.parser_id if parser_id is None else parser_id), config
 
 
