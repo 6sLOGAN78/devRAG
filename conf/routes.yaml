@@ -176,5 +176,11 @@ endpoints:
      note: "plan 04-16 changes one document's chunking method and values without re-chunking; the uploader, the dataset creator, owner or admin (D-02, D-15)"}
   - {method: POST, path: "/api/v1/datasets/{dataset_id}/documents/batch-update-status", owner: python, auth: api, roles: [owner, admin, normal], scope: tenant, implemented: true,
      note: "plan 04-17 switches whole documents on or off for search; the uploader, the dataset creator, owner or admin (D-02, D-26)"}
+  - {method: GET, path: "/api/v1/datasets/{dataset_id}/documents/{doc_id}/chunks", owner: python, auth: api, roles: [owner, admin, normal], scope: tenant, implemented: true,
+     note: "plan 04-18 lists a document's chunks in document order with positions; reads need only dataset visibility (D-12)"}
+  - {method: POST, path: "/api/v1/datasets/{dataset_id}/documents/{doc_id}/chunks", owner: python, auth: api, roles: [owner, admin, normal], scope: tenant, implemented: true,
+     note: "plan 04-18 adds a hand-made chunk, embedded before it is written; the uploader, the dataset creator, owner or admin (D-10, D-11)"}
+  - {method: PATCH, path: "/api/v1/datasets/{dataset_id}/documents/{doc_id}/chunks/{chunk_id}", owner: python, auth: api, roles: [owner, admin, normal], scope: tenant, implemented: true,
+     note: "plan 04-18 edits a chunk's text and/or its own search switch; text is embedded before it is written (D-11, D-26)"}
   - {method: POST, path: "/api/v1/datasets/{dataset_id}/documents/parse", owner: python, auth: api, roles: [owner, admin, normal], scope: tenant, implemented: true,
      note: "plan 04-14 starts, cancels and re-parses documents; the uploader, the dataset creator, owner or admin (D-02)"}

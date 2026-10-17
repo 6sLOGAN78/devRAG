@@ -319,6 +319,16 @@ def test_a_failed_embedding_leaves_text_and_vector_untouched_byte_for_byte(world
     assert edit(world, doc_id, ids[0], text="now it works")["text"] == "now it works", "no pending state was left behind"
 
 
+def test_an_embedding_that_finishes_after_the_deadline_is_dropped_not_written(world, monkeypatch):
+    doc_id = document(world)
+    ids = seed(world, doc_id, 1)
+    before = stored(world, ids[0])
+    monkeypatch.setattr(cs, "WRITE_DEADLINE_SECONDS", -1.0)
+    assert refused(lambda: edit(world, doc_id, ids[0], text="late")).reason == "provider_timeout"
+    assert refused(lambda: add(world, doc_id, "late")).reason == "provider_timeout"
+    assert stored(world, ids[0]) == before and listing(world, doc_id)["total"] == 1
+
+
 def test_the_refusal_text_never_carries_a_key(world, fake):
     doc_id = document(world)
     ids = seed(world, doc_id, 1)

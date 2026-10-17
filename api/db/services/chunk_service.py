@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import logging
 import re
+import time
 from typing import Any
 
 from api.apps.permissions_gen import allowed
@@ -48,6 +49,9 @@ MAX_PAGE_SIZE = 100
 DEFAULT_PAGE_SIZE = 20
 MAX_KEYWORDS = 128
 MAX_CHUNK_CHARS = 32000
+# The handler stops waiting after 45 s but cannot stop the worker thread. An embedding that finishes later than this is dropped instead of written,
+# so an answer of "timed out" always means nothing was stored.
+WRITE_DEADLINE_SECONDS = 40.0
 _RUNNING = "1"
 _ENABLED = "1"
 _LIST_FIELDS = ["content_with_weight", "position_int", "origin_kwd", "available_int", "page_dims_flt", "order_int"]
@@ -233,6 +237,11 @@ def _embed(settings: Settings, visible: VisibleDataset, text: str) -> list[float
         raise ServiceError(Kind.INVALID, reasons.PROVIDER_REFUSED, "the provider returned an unusable vector") from None
 
 
+def _check_deadline(started: float) -> None:
+    if time.monotonic() - started > WRITE_DEADLINE_SECONDS:
+        raise ServiceError(Kind.TIMEOUT, reasons.PROVIDER_TIMEOUT, "the provider did not answer in time")
+
+
 def _read(engine: DocStoreConnection, visible: VisibleDataset, doc_id: str, chunk_id: str) -> dict[str, Any] | None:
     """The stored chunk of this document and dataset, or None."""
     try:
@@ -260,9 +269,11 @@ def create_chunk(
     doc_store: DocStoreConnection | None = None,
 ) -> dict[str, Any]:
     """Add a hand-made chunk to the document and return it. Embeds first; a failed embedding or index write leaves the index as it was (D-11)."""
+    started = time.monotonic()
     doc = _writable_document(visible, principal, doc_id)
     clean = _clean_text(text)
     vector = _embed(settings, visible, clean)
+    _check_deadline(started)
     engine = doc_store if doc_store is not None else get_doc_store(settings)
     _require_idle(visible, doc.id)
     row = manual_row(
@@ -303,6 +314,7 @@ def update_chunk(
     doc_store: DocStoreConnection | None = None,
 ) -> dict[str, Any]:
     """Change a chunk's text and/or its own search switch and return it. With text: embed first, then write text, tokens and vector in one operation."""
+    started = time.monotonic()
     if not valid_chunk_id(chunk_id):
         raise _not_found()
     if text is None and available is None:
@@ -319,6 +331,7 @@ def update_chunk(
     values: dict[str, Any] = {}
     if clean is not None:
         vector = _embed(settings, visible, clean)  # any failure ends here: nothing has been written
+        _check_deadline(started)
         values.update(
             {
                 "content_with_weight": clean,
