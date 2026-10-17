@@ -372,7 +372,7 @@ Plans:
 
 **Wave 9** *(blocked on Wave 8 completion)*
 
-- [ ] 04-16-PLAN.md — Document detail and settings routes, list handler on the new rows, pins, matrix and leak coverage
+- [x] 04-16-PLAN.md — Document detail and settings routes, list handler on the new rows, pins, matrix and leak coverage
 
 **Wave 10** *(blocked on Wave 9 completion)*
 

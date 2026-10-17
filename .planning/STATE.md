@@ -4,13 +4,13 @@ milestone: v1.0
 milestone_name: milestone
 status: executing
 stopped_at: Completed 04-11-PLAN.md
-last_updated: "2026-10-17T04:06:41.974Z"
+last_updated: "2026-10-17T04:18:40.423Z"
 last_activity: 2026-10-17
 progress:
   total_phases: 8
   completed_phases: 3
   total_plans: 118
-  completed_plans: 99
+  completed_plans: 100
   percent: 38
 ---
 
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-10-05)
 ## Current Position
 
 Phase: 4 (ingestion-pipeline) — EXECUTING
-Plan: 17 of 35
+Plan: 18 of 35
 Status: Ready to execute
 Last activity: 2026-10-17
 
-Progress: [████████░░] 84%
+Progress: [█████████░] 85%
 
 ## Performance Metrics
 
@@ -102,6 +102,7 @@ Progress: [████████░░] 84%
 | Phase 04 P13 | 90m | - tasks | - files |
 | Phase 4 P04-15 | 45min | - tasks | - files |
 | Phase 4 P04-14 | ~2h | - tasks | - files |
+| Phase 4 P16 | 70min | - tasks | - files |
 
 ## Accumulated Context
 
@@ -169,6 +170,7 @@ Recent decisions affecting current work:
 - [Phase ?]: 04-12: user cancel keeps indexed chunks; lock released before republish; roll-up reads latest [pages]/[skipped] per task
 - [Phase ?]: 04-13: task-executor scaled copies share one image, no names; Valkey volatile-lru (R-157)
 - [Phase ?]: 04-14: cancel is not rate limited; only parse start spends a parse_rate ticket; limiter outage answers queue_unavailable (fail closed)
+- [Phase 4]: 04-16: chunking values typed open in PATCH body so bad values are typed parser_config_invalid; page-count storage failure degrades to one full-range task (R-172)
 
 ### Pending Todos
 
@@ -204,6 +206,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-10-17T04:06:41.963Z
+Last session: 2026-10-17T04:18:40.412Z
 Stopped at: Completed 04-11-PLAN.md
 Resume file: None
