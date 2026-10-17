@@ -1,0 +1,85 @@
+{
+  "datasets": {
+    "details": {
+      "reason": {
+        "noText": "This PDF has no readable text; scanned documents are not supported yet.",
+        "unsupported": "Parsing isn't available yet for this file type.",
+        "chunker": "The chosen chunking method isn't available yet.",
+        "damaged": "The file is damaged or incomplete and couldn't be opened.",
+        "tooLarge": "The file is too large to parse.",
+        "archive": "The file unpacks to more data than is allowed, so it wasn't opened.",
+        "providerTimeout": "The embedding provider timed out.",
+        "providerLimited": "The embedding provider is limiting requests.",
+        "providerUnreachable": "The embedding provider couldn't be reached.",
+        "providerRefused": "The embedding provider refused the request.",
+        "model": "This dataset's embedding model is no longer available in the workspace.",
+        "dimension": "The embedding model returned vectors of a different size than this dataset uses.",
+        "indexDown": "The search index wasn't available.",
+        "storage": "The stored file couldn't be read.",
+        "workerLost": "The worker stopped while parsing this document.",
+        "tooManyChunks": "This document produced more chunks than one parsing task can store.",
+        "queue": "The task queue wasn't available.",
+        "documentGone": "The document was deleted while it was being parsed.",
+        "unknown": "Parsing failed for an unexpected reason."
+      },
+      "step": {
+        "queue": "Waiting for a worker",
+        "fetch": "Fetching the stored file",
+        "read": "Reading the file",
+        "split": "Splitting into chunks",
+        "embed": "Creating embeddings",
+        "index": "Saving to the search index",
+        "unknown": "Unknown step"
+      }
+    },
+    "parse": {
+      "error": {
+        "unavailable": "Parsing isn't available yet for this file type.",
+        "chunker": "This document is set to a chunking method that isn't available yet. Choose General, then parse.",
+        "model": "This dataset's embedding model is no longer available in the workspace. Add it again in model settings, then parse.",
+        "queue": "The parsing queue isn't available right now. Nothing was started. Try again in a moment.",
+        "index": "The search index isn't available right now. Nothing was changed. Try again in a moment.",
+        "limited": "Too many requests right now. Wait a moment, then try again.",
+        "startFallback": "Parsing wasn't started. Try again.",
+        "cancelFallback": "Parsing wasn't cancelled. Try again.",
+        "switchFallback": "The search setting wasn't changed. Try again."
+      }
+    },
+    "chunking": {
+      "storedUnavailableDataset": "The default method is set to {{method}}, which isn't available yet. Choose General.",
+      "error": {
+        "method": "That method isn't available yet. Choose General.",
+        "running": "This document is being parsed. Wait for it to finish or cancel parsing, then change the settings.",
+        "fallback": "The settings weren't saved. Try again.",
+        "datasetGone": "This dataset no longer exists, or it isn't shared with you anymore."
+      }
+    },
+    "files": {
+      "gone": "This document no longer exists."
+    }
+  },
+  "inspector": {
+    "editor": {
+      "refused": {
+        "titleEdit": "The chunk wasn't saved",
+        "titleAdd": "The chunk wasn't added",
+        "unchanged": "The text in the search index is unchanged.",
+        "timeout": "The embedding provider timed out.",
+        "provider": "The embedding provider refused the text.",
+        "limited": "The embedding provider is limiting requests. Wait a moment and try again.",
+        "unreachable": "The embedding provider couldn't be reached.",
+        "dimension": "The embedding model returned vectors of a different size than this dataset uses.",
+        "model": "This dataset's embedding model is no longer available in the workspace.",
+        "tooLong": "This text is longer than the embedding model accepts. Shorten it or split it into two chunks.",
+        "index": "The search index isn't available right now.",
+        "running": "This document is being parsed. Editing is paused until parsing ends.",
+        "gone": "This chunk no longer exists. The document was parsed again or deleted.",
+        "documentGone": "This document no longer exists.",
+        "fallback": "The connection was lost or the server didn't answer."
+      }
+    },
+    "switch": {
+      "failed": "The chunk's search setting wasn't changed. Try again."
+    }
+  }
+}

@@ -1,0 +1,85 @@
+{
+  "datasets": {
+    "details": {
+      "reason": {
+        "noText": "此 PDF 没有可读取的文字，暂不支持扫描文档。",
+        "unsupported": "暂不支持解析此文件类型。",
+        "chunker": "所选的分块方式暂不可用。",
+        "damaged": "文件已损坏或不完整，无法打开。",
+        "tooLarge": "文件过大，无法解析。",
+        "archive": "文件解压后的数据量超出允许范围，因此未打开。",
+        "providerTimeout": "向量化服务商响应超时。",
+        "providerLimited": "向量化服务商正在限制请求。",
+        "providerUnreachable": "无法连接到向量化服务商。",
+        "providerRefused": "向量化服务商拒绝了该请求。",
+        "model": "此数据集的向量化模型在工作区中已不可用。",
+        "dimension": "向量化模型返回的向量维度与此数据集不一致。",
+        "indexDown": "搜索索引当时不可用。",
+        "storage": "无法读取已存储的文件。",
+        "workerLost": "解析此文档时，处理程序已停止。",
+        "tooManyChunks": "此文档产生的分块数量超出单个解析任务可存储的上限。",
+        "queue": "任务队列当时不可用。",
+        "documentGone": "解析过程中该文档已被删除。",
+        "unknown": "解析因意外原因失败。"
+      },
+      "step": {
+        "queue": "等待处理程序",
+        "fetch": "获取已存储的文件",
+        "read": "读取文件",
+        "split": "拆分为分块",
+        "embed": "生成向量",
+        "index": "保存到搜索索引",
+        "unknown": "未知步骤"
+      }
+    },
+    "parse": {
+      "error": {
+        "unavailable": "暂不支持解析此文件类型。",
+        "chunker": "此文档设置的分块方式暂不可用。请选择“通用”，然后再解析。",
+        "model": "此数据集的向量化模型在工作区中已不可用。请在模型设置中重新添加，然后再解析。",
+        "queue": "解析队列暂时不可用，未开始任何解析。请稍后重试。",
+        "index": "搜索索引暂时不可用，未做任何更改。请稍后重试。",
+        "limited": "当前请求过多。请稍等片刻后重试。",
+        "startFallback": "未能开始解析。请重试。",
+        "cancelFallback": "未能取消解析。请重试。",
+        "switchFallback": "未能更改搜索设置。请重试。"
+      }
+    },
+    "chunking": {
+      "storedUnavailableDataset": "默认方式设置为 {{method}}，暂不可用。请选择“通用”。",
+      "error": {
+        "method": "该方式暂不可用。请选择“通用”。",
+        "running": "此文档正在解析。请等待完成或取消解析，然后再更改设置。",
+        "fallback": "设置未保存。请重试。",
+        "datasetGone": "此数据集已不存在，或已不再与你共享。"
+      }
+    },
+    "files": {
+      "gone": "此文档已不存在。"
+    }
+  },
+  "inspector": {
+    "editor": {
+      "refused": {
+        "titleEdit": "分块未保存",
+        "titleAdd": "分块未添加",
+        "unchanged": "搜索索引中的文本保持不变。",
+        "timeout": "向量化服务商响应超时。",
+        "provider": "向量化服务商拒绝了该文本。",
+        "limited": "向量化服务商正在限制请求。请稍等片刻后重试。",
+        "unreachable": "无法连接到向量化服务商。",
+        "dimension": "向量化模型返回的向量维度与此数据集不一致。",
+        "model": "此数据集的向量化模型在工作区中已不可用。",
+        "tooLong": "此文本超出向量化模型可接受的长度。请缩短，或拆分为两个分块。",
+        "index": "搜索索引暂时不可用。",
+        "running": "此文档正在解析。解析结束前暂停编辑。",
+        "gone": "此分块已不存在。文档已被重新解析或删除。",
+        "documentGone": "此文档已不存在。",
+        "fallback": "连接已断开，或服务器没有响应。"
+      }
+    },
+    "switch": {
+      "failed": "未能更改该分块的搜索设置。请重试。"
+    }
+  }
+}

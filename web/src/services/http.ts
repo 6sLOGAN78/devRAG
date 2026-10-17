@@ -37,8 +37,10 @@ export class ApiError<T = unknown> extends Error {
   readonly data?: T;
   /** Whole seconds from a numeric `Retry-After` header; absent when the header is missing or not a plain number. */
   readonly retryAfter?: number;
+  /** Set when no answer came back: the request timed out or the connection failed. Callers test this, never the message text (FE-06). */
+  readonly kind?: "timeout" | "network";
 
-  constructor(init: { code: number; message: string; status: number; requestId?: string; data?: T; retryAfter?: number }) {
+  constructor(init: { code: number; message: string; status: number; requestId?: string; data?: T; retryAfter?: number; kind?: "timeout" | "network" }) {
     super(init.message);
     this.name = "ApiError";
     this.code = init.code;
@@ -46,6 +48,7 @@ export class ApiError<T = unknown> extends Error {
     this.requestId = init.requestId;
     this.data = init.data;
     this.retryAfter = init.retryAfter;
+    this.kind = init.kind;
   }
 }
 
@@ -222,6 +225,7 @@ http.interceptors.response.use(
       error = new ApiError({
         code: -1,
         status: 0,
+        kind: timedOut ? "timeout" : "network",
         message: timedOut ? i18n.t("toast.timeout.title") : i18n.t("toast.network.title"),
       });
     } else {
