@@ -18,11 +18,22 @@ from common.doc_store.doc_store_base import DocStoreError, index_name
 from rag.utils.es_conn import get_doc_store
 from test.helpers.doc_store_contract import DIM, row, search
 from test.helpers.uploads import pdf_bytes, sql
+from test.integration import test_upload_service as base
 from test.integration.test_document_service import team_dataset_of
 from test.integration.test_knowledgebase_service import configure, join, make, principal_of
-from test.integration.test_upload_service import FaultyStorage, _bound_database, item, llm, refused, registry, settings, space, upload  # noqa: F401
 
 pytestmark = pytest.mark.integration
+
+# Fixtures and helpers of the upload service tests, reused by name.
+_bound_database = base._bound_database
+settings = base.settings
+llm = base.llm
+registry = base.registry
+space = base.space
+FaultyStorage = base.FaultyStorage
+item = base.item
+upload = base.upload
+refused = base.refused
 
 
 class DownIndex:
