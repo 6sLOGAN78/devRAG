@@ -13,7 +13,7 @@ from api.db.services.auth_service import Principal
 from api.db.services.service_errors import Kind, ServiceError
 from api.db.services.tenant_scope import ActingScope
 from api.utils import blocking
-from api.utils.blocking import DB_EXECUTOR, DOCSTORE_EXECUTOR, PROVIDER_EXECUTOR, STORAGE_EXECUTOR, run_blocking
+from api.utils.blocking import DB_EXECUTOR, DOCSTORE_EXECUTOR, PDF_EXECUTOR, PROVIDER_EXECUTOR, STORAGE_EXECUTOR, run_blocking
 
 pytestmark = pytest.mark.unit
 
@@ -28,12 +28,12 @@ def _principal(auth_type: str = "jwt", role: str = "owner") -> Principal:
 # --- executors ---------------------------------------------------------------------------------------------------
 
 
-def test_four_named_bounded_executors_exist() -> None:
-    expected = {DB_EXECUTOR: ("db", 16), PROVIDER_EXECUTOR: ("provider", 8), DOCSTORE_EXECUTOR: ("docstore", 8), STORAGE_EXECUTOR: ("storage", 8)}
+def test_five_named_bounded_executors_exist() -> None:
+    expected = {DB_EXECUTOR: ("db", 16), PROVIDER_EXECUTOR: ("provider", 8), DOCSTORE_EXECUTOR: ("docstore", 8), STORAGE_EXECUTOR: ("storage", 8), PDF_EXECUTOR: ("pdf", 2)}
     for executor, (prefix, workers) in expected.items():
         assert executor._thread_name_prefix.startswith(prefix)  # noqa: SLF001
         assert executor._max_workers == workers  # noqa: SLF001
-    assert len({id(e) for e in expected}) == 4
+    assert len({id(e) for e in expected}) == 5
 
 
 async def test_run_blocking_returns_the_value_and_runs_off_the_loop() -> None:
