@@ -7,7 +7,7 @@
   and never links another member's file. The candidate's ``file`` row is locked ``FOR UPDATE`` first, so a delete that removes the last link
   and the blob either commits before the lookup (no candidate) or sees the new link (blob kept).
 * ``release_blobs`` is the compensation: it removes the blobs a failed request created, best effort, and logs the operation only.
-* ``release_files`` (plan 03-17) is the delete side: inside the caller's transaction it removes documents' tasks, links and rows, and returns the
+* ``release_files`` (plan 03-17) is the delete side: inside the caller's transaction it removes documents' tasks, run-log rows, links and rows, and returns the
   keys whose last link went. It takes the affected ``file`` rows ``FOR UPDATE`` first (sorted by id), so it serialises with ``reuse_or_store``
   on the same rows, and counts the remaining links with a locking read, so a link an upload committed while it waited is seen (a plain read
   would use the transaction's older snapshot and wrongly free a blob that was just reused).
@@ -21,7 +21,7 @@ import logging
 from collections.abc import Iterator, Sequence
 from dataclasses import dataclass
 
-from api.db.models import Document, File, File2Document, Task
+from api.db.models import Document, File, File2Document, PipelineOperationLog, Task
 from api.db.services.upload_rules import SeekableReader, streams_equal
 from common.constants import BUCKET_NAME
 from rag.utils.storage_base import DEFAULT_CHUNK_SIZE, Storage, StorageError, StorageNotFound, new_object_key
@@ -164,6 +164,7 @@ def release_files(document_ids: Sequence[str]) -> list[str]:
         locked = File.select(File.id, File.location).where(File.id.in_(file_ids)).order_by(File.id).for_update()
         locations = {row.id: row.location for row in locked}
     Task.delete().where(Task.doc_id.in_(ids)).execute()
+    PipelineOperationLog.delete().where(PipelineOperationLog.document_id.in_(ids)).execute()  # run history of a document that no longer exists keeps its name
     File2Document.delete().where(File2Document.document_id.in_(ids)).execute()
     Document.delete().where(Document.id.in_(ids)).execute()
     freed: list[str] = []

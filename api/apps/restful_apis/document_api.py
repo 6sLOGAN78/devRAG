@@ -30,9 +30,9 @@ from __future__ import annotations
 
 import json
 import re
-from typing import Any, Protocol
+from typing import Any, Literal, Protocol
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, model_validator
 from quart import Blueprint, Response, current_app, g, request
 from quart_schema import document_response, validate_request
 from werkzeug.exceptions import RequestEntityTooLarge
@@ -44,7 +44,7 @@ from api.db.services.knowledgebase_service import MAX_PARSER_CONFIG
 from api.db.services.service_errors import Kind, ServiceError
 from api.utils import reasons
 from api.utils.api_utils import json_result
-from api.utils.blocking import DB_EXECUTOR, STORAGE_EXECUTOR, run_blocking
+from api.utils.blocking import DB_EXECUTOR, DOCSTORE_EXECUTOR, STORAGE_EXECUTOR, run_blocking
 from common.settings import Settings, UploadSettings
 
 document_bp = Blueprint("document", __name__)
@@ -53,6 +53,7 @@ document_bp = Blueprint("document", __name__)
 UPLOAD = "/api/v1/documents/upload"
 DOCUMENTS = "/api/v1/datasets/<dataset_id>/documents"
 DOCUMENT = "/api/v1/datasets/<dataset_id>/documents/<doc_id>"
+DOCUMENT_STATUS = "/api/v1/datasets/<dataset_id>/documents/batch-update-status"
 
 FILE_FIELD = "file"
 BODY_OVERHEAD_BYTES = 1024 * 1024  # multipart framing on top of one maximal file; the 101m Nginx location is the same sum
@@ -62,6 +63,8 @@ LIST_TIMEOUT_SECONDS = 10.0
 DELETE_TIMEOUT_SECONDS = 60.0
 # The detail may read a PDF blob to count its pages; the count is cached per (document, content hash), so only the first request pays.
 DETAIL_TIMEOUT_SECONDS = 20.0
+# The switch locks rows (a deadlock retry is possible) and then updates the index by query.
+STATUS_TIMEOUT_SECONDS = 60.0
 DEFAULT_PAGE_SIZE = 12
 MAX_PAGE_SIZE = 100
 MAX_KEYWORDS = 128
@@ -178,6 +181,41 @@ class DeleteDocumentsBody(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     ids: list[str]
+
+
+class ChangeStatusBody(BaseModel):
+    """``doc_ids`` (the SPA) and/or ``doc_id`` (the endpoint catalogue: one id or a list); at least one, merged without duplicates. ``status``: "1" on, "0" off."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    doc_ids: list[str] | None = None
+    doc_id: str | list[str] | None = None
+    status: Literal["0", "1"]
+
+    @model_validator(mode="after")
+    def _at_least_one(self) -> ChangeStatusBody:
+        if self.doc_ids is None and self.doc_id is None:
+            raise ValueError("send doc_ids or doc_id")
+        return self
+
+    def merged(self) -> list[str]:
+        merged: list[str] = []
+        single = [self.doc_id] if isinstance(self.doc_id, str) else list(self.doc_id or [])
+        for value in [*(self.doc_ids or []), *single]:
+            if value not in merged:
+                merged.append(value)
+        return merged
+
+
+class StatusChange(BaseModel):
+    updated: list[str]
+    enabled: bool
+
+
+class StatusChangeEnvelope(BaseModel):
+    code: int
+    message: str
+    data: StatusChange
 
 
 class DeletedCount(BaseModel):
@@ -358,8 +396,28 @@ async def update_document(dataset_id: str, doc_id: str, data: UpdateDocumentBody
         return service_error_response(exc)
 
 
+@validate_request(ChangeStatusBody)
+@document_response(StatusChangeEnvelope, 200)
+async def change_status(dataset_id: str, data: ChangeStatusBody) -> Response:
+    try:
+        settings = _settings()
+        principal = g.principal
+        visible = await run_blocking(DB_EXECUTOR, document_service.authorize_removal, principal, dataset_id, timeout=AUTHORIZE_TIMEOUT_SECONDS)
+        ids = data.merged()
+        enabled = data.status == "1"
+        updated = await run_blocking(
+            DOCSTORE_EXECUTOR,
+            lambda: document_service.set_documents_enabled(settings, visible, principal, ids, enabled),
+            timeout=STATUS_TIMEOUT_SECONDS,
+        )
+        return json_result({"updated": updated, "enabled": enabled})
+    except ServiceError as exc:
+        return service_error_response(exc)
+
+
 document_bp.add_url_rule(UPLOAD, endpoint="upload_documents", view_func=upload_documents, methods=["POST"])
 document_bp.add_url_rule(DOCUMENTS, endpoint="list_documents", view_func=list_documents, methods=["GET"])
 document_bp.add_url_rule(DOCUMENTS, endpoint="delete_documents", view_func=delete_documents, methods=["DELETE"])
 document_bp.add_url_rule(DOCUMENT, endpoint="get_document", view_func=get_document, methods=["GET"])
 document_bp.add_url_rule(DOCUMENT, endpoint="update_document", view_func=update_document, methods=["PATCH"])
+document_bp.add_url_rule(DOCUMENT_STATUS, endpoint="change_status", view_func=change_status, methods=["POST"])

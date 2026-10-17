@@ -32,7 +32,7 @@ from __future__ import annotations
 import logging
 import re
 import uuid
-from collections.abc import Mapping, Sequence
+from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
 from typing import Any
 
@@ -74,6 +74,8 @@ _VALID = "1"  # knowledgebase.status: 1 is a live dataset
 _SOURCE_LOCAL = "local"
 _FILE_SOURCE = "knowledgebase"
 _NOT_STARTED = "0"
+_ENABLED = "1"  # document.status: the document is searchable
+_DISABLED = "0"
 MAX_PAGE_SIZE = 100
 MAX_KEYWORDS = 128
 MAX_DELETE_IDS = 100
@@ -416,6 +418,71 @@ def update_document_settings(
             if exc.args and exc.args[0] == _MYSQL_DEADLOCK and attempt < DEADLOCK_ATTEMPTS:
                 continue
             raise
+
+
+# ----------------------------------------------------------------------------- search switch
+
+
+def set_documents_enabled(
+    settings: Settings,
+    visible: VisibleDataset,
+    principal: Principal,
+    ids: Sequence[str],
+    enabled: bool,
+    *,
+    doc_store: DocStoreConnection | None = None,
+) -> list[str]:
+    """Switch whole documents on or off for search and return their ids (plan 04-17; DOC-13, D-26, R-163).
+
+    The switch is stored in ``document.status`` and written to ``doc_enabled_int`` on every chunk of the documents. A chunk's own flag is never
+    written, so switching a document back on restores exactly what was searchable before. All or nothing: every id must belong to the dataset
+    (one ``NOT_FOUND``) and the caller, judged on the permission subject, must be allowed to change each (``FORBIDDEN``). When the index update
+    fails the stored switch is put back and the answer is 503 ``index_unavailable``.
+    """
+    wanted = _clean_ids(ids)
+    dataset, scope = visible.dataset, visible.scope
+    with DB.connection_context():
+        found = list(Document.select(Document.id, Document.created_by).where(Document.id.in_(wanted) & (Document.kb_id == dataset.id)))
+    if len(found) != len(wanted):
+        raise _not_found()
+    for doc in found:
+        if not can_remove_document(doc.created_by, dataset.created_by, principal.user_id, scope.subject):
+            raise ServiceError(Kind.FORBIDDEN, reasons.FORBIDDEN, "forbidden")
+
+    target = _ENABLED if enabled else _DISABLED
+    previous = _store_status(dataset.id, wanted, lambda _old: target)
+    engine = doc_store if doc_store is not None else get_doc_store(settings)
+    try:
+        engine.update({"doc_id": wanted}, {"doc_enabled_int": 1 if enabled else 0}, index_name(scope.tenant_id), dataset.id)
+    except DocStoreError as exc:
+        logger.warning("document switch could not update the index tenant=%s dataset=%s error=%s", scope.tenant_id, dataset.id, type(exc).__name__)
+        _store_status(dataset.id, wanted, lambda old: previous.get(old[0], old[1]))
+        raise ServiceError(Kind.UNAVAILABLE, reasons.INDEX_UNAVAILABLE, "the search index is not available, try again shortly") from None
+    logger.info("document switch tenant=%s dataset=%s documents=%d enabled=%s", scope.tenant_id, dataset.id, len(wanted), enabled)
+    return wanted
+
+
+def _store_status(dataset_id: str, wanted: list[str], choose: Callable[[tuple[str, str]], str]) -> dict[str, str]:
+    """One transaction: lock the documents by primary key in order, set each one's ``status`` to ``choose((id, current))`` and return the old values.
+
+    Times are stamped by hand (``Model.update`` does not). Retried when MySQL picks it as a deadlock victim.
+    """
+    for attempt in range(1, DEADLOCK_ATTEMPTS + 1):
+        try:
+            with DB.connection_context(), transaction():
+                locked = list(Document.select(Document.id, Document.kb_id, Document.status).where(Document.id.in_(wanted)).order_by(Document.id).for_update())
+                if len(locked) != len(wanted) or any(doc.kb_id != dataset_id for doc in locked):
+                    raise _not_found()  # a concurrent delete got there first: nothing is changed
+                old = {doc.id: doc.status or _ENABLED for doc in locked}
+                now = current_timestamp_ms()
+                for doc_id in old:
+                    Document.update(status=choose((doc_id, old[doc_id])), update_time=now, update_date=timestamp_to_date(now)).where(Document.id == doc_id).execute()
+            return old
+        except peewee.OperationalError as exc:
+            if exc.args and exc.args[0] == _MYSQL_DEADLOCK and attempt < DEADLOCK_ATTEMPTS:
+                continue
+            raise
+    raise AssertionError("unreachable: the last attempt returns or raises")
 
 
 # ----------------------------------------------------------------------------- delete

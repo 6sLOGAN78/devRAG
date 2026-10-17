@@ -61,6 +61,7 @@ _ROWS: tuple[tuple[str, tuple[str, ...], str, str, str, tuple[str, ...]], ...] =
     ('PUT', ('api', 'v1', 'datasets', '{dataset_id}'), 'python', 'api', 'tenant', ('owner', 'admin', 'normal')),
     ('DELETE', ('api', 'v1', 'datasets', '{dataset_id}', 'documents'), 'python', 'api', 'tenant', ('owner', 'admin', 'normal')),
     ('GET', ('api', 'v1', 'datasets', '{dataset_id}', 'documents'), 'python', 'api', 'tenant', ('owner', 'admin', 'normal')),
+    ('POST', ('api', 'v1', 'datasets', '{dataset_id}', 'documents', 'batch-update-status'), 'python', 'api', 'tenant', ('owner', 'admin', 'normal')),
     ('POST', ('api', 'v1', 'datasets', '{dataset_id}', 'documents', 'parse'), 'python', 'api', 'tenant', ('owner', 'admin', 'normal')),
     ('GET', ('api', 'v1', 'datasets', '{dataset_id}', 'documents', '{doc_id}'), 'python', 'api', 'tenant', ('owner', 'admin', 'normal')),
     ('PATCH', ('api', 'v1', 'datasets', '{dataset_id}', 'documents', '{doc_id}'), 'python', 'api', 'tenant', ('owner', 'admin', 'normal')),

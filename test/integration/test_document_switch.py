@@ -39,7 +39,9 @@ def put(cfg, owner, dataset, doc_id: str, count: int, *, unavailable: tuple[int,
         made["available_int"] = 0 if i in unavailable else 1
         made["doc_enabled_int"] = 1
         rows.append(made)
-    assert get_doc_store(cfg).insert(rows, index_name(owner.tenant_id), dataset.id) == []
+    store = get_doc_store(cfg)
+    store.create_idx(index_name(owner.tenant_id), dataset.id, DIM, "naive")
+    assert store.insert(rows, index_name(owner.tenant_id), dataset.id) == []
     return [r["id"] for r in rows]
 
 
