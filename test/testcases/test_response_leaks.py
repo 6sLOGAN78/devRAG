@@ -541,6 +541,52 @@ def sweep_dataset_write_rows(s: Sweep, w: World) -> None:
     s.req(row, "success with several ids", "DELETE", DATASETS, a.token, {"ids": [first, second, fifth], "tenant_id": a.tenant_id})
 
 
+def sweep_parse_rows(s: Sweep, w: World) -> None:
+    """``POST /api/v1/datasets/{dataset_id}/documents/parse`` on success and error paths (plan 04-14).
+
+    Text documents are uploaded through the real route (scanned under the upload row). Every one that was started is cancelled again so the executor
+    does not keep working, and removed at the end through the delete row.
+    """
+    a, b, member = w.a, w.b, w.normal
+    token = str(w.a_tokens[0]["token"])
+    team_id = str(w.a_team_dataset["id"])
+    team = f"{DATASETS}/{team_id}/documents/parse"
+    private = f"{DATASETS}/{w.a_private_dataset['id']}/documents/parse"
+    upload_row = f"POST {UPLOAD}"
+    delete_row = f"DELETE {DATASETS}/{{dataset_id}}/documents"
+    made: list[str] = []
+
+    def uploaded(who_token: str, name: str) -> str:
+        files = [("file", (name, ("leak parse text. " * 40).encode(), "text/plain"))]
+        resp = s.req(upload_row, "document for the parse sweep", "POST", f"{UPLOAD}?dataset_id={team_id}", who_token, files=files)
+        doc_id = str(resp.json()["data"][0]["id"])
+        made.append(doc_id)
+        return doc_id
+
+    row = f"POST {DATASETS}/{{dataset_id}}/documents/parse"
+    first, second, third = uploaded(a.token, "leak-parse-one.txt"), uploaded(member.token, "leak-parse-member.txt"), uploaded(a.token, "leak-parse-token.txt")
+    s.req(row, "success as owner", "POST", team, a.token, {"doc_ids": [first], "run": "1"})
+    s.req(row, "started again at once", "POST", team, a.token, {"doc_ids": [first], "run": "1"})
+    s.req(row, "confirmation needed or already running", "POST", team, a.token, {"doc_ids": [first], "run": "1", "confirm_replace": False})
+    s.req(row, "cancel as owner", "POST", team, a.token, {"doc_ids": [first], "run": "2"})
+    s.req(row, "success as the uploading member", "POST", team, member.token, {"doc_ids": [second], "run": "1"})
+    s.req(row, "cancel as the uploading member", "POST", team, member.token, {"doc_ids": [second], "run": "2"})
+    s.req(row, "success with an API token", "POST", team, token, {"doc_ids": [third], "run": "1"})
+    s.req(row, "cancel with an API token", "POST", team, token, {"doc_ids": [third], "run": "2"})
+    s.req(row, "another member's document", "POST", team, member.token, {"doc_ids": [first], "run": "1"})
+    s.req(row, "ids that are not ids", "POST", team, a.token, {"doc_ids": ["not-hex"], "run": "1"})
+    s.req(row, "empty ids", "POST", team, a.token, {"doc_ids": [], "run": "1"})
+    s.req(row, "unknown run value", "POST", team, a.token, {"doc_ids": [first], "run": "9"})
+    s.req(row, "unknown field", "POST", team, a.token, {"doc_ids": [first], "run": "1", "priority": 1})
+    s.req(row, "unknown document", "POST", team, a.token, {"doc_ids": [uuid.uuid4().hex], "run": "1"})
+    s.req(row, "private dataset as a member", "POST", private, member.token, {"doc_ids": [str(w.a_private_documents[0]["id"])], "run": "1"})
+    s.req(row, "absent dataset", "POST", f"{DATASETS}/{uuid.uuid4().hex}/documents/parse", a.token, {"doc_ids": [first], "run": "1"})
+    s.req(row, "malformed dataset id", "POST", f"{DATASETS}/not-an-id/documents/parse", a.token, {"doc_ids": [first], "run": "1"})
+    s.req(row, "as an outsider", "POST", team, b.token, {"doc_ids": [first], "run": "1"})
+    s.errors(row, "POST", team, "PATCH")
+    s.req(delete_row, "cleanup of the parse sweep documents", "DELETE", f"{DATASETS}/{team_id}/documents", a.token, {"ids": made})
+
+
 def sealed_envelopes(tenant_id: str) -> list[str]:
     """Every sealed provider key stored for one workspace (the ``v1:`` envelopes), read straight from MySQL."""
     conn = root_connection()
@@ -605,6 +651,7 @@ def sweep(ingress: httpx.Client) -> Iterator[Sweep]:
             sweep_upload_rows(s, world)
             sweep_document_rows(s, world)
             sweep_dataset_write_rows(s, world)
+            sweep_parse_rows(s, world)
             collect_database_secrets(s)
             s.secrets.extend(infrastructure_secrets())
             yield s

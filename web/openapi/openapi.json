@@ -543,6 +543,42 @@
         "title": "ModelView",
         "type": "object"
       },
+      "ParseResult": {
+        "properties": {
+          "cancelled": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Cancelled"
+          },
+          "started": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/StartedDocument"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Started"
+          }
+        },
+        "title": "ParseResult",
+        "type": "object"
+      },
       "ProbeResult": {
         "properties": {
           "elapsed_ms": {
@@ -598,6 +634,24 @@
           "models"
         ],
         "title": "ProviderView",
+        "type": "object"
+      },
+      "StartedDocument": {
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "tasks": {
+            "title": "Tasks",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "tasks"
+        ],
+        "title": "StartedDocument",
         "type": "object"
       },
       "UploadLimitsView": {
@@ -1208,6 +1262,90 @@
                     "data"
                   ],
                   "title": "DocumentPageEnvelope",
+                  "type": "object"
+                }
+              }
+            },
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v1/datasets/{dataset_id}/documents/parse": {
+      "post": {
+        "operationId": "post_parse_documents",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "dataset_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "description": "Only these fields exist. The count and shape of the ids are the service's check, so a bad one is a typed ``ids_invalid``.",
+                "properties": {
+                  "confirm_replace": {
+                    "default": false,
+                    "title": "Confirm Replace",
+                    "type": "boolean"
+                  },
+                  "doc_ids": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "title": "Doc Ids",
+                    "type": "array"
+                  },
+                  "run": {
+                    "enum": [
+                      "1",
+                      "2"
+                    ],
+                    "title": "Run",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "doc_ids",
+                  "run"
+                ],
+                "title": "ParseBody",
+                "type": "object"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "title": "Code",
+                      "type": "integer"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/ParseResult"
+                    },
+                    "message": {
+                      "title": "Message",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "message",
+                    "data"
+                  ],
+                  "title": "ParseEnvelope",
                   "type": "object"
                 }
               }

@@ -266,7 +266,7 @@ def resource_of(row: Row) -> str:
         return "providers"
     if row.path.startswith(MODELS):
         return "models"
-    if row.path.startswith(DATASETS + "/") and row.path.endswith("/documents"):
+    if row.path.startswith(DATASETS + "/") and (row.path.endswith("/documents") or row.path.endswith("/documents/parse")):
         return "documents"
     if row.path.startswith(DATASETS):
         return "datasets"
@@ -422,11 +422,18 @@ def _delete_documents(w: World) -> Target:
     return Target({"dataset_id": str(w.a_team_dataset["id"])}, _sender("DELETE", DATASETS + "/{dataset_id}/documents", body, extra_fields=set()), w.snapshot_documents)
 
 
+def _parse_documents(w: World) -> Target:
+    """Parse A's real document: only the dataset's visibility keeps an outsider from starting work or spending A's embedding quota."""
+    body = {"doc_ids": [str(w.a_team_documents[0]["id"])], "run": "1"}
+    return Target({"dataset_id": str(w.a_team_dataset["id"])}, _sender("POST", DATASETS + "/{dataset_id}/documents/parse", body, extra_fields=set()), w.snapshot_documents)
+
+
 BUILDERS: dict[str, Builder] = {
     "GET /api/v1/datasets/{dataset_id}": _dataset_detail,
     "PUT /api/v1/datasets/{dataset_id}": _update_dataset,
     "GET /api/v1/datasets/{dataset_id}/documents": _list_documents,
     "DELETE /api/v1/datasets/{dataset_id}/documents": _delete_documents,
+    "POST /api/v1/datasets/{dataset_id}/documents/parse": _parse_documents,
     "DELETE /api/v1/providers/{provider}": _delete_provider,
     "GET /api/v1/providers/{provider}/models": _provider_models,
     "POST /api/v1/providers/{provider}/instances": _add_instance,

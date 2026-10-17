@@ -52,6 +52,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/datasets/{dataset_id}/documents/parse": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["post_parse_documents"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/documents/upload": {
         parameters: {
             query?: never;
@@ -465,6 +481,19 @@ export interface components {
             /** Used Tokens */
             used_tokens: number;
         };
+        /** ParseResult */
+        ParseResult: {
+            /**
+             * Cancelled
+             * @default null
+             */
+            cancelled: string[] | null;
+            /**
+             * Started
+             * @default null
+             */
+            started: components["schemas"]["StartedDocument"][] | null;
+        };
         /** ProbeResult */
         ProbeResult: {
             /** Elapsed Ms */
@@ -484,6 +513,13 @@ export interface components {
             name: string;
             /** Slug */
             slug: string;
+        };
+        /** StartedDocument */
+        StartedDocument: {
+            /** Id */
+            id: string;
+            /** Tasks */
+            tasks: number;
         };
         /** UploadLimitsView */
         UploadLimitsView: {
@@ -796,6 +832,50 @@ export interface operations {
                         /** Code */
                         code: number;
                         data: components["schemas"]["DeletedCount"];
+                        /** Message */
+                        message: string;
+                    };
+                };
+            };
+        };
+    };
+    post_parse_documents: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                dataset_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": {
+                    /**
+                     * Confirm Replace
+                     * @default false
+                     */
+                    confirm_replace?: boolean;
+                    /** Doc Ids */
+                    doc_ids: string[];
+                    /**
+                     * Run
+                     * @enum {string}
+                     */
+                    run: "1" | "2";
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Code */
+                        code: number;
+                        data: components["schemas"]["ParseResult"];
                         /** Message */
                         message: string;
                     };
