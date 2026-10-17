@@ -25,7 +25,7 @@ from rag.svr.failure import format_failure_line
 from rag.svr.progress import rollup_once
 from test.helpers.accounts import AccountRegistry
 from test.helpers.fake_provider import FakeProvider, running_fake_provider
-from test.helpers.ingest import World, add_document, add_task, begin_run, cleanup_tasks, make_pipeline_world, put_chunks, set_task
+from test.helpers.ingest import World, add_document, add_task, begin_run, cleanup_tasks, make_pipeline_world, poison_docx, put_chunks, set_task
 from test.helpers.uploads import sql
 from test.integration.test_chunk_service import add_document_to
 from test.integration.test_document_service import team_dataset_of
@@ -99,7 +99,7 @@ def log_row(world: World, doc_id: str, *, status: str, dsl: dict | None = None, 
 
 
 def running_doc(world: World, name: str = "a.txt") -> tuple[str, str]:
-    doc = add_document(world, name, b"hello world")
+    doc = add_document(world, name, poison_docx() if name.endswith(".docx") else b"hello world")
     task = add_task(doc)
     begin_run(doc)
     return doc, task
@@ -198,7 +198,7 @@ def test_a_failed_run_that_used_its_attempts_is_retried_and_one_that_failed_at_o
     assert entry["result"] == "failed" and entry["retried"] is True and entry["attempts"] == world.settings.ingest.max_attempts
     assert entry["error"] == {"step": "parse", "code": "file_damaged", "message": PLAIN_MESSAGES["file_damaged"]}
 
-    quick, quick_task = running_doc(world, "scan.pdf")
+    quick, quick_task = running_doc(world, "empty.txt")
     set_task(quick_task, 1.0, "10:00:01  done", retry_count=1)
     finish_through_rollup(world, quick)  # no chunks in the index: no_readable_text, terminal at once
     again = only_log(world, quick)
@@ -233,7 +233,7 @@ def test_the_log_text_is_capped_redacted_and_free_of_traces_and_paths(world):
     detail = ir.get_log(visible_of(world), log_id)
     assert len(detail["log"]) <= 3000
     text = "\n".join(detail["log"])
-    for banned in ("Traceback", "/ragflow", "/tmp", "127.0.0.1", KEY_SHAPE, "File \""):
+    for banned in ("Traceback", "/ragflow", "/tmp", "127.0.0.1", KEY_SHAPE, 'File "'):
         assert banned not in text, banned
     assert detail["log"][0].endswith("line 500") or len(detail["log"]) == 3000
 
