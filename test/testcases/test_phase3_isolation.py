@@ -163,6 +163,44 @@ def _inv_delete_documents(w: World, who: Account | None, token: str, as_tenant: 
     return call(w.client, "DELETE", f"{DATASETS}/{_team_id(w)}/documents", token, {}, body={"ids": [document]})
 
 
+def _doc_id(w: World, *, parsed: bool = False) -> str:
+    """The document a row addresses: a random id when the table asks for one, A's first team document (or its seeded parsed one) otherwise."""
+    return str(w.scratch.get("document_id") or (w.a_parsed_document if parsed else w.a_team_documents[0])["id"])
+
+
+def _doc_path(w: World, *, parsed: bool = False) -> str:
+    return f"{DATASETS}/{_team_id(w)}/documents/{_doc_id(w, parsed=parsed)}"
+
+
+def _inv_parse(w: World, who: Account | None, token: str, as_tenant: str | None) -> httpx.Response:
+    # run 2 cancels: it is a well-formed, permitted call that starts no work and spends no quota
+    return call(w.client, "POST", f"{DATASETS}/{_team_id(w)}/documents/parse", token, {}, body={"doc_ids": [_doc_id(w)], "run": "2"})
+
+
+def _inv_document(w: World, who: Account | None, token: str, as_tenant: str | None) -> httpx.Response:
+    return call(w.client, "GET", _doc_path(w), token, {})
+
+
+def _inv_update_document(w: World, who: Account | None, token: str, as_tenant: str | None) -> httpx.Response:
+    return call(w.client, "PATCH", _doc_path(w), token, {}, body={"parser_config": {"chunk_token_num": 64}})
+
+
+def _inv_batch_status(w: World, who: Account | None, token: str, as_tenant: str | None) -> httpx.Response:
+    return call(w.client, "POST", f"{DATASETS}/{_team_id(w)}/documents/batch-update-status", token, {}, body={"doc_ids": [_doc_id(w)], "status": "1"})
+
+
+def _inv_list_chunks(w: World, who: Account | None, token: str, as_tenant: str | None) -> httpx.Response:
+    return call(w.client, "GET", _doc_path(w, parsed=True) + "/chunks", token, {})
+
+
+def _inv_create_chunk(w: World, who: Account | None, token: str, as_tenant: str | None) -> httpx.Response:
+    return call(w.client, "POST", _doc_path(w, parsed=True) + "/chunks", token, {}, body={"content_with_weight": _unique("iso chunk")})
+
+
+def _inv_patch_chunk(w: World, who: Account | None, token: str, as_tenant: str | None) -> httpx.Response:
+    return call(w.client, "PATCH", _doc_path(w, parsed=True) + f"/chunks/{w.a_parsed_chunks[0]}", token, {}, body={"available": True})
+
+
 INVOKERS: dict[str, Invoker] = {
     "GET /api/v1/providers": _inv_list_providers,
     "PUT /api/v1/providers": _inv_save_provider,
@@ -181,11 +219,30 @@ INVOKERS: dict[str, Invoker] = {
     "POST /api/v1/documents/upload": _inv_upload,
     "GET /api/v1/datasets/{dataset_id}/documents": _inv_list_documents,
     "DELETE /api/v1/datasets/{dataset_id}/documents": _inv_delete_documents,
+    "POST /api/v1/datasets/{dataset_id}/documents/parse": _inv_parse,
+    "GET /api/v1/datasets/{dataset_id}/documents/{doc_id}": _inv_document,
+    "PATCH /api/v1/datasets/{dataset_id}/documents/{doc_id}": _inv_update_document,
+    "POST /api/v1/datasets/{dataset_id}/documents/batch-update-status": _inv_batch_status,
+    "GET /api/v1/datasets/{dataset_id}/documents/{doc_id}/chunks": _inv_list_chunks,
+    "POST /api/v1/datasets/{dataset_id}/documents/{doc_id}/chunks": _inv_create_chunk,
+    "PATCH /api/v1/datasets/{dataset_id}/documents/{doc_id}/chunks/{chunk_id}": _inv_patch_chunk,
 }
 
 # Rows whose registry roles let a normal member in, but whose object-level rule refuses a member for A's dataset or document
 # (settings and delete are for the creator, an owner or an admin; a document is removed by its uploader or those).
-NORMAL_IS_REFUSED_ON_A_RESOURCE = frozenset({"PUT /api/v1/datasets/{dataset_id}", "DELETE /api/v1/datasets", "DELETE /api/v1/datasets/{dataset_id}/documents"})
+NORMAL_IS_REFUSED_ON_A_RESOURCE = frozenset(
+    {
+        "PUT /api/v1/datasets/{dataset_id}",
+        "DELETE /api/v1/datasets",
+        "DELETE /api/v1/datasets/{dataset_id}/documents",
+        # Phase 4 writes on A's document: the uploader, the dataset creator, an owner or an admin (D-02, D-15, D-26)
+        "POST /api/v1/datasets/{dataset_id}/documents/parse",
+        "PATCH /api/v1/datasets/{dataset_id}/documents/{doc_id}",
+        "POST /api/v1/datasets/{dataset_id}/documents/batch-update-status",
+        "POST /api/v1/datasets/{dataset_id}/documents/{doc_id}/chunks",
+        "PATCH /api/v1/datasets/{dataset_id}/documents/{doc_id}/chunks/{chunk_id}",
+    }
+)
 # Rows whose resource is addressed by a dataset id: a stranger reaches nothing even without naming the workspace.
 ID_ROWS = frozenset(
     {
@@ -195,6 +252,13 @@ ID_ROWS = frozenset(
         "POST /api/v1/documents/upload",
         "GET /api/v1/datasets/{dataset_id}/documents",
         "DELETE /api/v1/datasets/{dataset_id}/documents",
+        "POST /api/v1/datasets/{dataset_id}/documents/parse",
+        "GET /api/v1/datasets/{dataset_id}/documents/{doc_id}",
+        "PATCH /api/v1/datasets/{dataset_id}/documents/{doc_id}",
+        "POST /api/v1/datasets/{dataset_id}/documents/batch-update-status",
+        "GET /api/v1/datasets/{dataset_id}/documents/{doc_id}/chunks",
+        "POST /api/v1/datasets/{dataset_id}/documents/{doc_id}/chunks",
+        "PATCH /api/v1/datasets/{dataset_id}/documents/{doc_id}/chunks/{chunk_id}",
     }
 )
 # Rows that call the model provider with the stored key: a refused request must never reach it.
