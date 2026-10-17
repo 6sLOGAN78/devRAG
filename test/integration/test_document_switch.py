@@ -43,6 +43,13 @@ class DownIndex:
         raise DocStoreError("index down")
 
 
+class PartialIndex:
+    """A document store whose update_by_query reports per-document failures (``update`` answers False)."""
+
+    def update(self, *args: Any, **kwargs: Any) -> bool:
+        return False
+
+
 def put(cfg, owner, dataset, doc_id: str, count: int, *, unavailable: tuple[int, ...] = ()) -> list[str]:
     rows = []
     for i in range(count):
@@ -151,6 +158,14 @@ def test_an_unreachable_index_reverts_the_stored_switch_and_is_503(settings, spa
     assert err.kind is Kind.UNAVAILABLE and err.reason == "index_unavailable"
     assert stored_status(doc_id) == "1", "the stored switch was restored"
     assert {f[1] for f in flags(settings, owner, dataset, doc_id)} == {1}
+
+
+def test_a_partial_index_update_reverts_the_stored_switch_and_is_503(settings, space):
+    owner, dataset = space
+    doc_id = made_document(settings, owner, dataset, "partial.pdf", 3)
+    err = refused(lambda: switch(settings, owner, dataset, [doc_id], False, doc_store=PartialIndex()))
+    assert err.kind is Kind.UNAVAILABLE and err.reason == "index_unavailable"
+    assert stored_status(doc_id) == "1", "the stored switch was restored"
 
 
 def test_ids_must_be_well_formed_and_not_empty(settings, space):

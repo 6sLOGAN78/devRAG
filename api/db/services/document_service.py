@@ -453,7 +453,9 @@ def set_documents_enabled(
     previous = _store_status(dataset.id, wanted, lambda _old: target)
     engine = doc_store if doc_store is not None else get_doc_store(settings)
     try:
-        engine.update({"doc_id": wanted}, {"doc_enabled_int": 1 if enabled else 0}, index_name(scope.tenant_id), dataset.id)
+        # update_by_query runs with conflicts="proceed": per-document failures come back as False, not an exception.
+        if not engine.update({"doc_id": wanted}, {"doc_enabled_int": 1 if enabled else 0}, index_name(scope.tenant_id), dataset.id):
+            raise DocStoreError("the index reported failures for some documents")
     except DocStoreError as exc:
         logger.warning("document switch could not update the index tenant=%s dataset=%s error=%s", scope.tenant_id, dataset.id, type(exc).__name__)
         _store_status(dataset.id, wanted, lambda old: previous.get(old[0], old[1]))
