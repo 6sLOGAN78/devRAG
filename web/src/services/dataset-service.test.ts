@@ -1,6 +1,6 @@
 import { AxiosHeaders, type AxiosAdapter, type InternalAxiosRequestConfig } from "axios";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { createDataset, deleteDatasets, getDataset, listDatasets, updateDataset } from "./dataset-service";
+import { createDataset, deleteDatasets, getDataset, listDatasets, updateDataset, updateDatasetChunking } from "./dataset-service";
 import { http } from "./http";
 
 const originalAdapter = http.defaults.adapter;
@@ -222,5 +222,25 @@ describe("deleteDatasets (KB-07, D-10)", () => {
   it("gives an empty list for a body without deleted ids", async () => {
     body = success(null);
     await expect(deleteDatasets(["kb1"], TENANT)).resolves.toEqual([]);
+  });
+});
+
+describe("dataset chunking values (UI-15)", () => {
+  it("reads the parser config of a detail with defaults for what the server did not send", async () => {
+    body = success({ ...datasetDto, parser_config: { chunk_token_num: 256, delimiter: "|", overlapped_percent: 10, layout_recognize: true } });
+    expect((await getDataset("kb1")).parserConfig).toEqual({ chunkTokenNum: 256, delimiter: "|", overlappedPercent: 10 });
+    body = success({ ...datasetDto, parser_config: {} });
+    expect((await getDataset("kb1")).parserConfig).toEqual({ chunkTokenNum: 512, delimiter: "\n!?;。；！？", overlappedPercent: 0 });
+    body = success({ ...datasetDto, parser_config: null });
+    expect((await getDataset("kb1")).parserConfig.chunkTokenNum).toBe(512);
+  });
+
+  it("saves the default method and values with PUT, silently", async () => {
+    body = success(datasetDto);
+    await updateDatasetChunking("kb1", { parserId: "book", chunkTokenNum: 300, delimiter: "\n", overlappedPercent: 5 });
+    expect(seen[0]?.method).toBe("put");
+    expect(seen[0]?.url).toBe("/api/v1/datasets/kb1");
+    expect(JSON.parse(seen[0]?.data as string)).toEqual({ parser_id: "book", parser_config: { chunk_token_num: 300, delimiter: "\n", overlapped_percent: 5 } });
+    expect(seen[0]?.silent).toBe(true);
   });
 });

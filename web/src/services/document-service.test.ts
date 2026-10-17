@@ -1,6 +1,6 @@
 import { AxiosHeaders, type AxiosAdapter, type InternalAxiosRequestConfig } from "axios";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { deleteDocuments, listDocuments, uploadDocument } from "./document-service";
+import { confirmCountsOf, deleteDocuments, getDocument, listDocuments, parseDocuments, setDocumentsEnabled, updateDocumentSettings, uploadDocument } from "./document-service";
 import { ApiError, http } from "./http";
 
 const originalAdapter = http.defaults.adapter;
@@ -59,6 +59,16 @@ const expectedView = {
   chunkNum: 0,
   updateTime: 1700000100000,
   createTime: 1700000000000,
+  chunkCount: 0,
+  tokenNum: 0,
+  parseable: true,
+  enabled: true,
+  thumbnail: null,
+  lastLogId: null,
+  pagesTotal: null,
+  pagesWithoutText: null,
+  progressMessage: "",
+  error: null,
 };
 
 describe("uploadDocument (DOC-01, Pitfall 8)", () => {
@@ -155,5 +165,116 @@ describe("deleteDocuments (DOC-14)", () => {
     expect(JSON.parse(seen[0]?.data as string)).toEqual({ ids: ["d1", "d2"] });
     expect(seen[0]?.silent).toBe(true);
     expect(deleted).toBe(2);
+  });
+});
+
+describe("toDocument on the Phase 4 rows (UI-13)", () => {
+  const row = { ...documentDto, chunk_count: 7, token_num: 90, parseable: false, enabled: false, last_log_id: "log1", pages_total: 12, pages_without_text: 2, progress_message: "Parsing", error: { step: "parse", code: "x", message: "bad", extra: 1 } };
+
+  it("maps the new fields and prefers chunk_count over chunk_num", async () => {
+    body = success({ items: [{ ...row, chunk_num: 3, location: "tenant/secret-key" }], total: 1 });
+    const { items } = await listDocuments({ datasetId: DATASET, page: 1, pageSize: 20, keywords: "" });
+    expect(items[0]).toMatchObject({ chunkCount: 7, chunkNum: 7, tokenNum: 90, parseable: false, enabled: false, lastLogId: "log1", pagesTotal: 12, pagesWithoutText: 2, progressMessage: "Parsing" });
+    expect(items[0]!.error).toEqual({ step: "parse", code: "x", message: "bad" });
+    expect(JSON.stringify(items[0])).not.toContain("secret-key");
+  });
+
+  it("keeps only a base64 JPEG or PNG thumbnail", async () => {
+    const make = (thumbnail: unknown) => ({ ...documentDto, thumbnail });
+    body = success({
+      items: [make("data:image/jpeg;base64,AAAA"), make("data:image/png;base64,AAAA"), make("data:image/svg+xml;base64,AAAA"), make("javascript:alert(1)"), make("https://x/y.png"), make(5)],
+      total: 6,
+    });
+    const { items } = await listDocuments({ datasetId: DATASET, page: 1, pageSize: 20, keywords: "" });
+    expect(items.map((item) => item.thumbnail)).toEqual(["data:image/jpeg;base64,AAAA", "data:image/png;base64,AAAA", null, null, null, null]);
+  });
+
+  it("cuts a progress message at 300 characters", async () => {
+    body = success({ items: [{ ...documentDto, progress_message: "m".repeat(900) }], total: 1 });
+    const { items } = await listDocuments({ datasetId: DATASET, page: 1, pageSize: 20, keywords: "" });
+    expect(items[0]!.progressMessage).toHaveLength(300);
+  });
+});
+
+describe("parseDocuments (UI-13)", () => {
+  it("posts doc_ids and run with a 30 s timeout, silently, and omits confirm_replace unless asked", async () => {
+    body = success({ started: [{ id: "d1", tasks: 2 }], cancelled: null });
+    const result = await parseDocuments(DATASET, ["d1"], "1");
+    expect(seen[0]?.url).toBe(`/api/v1/datasets/${DATASET}/documents/parse`);
+    expect(seen[0]?.method).toBe("post");
+    expect(JSON.parse(seen[0]?.data as string)).toEqual({ doc_ids: ["d1"], run: "1" });
+    expect(seen[0]?.timeout).toBe(30000);
+    expect(seen[0]?.silent).toBe(true);
+    expect(result).toEqual({ started: ["d1"], cancelled: [] });
+    seen = [];
+    body = success({ started: null, cancelled: ["d1"] });
+    expect(await parseDocuments(DATASET, ["d1"], "2", true)).toEqual({ started: [], cancelled: ["d1"] });
+    expect(JSON.parse(seen[0]?.data as string)).toEqual({ doc_ids: ["d1"], run: "2", confirm_replace: true });
+  });
+
+  it("rejects a 409 confirm_required with the ApiError and reads the counts from it", async () => {
+    http.defaults.adapter = (config) =>
+      Promise.reject(
+        Object.assign(new Error("conflict"), {
+          isAxiosError: true,
+          config,
+          response: {
+            status: 409,
+            data: { code: 409, message: "confirm", data: { documents: [{ id: "d1", name: "a.pdf", chunk_count: 4, edited_count: 1, manual_count: 2, secret: "x" }] } },
+            headers: new AxiosHeaders(),
+            config,
+          },
+        }),
+      );
+    const failure = await parseDocuments(DATASET, ["d1"], "1").catch((error: unknown) => error);
+    expect(failure).toBeInstanceOf(ApiError);
+    expect(confirmCountsOf(failure)).toEqual([{ id: "d1", name: "a.pdf", chunkCount: 4, editedCount: 1, manualCount: 2 }]);
+    expect(confirmCountsOf(new Error("x"))).toEqual([]);
+  });
+});
+
+describe("setDocumentsEnabled, getDocument, updateDocumentSettings (UI-14, UI-15)", () => {
+  it("sends doc_ids with status 1 or 0 and returns the updated ids", async () => {
+    body = success({ updated: ["d1", "d2"], enabled: false });
+    const result = await setDocumentsEnabled(DATASET, ["d1", "d2"], false);
+    expect(seen[0]?.url).toBe(`/api/v1/datasets/${DATASET}/documents/batch-update-status`);
+    expect(JSON.parse(seen[0]?.data as string)).toEqual({ doc_ids: ["d1", "d2"], status: "0" });
+    expect(seen[0]?.timeout).toBe(30000);
+    expect(seen[0]?.silent).toBe(true);
+    expect(result).toEqual({ updated: ["d1", "d2"], enabled: false });
+  });
+
+  it("maps the detail view and limits preview to pages or none", async () => {
+    const detail = { ...documentDto, chunk_token_num: 256, delimiter: "\n", overlapped_percent: 10, pages_total: 3 };
+    body = success({ ...detail, preview: "pages" });
+    const view = await getDocument(DATASET, "d1");
+    expect(seen[0]?.url).toBe(`/api/v1/datasets/${DATASET}/documents/d1`);
+    expect(seen[0]?.silent).toBe(true);
+    expect(view).toMatchObject({ chunkTokenNum: 256, delimiter: "\n", overlappedPercent: 10, preview: "pages", pagesTotal: 3 });
+    body = success({ ...detail, preview: "<script>" });
+    expect((await getDocument(DATASET, "d1")).preview).toBe("none");
+  });
+
+  it("fails clearly when the detail has no id", async () => {
+    body = success({});
+    await expect(getDocument(DATASET, "d1")).rejects.toBeInstanceOf(ApiError);
+  });
+
+  it("sends only the keys given", async () => {
+    body = success({ ...documentDto, chunk_token_num: 128 });
+    await updateDocumentSettings(DATASET, "d1", { chunkTokenNum: 128 });
+    expect(seen[0]?.method).toBe("patch");
+    expect(JSON.parse(seen[0]?.data as string)).toEqual({ parser_config: { chunk_token_num: 128 } });
+    seen = [];
+    await updateDocumentSettings(DATASET, "d1", { parserId: "book" });
+    expect(JSON.parse(seen[0]?.data as string)).toEqual({ parser_id: "book" });
+    expect(seen[0]?.silent).toBe(true);
+  });
+
+  it("encodes ids in every new path and puts no token in a URL", async () => {
+    body = success({ ...documentDto });
+    await getDocument(DATASET, "a/b");
+    expect(seen[0]?.url).toBe(`/api/v1/datasets/${DATASET}/documents/a%2Fb`);
+    expect(seen[0]?.url).not.toMatch(/token|authorization/i);
   });
 });

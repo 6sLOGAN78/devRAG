@@ -91,3 +91,55 @@ export function datasetDocumentsPath(id: string): string {
 }
 /** Multipart upload of files into a dataset (POST). */
 export const documentUploadPath = resolve("python", "/api/v1/documents/upload");
+
+const enc = encodeURIComponent;
+const datasetBase = (datasetId: string, rest: string): string => resolveUnder("python", "/api/v1/datasets/", `${enc(datasetId)}${rest}`);
+
+/** Start or cancel parsing for a batch of documents (POST). */
+export function datasetParsePath(datasetId: string): string {
+  return datasetBase(datasetId, "/documents/parse");
+}
+/** One document of a dataset (GET detail, PATCH chunking settings). */
+export function datasetDocumentPath(datasetId: string, docId: string): string {
+  return datasetBase(datasetId, `/documents/${enc(docId)}`);
+}
+/** Search switch for a batch of documents (POST `batch-update-status`). */
+export function datasetStatusPath(datasetId: string): string {
+  return datasetBase(datasetId, "/documents/batch-update-status");
+}
+/** Chunks of one document (GET list, POST add). */
+export function documentChunksPath(datasetId: string, docId: string): string {
+  return datasetBase(datasetId, `/documents/${enc(docId)}/chunks`);
+}
+/** One chunk (PATCH text or switch). */
+export function documentChunkPath(datasetId: string, docId: string, chunkId: string): string {
+  return datasetBase(datasetId, `/documents/${enc(docId)}/chunks/${enc(chunkId)}`);
+}
+/** One page of a PDF as a JPEG (GET, blob). */
+export function documentPageImagePath(datasetId: string, docId: string, page: number): string {
+  return datasetBase(datasetId, `/documents/${enc(docId)}/pages/${enc(String(Math.floor(page)))}/image`);
+}
+/** The original file (GET, blob) or its decoded text (`?format=text`). */
+export function documentContentPath(datasetId: string, docId: string): string {
+  return datasetBase(datasetId, `/documents/${enc(docId)}/content`);
+}
+/** Counts of documents by parse state (GET). */
+export function ingestionSummaryPath(datasetId: string): string {
+  return datasetBase(datasetId, "/ingestions/summary");
+}
+/** Parsing runs of a dataset (GET page). */
+export function ingestionLogsPath(datasetId: string): string {
+  return datasetBase(datasetId, "/ingestions");
+}
+/** One parsing run with its log lines (GET). */
+export function ingestionLogPath(datasetId: string, logId: string): string {
+  return datasetBase(datasetId, `/ingestions/${enc(logId)}`);
+}
+/** One embedding model check for a dataset (POST). */
+export function embeddingCheckPath(datasetId: string): string {
+  return datasetBase(datasetId, "/embedding/check");
+}
+/** One parse task (GET). */
+export function taskStatusPath(taskId: string): string {
+  return resolveUnder("python", "/v1/", `task/status/${enc(taskId)}`);
+}

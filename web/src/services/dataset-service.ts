@@ -33,10 +33,22 @@ export interface UploadLimitsView {
   allowedExtensions: string[];
 }
 
+/** The dataset's default chunking values (the document dialog and the default chunking dialog load them). */
+export interface DatasetParserConfig {
+  chunkTokenNum: number;
+  delimiter: string;
+  overlappedPercent: number;
+}
+
+export const DEFAULT_CHUNK_TOKEN_NUM = 512;
+export const DEFAULT_DELIMITER = "\n!?;。；！？";
+export const DEFAULT_OVERLAPPED_PERCENT = 0;
+
 /** One dataset opened on its own page. */
 export interface DatasetDetailView extends DatasetView {
   language: string;
   parserId: string;
+  parserConfig: DatasetParserConfig;
   chunkNum: number;
   tokenNum: number;
   createTime: number;
@@ -105,12 +117,24 @@ function toLimits(raw: unknown): UploadLimitsView | null {
   };
 }
 
+function toParserConfig(raw: unknown): DatasetParserConfig {
+  const dto = asRecord(raw);
+  const tokens = count(dto.chunk_token_num);
+  const overlap = count(dto.overlapped_percent);
+  return {
+    chunkTokenNum: tokens > 0 ? tokens : DEFAULT_CHUNK_TOKEN_NUM,
+    delimiter: typeof dto.delimiter === "string" && dto.delimiter !== "" ? dto.delimiter : DEFAULT_DELIMITER,
+    overlappedPercent: overlap > 0 ? overlap : DEFAULT_OVERLAPPED_PERCENT,
+  };
+}
+
 function toDetail(raw: unknown): DatasetDetailView {
   const dto = asRecord(raw);
   return {
     ...toDataset(raw),
     language: text(dto.language),
     parserId: text(dto.parser_id),
+    parserConfig: toParserConfig(dto.parser_config),
     chunkNum: count(dto.chunk_num),
     tokenNum: count(dto.token_num),
     createTime: count(dto.create_time),
@@ -169,4 +193,23 @@ export async function updateDataset(id: string, changes: DatasetChanges): Promis
 export async function deleteDatasets(ids: string[], tenantId: string): Promise<string[]> {
   const data = asRecord(await request<unknown>({ url: datasetsPath, method: "DELETE", data: { ids, tenant_id: tenantId }, timeout: CREATE_TIMEOUT_MS }, { silent: true }));
   return Array.isArray(data.deleted) ? data.deleted.filter((id): id is string => typeof id === "string") : [];
+}
+
+export interface DatasetChunkingInput {
+  parserId: string;
+  chunkTokenNum: number;
+  delimiter: string;
+  overlappedPercent: number;
+}
+
+/**
+ * PUT /api/v1/datasets/{id} with the default chunking method and values. The server merges a partial `parser_config`
+ * with what is stored. Existing documents keep their own values. Silent: the dialog shows the refusal inline.
+ */
+export async function updateDatasetChunking(id: string, input: DatasetChunkingInput): Promise<DatasetDetailView> {
+  const data = {
+    parser_id: input.parserId,
+    parser_config: { chunk_token_num: input.chunkTokenNum, delimiter: input.delimiter, overlapped_percent: input.overlappedPercent },
+  };
+  return toDetail(await request<unknown>({ url: datasetPath(id), method: "PUT", data, timeout: CREATE_TIMEOUT_MS }, { silent: true }));
 }
