@@ -25,6 +25,9 @@ DB_EXECUTOR = ThreadPoolExecutor(max_workers=16, thread_name_prefix="db")
 PROVIDER_EXECUTOR = ThreadPoolExecutor(max_workers=8, thread_name_prefix="provider")
 DOCSTORE_EXECUTOR = ThreadPoolExecutor(max_workers=8, thread_name_prefix="docstore")
 STORAGE_EXECUTOR = ThreadPoolExecutor(max_workers=8, thread_name_prefix="storage")
+# PDF rendering (plan 04-20, T-04-20-03). Two workers: pdfium is serialised by one process-wide lock anyway, so more threads would only queue
+# on it. ``ingest.pdf_render_threads`` is not applied to a running pool (ThreadPoolExecutor has no public resize), so the size stays 2.
+PDF_EXECUTOR = ThreadPoolExecutor(max_workers=2, thread_name_prefix="pdf")
 
 
 async def run_blocking(executor: ThreadPoolExecutor, fn: Callable[..., T], *args: object, timeout: float) -> T:  # noqa: ASYNC109 - the explicit deadline is the contract

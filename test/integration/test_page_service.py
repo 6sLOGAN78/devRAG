@@ -21,7 +21,7 @@ from api.db.services.service_errors import Kind, ServiceError
 from common.constants import BUCKET_NAME
 from rag.utils.storage_factory import get_storage
 from test.helpers.accounts import AccountRegistry
-from test.helpers.fake_provider import FakeProvider, running_fake_provider
+from test.helpers.fake_provider import running_fake_provider
 from test.helpers.ingest import World, add_document, cleanup_tasks, garbage_bytes, make_html, make_pipeline_world, text_pdf, thirteen_page_pdf
 from test.helpers.uploads import sql
 from test.integration.test_knowledgebase_service import principal_of
@@ -126,8 +126,10 @@ def test_a_text_document_and_a_foreign_dataset_have_no_image(world, registry, st
     assert refused(lambda: pages.page_image(world.settings, visible_of(world), txt, 1, storage=storage, cache=cache)).kind is Kind.NOT_FOUND
     pdf = add_document(world, "t.pdf", text_pdf([["x"]]))
     other = kbsvc.create_dataset(
-        world.settings, __import__("api.db.services.tenant_scope", fromlist=["ActingScope"]).ActingScope(tenant_id=world.owner.tenant_id, role="owner", subject="owner"),
-        world.owner.user_id, kbsvc.CreateRequest(name="other-dataset"),
+        world.settings,
+        __import__("api.db.services.tenant_scope", fromlist=["ActingScope"]).ActingScope(tenant_id=world.owner.tenant_id, role="owner", subject="owner"),
+        world.owner.user_id,
+        kbsvc.CreateRequest(name="other-dataset"),
     )
     visible = kbsvc.load_visible_dataset(principal_of(world.owner), other.id)
     assert refused(lambda: pages.page_image(world.settings, visible, pdf, 1, storage=storage, cache=cache)).kind is Kind.NOT_FOUND
@@ -189,7 +191,7 @@ def test_two_threads_render_different_pages_of_one_pdf(world, storage, cache):
 
 
 def test_the_content_stream_yields_the_exact_bytes(world, storage):
-    data = bytes(range(256)) * (3 * 4096)  # 3 MiB
+    data = (b"line of text 0123456789\n" * 4096)[:4096] * 768  # 3 MiB
     doc_id = add_document(world, "big.bin.txt", data)
     stream = pages.content_stream(world.settings, visible_of(world), doc_id, storage=storage)
     got = b"".join(stream.chunks)

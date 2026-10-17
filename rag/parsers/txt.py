@@ -35,6 +35,11 @@ def _decode(data: bytes) -> str:
     return str(best)
 
 
+def decode_text(data: bytes) -> str:
+    """Decode a text file the way the parser does (UTF-8 with BOM first, then charset detection); raises FileDamaged when nothing fits."""
+    return _decode(data)
+
+
 def parse(
     source: SourceFile,
     report: ParseReport,
