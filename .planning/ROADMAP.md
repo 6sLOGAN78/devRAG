@@ -376,7 +376,7 @@ Plans:
 
 **Wave 10** *(blocked on Wave 9 completion)*
 
-- [ ] 04-17-PLAN.md — Document search switch (D-26), deletion with real chunks and running workers
+- [x] 04-17-PLAN.md — Document search switch (D-26), deletion with real chunks and running workers
 
 **Wave 11** *(blocked on Wave 10 completion)*
 
