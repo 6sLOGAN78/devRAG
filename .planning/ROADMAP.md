@@ -398,7 +398,7 @@ Plans:
 **Wave 15** *(blocked on Wave 14 completion)*
 
 - [x] 04-22-PLAN.md — Kill, reclaim, poison, cancel, partial failure, re-parse, scaling
-- [ ] 04-25-PLAN.md — SPA polling hooks, workspace binding, failure placement and failure strings
+- [x] 04-25-PLAN.md — SPA polling hooks, workspace binding, failure placement and failure strings
 
 **Wave 16** *(blocked on Wave 15 completion)*
 

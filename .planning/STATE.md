@@ -4,13 +4,13 @@ milestone: v1.0
 milestone_name: milestone
 status: executing
 stopped_at: Completed 04-18-PLAN.md
-last_updated: "2026-10-17T06:12:13.827Z"
+last_updated: "2026-10-17T06:19:28.798Z"
 last_activity: 2026-10-17
 progress:
   total_phases: 8
   completed_phases: 3
   total_plans: 118
-  completed_plans: 107
+  completed_plans: 108
   percent: 38
 ---
 
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-10-05)
 ## Current Position
 
 Phase: 4 (ingestion-pipeline) — EXECUTING
-Plan: 25 of 35
+Plan: 26 of 35
 Status: Ready to execute
 Last activity: 2026-10-17
 
-Progress: [█████████░] 91%
+Progress: [█████████░] 92%
 
 ## Performance Metrics
 
@@ -110,6 +110,7 @@ Progress: [█████████░] 91%
 | Phase 4 P04-21 | 40min | - tasks | - files |
 | Phase 04 P24 | 25min | - tasks | - files |
 | Phase 04 P22 | 75min | - tasks | - files |
+| Phase 4 P25 | 40min | - tasks | - files |
 
 ## Accumulated Context
 
@@ -184,6 +185,7 @@ Recent decisions affecting current work:
 - [Phase ?]: R-177: page images JPEG zoom 3 with content-hash ETag, 2-thread PDF executor, bounded temp PDF cache, inline only for PDF/PNG/JPEG, HTML never text/html
 - [Phase ?]: R-178: SPA reads chunk_count with chunk_num fallback; confirmCountsOf in document-service.ts
 - [Phase ?]: R-179: executor re-settles totals when a task stops on a cancel; test containers located by label
+- [Phase ?]: R-180: ApiError.kind for timeouts, usePollHealth via query timestamps, onSettled refresh (plan 04-25)
 
 ### Pending Todos
 
@@ -219,6 +221,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-10-17T06:12:13.814Z
+Last session: 2026-10-17T06:19:28.787Z
 Stopped at: Completed 04-18-PLAN.md
 Resume file: None
