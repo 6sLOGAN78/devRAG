@@ -384,7 +384,7 @@ Plans:
 
 **Wave 12** *(blocked on Wave 11 completion)*
 
-- [ ] 04-19-PLAN.md — Ingestion summary, runs, run details, embedding check, task status
+- [x] 04-19-PLAN.md — Ingestion summary, runs, run details, embedding check, task status
 
 **Wave 13** *(blocked on Wave 12 completion)*
 
