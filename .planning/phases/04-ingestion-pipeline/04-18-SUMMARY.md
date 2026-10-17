@@ -114,3 +114,7 @@ None beyond the plan's register. T-04-18-01 (role and token tests), -02 (dataset
 ## Self-Check: PASSED
 
 Files exist; commits 5b9e319, 98d07ad, cc20cd4, 5b4d229, bfa3769 present.
+
+## Post-plan fix
+
+Commit d13ec02 added `INVOKERS` entries in `test/testcases/test_phase3_isolation.py` for the seven Phase 4 rows (parse, document detail and patch, batch-update-status, three chunk rows), closing the deferred guard-test failure. Parse uses run 2 (cancel) so the permitted call starts no work. The five uploader-or-admin writes joined `NORMAL_IS_REFUSED_ON_A_RESOURCE`. Strangers, random-id and foreign-token cases all answered the one 404; no wrong cross-tenant answer found. 95 isolation tests, 58 matrix tests, 2041 unit tests and 7/7 CI gates pass.
