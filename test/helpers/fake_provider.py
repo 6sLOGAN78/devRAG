@@ -57,6 +57,7 @@ class FakeProvider:
     embedding_dim: int = 8
     shuffle_embeddings: bool = False
     delay_ms: int = 0  # embedding endpoints answer after this many milliseconds (plan 04-11: slows a call so a cancel can land mid-request)
+    embed_mode: str = "ok"  # plan 04-18: "ok", "refuse" (400), "timeout" (no answer until teardown) or "ratelimit" (429) on the embedding endpoints
     _counters: dict[str, int] = field(default_factory=dict)
     _loop: asyncio.AbstractEventLoop | None = None
     _release: asyncio.Event | None = None
@@ -273,9 +274,13 @@ def build_app(state: FakeProvider) -> Quart:
             assert state._release is not None
             with contextlib.suppress(TimeoutError):  # answer after the delay, or at once when teardown releases
                 await asyncio.wait_for(state._release.wait(), state.delay_ms / 1000)
-        if model == "fake-timeout":
+        if model == "fake-timeout" or state.embed_mode == "timeout":
             assert state._release is not None
             await state._release.wait()
+        if state.embed_mode == "refuse":
+            return _json(_error_body("The embedding request was refused.", "invalid_request"), 400)
+        if state.embed_mode == "ratelimit":
+            return _json(_error_body("Rate limit reached.", "rate_limit_exceeded", "rate_limit_error"), 429, {"Retry-After": "0"})
         failure = _scripted_failure(state, model)
         if model == "fake-redirect":
             return _redirect()
