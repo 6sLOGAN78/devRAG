@@ -184,6 +184,8 @@ def test_cancel_keeps_the_document_cancelled_and_the_task_stops_within_three_sec
         assert 0 < history[-1] < 40
         assert doc_state(doc)["run"] == "2"
         assert log_state(doc)["status"] == "cancelled"
+        # A batch that was already in flight when the cancel landed is still written (D-06); the totals must count it (plan 04-22).
+        wait_until(lambda: doc_state(doc)["chunk_num"] == history[-1], timeout=10, interval=0.2, describe=lambda: f"{doc_state(doc)['chunk_num']} != {history[-1]}")
 
 
 def test_two_executors_share_the_work_without_duplicate_chunks(world):

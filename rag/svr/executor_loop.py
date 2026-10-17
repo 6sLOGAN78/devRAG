@@ -21,7 +21,9 @@ from enum import Enum
 import valkey
 
 from api.db.services import task_service
+from api.db.services.service_errors import ServiceError
 from api.db.services.task_service import TaskContext
+from api.db.services.totals_service import settle_totals
 from common.ingest_codes import RUN_RUNNING
 from common.settings import Settings
 from rag.queue.queue_base import QueueMessage, TaskQueue
@@ -142,6 +144,7 @@ class Executor:
         except ShutdownRequested:
             return self._hand_on(message, ctx, lock, refund=True)
         except TaskCancelled:
+            self._settle_after_cancel(ctx)
             self.queue.ack(message)
             return Outcome.CANCELLED
         except LockLost:
@@ -152,6 +155,13 @@ class Executor:
         task_service.mark_task_done(ctx.task_id, result.chunk_ids, time.monotonic() - began)
         self.queue.ack(message)
         return Outcome.DONE
+
+    def _settle_after_cancel(self, ctx: TaskContext) -> None:
+        """Count the index again. The cancel request settled the totals when it landed, but a batch already in flight is still written (D-06)."""
+        try:
+            settle_totals(self.settings, ctx.tenant_id, ctx.dataset_id, ctx.doc_id, doc_store=self.deps.doc_store)
+        except ServiceError:
+            logger.warning("could not settle totals after a cancel", extra={"task": ctx.task_id})
 
     def _pipeline(self, ctx: TaskContext, control: TaskControl) -> PipelineResult:
         limiter = self.deps.limiters.task_limiter

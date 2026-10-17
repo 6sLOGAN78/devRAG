@@ -5,7 +5,6 @@ orphan chunk (PATTERNS gotchas 25 and 26). Waiting is polling with a deadline.
 """
 from __future__ import annotations
 
-import subprocess
 import time
 from collections.abc import Iterator
 
@@ -18,7 +17,7 @@ from test.helpers.fake_provider import FakeProvider, running_stack_fake_provider
 from test.helpers.ingest import dataset_row, index_count, paragraphs, start_parse, task_rows, upload_text, wait_run
 from test.helpers.uploads import sql
 from test.helpers.wait import wait_until
-from test.testcases.conftest import BASE_URL, DOCKER, PROJECT
+from test.testcases.conftest import BASE_URL
 from test.testcases.test_dataset_flow import create, workspace
 from test.testcases.test_provider_flow import _bearer, ok
 
@@ -134,6 +133,8 @@ def test_deleting_a_dataset_leaves_the_other_datasets_chunks_in_the_same_index(i
 
 
 def test_the_executor_logs_no_traceback_for_these_runs(started_at: float) -> None:
-    out = subprocess.run([DOCKER, "logs", "--since", str(int(started_at)), f"{PROJECT}-task-executor-1"], capture_output=True, text=True, check=False, timeout=60)
-    assert out.returncode == 0, out.stderr[:200]
-    assert "Traceback" not in out.stdout + out.stderr
+    from test.helpers.executor_control import container_ids, logs_since  # the container name changes whenever the service is recreated
+
+    ids = container_ids()
+    assert ids, "no task-executor container is running"
+    assert all("Traceback" not in logs_since(cid, started_at) for cid in ids)
