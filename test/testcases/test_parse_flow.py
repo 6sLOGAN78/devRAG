@@ -96,7 +96,7 @@ def test_an_upload_parses_nothing(ingress: httpx.Client, owner: Account) -> None
     dataset_id = new_dataset(ingress, owner)
     doc = upload_text(ingress, owner, dataset_id, paragraphs(CHUNKS))
     row = doc_row(ingress, owner, dataset_id, doc["id"])
-    assert row["run"] == "0" and row["progress"] == 0 and row["chunk_num"] == 0
+    assert row["run"] == "0" and row["progress"] == 0 and row["chunk_count"] == 0
     assert task_rows(doc["id"]) == [], "no task row exists until a parse request names the document (D-01)"
 
 
@@ -106,7 +106,7 @@ def test_parse_takes_a_document_from_not_started_to_finished_with_the_index_as_t
     assert [s["id"] for s in started] == [finished.doc_id]
     row = finished.row
     assert row["run"] == "3" and row["progress"] == 1
-    assert finished.count == CHUNKS and row["chunk_num"] == finished.count, "the document counter equals the index"
+    assert finished.count == CHUNKS and row["chunk_count"] == finished.count, "the document counter equals the index"
     assert row["token_num"] > 0
     dataset = dataset_row(ingress, owner, finished.dataset_id)
     assert dataset["chunk_num"] == finished.count and dataset["token_num"] == row["token_num"]
@@ -126,7 +126,7 @@ def test_a_confirmed_reparse_replaces_the_chunks_and_ends_with_the_same_count(in
     resp = start_parse(ingress, owner, finished.dataset_id, [finished.doc_id], confirm=True)
     assert resp.status_code == 200, resp.text
     row = wait_run(ingress, owner, finished.dataset_id, finished.doc_id, "3", timeout=120)
-    assert row["progress"] == 1 and row["chunk_num"] == finished.count
+    assert row["progress"] == 1 and row["chunk_count"] == finished.count
     assert index_count(settings, owner.tenant_id, finished.dataset_id, finished.doc_id) == finished.count
 
 
@@ -160,7 +160,7 @@ def test_cancel_keeps_the_indexed_chunks_and_a_following_parse_finishes_without_
     again = start_parse(ingress, owner, dataset_id, [doc["id"]])
     assert again.status_code == 200, "nothing was edited, so no dialog is needed after a cancel"
     row = wait_run(ingress, owner, dataset_id, doc["id"], "3", timeout=180)
-    assert row["chunk_num"] == LONG == index_count(settings, owner.tenant_id, dataset_id, doc["id"])
+    assert row["chunk_count"] == LONG == index_count(settings, owner.tenant_id, dataset_id, doc["id"])
 
 
 # ----------------------------------------------------------------------------- who may parse

@@ -68,6 +68,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/datasets/{dataset_id}/documents/{doc_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["get_get_document"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["patch_update_document"];
+        trace?: never;
+    };
     "/api/v1/documents/upload": {
         parameters: {
             query?: never;
@@ -290,6 +306,27 @@ export interface components {
             redis: components["schemas"]["ProbeResult"];
             storage: components["schemas"]["ProbeResult"];
         };
+        /**
+         * ChunkingValues
+         * @description The three chunking values one document may change. A bad value is a typed 400 ``parser_config_invalid`` from the service, so the types are open here.
+         */
+        ChunkingValues: {
+            /**
+             * Chunk Token Num
+             * @default null
+             */
+            chunk_token_num: unknown;
+            /**
+             * Delimiter
+             * @default null
+             */
+            delimiter: unknown;
+            /**
+             * Overlapped Percent
+             * @default null
+             */
+            overlapped_percent: unknown;
+        };
         /** DatasetPage */
         DatasetPage: {
             /** Items */
@@ -360,14 +397,129 @@ export interface components {
             /** Deleted */
             deleted: boolean;
         };
+        /** DocumentDetailView */
+        DocumentDetailView: {
+            /** Chunk Count */
+            chunk_count: number;
+            /** Chunk Token Num */
+            chunk_token_num: number;
+            /** Create Time */
+            create_time: number;
+            /** Created By */
+            created_by: string;
+            /** Dataset Id */
+            dataset_id: string;
+            /** Delimiter */
+            delimiter: string;
+            /** Enabled */
+            enabled: boolean;
+            error: components["schemas"]["DocumentErrorView"] | null;
+            /** Id */
+            id: string;
+            /** Last Log Id */
+            last_log_id: string | null;
+            /** Name */
+            name: string;
+            /** Overlapped Percent */
+            overlapped_percent: number;
+            /** Pages Total */
+            pages_total: number | null;
+            /** Pages Without Text */
+            pages_without_text: number | null;
+            /** Parseable */
+            parseable: boolean;
+            /** Parser Id */
+            parser_id: string;
+            /** Preview */
+            preview: string;
+            /** Progress */
+            progress: number;
+            /** Progress Message */
+            progress_message: string;
+            /** Run */
+            run: string;
+            /** Size */
+            size: number;
+            /** Suffix */
+            suffix: string;
+            /** Thumbnail */
+            thumbnail: string | null;
+            /** Token Num */
+            token_num: number;
+            /** Type */
+            type: string;
+            /** Update Time */
+            update_time: number;
+        };
+        /** DocumentErrorView */
+        DocumentErrorView: {
+            /** Code */
+            code: string;
+            /** Message */
+            message: string;
+            /** Step */
+            step: string;
+        };
         /** DocumentPage */
         DocumentPage: {
             /** Items */
-            items: components["schemas"]["DocumentView"][];
+            items: components["schemas"]["DocumentRowView"][];
             /** Total */
             total: number;
         };
-        /** DocumentView */
+        /**
+         * DocumentRowView
+         * @description One list row (``document_view.ROW_KEYS``).
+         */
+        DocumentRowView: {
+            /** Chunk Count */
+            chunk_count: number;
+            /** Create Time */
+            create_time: number;
+            /** Created By */
+            created_by: string;
+            /** Dataset Id */
+            dataset_id: string;
+            /** Enabled */
+            enabled: boolean;
+            error: components["schemas"]["DocumentErrorView"] | null;
+            /** Id */
+            id: string;
+            /** Last Log Id */
+            last_log_id: string | null;
+            /** Name */
+            name: string;
+            /** Pages Total */
+            pages_total: number | null;
+            /** Pages Without Text */
+            pages_without_text: number | null;
+            /** Parseable */
+            parseable: boolean;
+            /** Parser Id */
+            parser_id: string;
+            /** Progress */
+            progress: number;
+            /** Progress Message */
+            progress_message: string;
+            /** Run */
+            run: string;
+            /** Size */
+            size: number;
+            /** Suffix */
+            suffix: string;
+            /** Thumbnail */
+            thumbnail: string | null;
+            /** Token Num */
+            token_num: number;
+            /** Type */
+            type: string;
+            /** Update Time */
+            update_time: number;
+        };
+        /**
+         * DocumentView
+         * @description The upload response row (the narrow Phase 3 key set).
+         */
         DocumentView: {
             /** Chunk Num */
             chunk_num: number;
@@ -876,6 +1028,74 @@ export interface operations {
                         /** Code */
                         code: number;
                         data: components["schemas"]["ParseResult"];
+                        /** Message */
+                        message: string;
+                    };
+                };
+            };
+        };
+    };
+    get_get_document: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                dataset_id: string;
+                doc_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Code */
+                        code: number;
+                        data: components["schemas"]["DocumentDetailView"];
+                        /** Message */
+                        message: string;
+                    };
+                };
+            };
+        };
+    };
+    patch_update_document: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                dataset_id: string;
+                doc_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": {
+                    /** @default null */
+                    parser_config?: components["schemas"]["ChunkingValues"] | null;
+                    /**
+                     * Parser Id
+                     * @default null
+                     */
+                    parser_id?: string | null;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Code */
+                        code: number;
+                        data: components["schemas"]["DocumentDetailView"];
                         /** Message */
                         message: string;
                     };

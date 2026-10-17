@@ -52,6 +52,7 @@ document_bp = Blueprint("document", __name__)
 # Identical to the endpoint rows in conf/routes.yaml (Quart spells a path parameter <name>, the registry {name}).
 UPLOAD = "/api/v1/documents/upload"
 DOCUMENTS = "/api/v1/datasets/<dataset_id>/documents"
+DOCUMENT = "/api/v1/datasets/<dataset_id>/documents/<doc_id>"
 
 FILE_FIELD = "file"
 BODY_OVERHEAD_BYTES = 1024 * 1024  # multipart framing on top of one maximal file; the 101m Nginx location is the same sum
@@ -59,6 +60,8 @@ AUTHORIZE_TIMEOUT_SECONDS = 10.0
 LIST_TIMEOUT_SECONDS = 10.0
 # The service waits up to 30 s for the dataset lock and gives the index engine its own deadline; the handler waits longer so the typed errors win.
 DELETE_TIMEOUT_SECONDS = 60.0
+# The detail may read a PDF blob to count its pages; the count is cached per (document, content hash), so only the first request pays.
+DETAIL_TIMEOUT_SECONDS = 20.0
 DEFAULT_PAGE_SIZE = 12
 MAX_PAGE_SIZE = 100
 MAX_KEYWORDS = 128
@@ -71,6 +74,8 @@ class _LimitedRequest(Protocol):
 
 
 class DocumentView(BaseModel):
+    """The upload response row (the narrow Phase 3 key set)."""
+
     id: str
     name: str
     size: int
@@ -87,6 +92,69 @@ class DocumentView(BaseModel):
     update_time: int
 
 
+class DocumentErrorView(BaseModel):
+    step: str
+    code: str
+    message: str
+
+
+class DocumentRowView(BaseModel):
+    """One list row (``document_view.ROW_KEYS``)."""
+
+    id: str
+    name: str
+    size: int
+    type: str
+    suffix: str
+    dataset_id: str
+    created_by: str
+    parser_id: str
+    create_time: int
+    update_time: int
+    run: str
+    progress: float
+    progress_message: str
+    chunk_count: int
+    token_num: int
+    parseable: bool
+    enabled: bool
+    thumbnail: str | None
+    last_log_id: str | None
+    pages_total: int | None
+    pages_without_text: int | None
+    error: DocumentErrorView | None
+
+
+class DocumentDetailView(DocumentRowView):
+    chunk_token_num: int
+    delimiter: str
+    overlapped_percent: int
+    preview: str
+
+
+class DocumentDetailEnvelope(BaseModel):
+    code: int
+    message: str
+    data: DocumentDetailView
+
+
+class ChunkingValues(BaseModel):
+    """The three chunking values one document may change. A bad value is a typed 400 ``parser_config_invalid`` from the service, so the types are open here."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    chunk_token_num: Any = None
+    delimiter: Any = None
+    overlapped_percent: Any = None
+
+
+class UpdateDocumentBody(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    parser_id: str | None = None
+    parser_config: ChunkingValues | None = None
+
+
 class DocumentListEnvelope(BaseModel):
     code: int
     message: str
@@ -94,7 +162,7 @@ class DocumentListEnvelope(BaseModel):
 
 
 class DocumentPage(BaseModel):
-    items: list[DocumentView]
+    items: list[DocumentRowView]
     total: int
 
 
@@ -231,7 +299,7 @@ async def list_documents(dataset_id: str) -> Response:
         principal = g.principal  # read on the loop: the request context does not follow the call into the worker thread
         view = await run_blocking(
             DB_EXECUTOR,
-            lambda: document_service.list_view(principal, dataset_id, page=page, page_size=page_size, keywords=keywords),
+            lambda: document_service.list_rows_view(principal, dataset_id, page=page, page_size=page_size, keywords=keywords),
             timeout=LIST_TIMEOUT_SECONDS,
         )
         return json_result(view)
@@ -257,6 +325,41 @@ async def delete_documents(dataset_id: str, data: DeleteDocumentsBody) -> Respon
         return service_error_response(exc)
 
 
+@document_response(DocumentDetailEnvelope, 200)
+async def get_document(dataset_id: str, doc_id: str) -> Response:
+    try:
+        settings = _settings()
+        principal = g.principal
+        detail = await run_blocking(
+            STORAGE_EXECUTOR,
+            lambda: document_service.detail_view(settings, principal, dataset_id, doc_id),
+            timeout=DETAIL_TIMEOUT_SECONDS,
+        )
+        return json_result(detail)
+    except ServiceError as exc:
+        return service_error_response(exc)
+
+
+@validate_request(UpdateDocumentBody)
+@document_response(DocumentDetailEnvelope, 200)
+async def update_document(dataset_id: str, doc_id: str, data: UpdateDocumentBody) -> Response:
+    try:
+        settings = _settings()
+        principal = g.principal
+        parser_id = data.parser_id
+        parser_config = None if data.parser_config is None else data.parser_config.model_dump(exclude_unset=True)
+        detail = await run_blocking(
+            STORAGE_EXECUTOR,
+            lambda: document_service.change_settings_view(settings, principal, dataset_id, doc_id, parser_id, parser_config),
+            timeout=DETAIL_TIMEOUT_SECONDS,
+        )
+        return json_result(detail)
+    except ServiceError as exc:
+        return service_error_response(exc)
+
+
 document_bp.add_url_rule(UPLOAD, endpoint="upload_documents", view_func=upload_documents, methods=["POST"])
 document_bp.add_url_rule(DOCUMENTS, endpoint="list_documents", view_func=list_documents, methods=["GET"])
 document_bp.add_url_rule(DOCUMENTS, endpoint="delete_documents", view_func=delete_documents, methods=["DELETE"])
+document_bp.add_url_rule(DOCUMENT, endpoint="get_document", view_func=get_document, methods=["GET"])
+document_bp.add_url_rule(DOCUMENT, endpoint="update_document", view_func=update_document, methods=["PATCH"])

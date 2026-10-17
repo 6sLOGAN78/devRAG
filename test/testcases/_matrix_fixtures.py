@@ -266,7 +266,7 @@ def resource_of(row: Row) -> str:
         return "providers"
     if row.path.startswith(MODELS):
         return "models"
-    if row.path.startswith(DATASETS + "/") and (row.path.endswith("/documents") or row.path.endswith("/documents/parse")):
+    if row.path.startswith(DATASETS + "/") and "/documents" in row.path:
         return "documents"
     if row.path.startswith(DATASETS):
         return "datasets"
@@ -428,12 +428,26 @@ def _parse_documents(w: World) -> Target:
     return Target({"dataset_id": str(w.a_team_dataset["id"])}, _sender("POST", DATASETS + "/{dataset_id}/documents/parse", body, extra_fields=set()), w.snapshot_documents)
 
 
+def _document_detail(w: World) -> Target:
+    ids = {"dataset_id": str(w.a_team_dataset["id"]), "doc_id": str(w.a_team_documents[0]["id"])}
+    return Target(ids, _sender("GET", DATASETS + "/{dataset_id}/documents/{doc_id}", extra_fields=set()), w.snapshot_documents)
+
+
+def _update_document(w: World) -> Target:
+    """PATCH on A's real document: only the dataset's visibility keeps an outsider from changing how it is chunked."""
+    ids = {"dataset_id": str(w.a_team_dataset["id"]), "doc_id": str(w.a_team_documents[0]["id"])}
+    body = {"parser_config": {"chunk_token_num": 64}}
+    return Target(ids, _sender("PATCH", DATASETS + "/{dataset_id}/documents/{doc_id}", body, extra_fields=set()), w.snapshot_documents)
+
+
 BUILDERS: dict[str, Builder] = {
     "GET /api/v1/datasets/{dataset_id}": _dataset_detail,
     "PUT /api/v1/datasets/{dataset_id}": _update_dataset,
     "GET /api/v1/datasets/{dataset_id}/documents": _list_documents,
     "DELETE /api/v1/datasets/{dataset_id}/documents": _delete_documents,
     "POST /api/v1/datasets/{dataset_id}/documents/parse": _parse_documents,
+    "GET /api/v1/datasets/{dataset_id}/documents/{doc_id}": _document_detail,
+    "PATCH /api/v1/datasets/{dataset_id}/documents/{doc_id}": _update_document,
     "DELETE /api/v1/providers/{provider}": _delete_provider,
     "GET /api/v1/providers/{provider}/models": _provider_models,
     "POST /api/v1/providers/{provider}/instances": _add_instance,

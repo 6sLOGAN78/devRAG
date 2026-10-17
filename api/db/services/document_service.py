@@ -332,6 +332,33 @@ def list_rows_view(principal: Principal, dataset_id: str, *, page: int, page_siz
     return {"items": items, "total": total}
 
 
+def detail_view(settings: Settings, principal: Principal, dataset_id: str, doc_id: str, *, storage: Storage | None = None) -> dict[str, Any]:
+    """One document of a dataset the caller can see, with its chunking settings and preview kind; the one ``NOT_FOUND`` otherwise.
+
+    Blocking (the page count of a PDF may read its blob): the caller runs this in the storage executor with a deadline.
+    """
+    from api.db.services import document_view  # local: document_view imports this module
+
+    visible = load_visible_dataset(principal, dataset_id)
+    return document_view.document_detail(settings, visible, doc_id, storage=storage)
+
+
+def change_settings_view(
+    settings: Settings,
+    principal: Principal,
+    dataset_id: str,
+    doc_id: str,
+    parser_id: object,
+    parser_config: object,
+    *,
+    storage: Storage | None = None,
+) -> dict[str, Any]:
+    """Authorise, change one document's settings and answer the new detail."""
+    visible = authorize_removal(principal, dataset_id)
+    update_document_settings(settings, visible, principal, doc_id, parser_id, parser_config)
+    return detail_view(settings, principal, dataset_id, doc_id, storage=storage)
+
+
 # ----------------------------------------------------------------------------- settings
 
 _CHUNKING_KEYS = ("chunk_token_num", "delimiter", "overlapped_percent")

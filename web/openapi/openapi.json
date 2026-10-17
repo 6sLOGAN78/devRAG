@@ -25,6 +25,26 @@
         "title": "Checks",
         "type": "object"
       },
+      "ChunkingValues": {
+        "additionalProperties": false,
+        "description": "The three chunking values one document may change. A bad value is a typed 400 ``parser_config_invalid`` from the service, so the types are open here.",
+        "properties": {
+          "chunk_token_num": {
+            "default": null,
+            "title": "Chunk Token Num"
+          },
+          "delimiter": {
+            "default": null,
+            "title": "Delimiter"
+          },
+          "overlapped_percent": {
+            "default": null,
+            "title": "Overlapped Percent"
+          }
+        },
+        "title": "ChunkingValues",
+        "type": "object"
+      },
       "DatasetPage": {
         "properties": {
           "items": {
@@ -218,11 +238,206 @@
         "title": "DeletedView",
         "type": "object"
       },
+      "DocumentDetailView": {
+        "properties": {
+          "chunk_count": {
+            "title": "Chunk Count",
+            "type": "integer"
+          },
+          "chunk_token_num": {
+            "title": "Chunk Token Num",
+            "type": "integer"
+          },
+          "create_time": {
+            "title": "Create Time",
+            "type": "integer"
+          },
+          "created_by": {
+            "title": "Created By",
+            "type": "string"
+          },
+          "dataset_id": {
+            "title": "Dataset Id",
+            "type": "string"
+          },
+          "delimiter": {
+            "title": "Delimiter",
+            "type": "string"
+          },
+          "enabled": {
+            "title": "Enabled",
+            "type": "boolean"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/DocumentErrorView"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "last_log_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Log Id"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "overlapped_percent": {
+            "title": "Overlapped Percent",
+            "type": "integer"
+          },
+          "pages_total": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pages Total"
+          },
+          "pages_without_text": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pages Without Text"
+          },
+          "parseable": {
+            "title": "Parseable",
+            "type": "boolean"
+          },
+          "parser_id": {
+            "title": "Parser Id",
+            "type": "string"
+          },
+          "preview": {
+            "title": "Preview",
+            "type": "string"
+          },
+          "progress": {
+            "title": "Progress",
+            "type": "number"
+          },
+          "progress_message": {
+            "title": "Progress Message",
+            "type": "string"
+          },
+          "run": {
+            "title": "Run",
+            "type": "string"
+          },
+          "size": {
+            "title": "Size",
+            "type": "integer"
+          },
+          "suffix": {
+            "title": "Suffix",
+            "type": "string"
+          },
+          "thumbnail": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Thumbnail"
+          },
+          "token_num": {
+            "title": "Token Num",
+            "type": "integer"
+          },
+          "type": {
+            "title": "Type",
+            "type": "string"
+          },
+          "update_time": {
+            "title": "Update Time",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "size",
+          "type",
+          "suffix",
+          "dataset_id",
+          "created_by",
+          "parser_id",
+          "create_time",
+          "update_time",
+          "run",
+          "progress",
+          "progress_message",
+          "chunk_count",
+          "token_num",
+          "parseable",
+          "enabled",
+          "thumbnail",
+          "last_log_id",
+          "pages_total",
+          "pages_without_text",
+          "error",
+          "chunk_token_num",
+          "delimiter",
+          "overlapped_percent",
+          "preview"
+        ],
+        "title": "DocumentDetailView",
+        "type": "object"
+      },
+      "DocumentErrorView": {
+        "properties": {
+          "code": {
+            "title": "Code",
+            "type": "string"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          },
+          "step": {
+            "title": "Step",
+            "type": "string"
+          }
+        },
+        "required": [
+          "step",
+          "code",
+          "message"
+        ],
+        "title": "DocumentErrorView",
+        "type": "object"
+      },
       "DocumentPage": {
         "properties": {
           "items": {
             "items": {
-              "$ref": "#/components/schemas/DocumentView"
+              "$ref": "#/components/schemas/DocumentRowView"
             },
             "title": "Items",
             "type": "array"
@@ -239,7 +454,161 @@
         "title": "DocumentPage",
         "type": "object"
       },
+      "DocumentRowView": {
+        "description": "One list row (``document_view.ROW_KEYS``).",
+        "properties": {
+          "chunk_count": {
+            "title": "Chunk Count",
+            "type": "integer"
+          },
+          "create_time": {
+            "title": "Create Time",
+            "type": "integer"
+          },
+          "created_by": {
+            "title": "Created By",
+            "type": "string"
+          },
+          "dataset_id": {
+            "title": "Dataset Id",
+            "type": "string"
+          },
+          "enabled": {
+            "title": "Enabled",
+            "type": "boolean"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/DocumentErrorView"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "last_log_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Log Id"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "pages_total": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pages Total"
+          },
+          "pages_without_text": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pages Without Text"
+          },
+          "parseable": {
+            "title": "Parseable",
+            "type": "boolean"
+          },
+          "parser_id": {
+            "title": "Parser Id",
+            "type": "string"
+          },
+          "progress": {
+            "title": "Progress",
+            "type": "number"
+          },
+          "progress_message": {
+            "title": "Progress Message",
+            "type": "string"
+          },
+          "run": {
+            "title": "Run",
+            "type": "string"
+          },
+          "size": {
+            "title": "Size",
+            "type": "integer"
+          },
+          "suffix": {
+            "title": "Suffix",
+            "type": "string"
+          },
+          "thumbnail": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Thumbnail"
+          },
+          "token_num": {
+            "title": "Token Num",
+            "type": "integer"
+          },
+          "type": {
+            "title": "Type",
+            "type": "string"
+          },
+          "update_time": {
+            "title": "Update Time",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "size",
+          "type",
+          "suffix",
+          "dataset_id",
+          "created_by",
+          "parser_id",
+          "create_time",
+          "update_time",
+          "run",
+          "progress",
+          "progress_message",
+          "chunk_count",
+          "token_num",
+          "parseable",
+          "enabled",
+          "thumbnail",
+          "last_log_id",
+          "pages_total",
+          "pages_without_text",
+          "error"
+        ],
+        "title": "DocumentRowView",
+        "type": "object"
+      },
       "DocumentView": {
+        "description": "The upload response row (the narrow Phase 3 key set).",
         "properties": {
           "chunk_num": {
             "title": "Chunk Num",
@@ -1346,6 +1715,148 @@
                     "data"
                   ],
                   "title": "ParseEnvelope",
+                  "type": "object"
+                }
+              }
+            },
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v1/datasets/{dataset_id}/documents/{doc_id}": {
+      "get": {
+        "operationId": "get_get_document",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "dataset_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "doc_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "title": "Code",
+                      "type": "integer"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/DocumentDetailView"
+                    },
+                    "message": {
+                      "title": "Message",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "message",
+                    "data"
+                  ],
+                  "title": "DocumentDetailEnvelope",
+                  "type": "object"
+                }
+              }
+            },
+            "description": ""
+          }
+        }
+      },
+      "patch": {
+        "operationId": "patch_update_document",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "dataset_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "doc_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "parser_config": {
+                    "anyOf": [
+                      {
+                        "$ref": "#/components/schemas/ChunkingValues"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null
+                  },
+                  "parser_id": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null,
+                    "title": "Parser Id"
+                  }
+                },
+                "title": "UpdateDocumentBody",
+                "type": "object"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "title": "Code",
+                      "type": "integer"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/DocumentDetailView"
+                    },
+                    "message": {
+                      "title": "Message",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "message",
+                    "data"
+                  ],
+                  "title": "DocumentDetailEnvelope",
                   "type": "object"
                 }
               }

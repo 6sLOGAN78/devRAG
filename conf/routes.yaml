@@ -170,5 +170,9 @@ endpoints:
      note: "plan 03-17 lists documents of a visible dataset (D-27)"}
   - {method: DELETE, path: "/api/v1/datasets/{dataset_id}/documents", owner: python, auth: api, roles: [owner, admin, normal], scope: tenant, implemented: true,
      note: "plan 03-17 removes documents; the document creator, owner or admin (D-09)"}
+  - {method: GET, path: "/api/v1/datasets/{dataset_id}/documents/{doc_id}", owner: python, auth: api, roles: [owner, admin, normal], scope: tenant, implemented: true,
+     note: "plan 04-16 one document with its chunking settings and preview kind (D-07)"}
+  - {method: PATCH, path: "/api/v1/datasets/{dataset_id}/documents/{doc_id}", owner: python, auth: api, roles: [owner, admin, normal], scope: tenant, implemented: true,
+     note: "plan 04-16 changes one document's chunking method and values without re-chunking; the uploader, the dataset creator, owner or admin (D-02, D-15)"}
   - {method: POST, path: "/api/v1/datasets/{dataset_id}/documents/parse", owner: python, auth: api, roles: [owner, admin, normal], scope: tenant, implemented: true,
      note: "plan 04-14 starts, cancels and re-parses documents; the uploader, the dataset creator, owner or admin (D-02)"}

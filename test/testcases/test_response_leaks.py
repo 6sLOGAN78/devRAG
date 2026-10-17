@@ -587,6 +587,58 @@ def sweep_parse_rows(s: Sweep, w: World) -> None:
     s.req(delete_row, "cleanup of the parse sweep documents", "DELETE", f"{DATASETS}/{team_id}/documents", a.token, {"ids": made})
 
 
+def sweep_detail_rows(s: Sweep, w: World) -> None:
+    """``GET`` and ``PATCH`` on ``/api/v1/datasets/{dataset_id}/documents/{doc_id}`` on success and error paths (plan 04-16).
+
+    The member's own document (uploaded through the real route, scanned under the upload row) is the one the member may change; A's documents are
+    the ones the member may only read.
+    """
+    a, b, member = w.a, w.b, w.normal
+    token = str(w.a_tokens[0]["token"])
+    team_id = str(w.a_team_dataset["id"])
+    private_id = str(w.a_private_dataset["id"])
+    base = f"{DATASETS}/{team_id}/documents"
+    theirs = f"{base}/{w.a_team_documents[0]['id']}"
+    private = f"{DATASETS}/{private_id}/documents/{w.a_private_documents[0]['id']}"
+    files = [("file", ("leak-detail-member.txt", ("leak detail text. " * 40).encode(), "text/plain"))]
+    made = s.req(f"POST {UPLOAD}", "document for the detail sweep", "POST", f"{UPLOAD}?dataset_id={team_id}", member.token, files=files)
+    mine = f"{base}/{made.json()['data'][0]['id']}"
+    absent = f"{base}/{uuid.uuid4().hex}"
+    change = {"parser_config": {"chunk_token_num": 256}}
+
+    row = f"GET {DATASETS}/{{dataset_id}}/documents/{{doc_id}}"
+    s.req(row, "success as owner", "GET", theirs, a.token)
+    s.req(row, "success as member (team)", "GET", theirs, member.token)
+    s.req(row, "success with an API token", "GET", theirs, token)
+    s.req(row, "own private dataset", "GET", private, a.token)
+    s.req(row, "private dataset as a member", "GET", private, member.token)
+    s.req(row, "absent document", "GET", absent, a.token)
+    s.req(row, "malformed document id", "GET", f"{base}/not-an-id", a.token)
+    s.req(row, "absent dataset", "GET", f"{DATASETS}/{uuid.uuid4().hex}/documents/{uuid.uuid4().hex}", a.token)
+    s.req(row, "malformed dataset id", "GET", f"{DATASETS}/not-an-id/documents/{uuid.uuid4().hex}", a.token)
+    s.req(row, "as an outsider", "GET", theirs, b.token)
+    s.errors(row, "GET", theirs, "PUT")
+
+    row = f"PATCH {DATASETS}/{{dataset_id}}/documents/{{doc_id}}"
+    s.req(row, "success as the uploading member", "PATCH", mine, member.token, change)
+    s.req(row, "success as owner", "PATCH", theirs, a.token, {"parser_config": {"delimiter": "##", "overlapped_percent": 5}})
+    s.req(row, "success with an API token", "PATCH", theirs, token, change)
+    s.req(row, "another member's document", "PATCH", theirs, member.token, change)
+    s.req(row, "method not built", "PATCH", theirs, a.token, {"parser_id": "qa"})
+    s.req(row, "bad value", "PATCH", theirs, a.token, {"parser_config": {"chunk_token_num": 0}})
+    s.req(row, "unknown field", "PATCH", theirs, a.token, {"run": "1"})
+    s.req(row, "unknown setting", "PATCH", theirs, a.token, {"parser_config": {"pages": [[1, 2]]}})
+    s.req(row, "unknown parser", "PATCH", theirs, a.token, {"parser_id": "bogus"})
+    s.req(row, "absent document", "PATCH", absent, a.token, change)
+    s.req(row, "malformed document id", "PATCH", f"{base}/not-an-id", a.token, change)
+    s.req(row, "private dataset as a member", "PATCH", private, member.token, change)
+    s.req(row, "absent dataset", "PATCH", f"{DATASETS}/{uuid.uuid4().hex}/documents/{uuid.uuid4().hex}", a.token, change)
+    s.req(row, "malformed dataset id", "PATCH", f"{DATASETS}/not-an-id/documents/{uuid.uuid4().hex}", a.token, change)
+    s.req(row, "as an outsider", "PATCH", theirs, b.token, change)
+    s.errors(row, "PATCH", theirs, "PUT")
+    s.req(f"DELETE {DATASETS}/{{dataset_id}}/documents", "cleanup of the detail sweep document", "DELETE", base, a.token, {"ids": [mine.rsplit("/", 1)[1]]})
+
+
 def sealed_envelopes(tenant_id: str) -> list[str]:
     """Every sealed provider key stored for one workspace (the ``v1:`` envelopes), read straight from MySQL."""
     conn = root_connection()
@@ -652,6 +704,7 @@ def sweep(ingress: httpx.Client) -> Iterator[Sweep]:
             sweep_document_rows(s, world)
             sweep_dataset_write_rows(s, world)
             sweep_parse_rows(s, world)
+            sweep_detail_rows(s, world)
             collect_database_secrets(s)
             s.secrets.extend(infrastructure_secrets())
             yield s
