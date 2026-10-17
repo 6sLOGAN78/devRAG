@@ -380,7 +380,7 @@ Plans:
 
 **Wave 11** *(blocked on Wave 10 completion)*
 
-- [ ] 04-18-PLAN.md — Chunk list, add, edit and switch with embed-before-write
+- [x] 04-18-PLAN.md — Chunk list, add, edit and switch with embed-before-write
 
 **Wave 12** *(blocked on Wave 11 completion)*
 
