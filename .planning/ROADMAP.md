@@ -388,7 +388,7 @@ Plans:
 
 **Wave 13** *(blocked on Wave 12 completion)*
 
-- [ ] 04-20-PLAN.md — Page images, original content, text preview
+- [x] 04-20-PLAN.md — Page images, original content, text preview
 
 **Wave 14** *(blocked on Wave 13 completion)*
 

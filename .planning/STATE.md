@@ -4,13 +4,13 @@ milestone: v1.0
 milestone_name: milestone
 status: executing
 stopped_at: Completed 04-18-PLAN.md
-last_updated: "2026-10-17T05:29:53.382Z"
+last_updated: "2026-10-17T05:43:06.357Z"
 last_activity: 2026-10-17
 progress:
   total_phases: 8
   completed_phases: 3
   total_plans: 118
-  completed_plans: 103
+  completed_plans: 104
   percent: 38
 ---
 
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-10-05)
 ## Current Position
 
 Phase: 4 (ingestion-pipeline) — EXECUTING
-Plan: 21 of 35
+Plan: 22 of 35
 Status: Ready to execute
 Last activity: 2026-10-17
 
-Progress: [█████████░] 87%
+Progress: [█████████░] 88%
 
 ## Performance Metrics
 
@@ -106,6 +106,7 @@ Progress: [█████████░] 87%
 | Phase 04 P17 | 60min | - tasks | - files |
 | Phase 04 P18 | ~2h | 3 tasks | 21 files |
 | Phase 04 P19 | resumed | - tasks | - files |
+| Phase 4 P20 | one session | - tasks | - files |
 
 ## Accumulated Context
 
@@ -177,6 +178,7 @@ Recent decisions affecting current work:
 - [Phase ?]: R-173: batch-update-status answers {updated, enabled}; stored switch reverted on index failure; run-log rows deleted with documents
 - [Phase 04]: R-174/R-175: chunk API shapes; embed first, one update_by_query, late embedding dropped after 40 s
 - [Phase ?]: R-176: ingestion read surface uses result key, plain errors, 409 model_unavailable
+- [Phase ?]: R-177: page images JPEG zoom 3 with content-hash ETag, 2-thread PDF executor, bounded temp PDF cache, inline only for PDF/PNG/JPEG, HTML never text/html
 
 ### Pending Todos
 
@@ -212,6 +214,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-10-17T05:29:53.369Z
+Last session: 2026-10-17T05:43:06.347Z
 Stopped at: Completed 04-18-PLAN.md
 Resume file: None
