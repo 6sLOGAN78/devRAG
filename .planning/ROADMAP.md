@@ -393,7 +393,7 @@ Plans:
 **Wave 14** *(blocked on Wave 13 completion)*
 
 - [x] 04-21-PLAN.md — Format matrix and 13-page PDF journeys on the real stack
-- [ ] 04-24-PLAN.md — SPA services, mappers and the screen path builders
+- [x] 04-24-PLAN.md — SPA services, mappers and the screen path builders
 
 **Wave 15** *(blocked on Wave 14 completion)*
 
