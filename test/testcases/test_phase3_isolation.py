@@ -49,7 +49,7 @@ from test.testcases._matrix_fixtures import (
 from test.testcases._routes import ROUTES_FILE
 from test.testcases.conftest import BASE_URL
 
-PHASE3_PREFIXES = ("/api/v1/providers", "/api/v1/models", "/api/v1/datasets", "/api/v1/documents")
+PHASE3_PREFIXES = ("/api/v1/providers", "/api/v1/models", "/api/v1/datasets", "/api/v1/documents", "/v1/task/status")
 FORBIDDEN = (403, 403, "forbidden")
 UNAUTHORIZED = 401
 
@@ -201,7 +201,32 @@ def _inv_patch_chunk(w: World, who: Account | None, token: str, as_tenant: str |
     return call(w.client, "PATCH", _doc_path(w, parsed=True) + f"/chunks/{w.a_parsed_chunks[0]}", token, {}, body={"available": True})
 
 
+def _inv_ingestion_summary(w: World, who: Account | None, token: str, as_tenant: str | None) -> httpx.Response:
+    return call(w.client, "GET", f"{DATASETS}/{_team_id(w)}/ingestions/summary", token, {})
+
+
+def _inv_ingestion_logs(w: World, who: Account | None, token: str, as_tenant: str | None) -> httpx.Response:
+    return call(w.client, "GET", f"{DATASETS}/{_team_id(w)}/ingestions", token, {})
+
+
+def _inv_ingestion_log(w: World, who: Account | None, token: str, as_tenant: str | None) -> httpx.Response:
+    return call(w.client, "GET", f"{DATASETS}/{_team_id(w)}/ingestions/{w.scratch.get('document_id') or w.a_log_id}", token, {})
+
+
+def _inv_embedding_check(w: World, who: Account | None, token: str, as_tenant: str | None) -> httpx.Response:
+    return call(w.client, "POST", f"{DATASETS}/{_team_id(w)}/embedding/check", token, {}, body={"embd_id": None})
+
+
+def _inv_task_status(w: World, who: Account | None, token: str, as_tenant: str | None) -> httpx.Response:
+    return call(w.client, "GET", f"/v1/task/status/{w.scratch.get('document_id') or w.a_task_id}", token, {})
+
+
 INVOKERS: dict[str, Invoker] = {
+    "GET /api/v1/datasets/{dataset_id}/ingestions/summary": _inv_ingestion_summary,
+    "GET /api/v1/datasets/{dataset_id}/ingestions": _inv_ingestion_logs,
+    "GET /api/v1/datasets/{dataset_id}/ingestions/{log_id}": _inv_ingestion_log,
+    "POST /api/v1/datasets/{dataset_id}/embedding/check": _inv_embedding_check,
+    "GET /v1/task/status/{task_id}": _inv_task_status,
     "GET /api/v1/providers": _inv_list_providers,
     "PUT /api/v1/providers": _inv_save_provider,
     "DELETE /api/v1/providers/{provider}": _inv_delete_provider,
@@ -241,6 +266,7 @@ NORMAL_IS_REFUSED_ON_A_RESOURCE = frozenset(
         "POST /api/v1/datasets/{dataset_id}/documents/batch-update-status",
         "POST /api/v1/datasets/{dataset_id}/documents/{doc_id}/chunks",
         "PATCH /api/v1/datasets/{dataset_id}/documents/{doc_id}/chunks/{chunk_id}",
+        "POST /api/v1/datasets/{dataset_id}/embedding/check",  # the dataset manage rule: creator, owner or admin (KB-16)
     }
 )
 # Rows whose resource is addressed by a dataset id: a stranger reaches nothing even without naming the workspace.
@@ -259,6 +285,11 @@ ID_ROWS = frozenset(
         "GET /api/v1/datasets/{dataset_id}/documents/{doc_id}/chunks",
         "POST /api/v1/datasets/{dataset_id}/documents/{doc_id}/chunks",
         "PATCH /api/v1/datasets/{dataset_id}/documents/{doc_id}/chunks/{chunk_id}",
+        "POST /api/v1/datasets/{dataset_id}/embedding/check",  # the dataset manage rule: creator, owner or admin (KB-16)
+        "GET /api/v1/datasets/{dataset_id}/ingestions/summary",
+        "GET /api/v1/datasets/{dataset_id}/ingestions",
+        "GET /api/v1/datasets/{dataset_id}/ingestions/{log_id}",
+        "POST /api/v1/datasets/{dataset_id}/embedding/check",
     }
 )
 # Rows that call the model provider with the stored key: a refused request must never reach it.

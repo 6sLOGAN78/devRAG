@@ -27,6 +27,7 @@ import yaml
 
 from test.helpers.accounts import Account, AccountRegistry
 from test.helpers.fake_provider import FakeProvider
+from test.helpers.ingest import seed_parse_artifacts
 from test.helpers.uploads import pdf_bytes, sql, tenant_object_keys
 from test.testcases._routes import ROUTES_FILE  # conf/routes.yaml
 
@@ -152,6 +153,8 @@ class World:
     a_team_documents: list[dict[str, Any]] = field(default_factory=list)  # two documents A uploaded into the team dataset (plan 03-17)
     a_private_documents: list[dict[str, Any]] = field(default_factory=list)  # one document A uploaded into the private dataset
     a_parsed_chunks: list[str] = field(default_factory=list)  # ids of the chunks seeded into the second team document (plan 04-18)
+    a_log_id: str = ""  # a parsing-log entry seeded for the second team document (plan 04-19)
+    a_task_id: str = ""  # a finished task seeded for the same document (plan 04-19)
     a_normal_private_dataset: dict[str, Any] = field(default_factory=dict)  # a `me` dataset the normal member created in A's workspace (plan 03-19)
     scratch: dict[str, Any] = field(default_factory=dict)  # per-call disposable resources of the isolation table (plan 03-19)
 
@@ -222,6 +225,22 @@ class World:
         assert resp.status_code == 200, resp.text
         return [(c["id"], c["text"], c["enabled"], c["origin"]) for c in resp.json()["data"]["items"]]
 
+    def snapshot_ingestion(self) -> Any:
+        """A's ingestion summary, the seeded log entry and the seeded task as the owner reads them: a refused read or check must change none of it."""
+        if not self.a_log_id:
+            return []
+        dataset_id = str(self.a_team_dataset["id"])
+        out = []
+        for path, ids in (
+            (DATASETS + "/{dataset_id}/ingestions/summary", {"dataset_id": dataset_id}),
+            (DATASETS + "/{dataset_id}/ingestions/{log_id}", {"dataset_id": dataset_id, "log_id": self.a_log_id}),
+            ("/v1/task/status/{task_id}", {"task_id": self.a_task_id}),
+        ):
+            resp = call(self.client, "GET", path, self.a.token, ids)
+            assert resp.status_code == 200, resp.text
+            out.append(resp.json()["data"])
+        return out
+
     def snapshot_tokens(self) -> Any:
         return sorted(self.list_tokens(self.a), key=lambda t: t["token"])
 
@@ -247,6 +266,7 @@ class World:
             "objects": self.snapshot_objects(),
             "documents": self.snapshot_documents(),
             "chunks": self.snapshot_chunks(),
+            "ingestion": self.snapshot_ingestion(),
         }
 
     def a_identifiers(self) -> list[str]:
@@ -263,6 +283,7 @@ class World:
         for doc in (*self.a_team_documents, *self.a_private_documents):
             out += [str(doc.get("id", "")), str(doc.get("name", ""))]
         out += self.a_parsed_chunks
+        out += [self.a_log_id, self.a_task_id]
         return [v for v in out if v]
 
 
@@ -284,6 +305,8 @@ def resource_of(row: Row) -> str:
         return "providers"
     if row.path.startswith(MODELS):
         return "models"
+    if row.path.startswith("/v1/task/status") or (row.path.startswith(DATASETS + "/") and ("/ingestions" in row.path or "/embedding/check" in row.path)):
+        return "ingestion"
     if row.path.startswith(DATASETS + "/") and "/chunks" in row.path:
         return "chunks"
     if row.path.startswith(DATASETS + "/") and "/documents" in row.path:
@@ -343,6 +366,7 @@ def build_world(client: httpx.Client, registry: AccountRegistry, fake: FakeProvi
             for name in names:
                 store.extend(_ok(upload_file(world, a.token, str(dataset["id"]), name=name), f"A uploads {name}")["data"])
         world.a_parsed_chunks = seed_chunks(world, CHUNK_SEED_COUNT)
+        world.a_log_id, world.a_task_id = seed_parse_artifacts(world)
     return world
 
 
@@ -529,7 +553,34 @@ def _patch_chunk(w: World) -> Target:
     )
 
 
+def _ingestion_summary(w: World) -> Target:
+    return Target({"dataset_id": str(w.a_team_dataset["id"])}, _sender("GET", DATASETS + "/{dataset_id}/ingestions/summary", extra_fields=set()), w.snapshot_ingestion)
+
+
+def _ingestion_logs(w: World) -> Target:
+    return Target({"dataset_id": str(w.a_team_dataset["id"])}, _sender("GET", DATASETS + "/{dataset_id}/ingestions", extra_fields=set()), w.snapshot_ingestion)
+
+
+def _ingestion_log(w: World) -> Target:
+    ids = {"dataset_id": str(w.a_team_dataset["id"]), "log_id": w.a_log_id}
+    return Target(ids, _sender("GET", DATASETS + "/{dataset_id}/ingestions/{log_id}", extra_fields=set()), w.snapshot_ingestion)
+
+
+def _embedding_check(w: World) -> Target:
+    """The probe spends A's embedding quota: only the dataset's visibility keeps an outsider from using it."""
+    return Target({"dataset_id": str(w.a_team_dataset["id"])}, _sender("POST", DATASETS + "/{dataset_id}/embedding/check", {"embd_id": None}, extra_fields=set()), w.snapshot_ingestion)
+
+
+def _task_status(w: World) -> Target:
+    return Target({"task_id": w.a_task_id}, _sender("GET", "/v1/task/status/{task_id}", extra_fields=set()), w.snapshot_ingestion)
+
+
 BUILDERS: dict[str, Builder] = {
+    "GET /api/v1/datasets/{dataset_id}/ingestions/summary": _ingestion_summary,
+    "GET /api/v1/datasets/{dataset_id}/ingestions": _ingestion_logs,
+    "GET /api/v1/datasets/{dataset_id}/ingestions/{log_id}": _ingestion_log,
+    "POST /api/v1/datasets/{dataset_id}/embedding/check": _embedding_check,
+    "GET /v1/task/status/{task_id}": _task_status,
     "GET /api/v1/datasets/{dataset_id}/documents/{doc_id}/chunks": _list_chunks,
     "POST /api/v1/datasets/{dataset_id}/documents/{doc_id}/chunks": _create_chunk,
     "PATCH /api/v1/datasets/{dataset_id}/documents/{doc_id}/chunks/{chunk_id}": _patch_chunk,

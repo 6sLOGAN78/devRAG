@@ -739,6 +739,71 @@ def sweep_chunk_rows(s: Sweep, w: World) -> None:
     s.errors(row, "PATCH", path, "PUT")
 
 
+def sweep_ingestion_rows(s: Sweep, w: World) -> None:
+    """The ingestion summary, log list, one log entry, the embedding check and task status (plan 04-19).
+
+    The seeded log entry and task belong to A's second team document. The embedding check reaches the loopback provider on success.
+    """
+    a, b, member = w.a, w.b, w.normal
+    token = str(w.a_tokens[0]["token"])
+    team = f"{DATASETS}/{w.a_team_dataset['id']}"
+    private = f"{DATASETS}/{w.a_private_dataset['id']}"
+
+    row = f"GET {DATASETS}/{{dataset_id}}/ingestions/summary"
+    s.req(row, "success as owner", "GET", f"{team}/ingestions/summary", a.token)
+    s.req(row, "success as a member", "GET", f"{team}/ingestions/summary", member.token)
+    s.req(row, "success with an API token", "GET", f"{team}/ingestions/summary", token)
+    s.req(row, "private dataset as a member", "GET", f"{private}/ingestions/summary", member.token)
+    s.req(row, "absent dataset", "GET", f"{DATASETS}/{uuid.uuid4().hex}/ingestions/summary", a.token)
+    s.req(row, "malformed dataset id", "GET", f"{DATASETS}/not-an-id/ingestions/summary", a.token)
+    s.req(row, "as an outsider", "GET", f"{team}/ingestions/summary", b.token)
+    s.errors(row, "GET", f"{team}/ingestions/summary", "PUT")
+
+    row = f"GET {DATASETS}/{{dataset_id}}/ingestions"
+    s.req(row, "success as owner", "GET", f"{team}/ingestions", a.token)
+    s.req(row, "success with paging", "GET", f"{team}/ingestions?page=1&size=2", member.token)
+    s.req(row, "success with an API token", "GET", f"{team}/ingestions", token)
+    s.req(row, "size over the limit", "GET", f"{team}/ingestions?size=101", a.token)
+    s.req(row, "page that is not a number", "GET", f"{team}/ingestions?page=x", a.token)
+    s.req(row, "private dataset as a member", "GET", f"{private}/ingestions", member.token)
+    s.req(row, "absent dataset", "GET", f"{DATASETS}/{uuid.uuid4().hex}/ingestions", a.token)
+    s.req(row, "as an outsider", "GET", f"{team}/ingestions", b.token)
+    s.errors(row, "GET", f"{team}/ingestions", "PUT")
+
+    row = f"GET {DATASETS}/{{dataset_id}}/ingestions/{{log_id}}"
+    path = f"{team}/ingestions/{w.a_log_id}"
+    s.req(row, "success as owner", "GET", path, a.token)
+    s.req(row, "success as a member", "GET", path, member.token)
+    s.req(row, "success with an API token", "GET", path, token)
+    s.req(row, "log id that is not an id", "GET", f"{team}/ingestions/not-an-id", a.token)
+    s.req(row, "absent log", "GET", f"{team}/ingestions/{uuid.uuid4().hex}", a.token)
+    s.req(row, "log of another dataset", "GET", f"{private}/ingestions/{w.a_log_id}", a.token)
+    s.req(row, "private dataset as a member", "GET", f"{private}/ingestions/{w.a_log_id}", member.token)
+    s.req(row, "absent dataset", "GET", f"{DATASETS}/{uuid.uuid4().hex}/ingestions/{w.a_log_id}", a.token)
+    s.req(row, "as an outsider", "GET", path, b.token)
+    s.errors(row, "GET", path, "PUT")
+
+    row = f"POST {DATASETS}/{{dataset_id}}/embedding/check"
+    s.req(row, "success as owner", "POST", f"{team}/embedding/check", a.token, {})
+    s.req(row, "success with an API token", "POST", f"{team}/embedding/check", token, {})
+    s.req(row, "member who may not manage the dataset", "POST", f"{team}/embedding/check", member.token, {})
+    s.req(row, "model that is not in the workspace", "POST", f"{team}/embedding/check", a.token, {"embd_id": "missing-model@OpenAI-API-Compatible"})
+    s.req(row, "unknown field", "POST", f"{team}/embedding/check", a.token, {"tenant_id": a.tenant_id})
+    s.req(row, "absent dataset", "POST", f"{DATASETS}/{uuid.uuid4().hex}/embedding/check", a.token, {})
+    s.req(row, "as an outsider", "POST", f"{team}/embedding/check", b.token, {})
+    s.errors(row, "POST", f"{team}/embedding/check", "PUT")
+
+    row = "GET /v1/task/status/{task_id}"
+    path = f"/v1/task/status/{w.a_task_id}"
+    s.req(row, "success as owner", "GET", path, a.token)
+    s.req(row, "success as a member", "GET", path, member.token)
+    s.req(row, "success with an API token", "GET", path, token)
+    s.req(row, "task id that is not an id", "GET", "/v1/task/status/not-an-id", a.token)
+    s.req(row, "absent task", "GET", f"/v1/task/status/{uuid.uuid4().hex}", a.token)
+    s.req(row, "as an outsider", "GET", path, b.token)
+    s.errors(row, "GET", path, "PUT")
+
+
 def sealed_envelopes(tenant_id: str) -> list[str]:
     """Every sealed provider key stored for one workspace (the ``v1:`` envelopes), read straight from MySQL."""
     conn = root_connection()
@@ -807,6 +872,7 @@ def sweep(ingress: httpx.Client) -> Iterator[Sweep]:
             sweep_detail_rows(s, world)
             sweep_status_rows(s, world)
             sweep_chunk_rows(s, world)
+            sweep_ingestion_rows(s, world)
             collect_database_secrets(s)
             s.secrets.extend(infrastructure_secrets())
             yield s

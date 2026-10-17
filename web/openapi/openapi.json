@@ -1,6 +1,29 @@
 {
   "components": {
     "schemas": {
+      "CheckView": {
+        "properties": {
+          "dimension": {
+            "title": "Dimension",
+            "type": "integer"
+          },
+          "expected": {
+            "title": "Expected",
+            "type": "integer"
+          },
+          "ok": {
+            "title": "Ok",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "ok",
+          "dimension",
+          "expected"
+        ],
+        "title": "CheckView",
+        "type": "object"
+      },
       "Checks": {
         "properties": {
           "database": {
@@ -754,6 +777,41 @@
         "title": "DocumentView",
         "type": "object"
       },
+      "ErrorView": {
+        "properties": {
+          "code": {
+            "title": "Code",
+            "type": "string"
+          },
+          "detail": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Detail"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          },
+          "step": {
+            "title": "Step",
+            "type": "string"
+          }
+        },
+        "required": [
+          "step",
+          "code",
+          "message"
+        ],
+        "title": "ErrorView",
+        "type": "object"
+      },
       "HealthData": {
         "properties": {
           "checks": {
@@ -849,6 +907,221 @@
           "engine"
         ],
         "title": "LanguageData",
+        "type": "object"
+      },
+      "LogDetailView": {
+        "properties": {
+          "attempts": {
+            "title": "Attempts",
+            "type": "integer"
+          },
+          "chunk_count": {
+            "title": "Chunk Count",
+            "type": "integer"
+          },
+          "document_id": {
+            "title": "Document Id",
+            "type": "string"
+          },
+          "document_name": {
+            "title": "Document Name",
+            "type": "string"
+          },
+          "duration_seconds": {
+            "title": "Duration Seconds",
+            "type": "number"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ErrorView"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "log": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Log",
+            "type": "array"
+          },
+          "max_attempts": {
+            "title": "Max Attempts",
+            "type": "integer"
+          },
+          "pages_total": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pages Total"
+          },
+          "pages_without_text": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pages Without Text"
+          },
+          "result": {
+            "title": "Result",
+            "type": "string"
+          },
+          "retried": {
+            "title": "Retried",
+            "type": "boolean"
+          },
+          "started_at": {
+            "title": "Started At",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "document_id",
+          "document_name",
+          "started_at",
+          "duration_seconds",
+          "result",
+          "attempts",
+          "max_attempts",
+          "retried",
+          "chunk_count",
+          "pages_total",
+          "pages_without_text",
+          "error",
+          "log"
+        ],
+        "title": "LogDetailView",
+        "type": "object"
+      },
+      "LogPage": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/LogView"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total"
+        ],
+        "title": "LogPage",
+        "type": "object"
+      },
+      "LogView": {
+        "properties": {
+          "attempts": {
+            "title": "Attempts",
+            "type": "integer"
+          },
+          "chunk_count": {
+            "title": "Chunk Count",
+            "type": "integer"
+          },
+          "document_id": {
+            "title": "Document Id",
+            "type": "string"
+          },
+          "document_name": {
+            "title": "Document Name",
+            "type": "string"
+          },
+          "duration_seconds": {
+            "title": "Duration Seconds",
+            "type": "number"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ErrorView"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "max_attempts": {
+            "title": "Max Attempts",
+            "type": "integer"
+          },
+          "pages_total": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pages Total"
+          },
+          "pages_without_text": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pages Without Text"
+          },
+          "result": {
+            "title": "Result",
+            "type": "string"
+          },
+          "retried": {
+            "title": "Retried",
+            "type": "boolean"
+          },
+          "started_at": {
+            "title": "Started At",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "document_id",
+          "document_name",
+          "started_at",
+          "duration_seconds",
+          "result",
+          "attempts",
+          "max_attempts",
+          "retried",
+          "chunk_count",
+          "pages_total",
+          "pages_without_text",
+          "error"
+        ],
+        "title": "LogView",
         "type": "object"
       },
       "ModelBody": {
@@ -1143,6 +1416,123 @@
           "enabled"
         ],
         "title": "StatusChange",
+        "type": "object"
+      },
+      "SummaryView": {
+        "properties": {
+          "cancelled": {
+            "title": "Cancelled",
+            "type": "integer"
+          },
+          "chunk_total": {
+            "title": "Chunk Total",
+            "type": "integer"
+          },
+          "done": {
+            "title": "Done",
+            "type": "integer"
+          },
+          "failed": {
+            "title": "Failed",
+            "type": "integer"
+          },
+          "partial": {
+            "title": "Partial",
+            "type": "integer"
+          },
+          "running": {
+            "title": "Running",
+            "type": "integer"
+          },
+          "token_total": {
+            "title": "Token Total",
+            "type": "integer"
+          },
+          "unstart": {
+            "title": "Unstart",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "unstart",
+          "running",
+          "done",
+          "failed",
+          "cancelled",
+          "partial",
+          "chunk_total",
+          "token_total"
+        ],
+        "title": "SummaryView",
+        "type": "object"
+      },
+      "TaskView": {
+        "properties": {
+          "attempts": {
+            "title": "Attempts",
+            "type": "integer"
+          },
+          "dataset_id": {
+            "title": "Dataset Id",
+            "type": "string"
+          },
+          "doc_id": {
+            "title": "Doc Id",
+            "type": "string"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ErrorView"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "failed": {
+            "title": "Failed",
+            "type": "boolean"
+          },
+          "finished": {
+            "title": "Finished",
+            "type": "boolean"
+          },
+          "from_page": {
+            "title": "From Page",
+            "type": "integer"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "progress": {
+            "title": "Progress",
+            "type": "number"
+          },
+          "progress_message": {
+            "title": "Progress Message",
+            "type": "string"
+          },
+          "to_page": {
+            "title": "To Page",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "doc_id",
+          "dataset_id",
+          "from_page",
+          "to_page",
+          "progress",
+          "progress_message",
+          "attempts",
+          "finished",
+          "failed",
+          "error"
+        ],
+        "title": "TaskView",
         "type": "object"
       },
       "UploadLimitsView": {
@@ -2317,6 +2707,223 @@
         }
       }
     },
+    "/api/v1/datasets/{dataset_id}/embedding/check": {
+      "post": {
+        "operationId": "post_embedding_check",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "dataset_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "embd_id": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null,
+                    "title": "Embd Id"
+                  }
+                },
+                "title": "EmbeddingCheckBody",
+                "type": "object"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "title": "Code",
+                      "type": "integer"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/CheckView"
+                    },
+                    "message": {
+                      "title": "Message",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "message",
+                    "data"
+                  ],
+                  "title": "CheckEnvelope",
+                  "type": "object"
+                }
+              }
+            },
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v1/datasets/{dataset_id}/ingestions": {
+      "get": {
+        "operationId": "get_list_logs",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "dataset_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "title": "Code",
+                      "type": "integer"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/LogPage"
+                    },
+                    "message": {
+                      "title": "Message",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "message",
+                    "data"
+                  ],
+                  "title": "LogPageEnvelope",
+                  "type": "object"
+                }
+              }
+            },
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v1/datasets/{dataset_id}/ingestions/summary": {
+      "get": {
+        "operationId": "get_ingestion_summary",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "dataset_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "title": "Code",
+                      "type": "integer"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/SummaryView"
+                    },
+                    "message": {
+                      "title": "Message",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "message",
+                    "data"
+                  ],
+                  "title": "SummaryEnvelope",
+                  "type": "object"
+                }
+              }
+            },
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v1/datasets/{dataset_id}/ingestions/{log_id}": {
+      "get": {
+        "operationId": "get_get_log",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "dataset_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "log_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "title": "Code",
+                      "type": "integer"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/LogDetailView"
+                    },
+                    "message": {
+                      "title": "Message",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "message",
+                    "data"
+                  ],
+                  "title": "LogDetailEnvelope",
+                  "type": "object"
+                }
+              }
+            },
+            "description": ""
+          }
+        }
+      }
+    },
     "/api/v1/documents/upload": {
       "post": {
         "operationId": "post_upload_documents",
@@ -3269,6 +3876,52 @@
                     "data"
                   ],
                   "title": "HealthEnvelope",
+                  "type": "object"
+                }
+              }
+            },
+            "description": ""
+          }
+        }
+      }
+    },
+    "/v1/task/status/{task_id}": {
+      "get": {
+        "operationId": "get_task_status",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "task_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "title": "Code",
+                      "type": "integer"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/TaskView"
+                    },
+                    "message": {
+                      "title": "Message",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "message",
+                    "data"
+                  ],
+                  "title": "TaskEnvelope",
                   "type": "object"
                 }
               }

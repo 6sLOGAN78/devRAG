@@ -313,3 +313,30 @@ def wait_run(ingress: Any, who: Any, dataset_id: str, doc_id: str, run: str, tim
         interval=1.0,
         describe=lambda: f"document {doc_id} never reached run {run}",
     )
+
+
+def seed_parse_artifacts(world: Any) -> tuple[str, str]:
+    """One finished task and one finished parsing-log entry for the world's parsed document, shaped as the roll-up writes them: ``(log_id, task_id)``.
+
+    Both rows belong to the tenant of the world's owner, so ``delete_accounts`` removes them. Plain SQL: no provider call and no worker run.
+    """
+    import json as _json
+
+    from common.ingest_codes import LOG_DONE
+    from test.helpers.uploads import sql
+
+    doc = world.a_parsed_document
+    dataset_id, doc_id = str(world.a_team_dataset["id"]), str(doc["id"])
+    log_id, task_id = uuid.uuid4().hex, uuid.uuid4().hex
+    line = "Parsing finished: 3 chunks"
+    sql(
+        "INSERT INTO `task` (`id`, `doc_id`, `from_page`, `to_page`, `task_type`, `priority`, `progress`, `progress_msg`, `retry_count`) VALUES (%s, %s, 0, 1000000, '', 0, 1, %s, 1)",
+        (task_id, doc_id, line),
+    )
+    dsl = {"tasks": 1, "attempts": 1, "chunks": 3, "pages_total": 1, "pages_without_text": 0, "retried": False}
+    sql(
+        "INSERT INTO `pipeline_operation_log` (`id`, `document_id`, `tenant_id`, `kb_id`, `parser_id`, `document_name`, `document_suffix`, `document_type`, `source_from`, "
+        "`progress`, `progress_msg`, `process_duration`, `dsl`, `task_type`, `operation_status`) VALUES (%s, %s, %s, %s, 'naive', %s, 'pdf', 'pdf', 'local', 1, %s, 1.5, %s, '', %s)",
+        (log_id, doc_id, world.a.tenant_id, dataset_id, str(doc["name"]), line, _json.dumps(dsl), LOG_DONE),
+    )
+    return log_id, task_id

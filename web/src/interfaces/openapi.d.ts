@@ -132,6 +132,70 @@ export interface paths {
         patch: operations["patch_patch_chunk"];
         trace?: never;
     };
+    "/api/v1/datasets/{dataset_id}/embedding/check": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["post_embedding_check"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/datasets/{dataset_id}/ingestions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["get_list_logs"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/datasets/{dataset_id}/ingestions/summary": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["get_ingestion_summary"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/datasets/{dataset_id}/ingestions/{log_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["get_get_log"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/documents/upload": {
         parameters: {
             query?: never;
@@ -343,10 +407,35 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/task/status/{task_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["get_task_status"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** CheckView */
+        CheckView: {
+            /** Dimension */
+            dimension: number;
+            /** Expected */
+            expected: number;
+            /** Ok */
+            ok: boolean;
+        };
         /** Checks */
         Checks: {
             database: components["schemas"]["ProbeResult"];
@@ -622,6 +711,20 @@ export interface components {
             /** Update Time */
             update_time: number;
         };
+        /** ErrorView */
+        ErrorView: {
+            /** Code */
+            code: string;
+            /**
+             * Detail
+             * @default null
+             */
+            detail: string | null;
+            /** Message */
+            message: string;
+            /** Step */
+            step: string;
+        };
         /** HealthData */
         HealthData: {
             checks: components["schemas"]["Checks"];
@@ -658,6 +761,71 @@ export interface components {
         LanguageData: {
             /** Engine */
             engine: string;
+        };
+        /** LogDetailView */
+        LogDetailView: {
+            /** Attempts */
+            attempts: number;
+            /** Chunk Count */
+            chunk_count: number;
+            /** Document Id */
+            document_id: string;
+            /** Document Name */
+            document_name: string;
+            /** Duration Seconds */
+            duration_seconds: number;
+            error: components["schemas"]["ErrorView"] | null;
+            /** Id */
+            id: string;
+            /** Log */
+            log: string[];
+            /** Max Attempts */
+            max_attempts: number;
+            /** Pages Total */
+            pages_total: number | null;
+            /** Pages Without Text */
+            pages_without_text: number | null;
+            /** Result */
+            result: string;
+            /** Retried */
+            retried: boolean;
+            /** Started At */
+            started_at: number;
+        };
+        /** LogPage */
+        LogPage: {
+            /** Items */
+            items: components["schemas"]["LogView"][];
+            /** Total */
+            total: number;
+        };
+        /** LogView */
+        LogView: {
+            /** Attempts */
+            attempts: number;
+            /** Chunk Count */
+            chunk_count: number;
+            /** Document Id */
+            document_id: string;
+            /** Document Name */
+            document_name: string;
+            /** Duration Seconds */
+            duration_seconds: number;
+            error: components["schemas"]["ErrorView"] | null;
+            /** Id */
+            id: string;
+            /** Max Attempts */
+            max_attempts: number;
+            /** Pages Total */
+            pages_total: number | null;
+            /** Pages Without Text */
+            pages_without_text: number | null;
+            /** Result */
+            result: string;
+            /** Retried */
+            retried: boolean;
+            /** Started At */
+            started_at: number;
         };
         /** ModelBody */
         ModelBody: {
@@ -764,6 +932,49 @@ export interface components {
             enabled: boolean;
             /** Updated */
             updated: string[];
+        };
+        /** SummaryView */
+        SummaryView: {
+            /** Cancelled */
+            cancelled: number;
+            /** Chunk Total */
+            chunk_total: number;
+            /** Done */
+            done: number;
+            /** Failed */
+            failed: number;
+            /** Partial */
+            partial: number;
+            /** Running */
+            running: number;
+            /** Token Total */
+            token_total: number;
+            /** Unstart */
+            unstart: number;
+        };
+        /** TaskView */
+        TaskView: {
+            /** Attempts */
+            attempts: number;
+            /** Dataset Id */
+            dataset_id: string;
+            /** Doc Id */
+            doc_id: string;
+            error: components["schemas"]["ErrorView"] | null;
+            /** Failed */
+            failed: boolean;
+            /** Finished */
+            finished: boolean;
+            /** From Page */
+            from_page: number;
+            /** Id */
+            id: string;
+            /** Progress */
+            progress: number;
+            /** Progress Message */
+            progress_message: string;
+            /** To Page */
+            to_page: number;
         };
         /** UploadLimitsView */
         UploadLimitsView: {
@@ -1349,6 +1560,125 @@ export interface operations {
             };
         };
     };
+    post_embedding_check: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                dataset_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": {
+                    /**
+                     * Embd Id
+                     * @default null
+                     */
+                    embd_id?: string | null;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Code */
+                        code: number;
+                        data: components["schemas"]["CheckView"];
+                        /** Message */
+                        message: string;
+                    };
+                };
+            };
+        };
+    };
+    get_list_logs: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                dataset_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Code */
+                        code: number;
+                        data: components["schemas"]["LogPage"];
+                        /** Message */
+                        message: string;
+                    };
+                };
+            };
+        };
+    };
+    get_ingestion_summary: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                dataset_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Code */
+                        code: number;
+                        data: components["schemas"]["SummaryView"];
+                        /** Message */
+                        message: string;
+                    };
+                };
+            };
+        };
+    };
+    get_get_log: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                dataset_id: string;
+                log_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Code */
+                        code: number;
+                        data: components["schemas"]["LogDetailView"];
+                        /** Message */
+                        message: string;
+                    };
+                };
+            };
+        };
+    };
     post_upload_documents: {
         parameters: {
             query?: never;
@@ -1872,6 +2202,33 @@ export interface operations {
                         /** Code */
                         code: number;
                         data: components["schemas"]["HealthData"];
+                        /** Message */
+                        message: string;
+                    };
+                };
+            };
+        };
+    };
+    get_task_status: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                task_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Code */
+                        code: number;
+                        data: components["schemas"]["TaskView"];
                         /** Message */
                         message: string;
                     };
