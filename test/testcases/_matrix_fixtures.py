@@ -27,7 +27,7 @@ import yaml
 
 from test.helpers.accounts import Account, AccountRegistry
 from test.helpers.fake_provider import FakeProvider
-from test.helpers.uploads import pdf_bytes, tenant_object_keys
+from test.helpers.uploads import pdf_bytes, sql, tenant_object_keys
 from test.testcases._routes import ROUTES_FILE  # conf/routes.yaml
 
 _PLACEHOLDER = re.compile(r"\{(\w+)\}")
@@ -151,6 +151,7 @@ class World:
     a_private_dataset: dict[str, Any] = field(default_factory=dict)  # A's dataset with permission me
     a_team_documents: list[dict[str, Any]] = field(default_factory=list)  # two documents A uploaded into the team dataset (plan 03-17)
     a_private_documents: list[dict[str, Any]] = field(default_factory=list)  # one document A uploaded into the private dataset
+    a_parsed_chunks: list[str] = field(default_factory=list)  # ids of the chunks seeded into the second team document (plan 04-18)
     a_normal_private_dataset: dict[str, Any] = field(default_factory=dict)  # a `me` dataset the normal member created in A's workspace (plan 03-19)
     scratch: dict[str, Any] = field(default_factory=dict)  # per-call disposable resources of the isolation table (plan 03-19)
 
@@ -206,6 +207,21 @@ class World:
             out[str(dataset["id"])] = resp.json()["data"]
         return out
 
+    @property
+    def a_parsed_document(self) -> dict[str, Any]:
+        """The second team document: its chunks were written host-side through the real doc store (``seed_chunks``), so no provider call builds the world."""
+        return self.a_team_documents[1]
+
+    def snapshot_chunks(self) -> Any:
+        """The seeded document's chunks as the owner lists them (ids, texts, switches, origins): a refused chunk call that crosses a boundary would change them."""
+        if not self.a_parsed_chunks:
+            return []
+        path = DATASETS + "/{dataset_id}/documents/{doc_id}/chunks"
+        ids = {"dataset_id": str(self.a_team_dataset["id"]), "doc_id": str(self.a_parsed_document["id"])}
+        resp = call(self.client, "GET", path, self.a.token, ids, query={"size": "100"})
+        assert resp.status_code == 200, resp.text
+        return [(c["id"], c["text"], c["enabled"], c["origin"]) for c in resp.json()["data"]["items"]]
+
     def snapshot_tokens(self) -> Any:
         return sorted(self.list_tokens(self.a), key=lambda t: t["token"])
 
@@ -230,6 +246,7 @@ class World:
             "datasets": self.snapshot_datasets(),
             "objects": self.snapshot_objects(),
             "documents": self.snapshot_documents(),
+            "chunks": self.snapshot_chunks(),
         }
 
     def a_identifiers(self) -> list[str]:
@@ -245,6 +262,7 @@ class World:
             out += [str(dataset.get("id", "")), str(dataset.get("name", ""))]
         for doc in (*self.a_team_documents, *self.a_private_documents):
             out += [str(doc.get("id", "")), str(doc.get("name", ""))]
+        out += self.a_parsed_chunks
         return [v for v in out if v]
 
 
@@ -266,6 +284,8 @@ def resource_of(row: Row) -> str:
         return "providers"
     if row.path.startswith(MODELS):
         return "models"
+    if row.path.startswith(DATASETS + "/") and "/chunks" in row.path:
+        return "chunks"
     if row.path.startswith(DATASETS + "/") and "/documents" in row.path:
         return "documents"
     if row.path.startswith(DATASETS):
@@ -322,7 +342,45 @@ def build_world(client: httpx.Client, registry: AccountRegistry, fake: FakeProvi
         for dataset, store, names in plan:
             for name in names:
                 store.extend(_ok(upload_file(world, a.token, str(dataset["id"]), name=name), f"A uploads {name}")["data"])
+        world.a_parsed_chunks = seed_chunks(world, CHUNK_SEED_COUNT)
     return world
+
+
+CHUNK_SEED_COUNT = 3
+CHUNK_SEED_TEXTS = ("matrix alpha ledger", "matrix beta ledger", "matrix gamma ledger")
+
+
+def seed_chunks(world: World, count: int) -> list[str]:
+    """Parsed-looking chunks for A's second team document, written straight into the real index from the host with correct vectors.
+
+    The totals are set with plain SQL as ``settle_totals`` would. No provider call is made, and the workspace's cleanup removes the index rows.
+    """
+    from common.doc_store.doc_store_base import index_name
+    from common.settings import load_settings
+    from rag.chunking.types import Chunk
+    from rag.nlp.token_count import count_tokens
+    from rag.svr.chunk_doc import build_row
+    from rag.utils.es_conn import get_doc_store
+
+    assert world.fake is not None
+    dimension = world.fake.embedding_dim
+    dataset_id, doc = str(world.a_team_dataset["id"]), world.a_parsed_document
+    store = get_doc_store(load_settings())
+    index = index_name(world.a.tenant_id)
+    store.create_idx(index, dataset_id, dimension, "naive")
+    rows = []
+    for i in range(count):
+        text = CHUNK_SEED_TEXTS[i % len(CHUNK_SEED_TEXTS)]
+        vector = [1.0 if axis == i % dimension else 0.0 for axis in range(dimension)]
+        chunk = Chunk(text, (), {}, count_tokens(text), i)
+        rows.append(
+            build_row(chunk, index=i, doc_id=str(doc["id"]), kb_id=dataset_id, doc_name=str(doc["name"]), task_id="matrix", from_page=0, to_page=1000000, vector=vector, enabled=True)
+        )
+    assert store.insert(rows, index, dataset_id) == []
+    tokens = sum(int(r["token_num_int"]) for r in rows)
+    sql("UPDATE `document` SET `chunk_num` = %s, `token_num` = %s WHERE `id` = %s", (count, tokens, doc["id"]))
+    sql("UPDATE `knowledgebase` SET `chunk_num` = `chunk_num` + %s, `token_num` = `token_num` + %s WHERE `id` = %s", (count, tokens, dataset_id))
+    return [str(r["id"]) for r in rows]
 
 
 # --- targets and builders (rows with path parameters) -----------------------------------------------------------
@@ -446,7 +504,35 @@ def _batch_update_status(w: World) -> Target:
     return Target({"dataset_id": str(w.a_team_dataset["id"])}, _sender("POST", DATASETS + "/{dataset_id}/documents/batch-update-status", body, extra_fields=set()), w.snapshot_documents)
 
 
+def _chunk_ids(w: World, with_chunk: bool = False) -> dict[str, str]:
+    ids = {"dataset_id": str(w.a_team_dataset["id"]), "doc_id": str(w.a_parsed_document["id"])}
+    if with_chunk:
+        ids["chunk_id"] = w.a_parsed_chunks[0]
+    return ids
+
+
+def _list_chunks(w: World) -> Target:
+    return Target(_chunk_ids(w), _sender("GET", DATASETS + "/{dataset_id}/documents/{doc_id}/chunks", extra_fields=set()), w.snapshot_chunks)
+
+
+def _create_chunk(w: World) -> Target:
+    """Add a chunk to A's real parsed document: only the dataset's visibility keeps an outsider from spending A's embedding quota and writing to A's index."""
+    return Target(_chunk_ids(w), _sender("POST", DATASETS + "/{dataset_id}/documents/{doc_id}/chunks", {"content_with_weight": "x"}, extra_fields=set()), w.snapshot_chunks)
+
+
+def _patch_chunk(w: World) -> Target:
+    """Switch one of A's real chunks off: only the dataset's visibility keeps an outsider from hiding it from search. ``enabled`` is in the snapshot."""
+    return Target(
+        _chunk_ids(w, True),
+        _sender("PATCH", DATASETS + "/{dataset_id}/documents/{doc_id}/chunks/{chunk_id}", {"available": False}, extra_fields=set()),
+        w.snapshot_chunks,
+    )
+
+
 BUILDERS: dict[str, Builder] = {
+    "GET /api/v1/datasets/{dataset_id}/documents/{doc_id}/chunks": _list_chunks,
+    "POST /api/v1/datasets/{dataset_id}/documents/{doc_id}/chunks": _create_chunk,
+    "PATCH /api/v1/datasets/{dataset_id}/documents/{doc_id}/chunks/{chunk_id}": _patch_chunk,
     "GET /api/v1/datasets/{dataset_id}": _dataset_detail,
     "PUT /api/v1/datasets/{dataset_id}": _update_dataset,
     "GET /api/v1/datasets/{dataset_id}/documents": _list_documents,

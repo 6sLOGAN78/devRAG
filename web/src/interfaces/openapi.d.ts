@@ -100,6 +100,38 @@ export interface paths {
         patch: operations["patch_update_document"];
         trace?: never;
     };
+    "/api/v1/datasets/{dataset_id}/documents/{doc_id}/chunks": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["get_list_chunks"];
+        put?: never;
+        post: operations["post_create_chunk"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/datasets/{dataset_id}/documents/{doc_id}/chunks/{chunk_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["patch_patch_chunk"];
+        trace?: never;
+    };
     "/api/v1/documents/upload": {
         parameters: {
             query?: never;
@@ -321,6 +353,30 @@ export interface components {
             doc_store: components["schemas"]["ProbeResult"];
             redis: components["schemas"]["ProbeResult"];
             storage: components["schemas"]["ProbeResult"];
+        };
+        /** ChunkPage */
+        ChunkPage: {
+            /** Items */
+            items: components["schemas"]["ChunkView"][];
+            /** Page Sizes */
+            page_sizes: {
+                [key: string]: number[];
+            };
+            /** Total */
+            total: number;
+        };
+        /** ChunkView */
+        ChunkView: {
+            /** Enabled */
+            enabled: boolean;
+            /** Id */
+            id: string;
+            /** Origin */
+            origin: string;
+            /** Positions */
+            positions: components["schemas"]["PositionView"][];
+            /** Text */
+            text: string;
         };
         /**
          * ChunkingValues
@@ -661,6 +717,19 @@ export interface components {
              * @default null
              */
             started: components["schemas"]["StartedDocument"][] | null;
+        };
+        /** PositionView */
+        PositionView: {
+            /** Bottom */
+            bottom: number;
+            /** Page */
+            page: number;
+            /** Top */
+            top: number;
+            /** X0 */
+            x0: number;
+            /** X1 */
+            x1: number;
         };
         /** ProbeResult */
         ProbeResult: {
@@ -1166,6 +1235,113 @@ export interface operations {
                         /** Code */
                         code: number;
                         data: components["schemas"]["DocumentDetailView"];
+                        /** Message */
+                        message: string;
+                    };
+                };
+            };
+        };
+    };
+    get_list_chunks: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                dataset_id: string;
+                doc_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Code */
+                        code: number;
+                        data: components["schemas"]["ChunkPage"];
+                        /** Message */
+                        message: string;
+                    };
+                };
+            };
+        };
+    };
+    post_create_chunk: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                dataset_id: string;
+                doc_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": {
+                    /** Content With Weight */
+                    content_with_weight: string;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Code */
+                        code: number;
+                        data: components["schemas"]["ChunkView"];
+                        /** Message */
+                        message: string;
+                    };
+                };
+            };
+        };
+    };
+    patch_patch_chunk: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                dataset_id: string;
+                doc_id: string;
+                chunk_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": {
+                    /**
+                     * Available
+                     * @default null
+                     */
+                    available?: boolean | null;
+                    /**
+                     * Content With Weight
+                     * @default null
+                     */
+                    content_with_weight?: string | null;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Code */
+                        code: number;
+                        data: components["schemas"]["ChunkView"];
                         /** Message */
                         message: string;
                     };

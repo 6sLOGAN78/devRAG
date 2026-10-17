@@ -677,6 +677,68 @@ def sweep_status_rows(s: Sweep, w: World) -> None:
     s.req(f"DELETE {DATASETS}/{{dataset_id}}/documents", "cleanup of the status sweep document", "DELETE", base, a.token, {"ids": [mine]})
 
 
+def sweep_chunk_rows(s: Sweep, w: World) -> None:
+    """The chunk list, add and patch rows on success and error paths (plan 04-18).
+
+    A's second team document carries three chunks written to the real index host-side. The owner may change them; a normal member who did not upload the
+    document may read but not write; an outsider and a member of a private dataset get the one 404. Every switch is put back. The chunk text used here
+    is plain words.
+    """
+    a, b, member = w.a, w.b, w.normal
+    token = str(w.a_tokens[0]["token"])
+    team_id, doc_id = str(w.a_team_dataset["id"]), str(w.a_parsed_document["id"])
+    chunk = w.a_parsed_chunks[0]
+    base = f"{DATASETS}/{team_id}/documents/{doc_id}/chunks"
+    private = f"{DATASETS}/{w.a_private_dataset['id']}/documents/{w.a_private_documents[0]['id']}/chunks"
+    absent_doc = f"{DATASETS}/{team_id}/documents/{uuid.uuid4().hex}/chunks"
+
+    row = f"GET {DATASETS}/{{dataset_id}}/documents/{{doc_id}}/chunks"
+    s.req(row, "success as owner", "GET", base, a.token)
+    s.req(row, "success as a member who may only read", "GET", base, member.token)
+    s.req(row, "success with an API token", "GET", base, token)
+    s.req(row, "success with keywords and a switch filter", "GET", f"{base}?keywords=what%20is%20(ledger&available=1&size=2&page=1", a.token)
+    s.req(row, "size over the limit", "GET", f"{base}?size=101", a.token)
+    s.req(row, "bad switch filter", "GET", f"{base}?available=2", a.token)
+    s.req(row, "absent document", "GET", absent_doc, a.token)
+    s.req(row, "private dataset as a member", "GET", private, member.token)
+    s.req(row, "absent dataset", "GET", f"{DATASETS}/{uuid.uuid4().hex}/documents/{doc_id}/chunks", a.token)
+    s.req(row, "malformed dataset id", "GET", f"{DATASETS}/not-an-id/documents/{doc_id}/chunks", a.token)
+    s.req(row, "as an outsider", "GET", base, b.token)
+    s.errors(row, "GET", base, "PUT")
+
+    row = f"POST {DATASETS}/{{dataset_id}}/documents/{{doc_id}}/chunks"
+    s.req(row, "success as owner", "POST", base, a.token, {"content_with_weight": "leak sweep owner note about ledgers"})
+    s.req(row, "success with an API token", "POST", base, token, {"content_with_weight": "leak sweep token note about ledgers"})
+    s.req(row, "member who did not upload the document", "POST", base, member.token, {"content_with_weight": "leak sweep member note"})
+    s.req(row, "empty text", "POST", base, a.token, {"content_with_weight": "   "})
+    s.req(row, "text too long", "POST", base, a.token, {"content_with_weight": "w" * 32001})
+    s.req(row, "unknown field", "POST", base, a.token, {"content_with_weight": "leak sweep note", "origin": "parsed"})
+    s.req(row, "no text", "POST", base, a.token, {})
+    s.req(row, "absent document", "POST", absent_doc, a.token, {"content_with_weight": "leak sweep note"})
+    s.req(row, "private dataset as a member", "POST", private, member.token, {"content_with_weight": "leak sweep note"})
+    s.req(row, "absent dataset", "POST", f"{DATASETS}/{uuid.uuid4().hex}/documents/{doc_id}/chunks", a.token, {"content_with_weight": "leak sweep note"})
+    s.req(row, "as an outsider", "POST", base, b.token, {"content_with_weight": "leak sweep note"})
+    s.errors(row, "POST", base, "PUT")
+
+    row = f"PATCH {DATASETS}/{{dataset_id}}/documents/{{doc_id}}/chunks/{{chunk_id}}"
+    path = f"{base}/{chunk}"
+    s.req(row, "success as owner (off)", "PATCH", path, a.token, {"available": False})
+    s.req(row, "success as owner (on again)", "PATCH", path, a.token, {"available": True})
+    s.req(row, "success as owner (text)", "PATCH", path, a.token, {"content_with_weight": "leak sweep edited ledger text"})
+    s.req(row, "success with an API token", "PATCH", path, token, {"available": True})
+    s.req(row, "member who did not upload the document", "PATCH", path, member.token, {"available": False})
+    s.req(row, "no fields", "PATCH", path, a.token, {})
+    s.req(row, "unknown field", "PATCH", path, a.token, {"available": False, "doc_id": doc_id})
+    s.req(row, "text too long", "PATCH", path, a.token, {"content_with_weight": "w" * 32001})
+    s.req(row, "chunk that is not a chunk id", "PATCH", f"{base}/not-a-chunk", a.token, {"available": False})
+    s.req(row, "chunk of nobody", "PATCH", f"{base}/{doc_id}_999999", a.token, {"available": False})
+    s.req(row, "absent document", "PATCH", f"{absent_doc}/{chunk}", a.token, {"available": False})
+    s.req(row, "private dataset as a member", "PATCH", f"{private}/{doc_id}_0", member.token, {"available": False})
+    s.req(row, "absent dataset", "PATCH", f"{DATASETS}/{uuid.uuid4().hex}/documents/{doc_id}/chunks/{chunk}", a.token, {"available": False})
+    s.req(row, "as an outsider", "PATCH", path, b.token, {"available": False})
+    s.errors(row, "PATCH", path, "PUT")
+
+
 def sealed_envelopes(tenant_id: str) -> list[str]:
     """Every sealed provider key stored for one workspace (the ``v1:`` envelopes), read straight from MySQL."""
     conn = root_connection()
@@ -744,6 +806,7 @@ def sweep(ingress: httpx.Client) -> Iterator[Sweep]:
             sweep_parse_rows(s, world)
             sweep_detail_rows(s, world)
             sweep_status_rows(s, world)
+            sweep_chunk_rows(s, world)
             collect_database_secrets(s)
             s.secrets.extend(infrastructure_secrets())
             yield s
