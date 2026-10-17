@@ -49,6 +49,7 @@ EMBED_MODELS = (
     NewModel("fake-embed", "embedding", DIMENSION, 8192),
     NewModel("fake-filter", "embedding", DIMENSION, 8192),
     NewModel("fake-timeout", "embedding", DIMENSION, 8192),
+    NewModel("fake-dim16", "embedding", 16, 8192),  # plan 04-19: the loopback answers 16 numbers for this name
 )
 
 

@@ -192,7 +192,8 @@ def _sse(model: str, wants_usage: bool) -> AsyncIterator[bytes]:
 
 
 def _embedding_response(state: FakeProvider, model: str, texts: list[str]) -> dict[str, Any]:
-    rows = [{"object": "embedding", "index": i, "embedding": [round((i + 1) / 10 + j / 100, 4) for j in range(state.embedding_dim)]} for i, _ in enumerate(texts)]
+    width = 16 if "dim16" in model else state.embedding_dim  # plan 04-19: a model named ...dim16 answers 16 numbers whatever the provider default is
+    rows = [{"object": "embedding", "index": i, "embedding": [round((i + 1) / 10 + j / 100, 4) for j in range(width)]} for i, _ in enumerate(texts)]
     if state.shuffle_embeddings:
         rows.reverse()
     tokens = sum(len(t.split()) or 1 for t in texts)
