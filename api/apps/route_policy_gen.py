@@ -68,6 +68,8 @@ _ROWS: tuple[tuple[str, tuple[str, ...], str, str, str, tuple[str, ...]], ...] =
     ('GET', ('api', 'v1', 'datasets', '{dataset_id}', 'documents', '{doc_id}', 'chunks'), 'python', 'api', 'tenant', ('owner', 'admin', 'normal')),
     ('POST', ('api', 'v1', 'datasets', '{dataset_id}', 'documents', '{doc_id}', 'chunks'), 'python', 'api', 'tenant', ('owner', 'admin', 'normal')),
     ('PATCH', ('api', 'v1', 'datasets', '{dataset_id}', 'documents', '{doc_id}', 'chunks', '{chunk_id}'), 'python', 'api', 'tenant', ('owner', 'admin', 'normal')),
+    ('GET', ('api', 'v1', 'datasets', '{dataset_id}', 'documents', '{doc_id}', 'content'), 'python', 'api', 'tenant', ('owner', 'admin', 'normal')),
+    ('GET', ('api', 'v1', 'datasets', '{dataset_id}', 'documents', '{doc_id}', 'pages', '{n}', 'image'), 'python', 'api', 'tenant', ('owner', 'admin', 'normal')),
     ('POST', ('api', 'v1', 'datasets', '{dataset_id}', 'embedding', 'check'), 'python', 'api', 'tenant', ('owner', 'admin', 'normal')),
     ('GET', ('api', 'v1', 'datasets', '{dataset_id}', 'ingestions'), 'python', 'api', 'tenant', ('owner', 'admin', 'normal')),
     ('GET', ('api', 'v1', 'datasets', '{dataset_id}', 'ingestions', 'summary'), 'python', 'api', 'tenant', ('owner', 'admin', 'normal')),

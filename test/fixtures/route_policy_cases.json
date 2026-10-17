@@ -27,6 +27,8 @@
     {"method": "POST", "path": "/api/v1/datasets/d1/documents/doc1/chunks", "auth": "api", "owner": "python", "scope": "tenant", "preflight": false},
     {"method": "PATCH", "path": "/api/v1/datasets/d1/documents/doc1/chunks/c1", "auth": "api", "owner": "python", "scope": "tenant", "preflight": false},
     {"method": "GET", "path": "/api/v1/datasets/d1/ingestions/summary", "auth": "api", "owner": "python", "scope": "tenant", "preflight": false},
+    {"method": "GET", "path": "/api/v1/datasets/d1/documents/x1/pages/1/image", "auth": "api", "owner": "python", "scope": "tenant", "preflight": false},
+    {"method": "GET", "path": "/api/v1/datasets/d1/documents/x1/content", "auth": "api", "owner": "python", "scope": "tenant", "preflight": false},
     {"method": "GET", "path": "/api/v1/datasets/d1/ingestions", "auth": "api", "owner": "python", "scope": "tenant", "preflight": false},
     {"method": "GET", "path": "/api/v1/datasets/d1/ingestions/l1", "auth": "api", "owner": "python", "scope": "tenant", "preflight": false},
     {"method": "POST", "path": "/api/v1/datasets/d1/embedding/check", "auth": "api", "owner": "python", "scope": "tenant", "preflight": false},

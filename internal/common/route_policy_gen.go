@@ -75,6 +75,8 @@ var policyRows = []policyRow{
 	{"GET", "python", "api", "tenant", []string{"api", "v1", "datasets", "{dataset_id}", "documents", "{doc_id}", "chunks"}, []string{"owner", "admin", "normal"}},
 	{"POST", "python", "api", "tenant", []string{"api", "v1", "datasets", "{dataset_id}", "documents", "{doc_id}", "chunks"}, []string{"owner", "admin", "normal"}},
 	{"PATCH", "python", "api", "tenant", []string{"api", "v1", "datasets", "{dataset_id}", "documents", "{doc_id}", "chunks", "{chunk_id}"}, []string{"owner", "admin", "normal"}},
+	{"GET", "python", "api", "tenant", []string{"api", "v1", "datasets", "{dataset_id}", "documents", "{doc_id}", "content"}, []string{"owner", "admin", "normal"}},
+	{"GET", "python", "api", "tenant", []string{"api", "v1", "datasets", "{dataset_id}", "documents", "{doc_id}", "pages", "{n}", "image"}, []string{"owner", "admin", "normal"}},
 	{"POST", "python", "api", "tenant", []string{"api", "v1", "datasets", "{dataset_id}", "embedding", "check"}, []string{"owner", "admin", "normal"}},
 	{"GET", "python", "api", "tenant", []string{"api", "v1", "datasets", "{dataset_id}", "ingestions"}, []string{"owner", "admin", "normal"}},
 	{"GET", "python", "api", "tenant", []string{"api", "v1", "datasets", "{dataset_id}", "ingestions", "summary"}, []string{"owner", "admin", "normal"}},

@@ -52,6 +52,7 @@ def create_app(
     from api.apps.restful_apis.document_api import document_bp
     from api.apps.restful_apis.ingestion_api import ingestion_bp
     from api.apps.restful_apis.models_api import models_bp
+    from api.apps.restful_apis.page_api import page_bp
     from api.apps.restful_apis.parse_api import parse_bp
     from api.apps.restful_apis.provider_api import provider_bp
     from api.apps.restful_apis.system_api import system_bp
@@ -64,6 +65,7 @@ def create_app(
     app.register_blueprint(parse_bp)
     app.register_blueprint(chunk_bp)
     app.register_blueprint(ingestion_bp)
+    app.register_blueprint(page_bp)
     for blueprint in extra_blueprints:
         app.register_blueprint(blueprint)
     return app
