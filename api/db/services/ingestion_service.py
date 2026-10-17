@@ -19,12 +19,10 @@ from __future__ import annotations
 
 import datetime
 import logging
-import tempfile
 import uuid
 from collections.abc import Sequence
 from contextlib import ExitStack
 from dataclasses import dataclass
-from pathlib import Path
 
 import peewee
 
@@ -36,23 +34,21 @@ from api.db.services import task_service
 from api.db.services.auth_service import Principal
 from api.db.services.document_service import AREA, DEADLOCK_ATTEMPTS, LOCK_TIMEOUT_SECONDS, MANAGE_DOCUMENT, _clean_ids
 from api.db.services.knowledgebase_service import DatasetRecord, VisibleDataset, _named_lock, embedding_dimensions, load_visible_dataset, upload_lock_name
+from api.db.services.pdf_pages import pdf_page_count
 from api.db.services.service_errors import Kind, ServiceError
 from api.db.services.tenant_scope import can_remove_document
 from api.db.services.totals_service import settle_totals
 from api.utils import reasons
-from common.constants import BUCKET_NAME
 from common.doc_store.doc_store_base import DocStoreConnection, DocStoreError, index_name
 from common.ingest_codes import LOG_CANCELLED, LOG_FAILED, LOG_RUNNING, RUN_CANCELLED, RUN_DONE, RUN_FAILED, RUN_NOT_STARTED, RUN_RUNNING
 from common.ratelimit import FixedWindowLimiter, RateLimited, RateLimitUnavailable
 from common.settings import Settings
 from rag.chunking.factory import available as chunker_available
-from rag.parsers.errors import ParserError
-from rag.parsers.pdf import count_pages
 from rag.parsers.router import parseable
 from rag.queue.factory import get_queue
 from rag.queue.queue_base import QueueUnavailable, TaskQueue
 from rag.utils.es_conn import get_doc_store
-from rag.utils.storage_base import Storage, StorageError
+from rag.utils.storage_base import Storage
 from rag.utils.storage_factory import get_storage
 
 logger = logging.getLogger(__name__)
@@ -170,28 +166,9 @@ def _check_all(settings: Settings, visible: VisibleDataset, documents: Sequence[
 
 
 def _page_ranges(settings: Settings, storage: Storage, doc: Document) -> list[tuple[int, int]]:
-    """Page ranges of one document. A PDF is counted on a temporary copy; a damaged one yields the single full range (the worker fails it, D-25)."""
-    page_size = settings.ingest.task_page_size
-    if (doc.suffix or "").lower() != "pdf":
-        return task_service.split_pages(None, page_size)
-    with tempfile.TemporaryDirectory() as tmp:
-        path = Path(tmp) / "doc.pdf"
-        stream = storage.iter_chunks(BUCKET_NAME, doc.location or "")
-        try:
-            with path.open("wb") as handle:
-                for piece in stream:
-                    handle.write(piece)
-        except StorageError:
-            logger.warning("parse could not read the blob document=%s", doc.id)
-            raise ServiceError(Kind.UNAVAILABLE, reasons.STORAGE_UNAVAILABLE, "file storage is not available, try again shortly") from None
-        finally:
-            close = getattr(stream, "close", None)
-            if close is not None:
-                close()
-        try:
-            return task_service.split_pages(count_pages(path), page_size)
-        except ParserError:
-            return task_service.split_pages(None, page_size)
+    """Page ranges of one document. The count comes from ``pdf_page_count`` (cached); a damaged or unreadable PDF yields the single full range (the worker fails it, D-25)."""
+    total = pdf_page_count(settings, doc.id, doc.location or "", doc.content_hash or "", doc.suffix or "", storage=storage)
+    return task_service.split_pages(total, settings.ingest.task_page_size)
 
 
 @dataclass(frozen=True)

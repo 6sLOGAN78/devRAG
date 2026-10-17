@@ -45,7 +45,7 @@ from api.db.models.base import current_timestamp_ms, timestamp_to_date
 from api.db.services import file_service
 from api.db.services.auth_service import Principal
 from api.db.services.knowledgebase_service import PARSER_IDS, DatasetRecord, VisibleDataset, load_visible_dataset, upload_lock_name
-from api.db.services.parser_config import validate_parser_config
+from api.db.services.parser_config import require_buildable, validate_parser_config
 from api.db.services.service_errors import Kind, ServiceError
 from api.db.services.tenant_scope import can_remove_document
 from api.db.services.upload_rules import (
@@ -330,6 +330,65 @@ def list_rows_view(principal: Principal, dataset_id: str, *, page: int, page_siz
     visible = load_visible_dataset(principal, dataset_id)
     items, total = document_view.list_rows(visible, page=page, page_size=page_size, keywords=keywords)
     return {"items": items, "total": total}
+
+
+# ----------------------------------------------------------------------------- settings
+
+_CHUNKING_KEYS = ("chunk_token_num", "delimiter", "overlapped_percent")
+
+
+def update_document_settings(
+    settings: Settings,
+    visible: VisibleDataset,
+    principal: Principal,
+    doc_id: str,
+    parser_id: object,
+    parser_config: object,
+) -> None:
+    """Change one document's chunking method and values (plan 04-16; D-02, D-15, D-27). Nothing is re-chunked and ``run`` is untouched.
+
+    The uploader, the dataset's creator, the owner and an admin may change; an API token is judged as its subject. The method must be a known
+    and built one, the merged configuration must validate, and the row is locked and re-read so a parse that started meanwhile is 409
+    ``parse_running``.
+    """
+    dataset, scope = visible.dataset, visible.scope
+    if not isinstance(doc_id, str) or _ID.fullmatch(doc_id) is None:
+        raise _not_found()
+    with DB.connection_context():
+        doc = Document.select(Document.id, Document.created_by).where((Document.id == doc_id) & (Document.kb_id == dataset.id)).first()
+    if doc is None:
+        raise _not_found()
+    if not can_remove_document(doc.created_by, dataset.created_by, principal.user_id, scope.subject):
+        raise ServiceError(Kind.FORBIDDEN, reasons.FORBIDDEN, "forbidden")
+    if parser_id is not None:
+        if not isinstance(parser_id, str) or parser_id not in PARSER_IDS:
+            raise _parser_invalid("that parser is not supported")
+        require_buildable(parser_id)
+    if parser_config is not None and not isinstance(parser_config, Mapping):
+        raise ServiceError(Kind.INVALID, reasons.PARSER_CONFIG_INVALID, "the parser configuration must be an object")
+    for attempt in range(1, DEADLOCK_ATTEMPTS + 1):
+        try:
+            with DB.connection_context(), transaction():
+                row = Document.select(Document.id, Document.run, Document.parser_id, Document.parser_config).where((Document.id == doc_id) & (Document.kb_id == dataset.id)).for_update().first()
+                if row is None:
+                    raise _not_found()
+                if row.run == "1":
+                    raise ServiceError(Kind.CONFLICT, reasons.PARSE_RUNNING, "this document is being parsed, wait for it to finish")
+                stored = row.parser_config if isinstance(row.parser_config, dict) else {}
+                merged = {**stored, **{k: v for k, v in dict(parser_config or {}).items()}}
+                config = {**stored, **validate_parser_config(merged)} if parser_config else stored
+                now = current_timestamp_ms()
+                Document.update(
+                    parser_id=row.parser_id if parser_id is None else parser_id,
+                    parser_config=config,
+                    update_time=now,
+                    update_date=timestamp_to_date(now),
+                ).where(Document.id == doc_id).execute()
+            return
+        except peewee.OperationalError as exc:
+            if exc.args and exc.args[0] == _MYSQL_DEADLOCK and attempt < DEADLOCK_ATTEMPTS:
+                continue
+            raise
 
 
 # ----------------------------------------------------------------------------- delete
