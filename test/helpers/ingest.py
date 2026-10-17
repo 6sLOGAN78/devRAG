@@ -10,6 +10,7 @@ from __future__ import annotations
 import dataclasses
 import datetime
 import io
+import json
 import os
 import time
 import uuid
@@ -134,8 +135,6 @@ def add_document(world: World, name: str, data: bytes, parser_config: dict[str, 
     made = docs.upload_documents(world.settings, visible, world.owner.user_id, [UploadItem(name=name, mime="application/octet-stream", stream=io.BytesIO(data))])
     doc_id = made[0]["id"]
     if parser_config:
-        import json
-
         sql("UPDATE `document` SET `parser_config` = %s WHERE `id` = %s", (json.dumps(parser_config), doc_id))
     return doc_id
 
@@ -229,8 +228,6 @@ def doc_state(doc_id: str) -> dict[str, Any]:
 
 
 def log_state(doc_id: str) -> dict[str, Any]:
-    import json
-
     status, progress, msg, dsl = sql(
         "SELECT `operation_status`, `progress`, `progress_msg`, `dsl` FROM `pipeline_operation_log` WHERE `document_id` = %s ORDER BY `create_time` DESC LIMIT 1", (doc_id,)
     )[0]
@@ -320,8 +317,6 @@ def seed_parse_artifacts(world: Any) -> tuple[str, str]:
 
     Both rows belong to the tenant of the world's owner, so ``delete_accounts`` removes them. Plain SQL: no provider call and no worker run.
     """
-    import json as _json
-
     from common.ingest_codes import LOG_DONE
     from test.helpers.uploads import sql
 
@@ -337,6 +332,60 @@ def seed_parse_artifacts(world: Any) -> tuple[str, str]:
     sql(
         "INSERT INTO `pipeline_operation_log` (`id`, `document_id`, `tenant_id`, `kb_id`, `parser_id`, `document_name`, `document_suffix`, `document_type`, `source_from`, "
         "`progress`, `progress_msg`, `process_duration`, `dsl`, `task_type`, `operation_status`) VALUES (%s, %s, %s, %s, 'naive', %s, 'pdf', 'pdf', 'local', 1, %s, 1.5, %s, '', %s)",
-        (log_id, doc_id, world.a.tenant_id, dataset_id, str(doc["name"]), line, _json.dumps(dsl), LOG_DONE),
+        (log_id, doc_id, world.a.tenant_id, dataset_id, str(doc["name"]), line, json.dumps(dsl), LOG_DONE),
     )
     return log_id, task_id
+
+
+# ----------------------------------------------------------------------------- format matrix helpers (plan 04-21)
+
+_MARKER_LETTERS = "abcdefghij"
+
+
+def marker_word(tag: str) -> str:
+    """A plain letters-only marker word unique to ``tag``: no digits or hyphens, so no secret or id shape matches it."""
+    return "zebramark" + tag + "".join(_MARKER_LETTERS[int(ch, 16) % 10] for ch in uuid.uuid4().hex[:8])
+
+
+def build_format_files(marker: str) -> dict[str, tuple[str, bytes, list[str]]]:
+    """``{suffix: (file name, bytes, fragments every chunk text together must contain)}`` for the eight formats, each 8 to 12 short units naming ``marker``."""
+    lines = [f"{marker} line number {word} about retrieval systems and plain words" for word in ("one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten")]
+    rows = [[f"item{w}", f"{marker} value{w}"] for w in ("alpha", "beta", "gamma", "delta", "epsilon", "zeta", "eta", "theta")]
+    html = (
+        "<html><head><title>page</title><script>var hostilescript = 1;</script></head><body>"
+        + "".join(f"<p>{line}</p>" for line in lines)
+        + "<script>alert('hostilescript')</script></body></html>"
+    )
+    slides = [{"title": f"{marker} slide {i}", "body": f"slide body text number {i}", "notes": f"speaker note {marker}notes{i}"} for i in range(1, 9)]
+    return {
+        ".txt": (f"plain-{marker}.txt", "\n".join(lines).encode(), [marker]),
+        ".md": (f"readme-{marker}.md", ("# " + marker + " heading\n\n" + "\n\n".join(f"- {line}" for line in lines)).encode(), [marker]),
+        ".csv": (f"table-{marker}.csv", ("name,note\n" + "\n".join(f"{r[0]},{r[1]}" for r in rows)).encode(), [marker]),
+        ".json": (f"data-{marker}.json", json.dumps([{"id": i, "text": line} for i, line in enumerate(lines)]).encode(), [marker]),
+        ".html": (f"page-{marker}.html", make_html(html), [marker]),
+        ".docx": (
+            f"word-{marker}.docx",
+            make_docx(lines[:8], headings=[f"{marker} heading"], table=[["cellhead", "cellvalue"], [f"{marker}cell", "cellbody"]]),
+            [marker, f"{marker}cell"],
+        ),
+        ".xlsx": (
+            f"sheet-{marker}.xlsx",
+            make_xlsx({"Sheet1": [["headone", "headtwo"], *[[f"headvalue{w}", f"{marker} {w}"] for w in "abcdefgh"]]}),
+            [marker, "headone"],
+        ),
+        ".pptx": (f"deck-{marker}.pptx", make_pptx(slides), [marker, f"{marker}notes1"]),
+    }
+
+
+def chunk_texts(api: Any, ingress: Any, token: str, dataset_id: str, doc_id: str, **params: str) -> list[dict[str, Any]]:
+    """Every listed chunk of the document (``id``, ``text``, ``positions``...) in document order, paging through the chunk list 100 at a time."""
+    out: list[dict[str, Any]] = []
+    page = 1
+    while True:
+        resp = api(ingress, "GET", f"{_DATASETS}/{dataset_id}/documents/{doc_id}/chunks", token, params={"page": str(page), "size": "100", **params})
+        assert resp.status_code == 200, resp.text
+        data = resp.json()["data"]
+        out.extend(data["items"])
+        if len(out) >= data["total"] or not data["items"]:
+            return out
+        page += 1
