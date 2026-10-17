@@ -1023,6 +1023,27 @@
         "title": "StartedDocument",
         "type": "object"
       },
+      "StatusChange": {
+        "properties": {
+          "enabled": {
+            "title": "Enabled",
+            "type": "boolean"
+          },
+          "updated": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Updated",
+            "type": "array"
+          }
+        },
+        "required": [
+          "updated",
+          "enabled"
+        ],
+        "title": "StatusChange",
+        "type": "object"
+      },
       "UploadLimitsView": {
         "properties": {
           "allowed_extensions": {
@@ -1631,6 +1652,110 @@
                     "data"
                   ],
                   "title": "DocumentPageEnvelope",
+                  "type": "object"
+                }
+              }
+            },
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v1/datasets/{dataset_id}/documents/batch-update-status": {
+      "post": {
+        "operationId": "post_change_status",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "dataset_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "description": "``doc_ids`` (the SPA) and/or ``doc_id`` (the endpoint catalogue: one id or a list); at least one, merged without duplicates. ``status``: \"1\" on, \"0\" off.",
+                "properties": {
+                  "doc_id": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "items": {
+                          "type": "string"
+                        },
+                        "type": "array"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null,
+                    "title": "Doc Id"
+                  },
+                  "doc_ids": {
+                    "anyOf": [
+                      {
+                        "items": {
+                          "type": "string"
+                        },
+                        "type": "array"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null,
+                    "title": "Doc Ids"
+                  },
+                  "status": {
+                    "enum": [
+                      "0",
+                      "1"
+                    ],
+                    "title": "Status",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "status"
+                ],
+                "title": "ChangeStatusBody",
+                "type": "object"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "title": "Code",
+                      "type": "integer"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/StatusChange"
+                    },
+                    "message": {
+                      "title": "Message",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "message",
+                    "data"
+                  ],
+                  "title": "StatusChangeEnvelope",
                   "type": "object"
                 }
               }

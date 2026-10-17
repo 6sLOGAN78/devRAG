@@ -639,6 +639,44 @@ def sweep_detail_rows(s: Sweep, w: World) -> None:
     s.req(f"DELETE {DATASETS}/{{dataset_id}}/documents", "cleanup of the detail sweep document", "DELETE", base, a.token, {"ids": [mine.rsplit("/", 1)[1]]})
 
 
+def sweep_status_rows(s: Sweep, w: World) -> None:
+    """``POST /api/v1/datasets/{dataset_id}/documents/batch-update-status`` on success and error paths (plan 04-17).
+
+    The member's own document (uploaded through the real route, scanned under the upload row) is the one the member may switch; A's documents are
+    the ones the member may not. Every switch that succeeded is undone and the member's document is removed at the end.
+    """
+    a, b, member = w.a, w.b, w.normal
+    token = str(w.a_tokens[0]["token"])
+    team_id = str(w.a_team_dataset["id"])
+    base = f"{DATASETS}/{team_id}/documents"
+    path = f"{base}/batch-update-status"
+    private = f"{DATASETS}/{w.a_private_dataset['id']}/documents/batch-update-status"
+    theirs = str(w.a_team_documents[0]["id"])
+    files = [("file", ("leak-status-member.txt", ("leak status text. " * 40).encode(), "text/plain"))]
+    made = s.req(f"POST {UPLOAD}", "document for the status sweep", "POST", f"{UPLOAD}?dataset_id={team_id}", member.token, files=files)
+    mine = str(made.json()["data"][0]["id"])
+
+    row = f"POST {DATASETS}/{{dataset_id}}/documents/batch-update-status"
+    s.req(row, "success as owner (off)", "POST", path, a.token, {"doc_ids": [theirs], "status": "0"})
+    s.req(row, "success as owner (on again)", "POST", path, a.token, {"doc_ids": [theirs], "status": "1"})
+    s.req(row, "success with the catalogue body", "POST", path, a.token, {"doc_id": theirs, "status": "1"})
+    s.req(row, "success as the uploading member", "POST", path, member.token, {"doc_ids": [mine], "status": "0"})
+    s.req(row, "success with an API token", "POST", path, token, {"doc_ids": [theirs], "status": "1"})
+    s.req(row, "another member's document", "POST", path, member.token, {"doc_ids": [theirs], "status": "0"})
+    s.req(row, "no ids", "POST", path, a.token, {"status": "0"})
+    s.req(row, "empty ids", "POST", path, a.token, {"doc_ids": [], "status": "0"})
+    s.req(row, "ids that are not ids", "POST", path, a.token, {"doc_ids": ["not-hex"], "status": "0"})
+    s.req(row, "bad status", "POST", path, a.token, {"doc_ids": [theirs], "status": "2"})
+    s.req(row, "unknown field", "POST", path, a.token, {"doc_ids": [theirs], "status": "0", "run": "1"})
+    s.req(row, "unknown document", "POST", path, a.token, {"doc_ids": [uuid.uuid4().hex], "status": "0"})
+    s.req(row, "private dataset as a member", "POST", private, member.token, {"doc_ids": [str(w.a_private_documents[0]["id"])], "status": "0"})
+    s.req(row, "absent dataset", "POST", f"{DATASETS}/{uuid.uuid4().hex}/documents/batch-update-status", a.token, {"doc_ids": [theirs], "status": "0"})
+    s.req(row, "malformed dataset id", "POST", f"{DATASETS}/not-an-id/documents/batch-update-status", a.token, {"doc_ids": [theirs], "status": "0"})
+    s.req(row, "as an outsider", "POST", path, b.token, {"doc_ids": [theirs], "status": "0"})
+    s.errors(row, "POST", path, "PATCH")
+    s.req(f"DELETE {DATASETS}/{{dataset_id}}/documents", "cleanup of the status sweep document", "DELETE", base, a.token, {"ids": [mine]})
+
+
 def sealed_envelopes(tenant_id: str) -> list[str]:
     """Every sealed provider key stored for one workspace (the ``v1:`` envelopes), read straight from MySQL."""
     conn = root_connection()
@@ -705,6 +743,7 @@ def sweep(ingress: httpx.Client) -> Iterator[Sweep]:
             sweep_dataset_write_rows(s, world)
             sweep_parse_rows(s, world)
             sweep_detail_rows(s, world)
+            sweep_status_rows(s, world)
             collect_database_secrets(s)
             s.secrets.extend(infrastructure_secrets())
             yield s

@@ -440,12 +440,19 @@ def _update_document(w: World) -> Target:
     return Target(ids, _sender("PATCH", DATASETS + "/{dataset_id}/documents/{doc_id}", body, extra_fields=set()), w.snapshot_documents)
 
 
+def _batch_update_status(w: World) -> Target:
+    """Switch A's real document off: only the dataset's visibility keeps an outsider from hiding it from search. ``enabled`` is in the snapshot."""
+    body = {"doc_ids": [str(w.a_team_documents[0]["id"])], "status": "0"}
+    return Target({"dataset_id": str(w.a_team_dataset["id"])}, _sender("POST", DATASETS + "/{dataset_id}/documents/batch-update-status", body, extra_fields=set()), w.snapshot_documents)
+
+
 BUILDERS: dict[str, Builder] = {
     "GET /api/v1/datasets/{dataset_id}": _dataset_detail,
     "PUT /api/v1/datasets/{dataset_id}": _update_dataset,
     "GET /api/v1/datasets/{dataset_id}/documents": _list_documents,
     "DELETE /api/v1/datasets/{dataset_id}/documents": _delete_documents,
     "POST /api/v1/datasets/{dataset_id}/documents/parse": _parse_documents,
+    "POST /api/v1/datasets/{dataset_id}/documents/batch-update-status": _batch_update_status,
     "GET /api/v1/datasets/{dataset_id}/documents/{doc_id}": _document_detail,
     "PATCH /api/v1/datasets/{dataset_id}/documents/{doc_id}": _update_document,
     "DELETE /api/v1/providers/{provider}": _delete_provider,

@@ -52,6 +52,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/datasets/{dataset_id}/documents/batch-update-status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["post_change_status"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/datasets/{dataset_id}/documents/parse": {
         parameters: {
             query?: never;
@@ -673,6 +689,13 @@ export interface components {
             /** Tasks */
             tasks: number;
         };
+        /** StatusChange */
+        StatusChange: {
+            /** Enabled */
+            enabled: boolean;
+            /** Updated */
+            updated: string[];
+        };
         /** UploadLimitsView */
         UploadLimitsView: {
             /** Allowed Extensions */
@@ -984,6 +1007,53 @@ export interface operations {
                         /** Code */
                         code: number;
                         data: components["schemas"]["DeletedCount"];
+                        /** Message */
+                        message: string;
+                    };
+                };
+            };
+        };
+    };
+    post_change_status: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                dataset_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": {
+                    /**
+                     * Doc Id
+                     * @default null
+                     */
+                    doc_id?: string | string[] | null;
+                    /**
+                     * Doc Ids
+                     * @default null
+                     */
+                    doc_ids?: string[] | null;
+                    /**
+                     * Status
+                     * @enum {string}
+                     */
+                    status: "0" | "1";
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Code */
+                        code: number;
+                        data: components["schemas"]["StatusChange"];
                         /** Message */
                         message: string;
                     };
