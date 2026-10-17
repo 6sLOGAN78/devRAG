@@ -182,5 +182,15 @@ endpoints:
      note: "plan 04-18 adds a hand-made chunk, embedded before it is written; the uploader, the dataset creator, owner or admin (D-10, D-11)"}
   - {method: PATCH, path: "/api/v1/datasets/{dataset_id}/documents/{doc_id}/chunks/{chunk_id}", owner: python, auth: api, roles: [owner, admin, normal], scope: tenant, implemented: true,
      note: "plan 04-18 edits a chunk's text and/or its own search switch; text is embedded before it is written (D-11, D-26)"}
+  - {method: GET, path: "/api/v1/datasets/{dataset_id}/ingestions/summary", owner: python, auth: api, roles: [owner, admin, normal], scope: tenant, implemented: true,
+     note: "plan 04-19 counts documents by state from one grouped query; reads need only dataset visibility (KB-14, D-07)"}
+  - {method: GET, path: "/api/v1/datasets/{dataset_id}/ingestions", owner: python, auth: api, roles: [owner, admin, normal], scope: tenant, implemented: true,
+     note: "plan 04-19 lists the dataset's parsing runs, newest first, 20 per page; the outcome key is result (KB-15, D-08)"}
+  - {method: GET, path: "/api/v1/datasets/{dataset_id}/ingestions/{log_id}", owner: python, auth: api, roles: [owner, admin, normal], scope: tenant, implemented: true,
+     note: "plan 04-19 returns one parsing run with its progress lines (at most 3000, redacted) and a plain, typed error (KB-15, D-08, D-23)"}
+  - {method: POST, path: "/api/v1/datasets/{dataset_id}/embedding/check", owner: python, auth: api, roles: [owner, admin, normal], scope: tenant, implemented: true,
+     note: "plan 04-19 embeds one fixed probe and compares the vector size with the dataset's; the dataset manage rule is enforced in the service and the call is rate limited like chunk writes (KB-16)"}
+  - {method: GET, path: "/v1/task/status/{task_id}", owner: python, auth: api, roles: [owner, admin, normal], scope: tenant, implemented: true,
+     note: "plan 04-19 reports one task; task, document and dataset come from MySQL and the dataset must be visible, otherwise the one 404 (DOC-22)"}
   - {method: POST, path: "/api/v1/datasets/{dataset_id}/documents/parse", owner: python, auth: api, roles: [owner, admin, normal], scope: tenant, implemented: true,
      note: "plan 04-14 starts, cancels and re-parses documents; the uploader, the dataset creator, owner or admin (D-02)"}

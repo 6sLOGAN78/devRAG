@@ -173,7 +173,13 @@ def log_dto(log: PipelineOperationLog, max_attempts: int, live_chunks: object) -
     """One parsing run. Keys are listed in ``LOG_KEYS``; a column added to the table never reaches a client unreviewed."""
     dsl = log.dsl if isinstance(log.dsl, dict) else {}
     result = log.operation_status if log.operation_status in _RESULTS else LOG_FAILED
-    chunks = _count(live_chunks) if result == LOG_RUNNING else _count(dsl.get("chunks"))
+    stored = _count(dsl.get("chunks"))
+    if result == LOG_RUNNING:
+        chunks = _count(live_chunks)
+    elif result == LOG_CANCELLED and not stored:
+        chunks = _count(live_chunks)  # a cancelled run keeps what it indexed before the stop; the roll-up may not have counted it yet
+    else:
+        chunks = stored
     return {
         "id": log.id,
         "document_id": log.document_id,
@@ -273,6 +279,11 @@ def task_status(principal: Principal, task_id: object) -> dict[str, Any]:
 # ----------------------------------------------------------------------------- embedding check
 
 
+def _model_unavailable() -> ServiceError:
+    """A typed 409: the one 404 hides reasons, and here the caller already sees the dataset, so the reason is safe to show."""
+    return ServiceError(Kind.CONFLICT, reasons.MODEL_UNAVAILABLE, "that model is not available in this workspace")
+
+
 def embedding_check(settings: Settings, visible: VisibleDataset, principal: Principal, embd_id: str | None = None) -> dict[str, Any]:
     """Embed the probe string once and compare the vector length with the dimension the dataset's index was built for.
 
@@ -283,11 +294,16 @@ def embedding_check(settings: Settings, visible: VisibleDataset, principal: Prin
     tenant_id = visible.scope.tenant_id
     expected = embedding_dimensions(tenant_id).get(visible.dataset.embd_id)
     if expected is None:
-        raise ServiceError(Kind.NOT_FOUND, reasons.MODEL_UNAVAILABLE, "that model is not available in this workspace")
+        raise _model_unavailable()
     model = visible.dataset.embd_id if embd_id is None else embd_id
     if not isinstance(model, str):
-        raise ServiceError(Kind.NOT_FOUND, reasons.MODEL_UNAVAILABLE, "that model is not available in this workspace")
-    bundle = LLMBundle(tenant_id, model, "embedding", settings=settings)  # unknown or non-embedding model: MODEL_UNAVAILABLE before any call
+        raise _model_unavailable()
+    try:
+        bundle = LLMBundle(tenant_id, model, "embedding", settings=settings)  # unknown or non-embedding model: refused before any call
+    except ServiceError as exc:
+        if exc.kind is Kind.NOT_FOUND:
+            raise _model_unavailable() from None
+        raise
     vectors, _ = bundle.encode([PROBE_TEXT])
     dimension = len(vectors[0]) if vectors else 0
     return {"ok": dimension == expected, "dimension": dimension, "expected": expected}
