@@ -217,11 +217,21 @@ def _inv_embedding_check(w: World, who: Account | None, token: str, as_tenant: s
     return call(w.client, "POST", f"{DATASETS}/{_team_id(w)}/embedding/check", token, {}, body={"embd_id": None})
 
 
+def _inv_page_image(w: World, who: Account | None, token: str, as_tenant: str | None) -> httpx.Response:
+    return call(w.client, "GET", _doc_path(w) + "/pages/1/image", token, {})
+
+
+def _inv_document_content(w: World, who: Account | None, token: str, as_tenant: str | None) -> httpx.Response:
+    return call(w.client, "GET", _doc_path(w) + "/content", token, {})
+
+
 def _inv_task_status(w: World, who: Account | None, token: str, as_tenant: str | None) -> httpx.Response:
     return call(w.client, "GET", f"/v1/task/status/{w.scratch.get('document_id') or w.a_task_id}", token, {})
 
 
 INVOKERS: dict[str, Invoker] = {
+    "GET /api/v1/datasets/{dataset_id}/documents/{doc_id}/pages/{n}/image": _inv_page_image,
+    "GET /api/v1/datasets/{dataset_id}/documents/{doc_id}/content": _inv_document_content,
     "GET /api/v1/datasets/{dataset_id}/ingestions/summary": _inv_ingestion_summary,
     "GET /api/v1/datasets/{dataset_id}/ingestions": _inv_ingestion_logs,
     "GET /api/v1/datasets/{dataset_id}/ingestions/{log_id}": _inv_ingestion_log,
@@ -290,6 +300,8 @@ ID_ROWS = frozenset(
         "GET /api/v1/datasets/{dataset_id}/ingestions",
         "GET /api/v1/datasets/{dataset_id}/ingestions/{log_id}",
         "POST /api/v1/datasets/{dataset_id}/embedding/check",
+        "GET /api/v1/datasets/{dataset_id}/documents/{doc_id}/pages/{n}/image",
+        "GET /api/v1/datasets/{dataset_id}/documents/{doc_id}/content",
     }
 )
 # Rows that call the model provider with the stored key: a refused request must never reach it.
@@ -353,6 +365,8 @@ def run(w: World, key: str, who: Account | None, token: str, as_tenant: str | No
 
 
 def succeeded(resp: httpx.Response) -> bool:
+    if resp.status_code == 200 and not resp.headers.get("content-type", "").startswith("application/json"):
+        return True  # a binary body (page image, original file): the status alone says it was served
     return resp.status_code == 200 and resp.json().get("code") == 0
 
 

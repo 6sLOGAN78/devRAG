@@ -2707,6 +2707,62 @@
         }
       }
     },
+    "/api/v1/datasets/{dataset_id}/documents/{doc_id}/content": {
+      "get": {
+        "operationId": "get_content",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "dataset_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "doc_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {}
+      }
+    },
+    "/api/v1/datasets/{dataset_id}/documents/{doc_id}/pages/{n}/image": {
+      "get": {
+        "operationId": "get_page_image",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "dataset_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "doc_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "n",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {}
+      }
+    },
     "/api/v1/datasets/{dataset_id}/embedding/check": {
       "post": {
         "operationId": "post_embedding_check",

@@ -27,8 +27,8 @@ import yaml
 
 from test.helpers.accounts import Account, AccountRegistry
 from test.helpers.fake_provider import FakeProvider
-from test.helpers.ingest import seed_parse_artifacts
-from test.helpers.uploads import pdf_bytes, sql, tenant_object_keys
+from test.helpers.ingest import seed_parse_artifacts, text_pdf
+from test.helpers.uploads import sql, tenant_object_keys, text_bytes
 from test.testcases._routes import ROUTES_FILE  # conf/routes.yaml
 
 _PLACEHOLDER = re.compile(r"\{(\w+)\}")
@@ -152,6 +152,7 @@ class World:
     a_private_dataset: dict[str, Any] = field(default_factory=dict)  # A's dataset with permission me
     a_team_documents: list[dict[str, Any]] = field(default_factory=list)  # two documents A uploaded into the team dataset (plan 03-17)
     a_private_documents: list[dict[str, Any]] = field(default_factory=list)  # one document A uploaded into the private dataset
+    a_text_document: dict[str, Any] = field(default_factory=dict)  # a .txt file in the team dataset for the text preview (plan 04-20)
     a_parsed_chunks: list[str] = field(default_factory=list)  # ids of the chunks seeded into the second team document (plan 04-18)
     a_log_id: str = ""  # a parsing-log entry seeded for the second team document (plan 04-19)
     a_task_id: str = ""  # a finished task seeded for the same document (plan 04-19)
@@ -282,6 +283,7 @@ class World:
             out += [str(dataset.get("id", "")), str(dataset.get("name", ""))]
         for doc in (*self.a_team_documents, *self.a_private_documents):
             out += [str(doc.get("id", "")), str(doc.get("name", ""))]
+        out += [str(self.a_text_document.get("id", "")), str(self.a_text_document.get("name", ""))]
         out += self.a_parsed_chunks
         out += [self.a_log_id, self.a_task_id]
         return [v for v in out if v]
@@ -309,6 +311,8 @@ def resource_of(row: Row) -> str:
         return "ingestion"
     if row.path.startswith(DATASETS + "/") and "/chunks" in row.path:
         return "chunks"
+    if row.path.startswith(DATASETS + "/") and ("/pages/" in row.path or row.path.endswith("/content")):
+        return "documents"
     if row.path.startswith(DATASETS + "/") and "/documents" in row.path:
         return "documents"
     if row.path.startswith(DATASETS):
@@ -365,6 +369,13 @@ def build_world(client: httpx.Client, registry: AccountRegistry, fake: FakeProvi
         for dataset, store, names in plan:
             for name in names:
                 store.extend(_ok(upload_file(world, a.token, str(dataset["id"]), name=name), f"A uploads {name}")["data"])
+        world.a_text_document = _ok(
+            world.client.post(
+                UPLOAD, headers=bearer(a.token), params={"dataset_id": str(world.a_team_dataset["id"])},
+                files=[("file", ("matrix-text.txt", text_bytes("matrix"), "text/plain"))], timeout=60.0,
+            ),
+            "A uploads a text file",
+        )["data"][0]
         world.a_parsed_chunks = seed_chunks(world, CHUNK_SEED_COUNT)
         world.a_log_id, world.a_task_id = seed_parse_artifacts(world)
     return world
@@ -571,11 +582,24 @@ def _embedding_check(w: World) -> Target:
     return Target({"dataset_id": str(w.a_team_dataset["id"])}, _sender("POST", DATASETS + "/{dataset_id}/embedding/check", {"embd_id": None}, extra_fields=set()), w.snapshot_ingestion)
 
 
+def _page_image(w: World) -> Target:
+    """Read page 1 of A's real PDF: only the dataset's visibility keeps an outsider from the rendered page."""
+    ids = {"dataset_id": str(w.a_team_dataset["id"]), "doc_id": str(w.a_team_documents[0]["id"]), "n": "1"}
+    return Target(ids, _sender("GET", DATASETS + "/{dataset_id}/documents/{doc_id}/pages/{n}/image", extra_fields=set()), w.snapshot_documents)
+
+
+def _document_content(w: World) -> Target:
+    ids = {"dataset_id": str(w.a_team_dataset["id"]), "doc_id": str(w.a_team_documents[0]["id"])}
+    return Target(ids, _sender("GET", DATASETS + "/{dataset_id}/documents/{doc_id}/content", extra_fields=set()), w.snapshot_documents)
+
+
 def _task_status(w: World) -> Target:
     return Target({"task_id": w.a_task_id}, _sender("GET", "/v1/task/status/{task_id}", extra_fields=set()), w.snapshot_ingestion)
 
 
 BUILDERS: dict[str, Builder] = {
+    "GET /api/v1/datasets/{dataset_id}/documents/{doc_id}/pages/{n}/image": _page_image,
+    "GET /api/v1/datasets/{dataset_id}/documents/{doc_id}/content": _document_content,
     "GET /api/v1/datasets/{dataset_id}/ingestions/summary": _ingestion_summary,
     "GET /api/v1/datasets/{dataset_id}/ingestions": _ingestion_logs,
     "GET /api/v1/datasets/{dataset_id}/ingestions/{log_id}": _ingestion_log,
@@ -879,13 +903,13 @@ def upload_file(w: World, token: str, dataset_id: str, *, query: Mapping[str, st
     """One multipart upload with the bearer under test. The dataset id travels in the query, where the route reads it."""
     w.client.cookies.clear()
     params = {"dataset_id": dataset_id, **(query or {})}
-    return w.client.post(UPLOAD, headers=bearer(token), params=params, files=[("file", (name, pdf_bytes("matrix"), "application/pdf"))], timeout=60.0)
+    return w.client.post(UPLOAD, headers=bearer(token), params=params, files=[("file", (name, text_pdf([[f"matrix {uuid.uuid4().hex}"]]), "application/pdf"))], timeout=60.0)
 
 
 def check_documents_upload(w: World) -> None:
     """POST /api/v1/documents/upload: nobody outside A reaches A's datasets, nothing appears under A's prefix, and a workspace uploads into its own."""
     before = w.snapshot()
-    assert len(before["objects"]) == 3, "A's world holds three uploaded documents (two team, one private)"
+    assert len(before["objects"]) == 4, "A's world holds four uploaded documents (three team, one private)"
     smuggle = {"tenant_id": w.a.tenant_id, "user_id": w.a.user_id}
     for dataset in (w.a_team_dataset, w.a_private_dataset):
         dataset_id = str(dataset["id"])

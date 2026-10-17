@@ -804,6 +804,49 @@ def sweep_ingestion_rows(s: Sweep, w: World) -> None:
     s.errors(row, "GET", path, "PUT")
 
 
+def sweep_page_rows(s: Sweep, w: World) -> None:
+    """The page image and the original file or text preview (plan 04-20). Binary bodies are scanned as text (D-19).
+
+    A's first team document is a real one-page PDF and ``a_text_document`` is a text file; both are read as every kind of caller.
+    """
+    a, b, member = w.a, w.b, w.normal
+    token = str(w.a_tokens[0]["token"])
+    team = f"{DATASETS}/{w.a_team_dataset['id']}/documents"
+    private = f"{DATASETS}/{w.a_private_dataset['id']}/documents"
+    pdf, txt = str(w.a_team_documents[0]["id"]), str(w.a_text_document["id"])
+    image = f"{team}/{pdf}/pages/1/image"
+    content = f"{team}/{pdf}/content"
+
+    row = f"GET {DATASETS}/{{dataset_id}}/documents/{{doc_id}}/pages/{{n}}/image"
+    s.req(row, "success as owner", "GET", image, a.token)
+    s.req(row, "success as a member", "GET", image, member.token)
+    s.req(row, "success with an API token", "GET", image, token)
+    s.req(row, "page beyond the last", "GET", f"{team}/{pdf}/pages/2/image", a.token)
+    for bad in ("0", "abc", "99999999999999999999"):
+        s.req(row, f"malformed page number {bad}", "GET", f"{team}/{pdf}/pages/{bad}/image", a.token)
+    s.req(row, "a document that is not a PDF", "GET", f"{team}/{txt}/pages/1/image", a.token)
+    s.req(row, "absent document", "GET", f"{team}/{uuid.uuid4().hex}/pages/1/image", a.token)
+    s.req(row, "private dataset as a member", "GET", f"{private}/{w.a_private_documents[0]['id']}/pages/1/image", member.token)
+    s.req(row, "absent dataset", "GET", f"{DATASETS}/{uuid.uuid4().hex}/documents/{pdf}/pages/1/image", a.token)
+    s.req(row, "as an outsider", "GET", image, b.token)
+    s.errors(row, "GET", image, "PUT")
+
+    row = f"GET {DATASETS}/{{dataset_id}}/documents/{{doc_id}}/content"
+    s.req(row, "success as owner", "GET", content, a.token)
+    s.req(row, "success as a member", "GET", content, member.token)
+    s.req(row, "success with an API token", "GET", content, token)
+    s.req(row, "text preview as owner", "GET", f"{team}/{txt}/content?format=text", a.token)
+    s.req(row, "text preview as a member", "GET", f"{team}/{txt}/content?format=text", member.token)
+    s.req(row, "text preview of a PDF", "GET", f"{content}?format=text", a.token)
+    s.req(row, "unknown format", "GET", f"{content}?format=html", a.token)
+    s.req(row, "absent document", "GET", f"{team}/{uuid.uuid4().hex}/content", a.token)
+    s.req(row, "private dataset as a member", "GET", f"{private}/{w.a_private_documents[0]['id']}/content", member.token)
+    s.req(row, "absent dataset", "GET", f"{DATASETS}/{uuid.uuid4().hex}/documents/{pdf}/content", a.token)
+    s.req(row, "as an outsider", "GET", content, b.token)
+    s.req(row, "text preview as an outsider", "GET", f"{team}/{txt}/content?format=text", b.token)
+    s.errors(row, "GET", content, "PUT")
+
+
 def sealed_envelopes(tenant_id: str) -> list[str]:
     """Every sealed provider key stored for one workspace (the ``v1:`` envelopes), read straight from MySQL."""
     conn = root_connection()
@@ -873,6 +916,7 @@ def sweep(ingress: httpx.Client) -> Iterator[Sweep]:
             sweep_status_rows(s, world)
             sweep_chunk_rows(s, world)
             sweep_ingestion_rows(s, world)
+            sweep_page_rows(s, world)
             collect_database_secrets(s)
             s.secrets.extend(infrastructure_secrets())
             yield s
