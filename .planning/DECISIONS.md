@@ -231,3 +231,4 @@ Measured with `docker stats --no-stream` on 2026-10-10, on this development host
 | redis | 160 | 4.6 |
 
 Total measured: 2242.0 MiB (budget 3891 MiB). Host available RAM at measurement: 8722 MiB. Host free disk after the run: 17G.
+| R-179 | Totals after a cancel (plan 04-22) | `cancel_parse` settles the document totals when the request lands, but a batch already embedding at that moment is still written (D-06 keeps chunks). The executor therefore calls `settle_totals` once more when a task stops on `TaskCancelled`, before it acknowledges the message, so `chunk_num` and the dataset counters equal the index. A failed settle is logged and does not block the acknowledgement. Test containers are found by compose labels, never by the `-1` name suffix, because recreating the service changes the number. | accepted (auto, not user-reviewed) | Plan 04-22; ING-12, D-06 |
