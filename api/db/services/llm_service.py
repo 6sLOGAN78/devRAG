@@ -195,6 +195,11 @@ class LLMBundle:
     def last_usage(self) -> Usage | None:
         return self._last_usage
 
+    @property
+    def token_limit(self) -> int:
+        """The embedding model's input limit in tokens; longer input is cut silently by the driver, so callers that must not truncate check it first."""
+        return self._embedder().token_limit
+
     # ------------------------------------------------------------------------- shared steps
 
     def _chat_driver(self) -> LiteLLMBase:

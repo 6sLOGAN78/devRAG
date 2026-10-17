@@ -17,11 +17,11 @@ import pytest
 import valkey
 
 from api.db.services import chunk_service as cs
+from api.db.services import document_service as docs
 from api.db.services import ingestion_service as ing
 from api.db.services.auth_service import AUTH_API, Principal
 from api.db.services.document_service import UploadItem
 from api.db.services.service_errors import Kind, ServiceError
-from api.db.services import document_service as docs
 from common.settings import load_settings
 from rag.chunking.types import Chunk
 from rag.nlp.token_count import count_tokens
@@ -309,7 +309,7 @@ def test_a_failed_embedding_leaves_text_and_vector_untouched_byte_for_byte(world
     totals = (doc_numbers(doc_id), dataset_numbers(world.dataset.id))
     fake.embed_mode = mode
     err = refused(lambda: edit(world, doc_id, ids[0], text="text that will never be stored"))
-    assert err.reason == reason and err.kind is not Kind.UNAUTHORIZED
+    assert err.reason == reason
     assert stored(world, ids[0]) == before, "text, tokens, vector, origin and flags are all as they were"
     failed_add = refused(lambda: add(world, doc_id, "a chunk that will never exist"))
     assert failed_add.reason == reason

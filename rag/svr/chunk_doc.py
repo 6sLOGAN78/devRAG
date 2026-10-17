@@ -19,6 +19,9 @@ from rag.svr.failure import TaskFailure
 
 PAGE_STRIDE = 1000
 ORIGIN_PARSED = "parsed"
+ORIGIN_EDITED = "edited"
+ORIGIN_MANUAL = "manual"
+MANUAL_ORDER = 2_000_000_000  # sorts after every parsed chunk (parsed order_int stays below 1000 * 1,000,000 pages)
 
 
 def parsed_chunk_id(doc_id: str, from_page: int, i: int, to_page: int) -> str:
@@ -86,3 +89,23 @@ def build_row(
         "doc_enabled_int": 1 if enabled else 0,
         "page_dims_flt": [[float(p), float(w), float(h)] for p, (w, h) in sorted(chunk.page_sizes.items())],
     }
+
+
+def manual_row(
+    text: str,
+    *,
+    doc_id: str,
+    kb_id: str,
+    doc_name: str,
+    vector: list[float],
+    enabled: bool,
+    token_num: int,
+    now: datetime.datetime | None = None,
+) -> dict[str, Any]:
+    """The stored row of a hand-added chunk: no geometry, ``origin_kwd`` manual, ``order_int`` last, a ``{doc_id}_m_{uuid}`` id (R-155)."""
+    chunk = Chunk(text=text, positions=(), page_sizes={}, token_num=token_num, index=0)
+    row = build_row(chunk, index=0, doc_id=doc_id, kb_id=kb_id, doc_name=doc_name, task_id="", from_page=0, to_page=1, vector=vector, enabled=enabled, now=now)
+    row["id"] = manual_chunk_id(doc_id)
+    row["order_int"] = MANUAL_ORDER
+    row["origin_kwd"] = ORIGIN_MANUAL
+    return row

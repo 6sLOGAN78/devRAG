@@ -98,6 +98,18 @@ def parse_rate_guard(settings: Settings, tenant_id: str, limiter: FixedWindowLim
         raise _queue_unavailable() from None
 
 
+def write_rate_guard(settings: Settings, tenant_id: str, limiter: FixedWindowLimiter | None = None) -> None:
+    """Count one chunk add or text edit for the workspace with the parse numbers (key ``chunk:{tenant_id}``); every one costs an embedding call."""
+    window = limiter or FixedWindowLimiter(settings.redis)
+    try:
+        window.hit(f"chunk:{tenant_id}", settings.ingest.parse_rate_max, settings.ingest.parse_rate_window_seconds)
+    except RateLimited as limited:
+        raise ServiceError(Kind.RATE_LIMITED, "rate_limited", "too many chunk changes, try again shortly", retry_after=limited.retry_after) from None
+    except RateLimitUnavailable:
+        logger.warning("chunk rate limit store unavailable tenant=%s", tenant_id)
+        raise ServiceError(Kind.UNAVAILABLE, reasons.BUSY, "chunk changes are not available, try again shortly") from None
+
+
 def authorize_parse(principal: Principal, dataset_id: str) -> VisibleDataset:
     """The dataset the caller may start or cancel parsing in: ``NOT_FOUND`` when not visible, then ``FORBIDDEN`` without the permission."""
     visible = load_visible_dataset(principal, dataset_id)
