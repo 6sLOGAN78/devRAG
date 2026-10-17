@@ -36,7 +36,10 @@ from test.helpers.ingest import (
 from test.helpers.uploads import sql
 from test.helpers.wait import wait_until
 from test.testcases.conftest import BASE_URL
+from test.testcases.test_chunk_flow import patch as patch_chunk
+from test.testcases.test_chunk_flow import stored
 from test.testcases.test_dataset_flow import create, workspace
+from test.testcases.test_document_flow import delete_docs
 from test.testcases.test_provider_flow import api, ok
 
 pytestmark = [pytest.mark.e2e, pytest.mark.serial]
@@ -70,7 +73,7 @@ def fake() -> Iterator[FakeProvider]:
 
 
 @pytest.fixture(autouse=True)
-def clean_provider(fake: FakeProvider) -> Iterator[None]:
+def clean_provider(fake: FakeProvider, executors: list[str]) -> Iterator[None]:
     fake.delay_ms, fake.embed_mode = 0, "ok"
     fake.reset()
     yield
@@ -203,3 +206,208 @@ def test_poison_a_truncated_docx_fails_after_three_attempts_with_a_plain_reason(
         assert leaks(text) == [], (leaks(text), text[:300])
     for cid in ctl.container_ids():
         assert leaks(ctl.logs_since(cid, began)) == [], f"internals in the executor log of {cid[:12]}"
+
+
+# ----------------------------------------------------------------------------- shared steps for cancel, failure and re-parse
+
+
+def where_of(dataset_id: str, doc_id: str) -> SimpleNamespace:
+    return SimpleNamespace(dataset_id=dataset_id, doc_id=doc_id)
+
+
+def stays(read: Any, expected: Any, polls: int = 3, timeout: float = 60.0) -> None:
+    """``read()`` equals ``expected`` for ``polls`` consecutive polls, one second apart."""
+    state = {"run": 0}
+
+    def check() -> bool:
+        state["run"] = state["run"] + 1 if read() == expected else 0
+        return state["run"] >= polls
+
+    wait_until(check, timeout=timeout, interval=1.0, describe=lambda: f"never stayed at {expected!r} for {polls} polls")
+
+
+def count_of(settings: Settings, who: Account, dataset_id: str, doc_id: str) -> int:
+    return index_count(settings, who.tenant_id, dataset_id, doc_id)
+
+
+def finish(ingress: httpx.Client, who: Account, settings: Settings, dataset_id: str, doc_id: str, *, confirm: bool = False) -> None:
+    """Parse, wait for ``run 3`` and check the exact id set."""
+    resp = start_parse(ingress, who, dataset_id, [doc_id], confirm=confirm)
+    assert resp.status_code == 200, resp.text
+    row = wait_run(ingress, who, dataset_id, doc_id, "3", timeout=180)
+    assert row["chunk_count"] == CHUNKS == count_of(settings, who, dataset_id, doc_id)
+    listed = ids_in_index(ingress, who, dataset_id, doc_id)
+    assert len(listed) == len(set(listed)) and set(listed) == expected_ids(doc_id)
+
+
+def midway(settings: Settings, who: Account, dataset_id: str, doc_id: str, low: int = 2) -> int:
+    """Wait until between ``low`` and CHUNKS-1 chunks are indexed (the replaced chunks of a re-parse are gone first); returns the count seen."""
+    return wait_until(
+        lambda: (lambda n: n if low <= n < CHUNKS else 0)(count_of(settings, who, dataset_id, doc_id)),
+        timeout=120, interval=0.1, describe=lambda: "the parse never got part-way",
+    )  # fmt: skip
+
+
+def cancel_midway(ingress: httpx.Client, who: Account, fake: FakeProvider, settings: Settings, dataset_id: str, doc_id: str) -> float:
+    """Cancel a running slowed parse (``fake.delay_ms`` set by the caller) part-way and wait for the count to settle. Returns seconds to ``run 2``."""
+    midway(settings, who, dataset_id, doc_id)
+    began = time.monotonic()
+    resp = start_parse(ingress, who, dataset_id, [doc_id], run="2")
+    assert resp.status_code == 200 and resp.json()["data"] == {"cancelled": [doc_id]}, resp.text
+    wait_until(lambda: doc_row(ingress, who, dataset_id, doc_id)["run"] == "2", timeout=5, interval=0.1, describe=lambda: "the row never said run 2")
+    seconds = time.monotonic() - began
+    fake.delay_ms = 0
+    wait_settled(settings, who, dataset_id, doc_id)
+    return seconds
+
+
+def wait_settled(settings: Settings, who: Account, dataset_id: str, doc_id: str) -> int:
+    """The index count once it stopped changing for three polls."""
+    last = {"count": -1, "run": 0}
+
+    def check() -> bool:
+        now = count_of(settings, who, dataset_id, doc_id)
+        last["run"] = last["run"] + 1 if now == last["count"] else 0
+        last["count"] = now
+        return last["run"] >= 3
+
+    wait_until(check, timeout=90, interval=1.0, describe=lambda: "the chunk count never settled")
+    return last["count"]
+
+
+def fail_midway(ingress: httpx.Client, who: Account, fake: FakeProvider, settings: Settings, dataset_id: str, doc_id: str, *, confirm: bool = False) -> set[str]:
+    """Parse with slowed embeddings, flip the provider to refuse after chunks were indexed, wait for ``run 4``. Returns the ids seen at the flip."""
+    fake.delay_ms = 300
+    resp = start_parse(ingress, who, dataset_id, [doc_id], confirm=confirm)
+    assert resp.status_code == 200, resp.text
+    midway(settings, who, dataset_id, doc_id)
+    before = set(ids_in_index(ingress, who, dataset_id, doc_id))
+    fake.embed_mode = "refuse"
+    wait_run(ingress, who, dataset_id, doc_id, "4", timeout=180)
+    fake.delay_ms, fake.embed_mode = 0, "ok"
+    assert before, "no chunk was indexed before the provider refused"
+    return before
+
+
+# ----------------------------------------------------------------------------- cancel
+
+
+def test_cancel_keeps_the_indexed_chunks_stops_within_five_seconds_and_parse_again_finishes(
+    ingress: httpx.Client, owner: Account, fake: FakeProvider, settings: Settings, executors: list[str]
+) -> None:
+    dataset_id = new_dataset(ingress, owner)
+    doc = upload_text(ingress, owner, dataset_id, paragraphs(CHUNKS))
+    fake.delay_ms = 300
+    assert start_parse(ingress, owner, dataset_id, [doc["id"]]).status_code == 200
+    seconds = cancel_midway(ingress, owner, fake, settings, dataset_id, doc["id"])
+    assert seconds <= 5, f"the row took {seconds:.1f} s to say run 2"
+
+    kept = count_of(settings, owner, dataset_id, doc["id"])
+    assert 0 < kept < CHUNKS, "chunks indexed before the cancel stay, the rest are never made"
+    row = wait_until(
+        lambda: (lambda r: r if r["chunk_count"] == kept else None)(doc_row(ingress, owner, dataset_id, doc["id"])),
+        timeout=30, interval=1.0, describe=lambda: "the document total never equalled the index",
+    )  # fmt: skip
+    assert row["run"] == "2" and row["chunk_count"] > 0, "the SPA draws Partly indexed from run 2 with chunks"
+    entry = wait_until(
+        lambda: (lambda e: e if e["result"] == "cancelled" else None)(latest_log(ingress, owner, dataset_id, doc["id"])),
+        timeout=30, interval=1.0, describe=lambda: "the log entry never closed as cancelled",
+    )  # fmt: skip
+    assert entry["chunk_count"] == kept
+    stays(lambda: count_of(settings, owner, dataset_id, doc["id"]), kept)
+
+    finish(ingress, owner, settings, dataset_id, doc["id"])
+
+
+# ----------------------------------------------------------------------------- partial failure and the edited-chunk guard
+
+
+def test_partial_failure_keeps_the_chunks_and_parse_again_replaces_them(
+    ingress: httpx.Client, owner: Account, fake: FakeProvider, settings: Settings, executors: list[str]
+) -> None:
+    dataset_id = new_dataset(ingress, owner)
+    doc = upload_text(ingress, owner, dataset_id, paragraphs(CHUNKS))
+    before = fail_midway(ingress, owner, fake, settings, dataset_id, doc["id"])
+
+    row = doc_row(ingress, owner, dataset_id, doc["id"])
+    assert row["run"] == "4"
+    after = set(ids_in_index(ingress, owner, dataset_id, doc["id"]))
+    assert before <= after and 0 < len(after) < CHUNKS, "the chunks indexed before the refusal are still searchable"
+    wait_until(
+        lambda: doc_row(ingress, owner, dataset_id, doc["id"])["chunk_count"] == len(after),
+        timeout=30, interval=1.0, describe=lambda: "the document total never equalled the index",
+    )  # fmt: skip
+    for chunk_id in sorted(before)[:3]:
+        assert int(stored(settings, owner, where_of(dataset_id, doc["id"]), chunk_id)["available_int"]) == 1
+    entry = latest_log(ingress, owner, dataset_id, doc["id"])
+    assert entry["result"] == "failed"
+    detail = ok(api(ingress, "GET", logs_path(dataset_id, entry["id"]), owner.token))
+    assert detail["error"]["code"] == "provider_refused" and detail["retried"] is False
+
+    finish(ingress, owner, settings, dataset_id, doc["id"])
+    assert len(ids_in_index(ingress, owner, dataset_id, doc["id"])) == CHUNKS
+
+
+def test_edited_chunk_after_a_failure_needs_a_confirmation_and_is_replaced(
+    ingress: httpx.Client, owner: Account, fake: FakeProvider, settings: Settings, executors: list[str]
+) -> None:
+    dataset_id = new_dataset(ingress, owner)
+    doc = upload_text(ingress, owner, dataset_id, paragraphs(CHUNKS))
+    before = fail_midway(ingress, owner, fake, settings, dataset_id, doc["id"])
+    target = sorted(before)[0]
+    edited = patch_chunk(ingress, owner, where_of(dataset_id, doc["id"]), target, {"content_with_weight": "edited text about margins zzedited"})
+    assert edited.status_code == 200, edited.text
+
+    resp = start_parse(ingress, owner, dataset_id, [doc["id"]])
+    assert resp.status_code == 409 and (resp.json()["data"] or {}).get("reason") == "confirm_required", resp.text
+    assert resp.json()["data"]["documents"][0]["edited_count"] == 1
+
+    finish(ingress, owner, settings, dataset_id, doc["id"], confirm=True)
+    texts = [c["text"] for c in chunk_texts(api, ingress, owner.token, dataset_id, doc["id"])]
+    assert not [t for t in texts if "zzedited" in t], "the edit is gone"
+
+
+# ----------------------------------------------------------------------------- re-parse identity
+
+
+def test_reparse_leaves_the_same_count_and_ids_also_after_a_cancel_and_after_a_failed_run(
+    ingress: httpx.Client, owner: Account, fake: FakeProvider, settings: Settings, executors: list[str]
+) -> None:
+    dataset_id = new_dataset(ingress, owner)
+    doc = upload_text(ingress, owner, dataset_id, paragraphs(CHUNKS))
+    finish(ingress, owner, settings, dataset_id, doc["id"])
+    first = sorted(ids_in_index(ingress, owner, dataset_id, doc["id"]))
+
+    finish(ingress, owner, settings, dataset_id, doc["id"], confirm=True)
+    assert sorted(ids_in_index(ingress, owner, dataset_id, doc["id"])) == first, "a confirmed re-parse"
+
+    fake.delay_ms = 300
+    assert start_parse(ingress, owner, dataset_id, [doc["id"]], confirm=True).status_code == 200
+    cancel_midway(ingress, owner, fake, settings, dataset_id, doc["id"])
+    finish(ingress, owner, settings, dataset_id, doc["id"])
+    assert sorted(ids_in_index(ingress, owner, dataset_id, doc["id"])) == first, "after a cancelled run"
+
+    fail_midway(ingress, owner, fake, settings, dataset_id, doc["id"], confirm=True)
+    finish(ingress, owner, settings, dataset_id, doc["id"])
+    assert sorted(ids_in_index(ingress, owner, dataset_id, doc["id"])) == first, "after a failed run"
+
+
+# ----------------------------------------------------------------------------- delete during a running parse
+
+
+def test_delete_a_document_during_a_parse_leaves_nothing_in_the_index(
+    ingress: httpx.Client, owner: Account, fake: FakeProvider, settings: Settings, executors: list[str]
+) -> None:
+    dataset_id = new_dataset(ingress, owner)
+    doc = upload_text(ingress, owner, dataset_id, paragraphs(CHUNKS))
+    began = time.time()
+    fake.delay_ms = 300
+    assert start_parse(ingress, owner, dataset_id, [doc["id"]]).status_code == 200
+    midway(settings, owner, dataset_id, doc["id"])
+    resp = delete_docs(ingress, owner, dataset_id, [doc["id"]])
+    assert resp.status_code == 200, resp.text
+    wait_until(lambda: count_of(settings, owner, dataset_id, doc["id"]) == 0, timeout=60, interval=0.5, describe=lambda: "chunks remain after the delete")
+    stays(lambda: count_of(settings, owner, dataset_id, doc["id"]), 0)
+    fake.delay_ms = 0
+    for cid in ctl.container_ids():
+        assert "Traceback" not in ctl.logs_since(cid, began), f"traceback in the executor log of {cid[:12]}"
