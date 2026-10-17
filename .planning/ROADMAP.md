@@ -368,7 +368,7 @@ Plans:
 
 **Wave 8** *(blocked on Wave 7 completion)*
 
-- [ ] 04-14-PLAN.md — Parse, cancel and re-parse route; first end-to-end slice (E2E-05)
+- [x] 04-14-PLAN.md — Parse, cancel and re-parse route; first end-to-end slice (E2E-05)
 
 **Wave 9** *(blocked on Wave 8 completion)*
 

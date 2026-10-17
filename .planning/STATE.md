@@ -4,13 +4,13 @@ milestone: v1.0
 milestone_name: milestone
 status: executing
 stopped_at: Completed 04-11-PLAN.md
-last_updated: "2026-10-16T22:13:31.666Z"
-last_activity: 2026-10-16
+last_updated: "2026-10-17T04:06:41.974Z"
+last_activity: 2026-10-17
 progress:
   total_phases: 8
   completed_phases: 3
   total_plans: 118
-  completed_plans: 98
+  completed_plans: 99
   percent: 38
 ---
 
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-10-05)
 ## Current Position
 
 Phase: 4 (ingestion-pipeline) — EXECUTING
-Plan: 16 of 35
+Plan: 17 of 35
 Status: Ready to execute
-Last activity: 2026-10-16
+Last activity: 2026-10-17
 
-Progress: [████████░░] 83%
+Progress: [████████░░] 84%
 
 ## Performance Metrics
 
@@ -101,6 +101,7 @@ Progress: [████████░░] 83%
 | Phase 04 P12 | 2h | - tasks | - files |
 | Phase 04 P13 | 90m | - tasks | - files |
 | Phase 4 P04-15 | 45min | - tasks | - files |
+| Phase 4 P04-14 | ~2h | - tasks | - files |
 
 ## Accumulated Context
 
@@ -167,6 +168,7 @@ Recent decisions affecting current work:
 - [Phase 4]: 04-11: run_pipeline is synchronous and leaves task_limiter and mark_task_done/failure-line persistence to the 04-12 executor; PLAIN_MESSAGES lives in common/ingest_codes.py
 - [Phase ?]: 04-12: user cancel keeps indexed chunks; lock released before republish; roll-up reads latest [pages]/[skipped] per task
 - [Phase ?]: 04-13: task-executor scaled copies share one image, no names; Valkey volatile-lru (R-157)
+- [Phase ?]: 04-14: cancel is not rate limited; only parse start spends a parse_rate ticket; limiter outage answers queue_unavailable (fail closed)
 
 ### Pending Todos
 
@@ -202,6 +204,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-10-16T22:13:31.654Z
+Last session: 2026-10-17T04:06:41.963Z
 Stopped at: Completed 04-11-PLAN.md
 Resume file: None
