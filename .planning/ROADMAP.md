@@ -407,7 +407,7 @@ Plans:
 
 **Wave 17** *(blocked on Wave 16 completion)*
 
-- [ ] 04-27-PLAN.md — Real-stack live journey: parse a TXT to Finished from the dataset page, no reload
+- [x] 04-27-PLAN.md — Real-stack live journey: parse a TXT to Finished from the dataset page, no reload
 - [ ] 04-28-PLAN.md — Parsing details sheet and parsing log page
 
 **Wave 18** *(blocked on Wave 17 completion)*
