@@ -19,7 +19,75 @@
     },
     "live": {
       "selected": "分块 {{n}}：第 {{page}} 页",
-      "selectedNoPage": "分块 {{n}}"
+      "selectedNoPage": "分块 {{n}}",
+      "switchedOff": "分块已关闭，现在列在“关”下。",
+      "switchedOn": "分块已开启，现在列在“开”下。"
+    },
+    "loading": "正在加载分块",
+    "notice": {
+      "readOnly": "你可以查看这些分块。只有上传此文档的人、数据集的创建者以及工作区所有者和管理员可以修改它们。",
+      "documentOff": "此文档已在搜索中关闭，因此不会返回它的任何分块。每个分块保留各自的设置，文档重新开启后会恢复搜索。",
+      "parsing": "此文档正在解析。分块在建立索引后会陆续出现，解析结束前暂停编辑。",
+      "partial": "解析未完成，因此此列表不完整。"
+    },
+    "list": {
+      "search": "在分块中搜索",
+      "show": "显示",
+      "all": "全部",
+      "on": "开",
+      "off": "关",
+      "count_one": "{{count}} 个分块",
+      "count_other": "{{count}} 个分块",
+      "pages": "分块页码"
+    },
+    "card": {
+      "select": "第 {{n}} 个分块，共 {{total}} 个",
+      "page": "第 {{page}} 页",
+      "edited": "已编辑",
+      "manual": "手动添加",
+      "switchLabel": "将分块 {{n}} 纳入搜索"
+    },
+    "empty": {
+      "heading": "还没有分块",
+      "body": "解析此文档，将其拆分为可搜索的分块。",
+      "bodyReadOnly": "此文档尚未解析。上传者、数据集创建者或工作区管理员可以解析它。",
+      "parse": "解析文档"
+    },
+    "unavailable": {
+      "heading": "暂不支持解析",
+      "body": "{{type}} 文件可以存储和下载，但此版本无法解析。"
+    },
+    "parsing": {
+      "heading": "正在解析"
+    },
+    "failed": {
+      "heading": "解析失败"
+    },
+    "cancelled": {
+      "heading": "解析已取消",
+      "body": "没有建立任何分块索引。"
+    },
+    "noMatch": {
+      "heading": "没有匹配的分块",
+      "body": "换些关键词试试，或显示全部分块。",
+      "action": "显示全部分块"
+    },
+    "noneOff": {
+      "heading": "没有已关闭的分块"
+    },
+    "error": {
+      "listHeading": "无法加载分块",
+      "pageHeading": "无法加载此文档"
+    },
+    "documentTitle": "{{name}} 的分块 - devRag",
+    "documentTitleFallback": "分块 - devRag",
+    "meta": {
+      "method": "方法：{{method}}",
+      "open": "打开文档"
+    },
+    "notFound": {
+      "heading": "未找到文档",
+      "body": "它可能已被删除，或未与你共享。"
     }
   }
 }

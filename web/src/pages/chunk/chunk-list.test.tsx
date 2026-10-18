@@ -120,7 +120,7 @@ describe("Chunk list and cards (UI-16, CHUNK-18)", () => {
   it("shows the singular count", async () => {
     setChunks(server, DOC, many(1));
     renderList();
-    expect(await screen.findByTestId("chunk-count")).toHaveTextContent("1 chunk");
+    await waitFor(() => expect(screen.getByTestId("chunk-count")).toHaveTextContent("1 chunk"));
   });
 
   it("carries id, origin and switch on the card and shows the badges for edited and hand-added chunks", async () => {
@@ -308,7 +308,7 @@ describe("The chunk switch (CHUNK-21, D-12, D-26)", () => {
     await screen.findByTestId("chunk-list");
     await user.click(within(cardOf(1)).getByTestId("chunk-switch"));
     await waitFor(() => expect(cardOf(1)).toBeNull());
-    expect(screen.getByTestId("chunk-switch-live")).toHaveTextContent("Chunk switched off. It is now listed under Off.");
+    await waitFor(() => expect(screen.getByTestId("chunk-switch-live")).toHaveTextContent("Chunk switched off. It is now listed under Off."));
     await waitFor(() => expect(within(cardOf(2)).getByTestId("chunk-switch")).toHaveFocus());
     expect(cards()).toHaveLength(2);
   });
@@ -320,7 +320,7 @@ describe("The chunk switch (CHUNK-21, D-12, D-26)", () => {
     await screen.findByTestId("chunk-list");
     await user.click(within(cardOf(2)).getByTestId("chunk-switch"));
     await waitFor(() => expect(cardOf(2)).toBeNull());
-    expect(screen.getByTestId("chunk-switch-live")).toHaveTextContent("Chunk switched on. It is now listed under On.");
+    await waitFor(() => expect(screen.getByTestId("chunk-switch-live")).toHaveTextContent("Chunk switched on. It is now listed under On."));
     await waitFor(() => expect(within(cardOf(1)).getByTestId("chunk-switch")).toHaveFocus());
   });
 

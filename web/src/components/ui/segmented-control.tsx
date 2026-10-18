@@ -16,13 +16,15 @@ export interface SegmentedControlProps {
   options: readonly SegmentedOption[];
   disabled?: boolean;
   className?: string;
+  /** Test id of the group; each radio gets `<testId>-<value>`. */
+  testId?: string;
 }
 
 /** A row of native radios drawn as segments. The selected one gets a foreground border and the page background. */
-export function SegmentedControl({ legend, name, value, onChange, options, disabled = false, className }: SegmentedControlProps) {
+export function SegmentedControl({ legend, name, value, onChange, options, disabled = false, className, testId }: SegmentedControlProps) {
   const base = React.useId();
   return (
-    <fieldset className={cn("inline-flex h-10 items-stretch rounded-md border border-input bg-muted p-0.5", className)} disabled={disabled}>
+    <fieldset data-testid={testId} className={cn("inline-flex h-10 items-stretch rounded-md border border-input bg-muted p-0.5", className)} disabled={disabled}>
       <legend className="sr-only">{legend}</legend>
       {options.map((option, index) => {
         const id = `${base}-${index}`;
@@ -37,7 +39,7 @@ export function SegmentedControl({ legend, name, value, onChange, options, disab
               disabled && "cursor-not-allowed opacity-50",
             )}
           >
-            <input id={id} type="radio" name={name} value={option.value} checked={checked} onChange={() => onChange(option.value)} className="sr-only" />
+            <input id={id} data-testid={testId === undefined ? undefined : `${testId}-${option.value}`} type="radio" name={name} value={option.value} checked={checked} onChange={() => onChange(option.value)} className="sr-only" />
             {option.label}
           </label>
         );

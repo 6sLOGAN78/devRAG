@@ -19,7 +19,75 @@
     },
     "live": {
       "selected": "Chunk {{n}}: page {{page}}",
-      "selectedNoPage": "Chunk {{n}}"
+      "selectedNoPage": "Chunk {{n}}",
+      "switchedOff": "Chunk switched off. It is now listed under Off.",
+      "switchedOn": "Chunk switched on. It is now listed under On."
+    },
+    "loading": "Loading chunks",
+    "notice": {
+      "readOnly": "You can read these chunks. Only the person who uploaded this document, the dataset's creator and the workspace owner and admins can change them.",
+      "documentOff": "This document is switched off for search, so none of its chunks are returned. Each chunk keeps its own setting below and returns to search when the document is switched on.",
+      "parsing": "This document is being parsed. Chunks appear here as they are indexed, and editing is paused until parsing ends.",
+      "partial": "Parsing did not finish, so this list is incomplete."
+    },
+    "list": {
+      "search": "Search in chunks",
+      "show": "Show",
+      "all": "All",
+      "on": "On",
+      "off": "Off",
+      "count_one": "{{count}} chunk",
+      "count_other": "{{count}} chunks",
+      "pages": "Chunk pages"
+    },
+    "card": {
+      "select": "Chunk {{n}} of {{total}}",
+      "page": "Page {{page}}",
+      "edited": "Edited",
+      "manual": "Added by hand",
+      "switchLabel": "Include chunk {{n}} in search"
+    },
+    "empty": {
+      "heading": "No chunks yet",
+      "body": "Parse this document to split it into searchable chunks.",
+      "bodyReadOnly": "This document hasn't been parsed yet. The person who uploaded it, the dataset's creator or a workspace admin can parse it.",
+      "parse": "Parse document"
+    },
+    "unavailable": {
+      "heading": "Parsing not available yet",
+      "body": "{{type}} files can be stored and downloaded, but they can't be parsed in this release."
+    },
+    "parsing": {
+      "heading": "Parsing in progress"
+    },
+    "failed": {
+      "heading": "Parsing failed"
+    },
+    "cancelled": {
+      "heading": "Parsing was cancelled",
+      "body": "No chunks were indexed."
+    },
+    "noMatch": {
+      "heading": "No chunks match",
+      "body": "Try other words, or show all chunks.",
+      "action": "Show all chunks"
+    },
+    "noneOff": {
+      "heading": "No chunks are switched off"
+    },
+    "error": {
+      "listHeading": "Couldn't load chunks",
+      "pageHeading": "Couldn't load this document"
+    },
+    "documentTitle": "Chunks of {{name}} - devRag",
+    "documentTitleFallback": "Chunks - devRag",
+    "meta": {
+      "method": "Method: {{method}}",
+      "open": "Open document"
+    },
+    "notFound": {
+      "heading": "Document not found",
+      "body": "It may have been deleted, or it isn't shared with you."
     }
   }
 }
