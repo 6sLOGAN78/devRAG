@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { act, render, screen, waitFor, within } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { RouterProvider, createMemoryRouter } from "react-router";
 import { beforeEach, describe, expect, it } from "vitest";
@@ -427,5 +427,335 @@ describe("Notices and states of the whole page", () => {
     advanceParse(server, DOC, { run: "3", chunkCount: 3 });
     await waitFor(() => expect(cards()).toHaveLength(3), { timeout: 8000 });
     expect(listCalls().length).toBe(first + 2);
+  });
+});
+
+const editButton = (n: number) => within(cardOf(n)).queryByRole("button", { name: `Edit chunk ${n}` });
+const textarea = () => screen.getByLabelText("Chunk text") as HTMLTextAreaElement;
+const PATCH_URL = (n: number) => `${CHUNKS_URL}/${chunkId(n)}`;
+
+async function openEditor(user: ReturnType<typeof userEvent.setup>, n: number): Promise<void> {
+  await user.click(editButton(n) as HTMLElement);
+  await screen.findByLabelText("Chunk text");
+}
+
+describe("Edit and add controls (D-10)", () => {
+  it("draws a pencil on each card and the Add chunk button for the person who may change the document", async () => {
+    finished(2);
+    renderPage();
+    await waitFor(() => expect(cards()).toHaveLength(2));
+    expect(editButton(1)).toBeInTheDocument();
+    expect(editButton(2)).toBeInTheDocument();
+    expect(screen.getByTestId("chunk-add")).toHaveTextContent("Add chunk");
+  });
+
+  it("draws neither for a read-only caller", async () => {
+    finished(2);
+    actAs(MEMBER, "normal", "u1");
+    renderPage();
+    await waitFor(() => expect(cards()).toHaveLength(2));
+    expect(screen.queryByRole("button", { name: /^Edit chunk/ })).toBeNull();
+    expect(screen.queryByTestId("chunk-add")).toBeNull();
+  });
+
+  it("draws neither while the document is parsing", async () => {
+    finished(2);
+    advanceParse(server, DOC, { run: "1", progress: 0.4, chunkCount: 2 });
+    renderPage();
+    await screen.findByTestId("chunk-parsing-notice");
+    await waitFor(() => expect(cards()).toHaveLength(2));
+    expect(screen.queryByRole("button", { name: /^Edit chunk/ })).toBeNull();
+    expect(screen.queryByTestId("chunk-add")).toBeNull();
+  });
+
+  it("opens the editor inside the card, hides the switch and the pencil there and leaves the header", async () => {
+    finished(3);
+    const user = userEvent.setup();
+    renderPage();
+    await waitFor(() => expect(cards()).toHaveLength(3));
+    await openEditor(user, 2);
+    expect(within(cardOf(2)).getByLabelText("Chunk text")).toBe(textarea());
+    expect(within(cardOf(2)).getByTestId("chunk-select")).toBeInTheDocument();
+    expect(within(cardOf(2)).queryByTestId("chunk-switch")).toBeNull();
+    expect(editButton(2)).toBeNull();
+    expect(within(cardOf(2)).queryByTestId("chunk-text")).toBeNull();
+    expect(editButton(1)).toBeInTheDocument();
+    expect(screen.getAllByLabelText("Chunk text")).toHaveLength(1);
+  });
+
+  it("moves the one editor to another chunk at once when nothing was changed", async () => {
+    finished(3);
+    const user = userEvent.setup();
+    renderPage();
+    await waitFor(() => expect(cards()).toHaveLength(3));
+    await openEditor(user, 1);
+    await user.click(editButton(3) as HTMLElement);
+    await waitFor(() => expect(within(cardOf(3)).queryByLabelText("Chunk text")).not.toBeNull());
+    expect(within(cardOf(1)).queryByLabelText("Chunk text")).toBeNull();
+    expect(screen.queryByRole("alertdialog")).toBeNull();
+  });
+
+  it("saves from the page: the card shows the new text and the Edited badge, focus returns to the pencil", async () => {
+    finished(2);
+    const user = userEvent.setup();
+    renderPage();
+    await waitFor(() => expect(cards()).toHaveLength(2));
+    await openEditor(user, 1);
+    await user.clear(textarea());
+    await user.paste("Corrected in the inspector");
+    await user.click(screen.getByRole("button", { name: "Save chunk" }));
+    await waitFor(() => expect(within(cardOf(1)).getByTestId("chunk-text")).toHaveTextContent("Corrected in the inspector"));
+    expect(within(cardOf(1)).getByTestId("chunk-badge-edited")).toBeInTheDocument();
+    expect(await screen.findByText("Chunk saved")).toBeInTheDocument();
+    await waitFor(() => expect(document.activeElement).toBe(editButton(1)));
+    expect(screen.queryByLabelText("Chunk text")).toBeNull();
+  });
+
+  it("keeps the editor and its alert when the refetch shows the chunk is gone (404)", async () => {
+    finished(2);
+    const user = userEvent.setup();
+    renderPage();
+    await waitFor(() => expect(cards()).toHaveLength(2));
+    await openEditor(user, 1);
+    await user.clear(textarea());
+    await user.paste("Lost cause");
+    setChunks(server, DOC, [chunkRow(2)]);
+    await user.click(screen.getByRole("button", { name: "Save chunk" }));
+    const alert = await screen.findByRole("alert");
+    expect(alert).toHaveTextContent("This chunk no longer exists. The document was parsed again or deleted.");
+    await waitFor(() => expect(cards().length).toBeGreaterThan(0));
+    expect(textarea().value).toBe("Lost cause");
+    expect(listCalls().length).toBeGreaterThan(1);
+  });
+
+  it("refetches the list when the answer is 409 parse_running", async () => {
+    finished(2);
+    const user = userEvent.setup();
+    renderPage();
+    await waitFor(() => expect(cards()).toHaveLength(2));
+    await openEditor(user, 1);
+    const before = listCalls().length;
+    server.forced[`PATCH ${PATCH_URL(1)}`] = { status: 409, message: "busy", reason: "parse_running" };
+    await user.type(textarea(), "!");
+    await user.click(screen.getByRole("button", { name: "Save chunk" }));
+    expect(await screen.findByText("This document is being parsed. Editing is paused until parsing ends.")).toBeInTheDocument();
+    await waitFor(() => expect(listCalls().length).toBeGreaterThan(before));
+  });
+});
+
+describe("The unsaved-changes guard (UI-SPEC Unsaved changes)", () => {
+  async function dirtyEditor(user: ReturnType<typeof userEvent.setup>, count = 3): Promise<void> {
+    await waitFor(() => expect(cards().length).toBeGreaterThan(0));
+    expect(cards()).toHaveLength(Math.min(count, 20));
+    await openEditor(user, 1);
+    await user.type(textarea(), " typed");
+  }
+
+  interface Action {
+    name: string;
+    perform: (user: ReturnType<typeof userEvent.setup>) => Promise<void>;
+    done: () => boolean;
+    count: number;
+    entry?: string;
+  }
+
+  const ACTIONS: Action[] = [
+    {
+      name: "editing another chunk",
+      count: 3,
+      perform: async (user) => user.click(editButton(2) as HTMLElement),
+      done: () => within(cardOf(2)).queryByLabelText("Chunk text") !== null,
+    },
+    {
+      name: "Add chunk",
+      count: 3,
+      perform: async (user) => user.click(screen.getByTestId("chunk-add")),
+      done: () => screen.queryByRole("heading", { name: "New chunk" }) !== null,
+    },
+    {
+      name: "the next page of chunks",
+      count: 25,
+      perform: async (user) => user.click(screen.getByRole("button", { name: "Next" })),
+      done: () => location().includes("page=2"),
+    },
+    {
+      name: "a search",
+      count: 3,
+      perform: async (user) => user.type(screen.getByRole("searchbox", { name: "Search in chunks" }), "number"),
+      done: () => location().includes("keywords=number"),
+    },
+    {
+      name: "a filter change",
+      count: 3,
+      perform: async (user) => user.click(within(screen.getByTestId("chunk-filter")).getByText("On")),
+      done: () => location().includes("show=on"),
+    },
+    {
+      name: "a route change",
+      count: 3,
+      perform: async () => {
+        await act(async () => {
+          await router.navigate("/datasets");
+        });
+      },
+      done: () => router.state.location.pathname === "/datasets",
+    },
+    {
+      name: "Esc in the textarea",
+      count: 3,
+      perform: async () => {
+        fireEvent.keyDown(textarea(), { key: "Escape" });
+      },
+      done: () => screen.queryByLabelText("Chunk text") === null,
+    },
+  ];
+
+  it.each(ACTIONS)("$name runs at once when clean", async ({ count, perform, done }) => {
+    finished(count);
+    const user = userEvent.setup();
+    renderPage();
+    await waitFor(() => expect(cards().length).toBeGreaterThan(0));
+    await openEditor(user, 1);
+    await perform(user);
+    await waitUntil(done, { describe: "the action" });
+    expect(screen.queryByRole("alertdialog")).toBeNull();
+  });
+
+  it.each(ACTIONS)("$name asks first when the text is changed, and runs after Discard changes", async ({ count, perform, done }) => {
+    finished(count);
+    const user = userEvent.setup();
+    renderPage();
+    await dirtyEditor(user, count);
+    await perform(user);
+    const dialog = await screen.findByRole("alertdialog", { name: "Discard unsaved changes?" });
+    expect(done()).toBe(false);
+    await user.click(within(dialog).getByRole("button", { name: "Discard changes" }));
+    await waitUntil(done, { describe: "the held action" });
+    expect(screen.queryByRole("alertdialog")).toBeNull();
+    expect(server.callsTo("PATCH", PATCH_URL(1))).toHaveLength(0);
+  });
+
+  it("Keep editing leaves the typed text, the address and the focus on the textarea", async () => {
+    finished(3);
+    const user = userEvent.setup();
+    renderPage();
+    await dirtyEditor(user);
+    const before = location();
+    await user.click(within(screen.getByTestId("chunk-filter")).getByText("Off"));
+    const dialog = await screen.findByRole("alertdialog");
+    expect(document.activeElement).toBe(within(dialog).getByRole("button", { name: "Keep editing" }));
+    await user.click(within(dialog).getByRole("button", { name: "Keep editing" }));
+    await waitFor(() => expect(document.activeElement).toBe(textarea()));
+    expect(textarea().value).toBe("Chunk text number 1 typed");
+    expect(location()).toBe(before);
+  });
+
+  it("does not ask when selecting another chunk, paging the preview or zooming", async () => {
+    pdf();
+    finished(3);
+    const user = userEvent.setup();
+    renderPage();
+    await dirtyEditor(user);
+    await user.click(within(cardOf(2)).getByTestId("chunk-select"));
+    expect(within(cardOf(2)).getByTestId("chunk-select")).toHaveAttribute("aria-pressed", "true");
+    await user.click(await screen.findByTestId("preview-next"));
+    await user.click(screen.getByTestId("preview-zoom-in"));
+    expect(screen.queryByRole("alertdialog")).toBeNull();
+    expect(textarea().value).toBe("Chunk text number 1 typed");
+  });
+
+  it("asks the browser to confirm a reload or a closed tab only while the text is changed", async () => {
+    finished(2);
+    const user = userEvent.setup();
+    renderPage();
+    await waitFor(() => expect(cards()).toHaveLength(2));
+    await openEditor(user, 1);
+    const unload = () => {
+      const event = new Event("beforeunload", { cancelable: true });
+      window.dispatchEvent(event);
+      return event.defaultPrevented;
+    };
+    expect(unload()).toBe(false);
+    await user.type(textarea(), "x");
+    expect(unload()).toBe(true);
+    await user.type(textarea(), "{Backspace}");
+    await waitFor(() => expect(unload()).toBe(false));
+  });
+});
+
+describe("Add chunk (CHUNK-19)", () => {
+  it("inserts the editor card at the top of the list", async () => {
+    finished(3);
+    const user = userEvent.setup();
+    renderPage();
+    await waitFor(() => expect(cards()).toHaveLength(3));
+    await user.click(screen.getByTestId("chunk-add"));
+    const heading = await screen.findByRole("heading", { name: "New chunk" });
+    const list = screen.getByTestId("chunk-list");
+    expect(list.firstElementChild?.contains(heading)).toBe(true);
+    expect(document.activeElement).toBe(textarea());
+  });
+
+  it("ends with the chunk added, search and filter cleared, the last page, the chunk selected and its header focused", async () => {
+    finished(25);
+    const user = userEvent.setup();
+    renderPage(`${chunkPath(DATASET_ID, DOC)}&keywords=Chunk&show=on`);
+    await waitFor(() => expect(cards()).toHaveLength(20));
+    await user.click(screen.getByTestId("chunk-add"));
+    await user.type(textarea(), "Brand new chunk by hand");
+    await user.click(screen.getByTestId("chunk-editor-save"));
+    expect(await screen.findByText("Chunk added")).toBeInTheDocument();
+    await waitUntil(() => location().includes("page=2"), { describe: "the last page" });
+    expect(location()).not.toContain("keywords");
+    expect(location()).not.toContain("show=");
+    const added = await waitUntil(() => document.querySelector<HTMLElement>('[data-origin="manual"]'), { describe: "the new card" });
+    const header = within(added).getByTestId("chunk-select");
+    await waitUntil(() => document.activeElement === header, { describe: "focus on the new chunk" });
+    expect(header).toHaveAttribute("aria-pressed", "true");
+    expect(within(added).getByTestId("chunk-text")).toHaveTextContent("Brand new chunk by hand");
+    expect(screen.queryByLabelText("Chunk text")).toBeNull();
+  });
+});
+
+describe("Add a chunk by hand (empty states)", () => {
+  it("is offered for a document that was never parsed, opens the add editor, and fills the list", async () => {
+    server.documents[DATASET_ID] = [firstDoc(), documentRow(2)];
+    setChunks(server, DOC, []);
+    const user = userEvent.setup();
+    renderPage();
+    await user.click(await screen.findByRole("button", { name: "Add a chunk by hand" }));
+    expect(await screen.findByRole("heading", { name: "New chunk" })).toBeInTheDocument();
+    expect(screen.queryByTestId("chunk-empty")).toBeNull();
+    await user.type(textarea(), "Hand written");
+    await user.click(screen.getByTestId("chunk-editor-save"));
+    await waitFor(() => expect(cards()).toHaveLength(1));
+    expect(cards()[0]).toHaveAttribute("data-origin", "manual");
+  });
+
+  it("goes back to the empty state when the add editor is discarded", async () => {
+    server.documents[DATASET_ID] = [firstDoc(), documentRow(2)];
+    setChunks(server, DOC, []);
+    const user = userEvent.setup();
+    renderPage();
+    await user.click(await screen.findByRole("button", { name: "Add a chunk by hand" }));
+    await user.click(await screen.findByRole("button", { name: "Discard changes" }));
+    expect(await screen.findByTestId("chunk-empty")).toBeInTheDocument();
+  });
+
+  it("is offered for a type without a parser", async () => {
+    server.documents[DATASET_ID] = [firstDoc({ suffix: "zip", name: "bundle.zip" }), documentRow(2)];
+    setFileExtra(server, DOC, { parseable: false });
+    setChunks(server, DOC, []);
+    renderPage();
+    expect(await screen.findByRole("button", { name: "Add a chunk by hand" })).toBeInTheDocument();
+  });
+
+  it("is not offered to a read-only caller", async () => {
+    server.documents[DATASET_ID] = [firstDoc(), documentRow(2)];
+    setChunks(server, DOC, []);
+    actAs(MEMBER, "normal", "u1");
+    renderPage();
+    expect(await screen.findByText(/hasn't been parsed yet/)).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Add a chunk by hand" })).toBeNull();
   });
 });
