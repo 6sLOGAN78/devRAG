@@ -3,13 +3,14 @@ import { fireEvent, render, screen, waitFor, within } from "@testing-library/rea
 import userEvent from "@testing-library/user-event";
 import i18n from "i18next";
 import { useState } from "react";
+import type { SessionUser } from "@/interfaces/user";
 import { MemoryRouter } from "react-router";
 import { describe, expect, it, vi } from "vitest";
 import { FAILURE_CODES, STEPS, failureReasonKey, failureStepKey } from "@/constants/failure-codes";
 import { registerQueryClient } from "@/services/http";
 import type { IngestionLogDetail } from "@/services/ingestion-service";
 import { DATASET_ID, documentRow } from "@/test/dataset-server";
-import { server, useFilesServer } from "@/test/files-harness";
+import { OWNER, actAs, renderTable, rowOf, server, useFilesServer } from "@/test/files-harness";
 import { addFileLog, setFileExtra } from "@/test/server-areas/files";
 import { appendLogLines, setLogExtra, type LogExtra } from "@/test/server-areas/ingestion-logs";
 import { waitUntil } from "@/test/wait-until";
@@ -130,14 +131,16 @@ describe("The content of a failed entry (UI-15, D-05, D-08)", () => {
     expect(screen.getByTestId("details-chunks")).toHaveTextContent("7");
   });
 
-  it("shows one decimal below ten seconds and whole seconds from ten", async () => {
+  it("rounds 9.96 seconds up to ten, shown whole", async () => {
     const a = seed(1, 1, "done", { durationSeconds: 9.96 });
     renderSheet({ logId: a });
     expect(await screen.findByTestId("details-duration")).toHaveTextContent("10 s");
-    const b = seed(2, 2, "done", { durationSeconds: 42.4 });
-    await userEvent.click(screen.getByRole("button", { name: "open second" }));
-    expect(b).toBe(idOf(2));
-    await waitFor(() => expect(screen.getByTestId("details-duration")).toHaveTextContent("42 s"));
+  });
+
+  it("shows whole seconds from ten up", async () => {
+    const id = seed(2, 2, "done", { durationSeconds: 42.4 });
+    renderSheet({ logId: id });
+    expect(await screen.findByTestId("details-duration")).toHaveTextContent("42 s");
   });
 });
 
@@ -333,3 +336,81 @@ describe("Footer (R-152)", () => {
   });
 });
 
+
+describe("Entry points on the dataset page (D-14, R-152)", () => {
+  const MEMBER: SessionUser = { ...OWNER, id: "u4", nickname: "Dan", tenantId: "t4", tenantName: "Dan's workspace" };
+
+  function failedDocument(over: Parameters<typeof documentRow>[1] = {}): string {
+    server.documents[DATASET_ID] = [documentRow(1, { run: "4", ...over })];
+    setFileExtra(server, documentRow(1).id, { error: FAILED_ERROR });
+    return seed(1, 1, "failed", { error: FAILED_ERROR, lines: ["Embedding batch 1"], attempts: 3, retried: true });
+  }
+
+  it("opens the sheet from the row's Details link and returns focus to the link on close", async () => {
+    failedDocument();
+    renderTable();
+    await screen.findByTestId("documents-table");
+    const link = within(rowOf(1)).getByRole("button", { name: "Parsing details for report-01.pdf" });
+    await userEvent.click(link);
+    const root = await sheet();
+    expect(await within(root).findByTestId("details-reason")).toHaveTextContent("The embedding provider timed out.");
+    await userEvent.click(within(root).getByTestId("details-close"));
+    await waitFor(() => expect(screen.queryByTestId("parsing-details")).toBeNull());
+    await waitFor(() => expect(link).toHaveFocus());
+  });
+
+  it("opens the sheet from the menu item 'Parsing details' and returns focus to the menu button", async () => {
+    failedDocument();
+    renderTable();
+    await screen.findByTestId("documents-table");
+    const more = within(rowOf(1)).getByTestId("document-more");
+    await userEvent.click(more);
+    await userEvent.click(await screen.findByTestId("document-menu-details"));
+    expect(await within(await sheet()).findByTestId("details-status")).toHaveTextContent("Failed");
+    await userEvent.keyboard("{Escape}");
+    await waitFor(() => expect(screen.queryByTestId("parsing-details")).toBeNull());
+    await waitFor(() => expect(more).toHaveFocus());
+  });
+
+  it("offers no menu item for a document that was never parsed", async () => {
+    renderTable();
+    await screen.findByTestId("documents-table");
+    await userEvent.click(within(rowOf(1)).getByTestId("document-more"));
+    await screen.findByTestId("document-menu-chunks");
+    expect(screen.queryByTestId("document-menu-details")).toBeNull();
+  });
+
+  it("parses again from the sheet: closes the sheet, then sends one request", async () => {
+    failedDocument();
+    renderTable();
+    await screen.findByTestId("documents-table");
+    await userEvent.click(within(rowOf(1)).getByTestId("document-details"));
+    await userEvent.click(await screen.findByTestId("details-reparse"));
+    await waitFor(() => expect(rowOf(1)).toHaveAttribute("data-run", "1"));
+    expect(screen.queryByTestId("parsing-details")).toBeNull();
+    expect(server.callsTo("POST", `/api/v1/datasets/${DATASET_ID}/documents/parse`)).toHaveLength(1);
+  });
+
+  it("never stacks the confirmation dialog over the sheet", async () => {
+    failedDocument({ chunk_num: 3 });
+    setFileExtra(server, documentRow(1).id, { editedCount: 2 });
+    renderTable();
+    await screen.findByTestId("documents-table");
+    await userEvent.click(within(rowOf(1)).getByTestId("document-details"));
+    await userEvent.click(await screen.findByTestId("details-reparse"));
+    const dialog = await screen.findByRole("alertdialog");
+    expect(dialog).toBeInTheDocument();
+    expect(screen.queryByTestId("parsing-details")).toBeNull();
+  });
+
+  it("draws no Parse again for a member who may not change the document", async () => {
+    failedDocument();
+    actAs(MEMBER, "normal", "u1");
+    renderTable();
+    await screen.findByTestId("documents-table");
+    await userEvent.click(within(rowOf(1)).getByTestId("document-details"));
+    await screen.findByTestId("details-status");
+    expect(screen.queryByTestId("details-reparse")).toBeNull();
+    expect(screen.getByTestId("details-close")).toBeInTheDocument();
+  });
+});

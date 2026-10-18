@@ -61,6 +61,21 @@ function useReducedMotion(): boolean {
   return reduced;
 }
 
+/** The badge of one state: an icon and a word, never colour alone. Shared by the table, the details sheet and the parsing log. */
+export function StatusKindBadge({ kind, testId = "document-status" }: { kind: StatusKind; testId?: string }) {
+  const { t } = useTranslation();
+  const reduced = useReducedMotion();
+  const look = LOOKS[kind];
+  const Icon = look.icon;
+  const spin = kind === "parsing" && !reduced ? "animate-spin" : undefined;
+  return (
+    <Badge variant={look.variant} data-testid={testId} data-kind={kind}>
+      {Icon === null ? null : <Icon className={`size-3 ${spin ?? ""}`.trim()} aria-hidden="true" />}
+      {t(look.key)}
+    </Badge>
+  );
+}
+
 /**
  * A document's parse state as the table shows it: an icon and a word for every state (never colour alone), then the
  * detail lines of the status map. The failure reason is a fixed sentence for a known code, else the server's plain
@@ -68,11 +83,7 @@ function useReducedMotion(): boolean {
  */
 export function DocumentStatusBadge({ document }: { document: StatusInput & Partial<Pick<DocumentView, "error" | "pagesTotal" | "pagesWithoutText">> }) {
   const { t } = useTranslation();
-  const reduced = useReducedMotion();
   const kind = statusKindOf(document);
-  const look = LOOKS[kind];
-  const Icon = look.icon;
-  const spin = kind === "parsing" && !reduced ? "animate-spin" : undefined;
 
   const sentence = failureSentence(document.error);
   const reason = "key" in sentence ? t(sentence.key) : sentence.text;
@@ -92,10 +103,7 @@ export function DocumentStatusBadge({ document }: { document: StatusInput & Part
 
   return (
     <div className="flex flex-col items-start gap-1">
-      <Badge variant={look.variant} data-testid="document-status" data-kind={kind}>
-        {Icon === null ? null : <Icon className={`size-3 ${spin ?? ""}`.trim()} aria-hidden="true" />}
-        {t(look.key)}
-      </Badge>
+      <StatusKindBadge kind={kind} />
       {detail === null ? null : (
         <p data-testid="document-status-detail" className={`text-xs font-normal ${detailClass}`}>
           {detail}

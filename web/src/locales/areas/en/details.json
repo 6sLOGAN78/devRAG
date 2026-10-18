@@ -1,0 +1,56 @@
+{
+  "datasets": {
+    "details": {
+      "title": "Parsing details",
+      "loading": "Loading the parsing details",
+      "retried_one": "Stopped after {{count}} attempt.",
+      "retried_other": "Stopped after {{count}} attempts.",
+      "notRetried": "Not retried, because trying again would give the same result.",
+      "field": {
+        "step": "Failed step",
+        "attempts": "Attempts",
+        "attemptsValue": "{{used}} of {{max}}",
+        "started": "Started",
+        "duration": "Duration",
+        "durationValue": "{{seconds}} s",
+        "indexed": "Chunks indexed",
+        "pages": "Pages without readable text",
+        "pagesValue": "{{skipped}} of {{total}}"
+      },
+      "providerMessage": "Provider message",
+      "log": "Progress log",
+      "logEmpty": "No progress messages were recorded.",
+      "error": {
+        "heading": "Couldn't load the parsing details."
+      },
+      "gone": "This log entry no longer exists."
+    },
+    "ingestion": {
+      "log": {
+        "title": "Parsing log",
+        "documentTitle": "Parsing log for {{name}} - devRag",
+        "documentTitleFallback": "Parsing log - devRag",
+        "intro": "Every parsing run in {{dataset}}, newest first.",
+        "caption": "Parsing runs in {{name}}",
+        "loading": "Loading the parsing log",
+        "col": {
+          "file": "Document",
+          "started": "Started",
+          "duration": "Duration",
+          "result": "Result",
+          "attempts": "Attempts",
+          "actions": "Actions"
+        },
+        "pages": "Parsing log pages",
+        "empty": {
+          "heading": "No parsing runs yet",
+          "body": "Each time a document is parsed, the run is listed here with its result.",
+          "action": "Back to documents"
+        },
+        "error": {
+          "heading": "Couldn't load the parsing log"
+        }
+      }
+    }
+  }
+}

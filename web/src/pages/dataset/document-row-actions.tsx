@@ -14,8 +14,8 @@ export interface DocumentRowActionsProps {
   /** May the caller parse, cancel and switch this document (D-02)? Controls the caller may not use are absent. */
   canChange: boolean;
   actions: ParseActions;
-  /** Opens the details sheet (plan 04-28). The menu item exists only when this is given and a log exists. */
-  onShowDetails?: (logId: string) => void;
+  /** Opens the details sheet. The menu item exists only when this is given and a log exists; focus returns to the menu button. */
+  onShowDetails?: (logId: string, opener: HTMLElement) => void;
 }
 
 type Inline = "parse" | "cancel" | "again" | null;
@@ -35,6 +35,7 @@ function inlineOf(document: DocumentView): Inline {
 export function DocumentRowActions({ datasetId, document, canChange, actions, onShowDetails }: DocumentRowActionsProps) {
   const { t } = useTranslation();
   const chosen = useRef(false);
+  const trigger = useRef<HTMLButtonElement | null>(null);
   const inline = canChange ? inlineOf(document) : null;
   const busy = actions.isBusy(document.id);
   const showDetails = document.lastLogId !== null && onShowDetails !== undefined;
@@ -72,7 +73,7 @@ export function DocumentRowActions({ datasetId, document, canChange, actions, on
       {inlineButton}
       <DropdownMenu modal={false}>
         <DropdownMenuTrigger asChild>
-          <Button type="button" variant="ghost" size="icon" data-testid="document-more" aria-label={t("datasets.files.more", { name: document.name })}>
+          <Button ref={trigger} type="button" variant="ghost" size="icon" data-testid="document-more" aria-label={t("datasets.files.more", { name: document.name })}>
             <EllipsisVertical aria-hidden="true" />
           </Button>
         </DropdownMenuTrigger>
@@ -95,7 +96,7 @@ export function DocumentRowActions({ datasetId, document, canChange, actions, on
               data-testid="document-menu-details"
               onSelect={() => {
                 chosen.current = true;
-                if (document.lastLogId !== null) onShowDetails?.(document.lastLogId);
+                if (document.lastLogId !== null && trigger.current !== null) onShowDetails?.(document.lastLogId, trigger.current);
               }}
             >
               {t("datasets.files.menu.details")}

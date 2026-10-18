@@ -47,7 +47,8 @@ interface DocumentRowProps {
   selected: boolean;
   onSelect: (checked: boolean) => void;
   onDelete: (document: DocumentView, opener: HTMLButtonElement) => void;
-  onShowDetails?: (logId: string) => void;
+  /** Opens the parsing details of the document's latest run; `opener` is where focus returns. */
+  onShowDetails?: (logId: string, opener: HTMLElement) => void;
 }
 
 /**
@@ -100,7 +101,7 @@ export function DocumentRow({ dataset, document, actions, selectColumn, selected
             data-testid="document-details"
             aria-label={t("datasets.files.detailsLabel", { name: document.name })}
             className="h-auto p-0 text-xs"
-            onClick={() => document.lastLogId !== null && onShowDetails?.(document.lastLogId)}
+            onClick={(event) => document.lastLogId !== null && onShowDetails?.(document.lastLogId, event.currentTarget)}
           >
             {t("datasets.files.detailsLink")}
           </Button>

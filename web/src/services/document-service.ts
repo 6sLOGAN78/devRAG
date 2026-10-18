@@ -81,7 +81,8 @@ function vetThumbnail(value: unknown): string | null {
 function toError(raw: unknown): DocumentErrorView | null {
   if (typeof raw !== "object" || raw === null || Array.isArray(raw)) return null;
   const dto = raw as Record<string, unknown>;
-  return { step: text(dto.step), code: text(dto.code), message: text(dto.message).slice(0, MAX_PROGRESS_MESSAGE_LENGTH) };
+  // One character past the limit is kept, so a message that is too long stays detectable and is never shown cut (D-08).
+  return { step: text(dto.step), code: text(dto.code), message: text(dto.message).slice(0, MAX_PROGRESS_MESSAGE_LENGTH + 1) };
 }
 
 export function toDocument(raw: unknown): DocumentView {

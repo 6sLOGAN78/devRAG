@@ -18,9 +18,11 @@ import { DOCUMENTS_PAGE_SIZE, useDocumentsRequest, useInvalidateOnParseEnd, useP
 import { useUserStore } from "@/stores/user-store";
 import type { UploadLimitsView } from "@/services/dataset-service";
 import { MAX_DOCUMENT_KEYWORDS_LENGTH, type DocumentView } from "@/services/document-service";
+import type { IngestionLogDetail } from "@/services/ingestion-service";
 import { DocumentRow } from "./document-row";
 import { IngestionSummary } from "./ingestion-summary";
 import { useParseActions, useParseAnnouncements } from "./parse-actions";
+import { ParsingDetailsSheet } from "./parsing-details-sheet";
 import { ReparseDialog } from "./reparse-dialog";
 import { SelectionBar } from "./selection-bar";
 
@@ -41,8 +43,6 @@ export interface DatasetFilesProps {
   onUpload: () => void;
   /** Called when the empty state starts or stops showing, so the page can hide its own header action. */
   onEmptyChange?: (empty: boolean) => void;
-  /** Opens the parsing details of a log entry (plan 04-28). Row links to it are drawn only when this is given. */
-  onShowDetails?: (logId: string) => void;
 }
 
 function TableSkeleton() {
@@ -66,7 +66,7 @@ function TableSkeleton() {
  * the table caption (the row is gone) and a page that became empty steps back to the last page that exists. Names are
  * user text and render as text nodes only.
  */
-export function DatasetFiles({ dataset, limits, page, keywords, onPageChange, onSearch, onUpload, onEmptyChange, onShowDetails }: DatasetFilesProps) {
+export function DatasetFiles({ dataset, limits, page, keywords, onPageChange, onSearch, onUpload, onEmptyChange }: DatasetFilesProps) {
   const { t, i18n } = useTranslation();
   const documents = useDocumentsRequest({ datasetId: dataset.id, page, keywords });
   const { pollPaused } = usePollHealth(documents);
@@ -91,6 +91,10 @@ export function DatasetFiles({ dataset, limits, page, keywords, onPageChange, on
   const [seenDocuments, setSeenDocuments] = useState(false);
   const [selected, setSelected] = useState<ReadonlySet<string>>(new Set());
   const reparseIds = useRef<string[]>([]);
+  // The details sheet keeps its entry after closing so it can slide out with its content; the body mounts only while open.
+  const detailsOpener = useRef<HTMLElement | null>(null);
+  const [detailsLogId, setDetailsLogId] = useState<string | null>(null);
+  const [detailsOpen, setDetailsOpen] = useState(false);
 
   // A row the caller may select: they may change it and it can be parsed or is parsing. The same rule the row draws.
   const qualifies = (document: DocumentView): boolean => canChangeDocument(dataset.createdBy, document.createdBy, userId, role) && (document.parseable || document.run === "1");
@@ -155,6 +159,27 @@ export function DatasetFiles({ dataset, limits, page, keywords, onPageChange, on
   function restoreFocus(event: Event): void {
     event.preventDefault();
     if (!deleted.current && opener.current?.isConnected === true) opener.current.focus();
+  }
+
+  function showDetails(logId: string, button: HTMLElement): void {
+    detailsOpener.current = button;
+    setDetailsLogId(logId);
+    setDetailsOpen(true);
+  }
+
+  /** Back to the link or menu button that opened the sheet; when the row is gone, the table caption. */
+  function restoreDetailsFocus(event: Event): void {
+    event.preventDefault();
+    const target = detailsOpener.current?.isConnected === true ? detailsOpener.current : caption.current;
+    target?.focus();
+  }
+
+  /** The caller may parse the entry's document again: it is the document's latest run, it ended badly, and they may change it. */
+  function canParseAgain(log: IngestionLogDetail): boolean {
+    const document = items.find((candidate) => candidate.id === log.documentId);
+    if (document === undefined || document.lastLogId !== log.id || !document.parseable) return false;
+    if (log.result !== "failed" && log.result !== "cancelled") return false;
+    return canChangeDocument(dataset.createdBy, document.createdBy, userId, role);
   }
 
   /** After a bulk action the bar is gone with the focus on it: the caption takes it. */
@@ -269,7 +294,7 @@ export function DatasetFiles({ dataset, limits, page, keywords, onPageChange, on
               selected={selected.has(document.id)}
               onSelect={(checked) => toggleSelected(document.id, checked)}
               onDelete={askDelete}
-              onShowDetails={onShowDetails}
+              onShowDetails={showDetails}
             />
           ))}
         </TableBody>
@@ -327,6 +352,15 @@ export function DatasetFiles({ dataset, limits, page, keywords, onPageChange, on
           statusLabel={t("common.pagination.status", { page, pages })}
         />
       ) : null}
+      <ParsingDetailsSheet
+        datasetId={dataset.id}
+        logId={detailsLogId}
+        open={detailsOpen}
+        onOpenChange={setDetailsOpen}
+        onCloseAutoFocus={restoreDetailsFocus}
+        canParseAgain={canParseAgain}
+        onParseAgain={(documentId) => void actions.parse([documentId])}
+      />
       <ReparseDialog confirm={actions.confirm} onReplace={actions.replace} onDismiss={actions.dismiss} onCloseAutoFocus={restoreAfterReparse} />
       {target === null ? null : (
         <DeleteDocumentDialog

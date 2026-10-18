@@ -1,0 +1,56 @@
+{
+  "datasets": {
+    "details": {
+      "title": "解析详情",
+      "loading": "正在加载解析详情",
+      "retried_one": "已尝试 {{count}} 次后停止。",
+    "retried_other": "已尝试 {{count}} 次后停止。",
+      "notRetried": "未重试，因为再试一次结果也相同。",
+      "field": {
+        "step": "失败步骤",
+        "attempts": "尝试次数",
+        "attemptsValue": "{{used}} / {{max}}",
+        "started": "开始时间",
+        "duration": "耗时",
+        "durationValue": "{{seconds}} 秒",
+        "indexed": "已索引分块",
+        "pages": "无可读文字的页数",
+        "pagesValue": "{{skipped}} / {{total}}"
+      },
+      "providerMessage": "服务商信息",
+      "log": "进度日志",
+      "logEmpty": "没有记录任何进度消息。",
+      "error": {
+        "heading": "无法加载解析详情。"
+      },
+      "gone": "此日志条目已不存在。"
+    },
+    "ingestion": {
+      "log": {
+        "title": "解析日志",
+        "documentTitle": "{{name}} 的解析日志 - devRag",
+        "documentTitleFallback": "解析日志 - devRag",
+        "intro": "{{dataset}} 中的每次解析，最新的在前。",
+        "caption": "{{name}} 中的解析记录",
+        "loading": "正在加载解析日志",
+        "col": {
+          "file": "文档",
+          "started": "开始时间",
+          "duration": "耗时",
+          "result": "结果",
+          "attempts": "尝试次数",
+          "actions": "操作"
+        },
+        "pages": "解析日志分页",
+        "empty": {
+          "heading": "还没有解析记录",
+          "body": "每次解析文档后，这里都会列出该次解析及其结果。",
+          "action": "返回文档"
+        },
+        "error": {
+          "heading": "无法加载解析日志"
+        }
+      }
+    }
+  }
+}

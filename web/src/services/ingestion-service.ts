@@ -85,7 +85,8 @@ function toError(raw: unknown): IngestionError | null {
   return {
     step: text(dto.step),
     code: text(dto.code),
-    message: text(dto.message).slice(0, MAX_MESSAGE_LENGTH),
+    // One character past the limit is kept, so a message that is too long stays detectable and is never shown cut (D-08).
+    message: text(dto.message).slice(0, MAX_MESSAGE_LENGTH + 1),
     detail: typeof dto.detail === "string" ? dto.detail.slice(0, MAX_MESSAGE_LENGTH) : null,
   };
 }
