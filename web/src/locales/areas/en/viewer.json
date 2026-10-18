@@ -1,0 +1,32 @@
+{
+  "viewer": {
+    "documentTitle": "{{name}} - devRag",
+    "documentTitleFallback": "Document - devRag",
+    "loading": "Loading document",
+    "viewChunks": "View chunks",
+    "download": "Download",
+    "downloadLabel": "Download {{name}}",
+    "downloading": "Downloading",
+    "downloadingPercent": "Downloading {{percent}}%",
+    "downloadFailed": "The file wasn't downloaded. Try again.",
+    "meta": {
+      "type": "Type",
+      "size": "Size",
+      "uploaded": "Uploaded",
+      "status": "Status",
+      "chunkTotal": "Chunks",
+      "method": "Method"
+    },
+    "text": {
+      "label": "File text",
+      "cut": "Showing the first part of this file. Download it to see the rest.",
+      "empty": "This file has no text."
+    },
+    "none": {
+      "heading": "No preview for {{type}} files",
+      "body": "Download the file to open it, or view its chunks to see the text that was read from it.",
+      "bodyUnparsed": "Download the file to open it."
+    },
+    "previewError": "Couldn't load this preview."
+  }
+}

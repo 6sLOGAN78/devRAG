@@ -1,0 +1,32 @@
+{
+  "viewer": {
+    "documentTitle": "{{name}} - devRag",
+    "documentTitleFallback": "文档 - devRag",
+    "loading": "正在加载文档",
+    "viewChunks": "查看分块",
+    "download": "下载",
+    "downloadLabel": "下载 {{name}}",
+    "downloading": "正在下载",
+    "downloadingPercent": "正在下载 {{percent}}%",
+    "downloadFailed": "文件未能下载。请重试。",
+    "meta": {
+      "type": "类型",
+      "size": "大小",
+      "uploaded": "上传时间",
+      "status": "状态",
+      "chunkTotal": "分块数",
+      "method": "方法"
+    },
+    "text": {
+      "label": "文件文本",
+      "cut": "仅显示此文件的开头部分。下载文件可查看其余内容。",
+      "empty": "此文件没有文本。"
+    },
+    "none": {
+      "heading": "{{type}} 文件无法预览",
+      "body": "下载文件即可打开，或查看分块以了解从中读取的文本。",
+      "bodyUnparsed": "下载文件即可打开。"
+    },
+    "previewError": "无法加载此预览。"
+  }
+}
