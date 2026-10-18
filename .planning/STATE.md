@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 04-28-PLAN.md
-last_updated: "2026-10-18T22:47:58.965Z"
+stopped_at: Completed 04-29-PLAN.md
+last_updated: "2026-10-18T23:01:19.189Z"
 last_activity: 2026-10-18
 progress:
   total_phases: 8
   completed_phases: 3
   total_plans: 118
-  completed_plans: 112
+  completed_plans: 113
   percent: 38
 ---
 
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-10-05)
 ## Current Position
 
 Phase: 4 (ingestion-pipeline) — EXECUTING
-Plan: 30 of 35
+Plan: 31 of 35
 Status: Ready to execute
 Last activity: 2026-10-18
 
-Progress: [██████████] 95%
+Progress: [██████████] 96%
 
 ## Performance Metrics
 
@@ -115,6 +115,7 @@ Progress: [██████████] 95%
 | Phase 4 P04-33 | 50 min | - tasks | - files |
 | Phase 04 P27 | 25min | - tasks | - files |
 | Phase 04 P28 | ~1h | 2 tasks | 19 files |
+| Phase 04 P29 | ~1h30 | 2 tasks | 26 files |
 
 ## Accumulated Context
 
@@ -193,6 +194,7 @@ Recent decisions affecting current work:
 - [Phase ?]: R-181: inSearch key names, router above the table, error state only before first load, files.ts area
 - [Phase ?]: R-182: live PDF chunk_token_num = 3 x longest line + 4 gives 26 chunks; 57 chunks embedded of 72 cap
 - [Phase 04]: R-183: DatasetFiles owns the details sheet; Parse again fires after the sheet unmounted; failure messages keep 301 chars
+- [Phase 04-29]: R-184: raw zod resolver with a second parse on submit; mode literals in SETTINGS_MODES; method title 'Tables'; Save clickable when dirty but invalid — Resolver cannot type transformed output; copy scan collisions; range messages must be reachable
 
 ### Pending Todos
 
@@ -228,6 +230,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-10-18T22:47:58.943Z
-Stopped at: Completed 04-28-PLAN.md
+Last session: 2026-10-18T23:01:19.176Z
+Stopped at: Completed 04-29-PLAN.md
 Resume file: None
