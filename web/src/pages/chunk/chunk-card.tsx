@@ -1,5 +1,5 @@
 import { EyeOff, Pencil, PenLine } from "lucide-react";
-import type { MouseEvent } from "react";
+import type { MouseEvent, ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { Badge, badgeVariants } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -23,6 +23,10 @@ export interface ChunkCardProps {
   onSelect: () => void;
   onChip: (page: number) => void;
   onToggle: () => void;
+  /** Present when the caller may edit this chunk: the pencil button. */
+  onEdit?: () => void;
+  /** The open editor of this chunk. It replaces the text, and the switch and the pencil are not drawn while it is there. */
+  editor?: ReactNode;
 }
 
 /** The pages a chunk lies on, each once, in order. */
@@ -36,7 +40,7 @@ const INTERACTIVE = "button, a, input, label, textarea, select";
  * One chunk of the inspector list. Clicking anywhere on the card selects it, unless the click was on a control or the
  * reader has selected text to copy. The text is a text node: nothing in a chunk is ever interpreted as markup.
  */
-export function ChunkCard({ chunk, number, total, selected, showPages, canChange, busy, onSelect, onChip, onToggle }: ChunkCardProps) {
+export function ChunkCard({ chunk, number, total, selected, showPages, canChange, busy, onSelect, onChip, onToggle, onEdit, editor }: ChunkCardProps) {
   const { t } = useTranslation();
   const off = !chunk.enabled;
   const pages = showPages ? pagesOf(chunk) : [];
@@ -84,8 +88,13 @@ export function ChunkCard({ chunk, number, total, selected, showPages, canChange
               {t("inspector.list.off")}
             </Badge>
           ) : null}
-          {canChange ? (
-            <div className="ml-auto">
+          {canChange && editor === undefined ? (
+            <div className="ml-auto flex items-center gap-2">
+              {onEdit !== undefined ? (
+                <Button type="button" variant="ghost" size="icon" data-testid="chunk-edit" aria-label={t("inspector.card.editLabel", { n: number })} onClick={onEdit}>
+                  <Pencil aria-hidden="true" />
+                </Button>
+              ) : null}
               <Switch
                 checked={chunk.enabled}
                 busy={busy}
@@ -98,9 +107,13 @@ export function ChunkCard({ chunk, number, total, selected, showPages, canChange
             </div>
           ) : null}
         </div>
-        <p data-testid="chunk-text" className={cn("whitespace-pre-wrap break-words text-sm font-normal", !selected && "line-clamp-6", off && "text-muted-foreground")}>
-          {chunk.text}
-        </p>
+        {editor !== undefined ? (
+          editor
+        ) : (
+          <p data-testid="chunk-text" className={cn("whitespace-pre-wrap break-words text-sm font-normal", !selected && "line-clamp-6", off && "text-muted-foreground")}>
+            {chunk.text}
+          </p>
+        )}
       </Card>
     </li>
   );

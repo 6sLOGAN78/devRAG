@@ -1,4 +1,5 @@
 import { ChevronLeft } from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, useSearchParams } from "react-router";
@@ -11,7 +12,8 @@ import { datasetFilesPath, documentViewerPath } from "@/constants/app-paths";
 import { useChunkRefresh, useChunksRequest, type ChunkShow } from "@/hooks/use-chunk-request";
 import { useCanChangeDocument } from "@/hooks/use-dataset-permissions";
 import { useDatasetBinding } from "@/hooks/use-dataset-binding";
-import { useDocumentDetailRequest } from "@/hooks/use-document-request";
+import { documentDetailKey, useDocumentDetailRequest } from "@/hooks/use-document-request";
+import { useActiveWorkspace } from "@/hooks/use-workspaces";
 import type { ChunkView } from "@/services/chunk-service";
 import type { DatasetDetailView } from "@/services/dataset-service";
 import type { DocumentDetailView } from "@/services/document-service";
@@ -20,7 +22,10 @@ import { datasetPageState } from "../dataset/errors";
 import { useParseActions } from "../dataset/parse-actions";
 import { ParsingDetailsSheet } from "../dataset/parsing-details-sheet";
 import { ReparseDialog } from "../dataset/reparse-dialog";
-import { ChunkList, MAX_KEYWORDS } from "./chunk-list";
+import { CHUNKS_PAGE_SIZE } from "@/hooks/use-chunk-request";
+import { DiscardChangesDialog } from "./discard-dialog";
+import { ChunkList, MAX_KEYWORDS, type Editing } from "./chunk-list";
+import { useEditGuard } from "./use-edit-guard";
 import { ChunkNotices } from "./chunk-notices";
 import { ChunkListSkeleton, DocumentEmpty, InspectorNotFound, NoPreviewNote, typeLabelOf } from "./inspector-states";
 
@@ -72,10 +77,12 @@ interface BodyProps {
   setKeywords: (keywords: string) => void;
   setShow: (show: ChunkShow) => void;
   clearFilters: () => void;
+  /** After an add: no search, no filter, this page. */
+  showPage: (page: number) => void;
 }
 
 /** The inspector once the dataset is bound and the document is known. Keyed by document, so the selection never carries over. */
-function InspectorBody({ dataset, doc, page, keywords, show, setPage, setKeywords, setShow, clearFilters }: BodyProps) {
+function InspectorBody({ dataset, doc, page, keywords, show, setPage, setKeywords, setShow, clearFilters, showPage }: BodyProps) {
   const { t, i18n } = useTranslation();
   const canChange = useCanChangeDocument(dataset, doc);
   const parsing = doc.run === "1";
@@ -83,6 +90,13 @@ function InspectorBody({ dataset, doc, page, keywords, show, setPage, setKeyword
   const chunks = useChunksRequest({ datasetId: dataset.id, docId: doc.id, page, keywords, show });
   useChunkRefresh(doc);
 
+  const queryClient = useQueryClient();
+  const tenantId = useActiveWorkspace()?.tenantId ?? null;
+  const [editing, setEditing] = useState<Editing | null>(null);
+  const [dirty, setDirty] = useState(false);
+  const [newId, setNewId] = useState<string | null>(null);
+  const edit = useEditGuard(dirty);
+  const textarea = useRef<HTMLTextAreaElement | null>(null);
   const [selected, setSelected] = useState<Selected | null>(null);
   const [previewPage, setPreviewPage] = useState(1);
   const [sheetOpen, setSheetOpen] = useState(false);
@@ -117,8 +131,32 @@ function InspectorBody({ dataset, doc, page, keywords, show, setPage, setKeyword
     else titleRef.current?.focus();
   }
 
+  /** Leaving the list as it is (another page, search or filter) closes the editor, after asking when its text is changed. */
+  const leave = (action: () => void) =>
+    edit.guard(() => {
+      setEditing(null);
+      action();
+    });
+
+  function added(chunk: ChunkView): void {
+    edit.release();
+    setEditing(null);
+    setNewId(chunk.id);
+    // The write refreshed the document before it answered, so its count already includes the new chunk, which is the last one.
+    const count = queryClient.getQueryData<DocumentDetailView>(documentDetailKey(tenantId, dataset.id, doc.id))?.chunkCount ?? doc.chunkCount;
+    showPage(Math.max(1, Math.ceil(count / CHUNKS_PAGE_SIZE)));
+  }
+
+  function saved(chunk: ChunkView): void {
+    if (editing?.kind === "add") added(chunk);
+    else {
+      edit.release();
+      setEditing(null);
+    }
+  }
+
   const noChunks = chunks.data !== undefined && chunks.data.total === 0 && keywords === "" && show === "all";
-  const listBody = noChunks ? (
+  const listBody = noChunks && editing?.kind !== "add" ? (
     <DocumentEmpty
       document={doc}
       canChange={canChange}
@@ -126,6 +164,7 @@ function InspectorBody({ dataset, doc, page, keywords, show, setPage, setKeyword
       onParse={() => void actions.parse([doc.id])}
       onCancel={() => void actions.cancel([doc.id])}
       onDetails={openDetails}
+      onAddByHand={canChange ? () => setEditing({ kind: "add" }) : undefined}
     />
   ) : (
     <ChunkList
@@ -138,11 +177,21 @@ function InspectorBody({ dataset, doc, page, keywords, show, setPage, setKeyword
       canChange={canChange && !parsing}
       showPages={hasPreview}
       selectedId={selected?.chunk.id ?? null}
-      onPage={setPage}
-      onSearch={setKeywords}
-      onShow={setShow}
-      onClear={clearFilters}
+      onPage={(next, options) => (options?.replace === true ? setPage(next, options) : leave(() => setPage(next, options)))}
+      onSearch={(next) => leave(() => setKeywords(next))}
+      onShow={(next) => leave(() => setShow(next))}
+      onClear={() => leave(clearFilters)}
       onSelect={select}
+      editing={editing}
+      guard={edit.guard}
+      onEdit={(chunk, number) => setEditing({ kind: "edit", chunk, number })}
+      onAdd={() => setEditing({ kind: "add" })}
+      onEditorDirty={setDirty}
+      onEditorClose={() => setEditing(null)}
+      onEditorSaved={saved}
+      textareaRef={textarea}
+      newId={newId}
+      onNewShown={() => setNewId(null)}
     />
   );
 
@@ -211,6 +260,15 @@ function InspectorBody({ dataset, doc, page, keywords, show, setPage, setKeyword
         canParseAgain={() => canChange}
         onParseAgain={(id) => void actions.parse([id])}
       />
+      <DiscardChangesDialog
+        open={edit.pending}
+        onKeep={edit.cancel}
+        onDiscard={edit.confirm}
+        onCloseAutoFocus={(event) => {
+          event.preventDefault();
+          if (textarea.current?.isConnected === true) textarea.current.focus();
+        }}
+      />
       <ReparseDialog confirm={actions.confirm} onReplace={actions.replace} onDismiss={actions.dismiss} onCloseAutoFocus={restoreFocus} />
     </div>
   );
@@ -275,6 +333,16 @@ export default function ChunkInspectorPage() {
       }, true),
     [update],
   );
+  const showPage = useCallback(
+    (next: number) =>
+      update((p) => {
+        p.delete("keywords");
+        p.delete("show");
+        if (next <= 1) p.delete("page");
+        else p.set("page", String(next));
+      }, false),
+    [update],
+  );
   const clearFilters = useCallback(
     () =>
       update((p) => {
@@ -309,6 +377,7 @@ export default function ChunkInspectorPage() {
       setKeywords={setKeywords}
       setShow={setShow}
       clearFilters={clearFilters}
+      showPage={showPage}
     />
   );
 }

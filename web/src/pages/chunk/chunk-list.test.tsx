@@ -69,6 +69,16 @@ function Host({ canChange = true, showPages = true, start = {}, onSelect = () =>
           setSelectedId(chunk.id);
           onSelect(chunk, number, sizes, chip);
         }}
+        editing={null}
+        guard={(action) => action()}
+        onEdit={() => {}}
+        onAdd={() => {}}
+        onEditorDirty={() => {}}
+        onEditorClose={() => {}}
+        onEditorSaved={() => {}}
+        textareaRef={{ current: null }}
+        newId={null}
+        onNewShown={() => {}}
       />
       <p data-testid="host-state">{`${page}|${keywords}|${show}`}</p>
       <Toaster />

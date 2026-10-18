@@ -75,6 +75,8 @@ export interface DocumentEmptyProps {
   onCancel: () => void;
   /** Receives the link-button so focus can return to it when the sheet closes. */
   onDetails: (opener: HTMLElement) => void;
+  /** Present when the caller may add a chunk by hand: the link-button under a never-parsed or unparseable document. */
+  onAddByHand?: () => void;
 }
 
 type EmptyKind = "never" | "unavailable" | "parsing" | "failed" | "cancelled";
@@ -90,7 +92,7 @@ function kindOf(document: EmptyDocumentInput): EmptyKind {
  * What the inspector says in place of the list when the document has no chunks and no search or filter is active. The
  * parse buttons are the same requests as the row's and go through the owner's `useParseActions`.
  */
-export function DocumentEmpty({ document, canChange, busy, onParse, onCancel, onDetails }: DocumentEmptyProps) {
+export function DocumentEmpty({ document, canChange, busy, onParse, onCancel, onDetails, onAddByHand }: DocumentEmptyProps) {
   const { t } = useTranslation();
   const reason = useReasonText(document.error);
   const kind = kindOf(document);
@@ -101,6 +103,13 @@ export function DocumentEmpty({ document, canChange, busy, onParse, onCancel, on
     </Button>
   );
 
+  const addByHand =
+    canChange && onAddByHand !== undefined ? (
+      <Button type="button" variant="link" data-testid="chunk-add-by-hand" onClick={onAddByHand}>
+        {t("inspector.empty.addByHand")}
+      </Button>
+    ) : null;
+
   let content;
   switch (kind) {
     case "never":
@@ -110,12 +119,19 @@ export function DocumentEmpty({ document, canChange, busy, onParse, onCancel, on
           icon={Rows3}
           heading={t("inspector.empty.heading")}
           body={canChange ? t("inspector.empty.body") : t("inspector.empty.bodyReadOnly")}
-          action={canChange ? parse(t("inspector.empty.parse")) : undefined}
+          action={
+            canChange ? (
+              <div className="flex flex-col items-center gap-1">
+                {parse(t("inspector.empty.parse"))}
+                {addByHand}
+              </div>
+            ) : undefined
+          }
         />
       );
       break;
     case "unavailable":
-      content = <EmptyState as="h2" icon={CircleSlash} heading={t("inspector.unavailable.heading")} body={t("inspector.unavailable.body", { type: typeLabelOf(document.suffix) })} />;
+      content = <EmptyState as="h2" icon={CircleSlash} heading={t("inspector.unavailable.heading")} body={t("inspector.unavailable.body", { type: typeLabelOf(document.suffix) })} action={addByHand ?? undefined} />;
       break;
     case "parsing": {
       const percent = percentOf(document);
