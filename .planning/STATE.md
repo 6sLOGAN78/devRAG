@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 04-29-PLAN.md
-last_updated: "2026-10-18T23:01:19.189Z"
+stopped_at: Completed 04-30-PLAN.md
+last_updated: "2026-10-18T23:20:00.471Z"
 last_activity: 2026-10-18
 progress:
   total_phases: 8
   completed_phases: 3
   total_plans: 118
-  completed_plans: 113
+  completed_plans: 114
   percent: 38
 ---
 
@@ -30,7 +30,7 @@ Plan: 31 of 35
 Status: Ready to execute
 Last activity: 2026-10-18
 
-Progress: [██████████] 96%
+Progress: [██████████] 97%
 
 ## Performance Metrics
 
@@ -116,6 +116,7 @@ Progress: [██████████] 96%
 | Phase 04 P27 | 25min | - tasks | - files |
 | Phase 04 P28 | ~1h | 2 tasks | 19 files |
 | Phase 04 P29 | ~1h30 | 2 tasks | 26 files |
+| Phase 04 P30 | 1h30 | 3 tasks | 22 files |
 
 ## Accumulated Context
 
@@ -195,6 +196,7 @@ Recent decisions affecting current work:
 - [Phase ?]: R-182: live PDF chunk_token_num = 3 x longest line + 4 gives 26 chunks; 57 chunks embedded of 72 cap
 - [Phase 04]: R-183: DatasetFiles owns the details sheet; Parse again fires after the sheet unmounted; failure messages keep 301 chars
 - [Phase 04-29]: R-184: raw zod resolver with a second parse on submit; mode literals in SETTINGS_MODES; method title 'Tables'; Save clickable when dirty but invalid — Resolver cannot type transformed output; copy scan collisions; range messages must be reachable
+- [Phase 04]: R-185: chunk inspector requests binding, then document detail, then the chunk list; boxes are percent of the page clipped to it; usePageImage is the only object-URL site
 
 ### Pending Todos
 
@@ -230,6 +232,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-10-18T23:01:19.176Z
-Stopped at: Completed 04-29-PLAN.md
+Last session: 2026-10-18T23:20:00.458Z
+Stopped at: Completed 04-30-PLAN.md
 Resume file: None

@@ -413,7 +413,7 @@ Plans:
 **Wave 18** *(blocked on Wave 17 completion)*
 
 - [x] 04-29-PLAN.md — Chunking-method dialog and parser configurator
-- [ ] 04-30-PLAN.md — Chunk inspector with page preview and box overlay
+- [x] 04-30-PLAN.md — Chunk inspector with page preview and box overlay
 
 **Wave 19** *(blocked on Wave 18 completion)*
 
