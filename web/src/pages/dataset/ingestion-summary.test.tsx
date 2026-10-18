@@ -3,6 +3,7 @@ import { act, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router";
 import { describe, expect, it } from "vitest";
+import { waitUntil } from "@/test/wait-until";
 import { datasetLogsPath } from "@/constants/app-paths";
 import { registerQueryClient } from "@/services/http";
 import { DATASET_ID, documentRow } from "@/test/dataset-server";
@@ -84,7 +85,10 @@ describe("IngestionSummary (KB-14)", () => {
     await waitFor(() => expect(screen.getByTestId("summary-count-done")).toHaveTextContent("1"), { timeout: 5000 });
     expect(screen.getByTestId("summary-count-chunk-total")).toHaveTextContent("8");
     const calls = server.callsTo("GET", SUMMARY_URL).length;
-    await new Promise((resolve) => setTimeout(resolve, 2600));
+    // Nothing runs any more, so no further summary request may arrive within one poll period (2 s) plus margin.
+    await expect(
+      waitUntil(() => server.callsTo("GET", SUMMARY_URL).length > calls, { timeout: 2600, describe: "another summary poll" }),
+    ).rejects.toThrow(/timed out/);
     expect(server.callsTo("GET", SUMMARY_URL).length).toBe(calls);
   }, 15000);
 });
