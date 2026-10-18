@@ -418,7 +418,7 @@ Plans:
 **Wave 19** *(blocked on Wave 18 completion)*
 
 - [x] 04-31-PLAN.md — Chunk editor, add flow and unsaved-changes guard
-- [ ] 04-32-PLAN.md — Document viewer
+- [x] 04-32-PLAN.md — Document viewer
 
 **Wave 20** *(blocked on Wave 19 completion)*
 
