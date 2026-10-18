@@ -46,6 +46,16 @@ export function setFileExtra(server: DatasetServer, docId: string, extra: FileEx
 
 export const fileLogsOf = (server: DatasetServer): readonly LogRow[] => stateOf(server).logs;
 
+/** The extra fields set for a document (error, progress message, page counts). Read-only view for other areas. */
+export const fileExtraOf = (server: DatasetServer, docId: string): Readonly<FileExtra> => stateOf(server).extras[docId] ?? {};
+
+/** Adds a log row as a parse would; `latest` makes it the one the document's `last_log_id` names. */
+export function addFileLog(server: DatasetServer, row: LogRow, latest = true): void {
+  const state = stateOf(server);
+  state.logs.push(row);
+  if (latest) state.lastLog[row.docId] = row.id;
+}
+
 function findDocument(server: DatasetServer, docId: string): DocumentRow | undefined {
   for (const list of Object.values(server.documents)) {
     const row = list.find((d) => d.id === docId);

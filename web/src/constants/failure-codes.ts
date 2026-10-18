@@ -54,6 +54,10 @@ const TERMINAL: ReadonlySet<string> = new Set([
   "document_deleted",
 ]);
 
+/** Every failure code and step the SPA has fixed copy for. */
+export const FAILURE_CODES: readonly string[] = Object.keys(REASON_LEAF);
+export const STEPS: readonly string[] = Object.keys(STEP_LEAF);
+
 const own = (table: Readonly<Record<string, string>>, name: string): string | undefined => (Object.hasOwn(table, name) ? table[name] : undefined);
 
 export const MAX_FAILURE_MESSAGE_LENGTH = 300;
