@@ -4,7 +4,7 @@ import { AxiosError, AxiosHeaders, type AxiosAdapter } from "axios";
 import { createMemoryRouter, matchPath, RouterProvider } from "react-router";
 import { Activity, Database, House } from "lucide-react";
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
-import { CHUNK_ROUTE, DATASET_LOGS_ROUTE, chunkPath, datasetLogsPath } from "@/constants/app-paths";
+import { CHUNK_ROUTE, DATASET_LOGS_ROUTE, DOCUMENT_VIEWER_ROUTE, chunkPath, datasetLogsPath, documentViewerPath } from "@/constants/app-paths";
 import { routes, type RouteEntry } from "@/constants/routes";
 import { ShellError } from "@/pages/route-error";
 import { buildRoutes } from "@/routes";
@@ -244,6 +244,18 @@ describe("chunk inspector route", () => {
     const pathname = new URL(chunkPath("0123456789abcdef0123456789abcdef", "fedcba9876543210fedcba9876543210"), "http://app.test").pathname;
     const entry = routes.find((r) => r.path !== "*" && matchPath(r.path, pathname) !== null);
     expect(entry?.path).toBe(CHUNK_ROUTE);
+    expect(entry).toMatchObject({ layout: "standard", auth: "required" });
+    expect(entry?.nav).toBeUndefined();
+    const page = await entry?.component?.();
+    expect(page?.default).toBeTypeOf("function");
+  });
+});
+
+describe("document viewer route", () => {
+  it("registers the path documentViewerPath builds, behind sign-in, as a lazy page with no navigation entry", async () => {
+    const pathname = new URL(documentViewerPath("0123456789abcdef0123456789abcdef", "fedcba9876543210fedcba9876543210"), "http://app.test").pathname;
+    const entry = routes.find((r) => r.path !== "*" && matchPath(r.path, pathname) !== null);
+    expect(entry?.path).toBe(DOCUMENT_VIEWER_ROUTE);
     expect(entry).toMatchObject({ layout: "standard", auth: "required" });
     expect(entry?.nav).toBeUndefined();
     const page = await entry?.component?.();

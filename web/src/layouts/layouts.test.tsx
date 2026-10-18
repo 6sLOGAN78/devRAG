@@ -156,6 +156,15 @@ describe("StandardLayout", () => {
     expect(screen.getByTestId("nav-item-datasets")).not.toHaveAttribute("aria-current");
   });
 
+  it("marks Datasets current on the document viewer /document, which has no entry of its own, and not on a look-alike", () => {
+    renderIn(StandardLayout, "/document?id=0123456789abcdef0123456789abcdef&doc=0123456789abcdef0123456789abcdef");
+    expect(screen.getByTestId("nav-item-datasets")).toHaveAttribute("aria-current", "page");
+    expect(screen.queryByTestId("nav-item-document")).toBeNull();
+    cleanup();
+    renderIn(StandardLayout, "/documents-x");
+    expect(screen.getByTestId("nav-item-datasets")).not.toHaveAttribute("aria-current");
+  });
+
   it("does not mark Datasets current on a path that only starts with the same letters", () => {
     renderIn(StandardLayout, "/datasetsx");
     expect(screen.getByTestId("nav-item-datasets")).not.toHaveAttribute("aria-current");
@@ -261,8 +270,8 @@ describe("FullBleedLayout and BareLayout", () => {
 });
 
 describe("registry", () => {
-  it("contains exactly the entries /, /login, /forgot-password, /home, /datasets, /dataset/files, /dataset/logs, /chunk, /system-status, /user-setting/profile, /user-setting/model, /user-setting/api, /user-setting/team and *", () => {
-    expect(routes.map((r) => r.path)).toEqual(["/", "/login", "/forgot-password", "/home", "/datasets", "/dataset/files", "/dataset/logs", "/chunk", "/system-status", "/user-setting/profile", "/user-setting/model", "/user-setting/api", "/user-setting/team", "*"]);
+  it("contains exactly the entries /, /login, /forgot-password, /home, /datasets, /dataset/files, /dataset/logs, /chunk, /document, /system-status, /user-setting/profile, /user-setting/model, /user-setting/api, /user-setting/team and *", () => {
+    expect(routes.map((r) => r.path)).toEqual(["/", "/login", "/forgot-password", "/home", "/datasets", "/dataset/files", "/dataset/logs", "/chunk", "/document", "/system-status", "/user-setting/profile", "/user-setting/model", "/user-setting/api", "/user-setting/team", "*"]);
     const files = routes.find((r) => r.path === "/dataset/files");
     expect(files).toMatchObject({ layout: "standard", auth: "required" });
     expect(files?.nav).toBeUndefined();
