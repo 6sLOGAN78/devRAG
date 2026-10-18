@@ -4,13 +4,13 @@ milestone: v1.0
 milestone_name: milestone
 status: executing
 stopped_at: Completed 04-18-PLAN.md
-last_updated: "2026-10-17T06:19:28.798Z"
-last_activity: 2026-10-17
+last_updated: "2026-10-18T22:19:23.033Z"
+last_activity: 2026-10-18
 progress:
   total_phases: 8
   completed_phases: 3
   total_plans: 118
-  completed_plans: 108
+  completed_plans: 109
   percent: 38
 ---
 
@@ -26,9 +26,9 @@ See: .planning/PROJECT.md (updated 2026-10-05)
 ## Current Position
 
 Phase: 4 (ingestion-pipeline) — EXECUTING
-Plan: 26 of 35
+Plan: 27 of 35
 Status: Ready to execute
-Last activity: 2026-10-17
+Last activity: 2026-10-18
 
 Progress: [█████████░] 92%
 
@@ -111,6 +111,7 @@ Progress: [█████████░] 92%
 | Phase 04 P24 | 25min | - tasks | - files |
 | Phase 04 P22 | 75min | - tasks | - files |
 | Phase 4 P25 | 40min | - tasks | - files |
+| Phase 4 P26 | 75min | - tasks | - files |
 
 ## Accumulated Context
 
@@ -186,6 +187,7 @@ Recent decisions affecting current work:
 - [Phase ?]: R-178: SPA reads chunk_count with chunk_num fallback; confirmCountsOf in document-service.ts
 - [Phase ?]: R-179: executor re-settles totals when a task stops on a cancel; test containers located by label
 - [Phase ?]: R-180: ApiError.kind for timeouts, usePollHealth via query timestamps, onSettled refresh (plan 04-25)
+- [Phase ?]: R-181: inSearch key names, router above the table, error state only before first load, files.ts area
 
 ### Pending Todos
 
@@ -221,6 +223,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-10-17T06:19:28.787Z
+Last session: 2026-10-18T22:19:23.021Z
 Stopped at: Completed 04-18-PLAN.md
 Resume file: None
