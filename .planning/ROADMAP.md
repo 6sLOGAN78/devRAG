@@ -403,7 +403,7 @@ Plans:
 **Wave 16** *(blocked on Wave 15 completion)*
 
 - [x] 04-26-PLAN.md — Dataset page: parse controls, live progress, selection, summary, Parse again dialog
-- [ ] 04-33-PLAN.md — Live ingestion tier with the real embedding model
+- [x] 04-33-PLAN.md — Live ingestion tier with the real embedding model
 
 **Wave 17** *(blocked on Wave 16 completion)*
 
