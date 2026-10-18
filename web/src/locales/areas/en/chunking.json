@@ -1,0 +1,90 @@
+{
+  "datasets": {
+    "menu": {
+      "chunking": "Default chunking method"
+    },
+    "files": {
+      "menu": {
+        "method": "Chunking method"
+      }
+    },
+    "chunking": {
+      "titleDocument": "Chunking method for \"{{name}}\"",
+      "titleDataset": "Default chunking method",
+      "bodyDocument": "How this document is split into chunks the next time it is parsed.",
+      "bodyDataset": "Applied to documents uploaded from now on. Documents already in this dataset keep their own settings.",
+      "loading": "Loading the chunking settings",
+      "later": "Available in a later release",
+      "method": {
+        "legend": "Method",
+        "help": "General is the only method in this release.",
+        "general": {
+          "title": "General",
+          "body": "Splits text into chunks of a set size, ending at the delimiters you choose. Works for most documents."
+        },
+        "qa": {
+          "title": "Q&A",
+          "body": "Keeps each question with its answer."
+        },
+        "paper": {
+          "title": "Paper",
+          "body": "Follows the sections of an academic paper."
+        },
+        "book": {
+          "title": "Book",
+          "body": "Follows chapters and sections."
+        },
+        "laws": {
+          "title": "Laws",
+          "body": "Follows the article structure of legal texts."
+        },
+        "presentation": {
+          "title": "Presentation",
+          "body": "One chunk per slide."
+        },
+        "table": {
+          "title": "Tables",
+          "body": "One chunk per table row."
+        },
+        "manual": {
+          "title": "Manual",
+          "body": "Follows the heading structure of technical manuals."
+        }
+      },
+      "storedUnavailable": "This document is set to {{method}}, which isn't available yet. Choose General to parse it.",
+      "parsedNote_one": "This document was parsed with its previous settings. Its {{count}} chunk stays as it is until you parse it again.",
+      "parsedNote_other": "This document was parsed with its previous settings. Its {{count}} chunks stay as they are until you parse it again.",
+      "field": {
+        "size": "Chunk size (tokens)",
+        "sizeHelp": "The largest size of one chunk. The default is 512.",
+        "delimiters": "Delimiters",
+        "delimitersHelp": "A chunk ends early at any of these characters. Write \\n for a line break.",
+        "overlap": "Overlap (%)",
+        "overlapHelp": "How much of the end of one chunk is repeated at the start of the next."
+      },
+      "notYet": {
+        "heading": "Not available yet",
+        "layout": {
+          "title": "Layout recognition",
+          "body": "Detects titles, tables and figures on each page before chunking."
+        },
+        "keywords": {
+          "title": "Auto-keywords",
+          "body": "Adds keywords to each chunk with a chat model."
+        }
+      },
+      "saved": "Chunking settings saved",
+      "error": {
+        "loadHeading": "Couldn't load the chunking settings"
+      }
+    }
+  },
+  "errors": {
+    "chunking": {
+      "sizeRange": "Enter a whole number from 1 to 8192.",
+      "delimitersRequired": "Enter at least one delimiter.",
+      "delimitersMax": "Use 64 characters or fewer.",
+      "overlapRange": "Enter a whole number from 0 to 50."
+    }
+  }
+}

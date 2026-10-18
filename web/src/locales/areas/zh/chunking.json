@@ -1,0 +1,90 @@
+{
+  "datasets": {
+    "menu": {
+      "chunking": "默认分块方式"
+    },
+    "files": {
+      "menu": {
+        "method": "分块方式"
+      }
+    },
+    "chunking": {
+      "titleDocument": "“{{name}}”的分块方式",
+      "titleDataset": "默认分块方式",
+      "bodyDocument": "此文档下次解析时的分块方式。",
+      "bodyDataset": "适用于此后上传的文档。数据集中已有的文档保留各自的设置。",
+      "loading": "正在加载分块设置",
+      "later": "将在后续版本提供",
+      "method": {
+        "legend": "方式",
+        "help": "本版本只提供“通用”方式。",
+        "general": {
+          "title": "通用",
+          "body": "按设定大小切分文本，并在你选择的分隔符处结束。适用于大多数文档。"
+        },
+        "qa": {
+          "title": "问答",
+          "body": "让每个问题与其答案保持在一起。"
+        },
+        "paper": {
+          "title": "论文",
+          "body": "按学术论文的章节切分。"
+        },
+        "book": {
+          "title": "书籍",
+          "body": "按章节切分。"
+        },
+        "laws": {
+          "title": "法律",
+          "body": "按法律文本的条款结构切分。"
+        },
+        "presentation": {
+          "title": "演示文稿",
+          "body": "每张幻灯片一个分块。"
+        },
+        "table": {
+          "title": "表格",
+          "body": "每个表格行一个分块。"
+        },
+        "manual": {
+          "title": "手册",
+          "body": "按技术手册的标题结构切分。"
+        }
+      },
+      "storedUnavailable": "此文档设置为 {{method}}，暂不可用。请选择“通用”后再解析。",
+      "parsedNote_one": "此文档已按之前的设置解析。在你再次解析之前，它的 {{count}} 个分块保持不变。",
+      "parsedNote_other": "此文档已按之前的设置解析。在你再次解析之前，它的 {{count}} 个分块保持不变。",
+      "field": {
+        "size": "分块大小（词元）",
+        "sizeHelp": "单个分块的最大大小。默认值为 512。",
+        "delimiters": "分隔符",
+        "delimitersHelp": "分块会在这些字符处提前结束。换行请写 \\n。",
+        "overlap": "重叠（%）",
+        "overlapHelp": "一个分块末尾有多少内容会在下一个分块开头重复。"
+      },
+      "notYet": {
+        "heading": "暂不可用",
+        "layout": {
+          "title": "版面识别",
+          "body": "分块前检测每页上的标题、表格和图片。"
+        },
+        "keywords": {
+          "title": "自动关键词",
+          "body": "用对话模型为每个分块添加关键词。"
+        }
+      },
+      "saved": "分块设置已保存",
+      "error": {
+        "loadHeading": "无法加载分块设置"
+      }
+    }
+  },
+  "errors": {
+    "chunking": {
+      "sizeRange": "请输入 1 到 8192 之间的整数。",
+      "delimitersRequired": "请至少输入一个分隔符。",
+      "delimitersMax": "最多使用 64 个字符。",
+      "overlapRange": "请输入 0 到 50 之间的整数。"
+    }
+  }
+}
