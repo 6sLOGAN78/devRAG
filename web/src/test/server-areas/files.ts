@@ -19,6 +19,8 @@ export interface FileExtra {
   error?: { step: string; code: string; message: string } | null;
   pagesTotal?: number | null;
   pagesWithoutText?: number | null;
+  /** `pages` for a PDF with page images (the chunk inspector shows its preview); default `none`. */
+  preview?: "pages" | "none";
   /** The next replacing parse is refused once more with fresh counts, as when the chunks changed meanwhile. */
   refuseConfirmOnce?: boolean;
   /** The document's own chunking values (the chunking dialog saves them). */
@@ -158,7 +160,7 @@ export function documentDetailOf(server: DatasetServer, row: DocumentRow) {
     chunk_token_num: values.chunkTokenNum,
     delimiter: values.delimiter,
     overlapped_percent: values.overlappedPercent,
-    preview: "none",
+    preview: stateOf(server).extras[row.id]?.preview ?? "none",
   };
 }
 
