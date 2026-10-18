@@ -219,11 +219,11 @@ describe("States", () => {
   });
 
   it("shows the loading skeleton before the document arrives", async () => {
-    const release = Promise.withResolvers<void>();
-    server.holds[`GET ${DETAIL_URL}`] = release.promise;
+    let release: () => void = () => {};
+    server.holds[`GET ${DETAIL_URL}`] = new Promise<void>((resolve) => (release = resolve));
     renderPage();
     expect(await screen.findByTestId("viewer-skeleton")).toBeInTheDocument();
-    release.resolve();
+    release();
     expect(await screen.findByTestId("viewer-page")).toBeInTheDocument();
   });
 
