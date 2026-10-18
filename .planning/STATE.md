@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 04-30-PLAN.md
-last_updated: "2026-10-18T23:20:00.471Z"
+stopped_at: Completed 04-31-PLAN.md
+last_updated: "2026-10-18T23:32:50.431Z"
 last_activity: 2026-10-18
 progress:
   total_phases: 8
   completed_phases: 3
   total_plans: 118
-  completed_plans: 114
+  completed_plans: 115
   percent: 38
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-10-05)
 ## Current Position
 
 Phase: 4 (ingestion-pipeline) — EXECUTING
-Plan: 31 of 35
+Plan: 32 of 35
 Status: Ready to execute
 Last activity: 2026-10-18
 
@@ -117,6 +117,7 @@ Progress: [██████████] 97%
 | Phase 04 P28 | ~1h | 2 tasks | 19 files |
 | Phase 04 P29 | ~1h30 | 2 tasks | 26 files |
 | Phase 04 P30 | 1h30 | 3 tasks | 22 files |
+| Phase 04 P31 | ~1h15 | 2 tasks | 14 files |
 
 ## Accumulated Context
 
@@ -197,6 +198,7 @@ Recent decisions affecting current work:
 - [Phase 04]: R-183: DatasetFiles owns the details sheet; Parse again fires after the sheet unmounted; failure messages keep 301 chars
 - [Phase 04-29]: R-184: raw zod resolver with a second parse on submit; mode literals in SETTINGS_MODES; method title 'Tables'; Save clickable when dirty but invalid — Resolver cannot type transformed output; copy scan collisions; range messages must be reachable
 - [Phase 04]: R-185: chunk inspector requests binding, then document detail, then the chunk list; boxes are percent of the page clipped to it; usePageImage is the only object-URL site
+- [Phase 04]: R-186: chunk editor keeps an Editing snapshot; blocker only on pathname or id/doc; leaving actions guarded as actions — typed text must survive a 404 refetch and the list's own page step
 
 ### Pending Todos
 
@@ -232,6 +234,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-10-18T23:20:00.458Z
-Stopped at: Completed 04-30-PLAN.md
+Last session: 2026-10-18T23:32:50.405Z
+Stopped at: Completed 04-31-PLAN.md
 Resume file: None
