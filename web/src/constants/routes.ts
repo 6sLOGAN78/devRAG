@@ -1,6 +1,7 @@
 import { Activity, Cpu, Database, House, KeyRound, UserRound, Users, type LucideIcon } from "lucide-react";
 import type { ComponentType } from "react";
 import { HOME_PATH } from "@/utils/safe-next";
+import { DATASET_LOGS_ROUTE } from "./app-paths";
 
 /**
  * The single typed route registry (UI-01, D-19, 01-UI-SPEC.md).
@@ -82,6 +83,13 @@ export const routes: readonly RouteEntry[] = [
     layout: "standard",
     auth: "required",
     component: () => import("@/pages/dataset"),
+  },
+  {
+    // The parsing log of a dataset: no navigation entry either; Datasets stays highlighted (nested-path match).
+    path: DATASET_LOGS_ROUTE,
+    layout: "standard",
+    auth: "required",
+    component: () => import("@/pages/dataset/logs"),
   },
   {
     path: "/system-status",

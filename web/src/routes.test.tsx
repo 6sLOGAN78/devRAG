@@ -1,9 +1,10 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AxiosError, AxiosHeaders, type AxiosAdapter } from "axios";
-import { createMemoryRouter, RouterProvider } from "react-router";
+import { createMemoryRouter, matchPath, RouterProvider } from "react-router";
 import { Activity, Database, House } from "lucide-react";
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
+import { DATASET_LOGS_ROUTE, datasetLogsPath } from "@/constants/app-paths";
 import { routes, type RouteEntry } from "@/constants/routes";
 import { ShellError } from "@/pages/route-error";
 import { buildRoutes } from "@/routes";
@@ -225,6 +226,16 @@ describe("the root entry redirect (UI-02)", () => {
     expect(models?.auth).toBe("required");
     expect(models?.layout).toBe("standard");
     expect(models?.nav).toMatchObject({ labelKey: "nav.models", order: 5, group: "account" });
+  });
+
+  it("registers the parsing log under the path the link helper builds, behind sign-in, as a lazy page with no navigation entry", async () => {
+    const pathname = new URL(datasetLogsPath("0123456789abcdef0123456789abcdef"), "http://app.test").pathname;
+    const entry = routes.find((r) => r.path !== "*" && matchPath(r.path, pathname) !== null);
+    expect(entry?.path).toBe(DATASET_LOGS_ROUTE);
+    expect(entry).toMatchObject({ layout: "standard", auth: "required" });
+    expect(entry?.nav).toBeUndefined();
+    const page = await entry?.component?.();
+    expect(page?.default).toBeTypeOf("function");
   });
 });
 

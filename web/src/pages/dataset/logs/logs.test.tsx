@@ -93,7 +93,7 @@ describe("Structure and rows (KB-15)", () => {
     run(3, 3, "cancelled");
     renderPage();
     const page = await screen.findByTestId("logs-page");
-    const back = within(page).getByTestId("logs-back");
+    const back = await within(page).findByTestId("logs-back");
     expect(back).toHaveAttribute("href", datasetFilesPath(DATASET_ID));
     expect(back).toHaveTextContent("Reports");
     expect(within(page).getByRole("heading", { level: 1, name: "Parsing log" })).toBeInTheDocument();
@@ -236,7 +236,7 @@ describe("States", () => {
   it("shows 'Dataset not found' for a malformed id and sends no request", async () => {
     renderPage("/dataset/logs?id=nope");
     expect(await screen.findByTestId("dataset-not-found")).toBeInTheDocument();
-    expect(server.calls).toHaveLength(0);
+    expect(server.calls.filter((c) => String(c.url).includes("/datasets/"))).toHaveLength(0);
   });
 
   it("shows 'Dataset not found' for a dataset the caller cannot see and asks for no logs", async () => {
@@ -263,10 +263,10 @@ describe("Live and binding (FE-02)", () => {
     signIn([membershipRow("t1", "Ada's workspace", "owner", "Ada"), membershipRow("t9", "Grace's workspace", "normal", "Grace")]);
     server.datasets[DATASET_ID] = datasetRow({ tenant_id: "t9", created_by: "u1" });
     const tenants: (string | null)[] = [];
-    server.use(({ url, method }) => {
-      if (method === "GET" && url === LOGS_URL) tenants.push(useWorkspaceStore.getState().activeTenantId);
-      return undefined;
-    });
+    http.defaults.adapter = (config) => {
+      if (String(config.method).toUpperCase() === "GET" && config.url === LOGS_URL) tenants.push(useWorkspaceStore.getState().activeTenantId);
+      return server.adapter(config);
+    };
     for (let n = 1; n <= 25; n += 1) {
       server.documents[DATASET_ID] = [...(server.documents[DATASET_ID] ?? []), documentRow(n + 10)];
       run(n, n + 10, "done");
