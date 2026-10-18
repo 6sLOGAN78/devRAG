@@ -38,7 +38,6 @@ function Host({ mode }: { mode: "edit" | "add" }) {
           datasetId={DATASET_ID}
           docId={DOC}
           chunk={mode === "edit" ? chunksOf(server, DOC)[0] : undefined}
-          number={1}
           textareaRef={textarea}
           guard={edit.guard}
           onDirtyChange={setDirty}
@@ -171,7 +170,8 @@ describe("Rules", () => {
     expect(saveButton()).toHaveAttribute("aria-disabled", "true");
     await user.click(saveButton());
     expect(posts()).toHaveLength(0);
-    await user.keyboard("{Backspace}");
+    await user.click(field());
+    await user.keyboard("{Control>}{End}{/Control}{Backspace}");
     expect(screen.queryByText("Use 32,000 characters or fewer.")).not.toBeInTheDocument();
     expect(saveButton()).not.toHaveAttribute("aria-disabled", "true");
   });
@@ -345,7 +345,7 @@ describe("Refusals of an edit (D-11)", () => {
     const alert = await screen.findByRole("alert");
     expect(within(alert).getByText("The chunk wasn't saved")).toBeInTheDocument();
     expect(within(alert).getByText(reason)).toBeInTheDocument();
-    expect(within(alert)).toHaveTextContent("The text in the search index is unchanged.");
+    expect(alert).toHaveTextContent("The text in the search index is unchanged.");
     await waitUntil(() => document.activeElement === alert, { describe: "focus on the alert" });
     expect(field().value).toBe("Corrected text");
     expect(field().readOnly).toBe(false);

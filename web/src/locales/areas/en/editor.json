@@ -1,0 +1,36 @@
+{
+  "inspector": {
+    "list": {
+      "add": "Add chunk"
+    },
+    "card": {
+      "editLabel": "Edit chunk {{n}}"
+    },
+    "editor": {
+      "label": "Chunk text",
+      "newHeading": "New chunk",
+      "editHelp": "Edits are kept until this document is parsed again.",
+      "addHelp": "A chunk added by hand is searchable like any other. It has no place on a page and is lost if this document is parsed again.",
+      "save": "Save chunk",
+      "discard": "Discard changes",
+      "saving": "Saving and updating the search index. This can take a few seconds.",
+      "saved": "Chunk saved",
+      "added": "Chunk added"
+    },
+    "discard": {
+      "title": "Discard unsaved changes?",
+      "body": "The text you typed for this chunk hasn't been saved.",
+      "keep": "Keep editing",
+      "confirm": "Discard changes"
+    },
+    "empty": {
+      "addByHand": "Add a chunk by hand"
+    }
+  },
+  "errors": {
+    "chunkText": {
+      "required": "Enter the chunk's text.",
+      "max": "Use 32,000 characters or fewer."
+    }
+  }
+}
