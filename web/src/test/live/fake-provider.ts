@@ -9,6 +9,7 @@
  */
 import { createServer, type IncomingMessage, type Server, type ServerResponse } from "node:http";
 import type { AddressInfo } from "node:net";
+import { setTimeout as pause } from "node:timers/promises";
 
 /** How the dev app container reaches the machine running the tests (extra_hosts in docker-compose.dev.yml). */
 const STACK_HOST = "host.docker.internal";
@@ -20,6 +21,10 @@ export interface FakeProvider {
   stackBaseUrl: string;
   /** Paths requested so far, in order. */
   paths: string[];
+  /** Embedding answers wait this many milliseconds (plan 04-34: keeps a parse running long enough to be cancelled). */
+  delayMs: number;
+  /** `refuse` answers every embedding call with a 400, the way a provider rejects an input (plan 04-34). */
+  mode: "ok" | "refuse";
   close: () => Promise<void>;
 }
 
@@ -53,6 +58,7 @@ function inputs(body: Record<string, unknown>): string[] {
 
 export async function startFakeProvider(): Promise<FakeProvider> {
   const paths: string[] = [];
+  const state = { delayMs: 0, mode: "ok" as "ok" | "refuse" };
   const server: Server = createServer((request, response) => {
     void (async () => {
       const path = (request.url ?? "").split("?")[0];
@@ -61,6 +67,8 @@ export async function startFakeProvider(): Promise<FakeProvider> {
       const model = typeof body.model === "string" ? body.model : "";
       if (request.method === "GET" && path === "/health") return send(response, 200, { ok: true });
       if (request.method === "POST" && path === "/v1/embeddings") {
+        if (state.delayMs > 0) await pause(state.delayMs);
+        if (state.mode === "refuse") return send(response, 400, { error: { message: "input rejected by the fake", type: "invalid_request_error" } });
         const texts = inputs(body);
         const data = texts.map((_, index) => ({
           object: "embedding",
@@ -91,6 +99,18 @@ export async function startFakeProvider(): Promise<FakeProvider> {
   return {
     stackBaseUrl: `http://${STACK_HOST}:${port}/v1`,
     paths,
+    get delayMs() {
+      return state.delayMs;
+    },
+    set delayMs(value: number) {
+      state.delayMs = value;
+    },
+    get mode() {
+      return state.mode;
+    },
+    set mode(value: "ok" | "refuse") {
+      state.mode = value;
+    },
     close: () =>
       new Promise<void>((resolve) => {
         server.closeAllConnections();
