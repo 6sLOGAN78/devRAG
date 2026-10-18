@@ -21,6 +21,10 @@ export interface FileExtra {
   pagesWithoutText?: number | null;
   /** The next replacing parse is refused once more with fresh counts, as when the chunks changed meanwhile. */
   refuseConfirmOnce?: boolean;
+  /** The document's own chunking values (the chunking dialog saves them). */
+  chunkTokenNum?: number;
+  delimiter?: string;
+  overlappedPercent?: number;
 }
 
 export interface LogRow {
@@ -29,14 +33,50 @@ export interface LogRow {
   result: "running" | "done" | "failed" | "cancelled";
 }
 
+/** A document's chunking values or a dataset's default (R-167: the `document-settings` area writes them). */
+export interface ChunkingValues {
+  chunkTokenNum: number;
+  delimiter: string;
+  overlappedPercent: number;
+}
+
+export interface DatasetDefaults extends ChunkingValues {
+  parserId: string;
+}
+
 interface FilesState {
   extras: Record<string, FileExtra>;
   logs: LogRow[];
   lastLog: Record<string, string>;
   counter: number;
+  defaults: Record<string, DatasetDefaults>;
 }
 
-const stateOf = (server: DatasetServer): FilesState => server.areaState<FilesState>("files", () => ({ extras: {}, logs: [], lastLog: {}, counter: 0 }));
+const stateOf = (server: DatasetServer): FilesState =>
+  server.areaState<FilesState>("files", () => ({ extras: {}, logs: [], lastLog: {}, counter: 0, defaults: {} }));
+
+const BUILT_IN_VALUES: ChunkingValues = { chunkTokenNum: 512, delimiter: "\n!?;。；！？", overlappedPercent: 0 };
+
+/** The default chunking method and values of a dataset: General with the server's defaults until a test or a save sets them. */
+export function datasetDefaultsOf(server: DatasetServer, datasetId: string): DatasetDefaults {
+  return stateOf(server).defaults[datasetId] ?? { parserId: "naive", ...BUILT_IN_VALUES };
+}
+
+export function setDatasetDefaults(server: DatasetServer, datasetId: string, patch: Partial<DatasetDefaults>): DatasetDefaults {
+  const next = { ...datasetDefaultsOf(server, datasetId), ...patch };
+  stateOf(server).defaults[datasetId] = next;
+  return next;
+}
+
+/** A document's chunking values (its own, else the built-in ones). */
+export function documentValuesOf(server: DatasetServer, docId: string): ChunkingValues {
+  const extra = stateOf(server).extras[docId] ?? {};
+  return {
+    chunkTokenNum: extra.chunkTokenNum ?? BUILT_IN_VALUES.chunkTokenNum,
+    delimiter: extra.delimiter ?? BUILT_IN_VALUES.delimiter,
+    overlappedPercent: extra.overlappedPercent ?? BUILT_IN_VALUES.overlappedPercent,
+  };
+}
 
 /** Sets fields a document row of the shared server does not carry (switch, thumbnail, edits, message, error). */
 export function setFileExtra(server: DatasetServer, docId: string, extra: FileExtra): void {
@@ -110,6 +150,18 @@ const viewOf = (row: DocumentRow, state: FilesState) => {
   };
 };
 
+/** The detail of one document as GET and PATCH answer it. */
+export function documentDetailOf(server: DatasetServer, row: DocumentRow) {
+  const values = documentValuesOf(server, row.id);
+  return {
+    ...viewOf(row, stateOf(server)),
+    chunk_token_num: values.chunkTokenNum,
+    delimiter: values.delimiter,
+    overlapped_percent: values.overlappedPercent,
+    preview: "none",
+  };
+}
+
 const DATASET_ROUTE = /^\/api\/v1\/datasets\/([^/]+)\/(.+)$/;
 
 function bodyOf(config: InternalAxiosRequestConfig): Record<string, unknown> {
@@ -136,7 +188,12 @@ export const handle: AreaHandler = ({ server, config, method, url, params, ok })
       chunk_num: own.reduce((total, d) => total + d.chunk_num, 0),
       token_num: tokens,
       language: "English",
-      parser_id: "naive",
+      parser_id: datasetDefaultsOf(server, row.id).parserId,
+      parser_config: {
+        chunk_token_num: datasetDefaultsOf(server, row.id).chunkTokenNum,
+        delimiter: datasetDefaultsOf(server, row.id).delimiter,
+        overlapped_percent: datasetDefaultsOf(server, row.id).overlappedPercent,
+      },
       create_time: row.update_time,
     });
   }
@@ -233,7 +290,7 @@ export const handle: AreaHandler = ({ server, config, method, url, params, ok })
   if (method === "GET" && one) {
     const row = list.find((d) => d.id === one[1]);
     if (!row) return refuse(config, 404, "not_found");
-    return ok({ ...viewOf(row, state), chunk_token_num: 512, delimiter: "\\n", overlapped_percent: 0, preview: "none" });
+    return ok(documentDetailOf(server, row));
   }
   return undefined;
 };
