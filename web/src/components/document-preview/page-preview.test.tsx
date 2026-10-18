@@ -145,7 +145,7 @@ describe("usePageImage (UI-SPEC HTTP client rules)", () => {
     expect(query).toBeDefined();
     expect(pageImageKey("t1", DATASET_ID, DOC, 4)).toEqual(["ws", "t1", "page-image", DATASET_ID, DOC, 4]);
     expect(query!.options.gcTime).toBe(60000);
-    expect(query!.options.staleTime).toBe(Infinity);
+    expect((query!.options as { staleTime?: number }).staleTime).toBe(Infinity);
   });
 
   it("sends no request while disabled and reports an error with a working refetch", async () => {
@@ -369,7 +369,7 @@ describe("PagePreview boxes (UI-16, R-164)", () => {
 
   it("names the first page of a chunk that spans pages, and shows each page's own boxes", async () => {
     const user = userEvent.setup();
-    show({ selection: selection([box(1), box(2), box(2, { top: 300, bottom: 360 })]), start: 5 });
+    show({ selection: selection([box(1), box(2), box(2, { top: 300, bottom: 360 })]), start: 5, pageSizes: { "1": A4, "2": A4 } });
     expect(await screen.findByTestId("preview-away-note")).toHaveTextContent("The selected chunk is on page 1.");
     await user.click(screen.getByTestId("preview-goto"));
     expect(await screen.findAllByTestId("preview-box")).toHaveLength(1);

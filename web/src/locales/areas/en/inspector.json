@@ -1,0 +1,25 @@
+{
+  "inspector": {
+    "preview": {
+      "region": "Page preview",
+      "pagesNav": "Document pages",
+      "previous": "Previous page",
+      "next": "Next page",
+      "caption": "Page {{page}} of {{pages}}",
+      "zoomOut": "Zoom out",
+      "zoomIn": "Zoom in",
+      "fit": "Fit width",
+      "zoomLevel": "{{percent}}%",
+      "alt": "Page {{page}} of {{name}}",
+      "away": "The selected chunk is on page {{page}}.",
+      "goto": "Go to page {{page}}",
+      "noPlace": "This chunk was added by hand and has no place on a page.",
+      "error": "Couldn't load page {{page}}.",
+      "none": "{{type}} files have no page preview. Chunks are shown as the text that was read from the file."
+    },
+    "live": {
+      "selected": "Chunk {{n}}: page {{page}}",
+      "selectedNoPage": "Chunk {{n}}"
+    }
+  }
+}

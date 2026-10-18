@@ -1,0 +1,25 @@
+{
+  "inspector": {
+    "preview": {
+      "region": "页面预览",
+      "pagesNav": "文档页面",
+      "previous": "上一页",
+      "next": "下一页",
+      "caption": "第 {{page}} 页，共 {{pages}} 页",
+      "zoomOut": "缩小",
+      "zoomIn": "放大",
+      "fit": "适应宽度",
+      "zoomLevel": "{{percent}}%",
+      "alt": "{{name}} 的第 {{page}} 页",
+      "away": "所选分块位于第 {{page}} 页。",
+      "goto": "转到第 {{page}} 页",
+      "noPlace": "此分块为手动添加，在页面上没有位置。",
+      "error": "无法加载第 {{page}} 页。",
+      "none": "{{type}} 文件没有页面预览。分块显示的是从文件中读取的文本。"
+    },
+    "live": {
+      "selected": "分块 {{n}}：第 {{page}} 页",
+      "selectedNoPage": "分块 {{n}}"
+    }
+  }
+}
