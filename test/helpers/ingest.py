@@ -389,3 +389,53 @@ def chunk_texts(api: Any, ingress: Any, token: str, dataset_id: str, doc_id: str
         if len(out) >= data["total"] or not data["items"]:
             return out
         page += 1
+
+
+# ----------------------------------------------------------------------------- live tier helpers (plan 04-33)
+
+
+def _pdf_lines() -> list[str]:
+    return [f"Page {p} line {k} alpha" for p in range(1, 14) for k in range(1, 7)]
+
+
+def pdf_chunk_config() -> dict[str, int]:
+    """``parser_config`` that makes the 13-page PDF yield about two chunks per page: the budget is three longest lines' worth of tokens plus the two line breaks between them and two tokens of slack (D-16)."""
+    return {"chunk_token_num": 3 * max(count_tokens(line) for line in _pdf_lines()) + 4}
+
+
+def expected_pdf_chunks(data: bytes | None = None, config: dict[str, int] | None = None) -> int:
+    """Chunks the real PDF parser and naive chunker produce for the PDF, run offline the way the executor runs it (tasks of pages 0-12 and 12-13)."""
+    import tempfile
+    from pathlib import Path
+
+    from rag.chunking.naive import NaiveConfig, chunk
+    from rag.parsers import pdf as pdf_parser
+    from rag.parsers.types import ParseReport, SourceFile
+
+    config = config or pdf_chunk_config()
+    with tempfile.TemporaryDirectory() as tmp:
+        path = Path(tmp) / "source.pdf"
+        path.write_bytes(data if data is not None else thirteen_page_pdf())
+        source = SourceFile(path, "pdf", path.stat().st_size)
+        total = 0
+        for page_range in ((0, 12), (12, 13)):
+            blocks = pdf_parser.parse(source, ParseReport(), page_range=page_range)
+            total += sum(1 for made in chunk(blocks, NaiveConfig(chunk_token_num=config["chunk_token_num"])) if made.text.strip())
+    return total
+
+
+TABLE_ROW = ["quasarharbor ledger", "violetorchard timetable"]
+
+
+def small_live_files() -> dict[str, tuple[bytes, int]]:
+    """``{file name: (bytes, chunks the real parser and naive chunker make of it)}`` for the five small live files (about 5 chunks each, D-16)."""
+    from test.helpers.office_files import make_docx, make_html, make_pptx, make_xlsx
+
+    texts = [paragraph_text(i) for i in range(5)]
+    return {
+        "live-notes.txt": (paragraphs(5), 5),
+        "live-report.docx": (make_docx(texts[:4], table=[["cellhead", "cellvalue"], TABLE_ROW]), 4),
+        "live-sheet.xlsx": (make_xlsx({"Sheet1": [["col"], *[[t] for t in texts]]}), 5),
+        "live-deck.pptx": (make_pptx([{"title": f"slide {i}", "body": texts[i], "notes": ""} for i in range(5)]), 5),
+        "live-page.html": (make_html("<html><body>" + "".join(f"<p>{t}</p>" for t in texts) + "</body></html>"), 5),
+    }
