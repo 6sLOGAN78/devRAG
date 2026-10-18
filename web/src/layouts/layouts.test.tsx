@@ -11,7 +11,7 @@ import { AppSidebar } from "@/components/app-sidebar";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { RouteSkeleton } from "@/components/route-skeleton";
 import i18n from "@/i18n";
-import { DATASET_LOGS_ROUTE } from "@/constants/app-paths";
+import { CHUNK_ROUTE, DATASET_LOGS_ROUTE } from "@/constants/app-paths";
 import { navEntries, routes, type RouteEntry } from "@/constants/routes";
 import { waitUntil } from "@/test/wait-until";
 import { useUserStore } from "@/stores/user-store";
@@ -147,6 +147,15 @@ describe("StandardLayout", () => {
     expect(screen.queryByTestId("nav-item-dataset-logs")).toBeNull();
   });
 
+  it("marks Datasets current on the chunk inspector /chunk, which has no entry of its own, and not on a look-alike", () => {
+    renderIn(StandardLayout, "/chunk?id=0123456789abcdef0123456789abcdef&doc=0123456789abcdef0123456789abcdef");
+    expect(screen.getByTestId("nav-item-datasets")).toHaveAttribute("aria-current", "page");
+    expect(screen.queryByTestId("nav-item-chunk")).toBeNull();
+    cleanup();
+    renderIn(StandardLayout, "/chunks-x");
+    expect(screen.getByTestId("nav-item-datasets")).not.toHaveAttribute("aria-current");
+  });
+
   it("does not mark Datasets current on a path that only starts with the same letters", () => {
     renderIn(StandardLayout, "/datasetsx");
     expect(screen.getByTestId("nav-item-datasets")).not.toHaveAttribute("aria-current");
@@ -252,14 +261,17 @@ describe("FullBleedLayout and BareLayout", () => {
 });
 
 describe("registry", () => {
-  it("contains exactly the entries /, /login, /forgot-password, /home, /datasets, /dataset/files, /dataset/logs, /system-status, /user-setting/profile, /user-setting/model, /user-setting/api, /user-setting/team and *", () => {
-    expect(routes.map((r) => r.path)).toEqual(["/", "/login", "/forgot-password", "/home", "/datasets", "/dataset/files", "/dataset/logs", "/system-status", "/user-setting/profile", "/user-setting/model", "/user-setting/api", "/user-setting/team", "*"]);
+  it("contains exactly the entries /, /login, /forgot-password, /home, /datasets, /dataset/files, /dataset/logs, /chunk, /system-status, /user-setting/profile, /user-setting/model, /user-setting/api, /user-setting/team and *", () => {
+    expect(routes.map((r) => r.path)).toEqual(["/", "/login", "/forgot-password", "/home", "/datasets", "/dataset/files", "/dataset/logs", "/chunk", "/system-status", "/user-setting/profile", "/user-setting/model", "/user-setting/api", "/user-setting/team", "*"]);
     const files = routes.find((r) => r.path === "/dataset/files");
     expect(files).toMatchObject({ layout: "standard", auth: "required" });
     expect(files?.nav).toBeUndefined();
     const logs = routes.find((r) => r.path === DATASET_LOGS_ROUTE);
     expect(logs).toMatchObject({ layout: "standard", auth: "required" });
     expect(logs?.nav).toBeUndefined();
+    const inspector = routes.find((r) => r.path === CHUNK_ROUTE);
+    expect(inspector).toMatchObject({ layout: "standard", auth: "required" });
+    expect(inspector?.nav).toBeUndefined();
     expect(navEntries().map((r) => i18n.t(r.nav?.labelKey ?? ""))).toEqual(["Home", "Datasets", "System status", "Profile", "Models", "API tokens", "Team"]);
     expect(navEntries().map((r) => r.nav?.order)).toEqual([1, 2, 3, 4, 5, 6, 7]);
   });
