@@ -20,6 +20,7 @@ import {
 import { useUserStore } from "@/stores/user-store";
 import { useWorkspaceStore } from "@/stores/workspace-store";
 import { setAuthorization } from "@/utils/authorization";
+import { advanceParse } from "@/test/server-areas/files";
 import DatasetPage from ".";
 
 // Drives the real page, table, dialogs, hooks, services and HTTP client against an in-memory server shaped like the
@@ -471,4 +472,80 @@ describe("Workspace binding (D-26)", () => {
     expect(location()).toBe(`/dataset/files?id=${DATASET_ID}`);
     expect(router.state.historyAction).toBe("POP");
   });
+});
+
+describe("Parsing on the workspace page (KB-14, KB-19, UI-SPEC states)", () => {
+  const DOCS = `/api/v1/datasets/${DATASET_ID}/documents`;
+
+  it("reads the chunk count in the meta line in the singular and plural forms", async () => {
+    server.documents[DATASET_ID] = [documentRow(1, { run: "3", chunk_num: 1 })];
+    const first = renderPage();
+    expect(await within(await screen.findByTestId("dataset-meta")).findByText("1 chunk")).toBeInTheDocument();
+    first.unmount();
+    server.documents[DATASET_ID] = [documentRow(1, { run: "3", chunk_num: 4 }), documentRow(2, { run: "3", chunk_num: 3 })];
+    renderPage();
+    expect(await within(await screen.findByTestId("dataset-meta")).findByText("7 chunks")).toBeInTheDocument();
+  });
+
+  it("refreshes the meta line and the summary once when a row leaves Parsing", async () => {
+    server.documents[DATASET_ID] = [documentRow(1, { run: "1", progress: 0.4 })];
+    renderPage();
+    const meta = await screen.findByTestId("dataset-meta");
+    await within(meta).findByText("0 chunks");
+    act(() => advanceParse(server, documentRow(1).id, { run: "3", progress: 1, chunkCount: 5 }));
+    expect(await within(meta).findByText("5 chunks", {}, { timeout: 6000 })).toBeInTheDocument();
+    await waitFor(() => expect(screen.getByTestId("summary-count-done")).toHaveTextContent("1"));
+  }, 15000);
+
+  it("says live updates are paused after three failed polls in a row, keeps the rows, and removes the notice on the next success", async () => {
+    server.documents[DATASET_ID] = [documentRow(1, { run: "1", progress: 0.4 })];
+    renderPage();
+    await screen.findByTestId("documents-table");
+    expect(screen.queryByTestId("documents-poll-paused")).toBeNull();
+    server.forced[`GET ${DOCS}`] = { status: 500, message: "down" };
+    const notice = await screen.findByTestId("documents-poll-paused", {}, { timeout: 12000 });
+    expect(notice).toHaveTextContent("Live updates are paused. The status below may be out of date.");
+    expect(screen.getByTestId("documents-table")).toBeInTheDocument();
+    expect(screen.getByTestId("document-progress")).toHaveTextContent("40%");
+    expect(screen.queryByTestId("error-state")).toBeNull();
+    delete server.forced[`GET ${DOCS}`];
+    await userEvent.click(within(notice).getByRole("button", { name: "Try again" }));
+    await waitFor(() => expect(screen.queryByTestId("documents-poll-paused")).toBeNull());
+  }, 25000);
+
+  it("announces started, finished, failed and cancelled in one polite region, never a percentage and never on the first render", async () => {
+    server.documents[DATASET_ID] = [documentRow(1), documentRow(2, { run: "1", progress: 0.2 }), documentRow(3, { run: "1", progress: 0.2 })];
+    renderPage();
+    await screen.findByTestId("documents-table");
+    const live = screen.getByTestId("documents-live");
+    expect(live).toHaveAttribute("role", "status");
+    expect(live).toHaveTextContent("");
+    await userEvent.click(within(rows()[0] as HTMLElement).getByTestId("document-parse"));
+    await waitFor(() => expect(live).toHaveTextContent("report-01.pdf: parsing started"));
+    act(() => {
+      advanceParse(server, documentRow(2).id, { run: "3", progress: 1, chunkCount: 2 });
+      advanceParse(server, documentRow(3).id, { run: "4", progress: 0.5, error: { step: "chunk", code: "no_readable_text", message: "" } });
+    });
+    await waitFor(() => expect(live).toHaveTextContent("report-02.pdf: parsing finished, 2 chunks"), { timeout: 6000 });
+    expect(live).toHaveTextContent("report-03.pdf: parsing failed");
+    expect(live.textContent).not.toContain("%");
+    act(() => advanceParse(server, documentRow(1).id, { run: "2" }));
+    await waitFor(() => expect(live).toHaveTextContent("report-01.pdf: parsing cancelled"), { timeout: 6000 });
+    expect(live.textContent).not.toContain("%");
+  }, 25000);
+
+  it("keeps the search text, the page and the selection through polls", async () => {
+    server.documents[DATASET_ID] = [documentRow(1, { run: "1", progress: 0.1 }), documentRow(2)];
+    renderPage(`/dataset/files?id=${DATASET_ID}&keywords=report`);
+    await screen.findByTestId("documents-table");
+    const field = screen.getByRole("searchbox", { name: "Search documents" });
+    expect(field).toHaveValue("report");
+    await userEvent.click(within(rows()[1] as HTMLElement).getByTestId("document-select"));
+    const where = location();
+    act(() => advanceParse(server, documentRow(1).id, { run: "1", progress: 0.7, message: "later" }));
+    await waitFor(() => expect(within(rows()[0] as HTMLElement).getByTestId("document-progress")).toHaveTextContent("70%"), { timeout: 6000 });
+    expect(screen.getByRole("searchbox", { name: "Search documents" })).toHaveValue("report");
+    expect(location()).toBe(where);
+    expect(screen.getByTestId("selection-count")).toHaveTextContent("1 document selected");
+  }, 15000);
 });
