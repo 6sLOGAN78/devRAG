@@ -1,4 +1,4 @@
-import { EllipsisVertical, Settings, Trash2 } from "lucide-react";
+import { EllipsisVertical, Settings, SlidersHorizontal, Trash2 } from "lucide-react";
 import { useRef, type Ref } from "react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
@@ -8,6 +8,8 @@ export interface DatasetActionsMenuProps {
   /** The dataset's name, for the trigger's accessible name. User text: rendered through i18n interpolation only. */
   name: string;
   onSettings: () => void;
+  /** Opens the default chunking method dialog. The item exists only when this is given. */
+  onChunking?: () => void;
   onDelete: () => void;
   /** The trigger button, so the owner of the dialogs can return focus to it when a dialog closes. */
   triggerRef?: Ref<HTMLButtonElement>;
@@ -19,7 +21,7 @@ export interface DatasetActionsMenuProps {
  * layer (`relative z-10`). After an item is chosen the menu does not hand focus back to the trigger: the dialog that
  * opens takes it, and gives it back to the trigger when it closes.
  */
-export function DatasetActionsMenu({ name, onSettings, onDelete, triggerRef }: DatasetActionsMenuProps) {
+export function DatasetActionsMenu({ name, onSettings, onChunking, onDelete, triggerRef }: DatasetActionsMenuProps) {
   const { t } = useTranslation();
   const chosen = useRef(false);
   return (
@@ -48,6 +50,18 @@ export function DatasetActionsMenu({ name, onSettings, onDelete, triggerRef }: D
           chosen.current = false;
         }}
       >
+        {onChunking === undefined ? null : (
+          <DropdownMenuItem
+            data-testid="dataset-menu-chunking"
+            onSelect={() => {
+              chosen.current = true;
+              onChunking();
+            }}
+          >
+            <SlidersHorizontal aria-hidden="true" />
+            {t("datasets.menu.chunking")}
+          </DropdownMenuItem>
+        )}
         <DropdownMenuItem
           data-testid="dataset-menu-settings"
           onSelect={() => {

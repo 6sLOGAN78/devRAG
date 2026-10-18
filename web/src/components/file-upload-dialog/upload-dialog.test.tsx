@@ -1,3 +1,4 @@
+import { GENERAL_METHOD } from "@/constants/chunk-methods";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
@@ -76,7 +77,7 @@ const documentDto = (name: string) => ({
   progress: 0,
   dataset_id: "kb1",
   created_by: "u1",
-  parser_id: "naive",
+  parser_id: GENERAL_METHOD,
   chunk_num: 0,
   token_num: 0,
   create_time: 1,

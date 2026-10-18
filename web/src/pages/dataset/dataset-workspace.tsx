@@ -2,6 +2,8 @@ import { ChevronLeft, Lock, Upload, Users } from "lucide-react";
 import { useCallback, useEffect, useRef, useState, type DragEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, useSearchParams } from "react-router";
+import { ChunkMethodDialog } from "@/components/chunk-method-dialog";
+import { SETTINGS_MODES } from "@/constants/failure-codes";
 import { DatasetActionsMenu } from "@/components/dataset-actions-menu";
 import { DatasetSettingsDialog } from "@/components/dataset-settings-dialog";
 import { DeleteDatasetDialog } from "@/components/delete-dataset-dialog";
@@ -53,7 +55,7 @@ export function DatasetWorkspace({ dataset, ready, onDeleted, onDeleteDialogChan
   const keywords = parseKeywords(params.get("keywords"));
   const canManage = useCanManageDataset(dataset);
 
-  const [dialog, setDialog] = useState<"settings" | "delete" | null>(null);
+  const [dialog, setDialog] = useState<"settings" | "chunking" | "delete" | null>(null);
   const [uploadOpen, setUploadOpen] = useState(false);
   const [dropped, setDropped] = useState<File[] | undefined>(undefined);
   const [dragging, setDragging] = useState(false);
@@ -142,7 +144,7 @@ export function DatasetWorkspace({ dataset, ready, onDeleted, onDeleteDialogChan
     (opener ?? header ?? title.current)?.focus();
   }
 
-  function dialogOpenChange(kind: "settings" | "delete", open: boolean): void {
+  function dialogOpenChange(kind: "settings" | "chunking" | "delete", open: boolean): void {
     setDialog(open ? kind : null);
     if (kind === "delete") onDeleteDialogChange(open);
   }
@@ -195,7 +197,15 @@ export function DatasetWorkspace({ dataset, ready, onDeleted, onDeleteDialogChan
   );
   const actions = (
     <>
-      {canManage ? <DatasetActionsMenu name={dataset.name} triggerRef={menuButton} onSettings={() => dialogOpenChange("settings", true)} onDelete={() => dialogOpenChange("delete", true)} /> : null}
+      {canManage ? (
+        <DatasetActionsMenu
+          name={dataset.name}
+          triggerRef={menuButton}
+          onSettings={() => dialogOpenChange("settings", true)}
+          onChunking={() => dialogOpenChange("chunking", true)}
+          onDelete={() => dialogOpenChange("delete", true)}
+        />
+      ) : null}
       {uploadButton}
     </>
   );
@@ -269,6 +279,12 @@ export function DatasetWorkspace({ dataset, ready, onDeleted, onDeleteDialogChan
       {canManage ? (
         <>
           <DatasetSettingsDialog dataset={dataset} open={dialog === "settings"} onOpenChange={(open) => dialogOpenChange("settings", open)} onCloseAutoFocus={returnToMenu} />
+          <ChunkMethodDialog
+            target={{ mode: SETTINGS_MODES.dataset, datasetId: dataset.id, tenantId: dataset.tenantId, name: dataset.name }}
+            open={dialog === "chunking"}
+            onOpenChange={(open) => dialogOpenChange("chunking", open)}
+            onCloseAutoFocus={returnToMenu}
+          />
           <DeleteDatasetDialog
             dataset={{ id: dataset.id, name: dataset.name, tenantId: dataset.tenantId }}
             open={dialog === "delete"}

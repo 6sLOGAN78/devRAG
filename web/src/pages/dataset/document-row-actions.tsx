@@ -16,6 +16,8 @@ export interface DocumentRowActionsProps {
   actions: ParseActions;
   /** Opens the details sheet. The menu item exists only when this is given and a log exists; focus returns to the menu button. */
   onShowDetails?: (logId: string, opener: HTMLElement) => void;
+  /** Opens the chunking-method dialog for this document. The menu item exists only when this is given, the caller may change the document and it is not parsing. */
+  onChunking?: (document: DocumentView, opener: HTMLElement) => void;
 }
 
 type Inline = "parse" | "cancel" | "again" | null;
@@ -32,7 +34,7 @@ function inlineOf(document: DocumentView): Inline {
  * The inline parse control and the overflow menu of one row. The menu is not modal and closes first when it opens the
  * re-parse dialog, so the dialog (not the menu) takes focus and hands it back to the menu button when it closes.
  */
-export function DocumentRowActions({ datasetId, document, canChange, actions, onShowDetails }: DocumentRowActionsProps) {
+export function DocumentRowActions({ datasetId, document, canChange, actions, onShowDetails, onChunking }: DocumentRowActionsProps) {
   const { t } = useTranslation();
   const chosen = useRef(false);
   const trigger = useRef<HTMLButtonElement | null>(null);
@@ -40,6 +42,7 @@ export function DocumentRowActions({ datasetId, document, canChange, actions, on
   const busy = actions.isBusy(document.id);
   const showDetails = document.lastLogId !== null && onShowDetails !== undefined;
   const canReparse = canChange && document.run === "3";
+  const showChunking = canChange && document.run !== "1" && onChunking !== undefined;
 
   let inlineButton = null;
   if (inline !== null) {
@@ -100,6 +103,17 @@ export function DocumentRowActions({ datasetId, document, canChange, actions, on
               }}
             >
               {t("datasets.files.menu.details")}
+            </DropdownMenuItem>
+          ) : null}
+          {showChunking ? (
+            <DropdownMenuItem
+              data-testid="document-menu-chunking"
+              onSelect={() => {
+                chosen.current = true;
+                if (trigger.current !== null) onChunking?.(document, trigger.current);
+              }}
+            >
+              {t("datasets.files.menu.method")}
             </DropdownMenuItem>
           ) : null}
           {canReparse ? (

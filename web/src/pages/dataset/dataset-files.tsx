@@ -2,6 +2,8 @@ import { FileUp, SearchX } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { formatBytes, resolveUploadLimits } from "@/components/file-upload-dialog/file-rules";
+import { ChunkMethodDialog, type ChunkTarget } from "@/components/chunk-method-dialog";
+import { SETTINGS_MODES } from "@/constants/failure-codes";
 import { DeleteDocumentDialog } from "@/components/delete-document-dialog";
 import { EmptyState } from "@/components/empty-state";
 import { ErrorState } from "@/components/error-state";
@@ -95,6 +97,10 @@ export function DatasetFiles({ dataset, limits, page, keywords, onPageChange, on
   const detailsOpener = useRef<HTMLElement | null>(null);
   const [detailsLogId, setDetailsLogId] = useState<string | null>(null);
   const [detailsOpen, setDetailsOpen] = useState(false);
+  // The chunking dialog keeps its target after closing so it can fade out; its body mounts only while open (FE-04).
+  const chunkingOpener = useRef<HTMLElement | null>(null);
+  const [chunkingTarget, setChunkingTarget] = useState<ChunkTarget | null>(null);
+  const [chunkingOpen, setChunkingOpen] = useState(false);
 
   // A row the caller may select: they may change it and it can be parsed or is parsing. The same rule the row draws.
   const qualifies = (document: DocumentView): boolean => canChangeDocument(dataset.createdBy, document.createdBy, userId, role) && (document.parseable || document.run === "1");
@@ -171,6 +177,19 @@ export function DatasetFiles({ dataset, limits, page, keywords, onPageChange, on
   function restoreDetailsFocus(event: Event): void {
     event.preventDefault();
     const target = detailsOpener.current?.isConnected === true ? detailsOpener.current : caption.current;
+    target?.focus();
+  }
+
+  function openChunking(document: DocumentView, button: HTMLElement): void {
+    chunkingOpener.current = button;
+    setChunkingTarget({ mode: SETTINGS_MODES.document, datasetId: dataset.id, tenantId: dataset.tenantId, documentId: document.id, name: document.name });
+    setChunkingOpen(true);
+  }
+
+  /** Back to the row's menu button; when the row is gone, the table caption. */
+  function restoreChunkingFocus(event: Event): void {
+    event.preventDefault();
+    const target = chunkingOpener.current?.isConnected === true ? chunkingOpener.current : caption.current;
     target?.focus();
   }
 
@@ -295,6 +314,7 @@ export function DatasetFiles({ dataset, limits, page, keywords, onPageChange, on
               onSelect={(checked) => toggleSelected(document.id, checked)}
               onDelete={askDelete}
               onShowDetails={showDetails}
+              onChunking={openChunking}
             />
           ))}
         </TableBody>
@@ -361,6 +381,7 @@ export function DatasetFiles({ dataset, limits, page, keywords, onPageChange, on
         canParseAgain={canParseAgain}
         onParseAgain={(documentId) => void actions.parse([documentId])}
       />
+      <ChunkMethodDialog target={chunkingTarget} open={chunkingOpen} onOpenChange={setChunkingOpen} onCloseAutoFocus={restoreChunkingFocus} />
       <ReparseDialog confirm={actions.confirm} onReplace={actions.replace} onDismiss={actions.dismiss} onCloseAutoFocus={restoreAfterReparse} />
       {target === null ? null : (
         <DeleteDocumentDialog

@@ -89,4 +89,5 @@ export function failureSentence(error: { code: string; message: string } | null 
 }
 
 /** Whose chunking settings a dialog edits: one document's, or the dataset default. Kept here, out of the copy scan's reach. */
-export type SettingsMode = "document" | "dataset";
+export const SETTINGS_MODES = { document: "document", dataset: "dataset" } as const;
+export type SettingsMode = (typeof SETTINGS_MODES)[keyof typeof SETTINGS_MODES];

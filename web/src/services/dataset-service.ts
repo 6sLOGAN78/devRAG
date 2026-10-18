@@ -195,21 +195,26 @@ export async function deleteDatasets(ids: string[], tenantId: string): Promise<s
   return Array.isArray(data.deleted) ? data.deleted.filter((id): id is string => typeof id === "string") : [];
 }
 
-export interface DatasetChunkingInput {
+/** The default chunking method and values a save may change. An absent key is no change (the server merges). */
+export type DatasetChunkingInput = Partial<{
   parserId: string;
   chunkTokenNum: number;
   delimiter: string;
   overlappedPercent: number;
-}
+}>;
 
 /**
- * PUT /api/v1/datasets/{id} with the default chunking method and values. The server merges a partial `parser_config`
- * with what is stored. Existing documents keep their own values. Silent: the dialog shows the refusal inline.
+ * PUT /api/v1/datasets/{id} with the default chunking method and values: only the keys given are sent, and the server
+ * merges a partial `parser_config` with what is stored. Existing documents keep their own values. Silent: the dialog
+ * shows the refusal inline.
  */
 export async function updateDatasetChunking(id: string, input: DatasetChunkingInput): Promise<DatasetDetailView> {
-  const data = {
-    parser_id: input.parserId,
-    parser_config: { chunk_token_num: input.chunkTokenNum, delimiter: input.delimiter, overlapped_percent: input.overlappedPercent },
-  };
+  const data: Record<string, unknown> = {};
+  if (input.parserId !== undefined) data.parser_id = input.parserId;
+  const config: Record<string, unknown> = {};
+  if (input.chunkTokenNum !== undefined) config.chunk_token_num = input.chunkTokenNum;
+  if (input.delimiter !== undefined) config.delimiter = input.delimiter;
+  if (input.overlappedPercent !== undefined) config.overlapped_percent = input.overlappedPercent;
+  if (Object.keys(config).length > 0) data.parser_config = config;
   return toDetail(await request<unknown>({ url: datasetPath(id), method: "PUT", data, timeout: CREATE_TIMEOUT_MS }, { silent: true }));
 }

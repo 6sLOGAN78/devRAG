@@ -99,6 +99,17 @@ export function settingsFailureOf(error: unknown, mode: SettingsMode): Placed {
   return { key: "datasets.chunking.error.fallback" };
 }
 
+/** The form field a `parser_config_invalid` answer names in `data.field`, or null when it names none that the form has. */
+export function invalidFieldOf(error: unknown): "chunkSize" | "delimiters" | "overlap" | null {
+  if (!(error instanceof ApiError) || error.status !== 400 || reasonOf(error) !== "parser_config_invalid") return null;
+  const data = error.data;
+  const field = typeof data === "object" && data !== null ? (data as Record<string, unknown>).field : undefined;
+  if (field === "chunk_token_num") return "chunkSize";
+  if (field === "delimiter") return "delimiters";
+  if (field === "overlapped_percent") return "overlap";
+  return null;
+}
+
 /** Locale key of the stored-method warning, per mode (Checker Flag 4). */
 export function storedUnavailableKey(mode: SettingsMode): string {
   return mode === "dataset" ? "datasets.chunking.storedUnavailableDataset" : "datasets.chunking.storedUnavailable";

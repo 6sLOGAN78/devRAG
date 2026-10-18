@@ -9,6 +9,8 @@ export interface ChoiceOption {
   disabled?: boolean;
   /** Short trailing word (for example "Later"); a disabled radio points at it with `aria-describedby`. */
   badge?: string;
+  /** `data-testid` of the radio. */
+  testId?: string;
 }
 
 export interface ChoiceGroupProps {
@@ -20,17 +22,25 @@ export interface ChoiceGroupProps {
   options: readonly ChoiceOption[];
   disabled?: boolean;
   className?: string;
+  /** A short line under the legend; the fieldset points at it with `aria-describedby`. */
+  help?: string;
 }
 
 /**
  * A fieldset of native radios, one bordered row per option with a title and a description. Selection and the arrow
  * keys are the browser's own radio behaviour; everything shown is rendered as text.
  */
-function ChoiceGroup({ legend, name, value, onChange, options, disabled = false, className }: ChoiceGroupProps) {
+function ChoiceGroup({ legend, name, value, onChange, options, disabled = false, className, help }: ChoiceGroupProps) {
   const base = React.useId();
+  const helpId = `${base}-help`;
   return (
-    <fieldset className={cn("grid gap-2", className)} disabled={disabled}>
+    <fieldset className={cn("grid gap-2", className)} disabled={disabled} aria-describedby={help ? helpId : undefined}>
       <legend className="mb-2 text-sm font-semibold text-foreground">{legend}</legend>
+      {help ? (
+        <p id={helpId} className="-mt-1 text-xs font-normal text-muted-foreground">
+          {help}
+        </p>
+      ) : null}
       {options.map((option, index) => {
         const id = `${base}-${index}`;
         const checked = option.value === value;
@@ -53,6 +63,7 @@ function ChoiceGroup({ legend, name, value, onChange, options, disabled = false,
               value={option.value}
               checked={checked}
               disabled={optionDisabled}
+              data-testid={option.testId}
               aria-describedby={optionDisabled && option.badge ? badgeId : undefined}
               onChange={() => onChange(option.value)}
               className="mt-1 size-4 shrink-0 accent-primary"

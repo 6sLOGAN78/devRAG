@@ -49,6 +49,8 @@ interface DocumentRowProps {
   onDelete: (document: DocumentView, opener: HTMLButtonElement) => void;
   /** Opens the parsing details of the document's latest run; `opener` is where focus returns. */
   onShowDetails?: (logId: string, opener: HTMLElement) => void;
+  /** Opens the chunking-method dialog; `opener` is where focus returns. */
+  onChunking?: (document: DocumentView, opener: HTMLElement) => void;
 }
 
 /**
@@ -57,7 +59,7 @@ interface DocumentRowProps {
  * button and the menu items that change it; everyone else sees status, progress, read-only On or Off text and the menu
  * with the read-only items. The delete icon exists only where the caller may delete the document (D-09).
  */
-export function DocumentRow({ dataset, document, actions, selectColumn, selected, onSelect, onDelete, onShowDetails }: DocumentRowProps) {
+export function DocumentRow({ dataset, document, actions, selectColumn, selected, onSelect, onDelete, onShowDetails, onChunking }: DocumentRowProps) {
   const { t, i18n } = useTranslation();
   const canRemove = useCanRemoveDocument(dataset, document);
   const canChange = useCanChangeDocument(dataset, document);
@@ -129,7 +131,7 @@ export function DocumentRow({ dataset, document, actions, selectColumn, selected
       </TableCell>
       <TableCell className="text-right">
         <div className="flex items-center justify-end gap-1">
-          <DocumentRowActions datasetId={dataset.id} document={document} canChange={canChange} actions={actions} onShowDetails={onShowDetails} />
+          <DocumentRowActions datasetId={dataset.id} document={document} canChange={canChange} actions={actions} onShowDetails={onShowDetails} onChunking={onChunking} />
           {canRemove ? (
             <Button
               type="button"

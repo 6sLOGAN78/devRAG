@@ -296,6 +296,22 @@ describe("Who can do what (D-09, D-20, D-27)", () => {
     expect(await screen.findByTestId("dataset-settings-dialog")).toBeInTheDocument();
   });
 
+  it("opens the default chunking method dialog from the menu, saves it and returns focus to the menu button", async () => {
+    renderPage();
+    await screen.findByTestId("documents-table");
+    await userEvent.click(screen.getByTestId("dataset-actions"));
+    expect(within(await screen.findByTestId("dataset-menu")).getAllByRole("menuitem").map((item) => item.textContent)).toEqual(["Default chunking method", "Dataset settings", "Delete dataset"]);
+    await userEvent.click(screen.getByTestId("dataset-menu-chunking"));
+    const dialog = await screen.findByTestId("chunk-method-dialog");
+    const size = await within(dialog).findByTestId("field-chunk-size");
+    await userEvent.clear(size);
+    await userEvent.type(size, "300");
+    await userEvent.click(within(dialog).getByTestId("chunk-method-submit"));
+    await waitFor(() => expect(screen.queryByTestId("chunk-method-dialog")).toBeNull());
+    await waitFor(() => expect(screen.getByTestId("dataset-actions")).toHaveFocus());
+    expect(server.callsTo("PUT", `/api/v1/datasets/${DATASET_ID}`)).toHaveLength(1);
+  });
+
   it("deletes the dataset from the menu, goes to /datasets and never asks for the deleted dataset again", async () => {
     renderPage();
     await screen.findByTestId("documents-table");

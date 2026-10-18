@@ -1,3 +1,4 @@
+import { GENERAL_METHOD } from "@/constants/chunk-methods";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
@@ -207,7 +208,7 @@ describe("Dataset settings dialog: the form (KB-06)", () => {
   });
 
   it("also locks the embedding model when the dataset has chunks but no documents are counted", async () => {
-    renderDialog({ ...baseDataset, docNum: 0, language: "English", parserId: "naive", chunkNum: 4, tokenNum: 10, createTime: 1, uploadLimits: null });
+    renderDialog({ ...baseDataset, docNum: 0, language: "English", parserId: GENERAL_METHOD, chunkNum: 4, tokenNum: 10, createTime: 1, uploadLimits: null });
     await ready();
     expect(screen.getByTestId("dataset-settings-embedding-fixed")).toBeInTheDocument();
     expect(screen.queryByTestId("field-dataset-embedding")).toBeNull();

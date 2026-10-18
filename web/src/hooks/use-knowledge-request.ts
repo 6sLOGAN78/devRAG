@@ -1,5 +1,15 @@
 import { useMutation, useQuery, useQueryClient, type QueryClient } from "@tanstack/react-query";
-import { createDataset, deleteDatasets, getDataset, listDatasets, updateDataset, type CreateDatasetInput, type DatasetChanges } from "@/services/dataset-service";
+import {
+  createDataset,
+  deleteDatasets,
+  getDataset,
+  listDatasets,
+  updateDataset,
+  updateDatasetChunking,
+  type CreateDatasetInput,
+  type DatasetChanges,
+  type DatasetChunkingInput,
+} from "@/services/dataset-service";
 import { useActiveWorkspace } from "./use-workspaces";
 
 /** Datasets per gallery page (UI-SPEC). */
@@ -72,6 +82,23 @@ export function useUpdateDatasetRequest() {
     retry: false,
     gcTime: 0,
     onSuccess: (_data, { id, tenantId }) => refreshDataset(queryClient, tenantId, id),
+  });
+}
+
+export interface UpdateDatasetChunkingInput {
+  id: string;
+  tenantId: string;
+  changes: DatasetChunkingInput;
+}
+
+/** Saves the dataset's default chunking method and values. Not retried; refreshes the detail and the lists in `onSettled`. */
+export function useUpdateDatasetChunkingRequest() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, changes }: UpdateDatasetChunkingInput) => updateDatasetChunking(id, changes),
+    retry: false,
+    gcTime: 0,
+    onSettled: (_data, _error, { id, tenantId }) => refreshDataset(queryClient, tenantId, id),
   });
 }
 
