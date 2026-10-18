@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { render, screen, waitFor, within } from "@testing-library/react";
+import { act, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { RouterProvider, createMemoryRouter } from "react-router";
 import { beforeEach, describe, expect, it } from "vitest";
@@ -8,7 +8,7 @@ import { CHUNK_ROUTE, chunkPath, datasetFilesPath, documentViewerPath } from "@/
 import type { SessionUser } from "@/interfaces/user";
 import { http, registerQueryClient } from "@/services/http";
 import { useWorkspaceStore } from "@/stores/workspace-store";
-import { DATASET_ID, datasetRow, documentRow, membershipRow, storedMemberships } from "@/test/dataset-server";
+import { DATASET_ID, datasetRow, documentRow, membershipRow, storedMemberships, type DocumentRow } from "@/test/dataset-server";
 import { OWNER, actAs, server, useFilesServer } from "@/test/files-harness";
 import { chunkId, chunkRow, setChunks, type ChunkRow } from "@/test/server-areas/chunks";
 import { addFileLog, advanceParse, setFileExtra } from "@/test/server-areas/files";
@@ -17,7 +17,9 @@ import ChunkInspector from ".";
 
 useFilesServer();
 
-const DOC = documentRow(1).id;
+/** Document ids are 32 lowercase hex characters; the shared fixture ids are not, so the first document gets its own. */
+const DOC = "d".repeat(31) + "1";
+const firstDoc = (over: Partial<DocumentRow> = {}): DocumentRow => documentRow(1, { id: DOC, ...over });
 const CHUNKS_URL = `/api/v1/datasets/${DATASET_ID}/documents/${DOC}/chunks`;
 const DETAIL_URL = `/api/v1/datasets/${DATASET_ID}/documents/${DOC}`;
 const MEMBER: SessionUser = { ...OWNER, id: "u4", nickname: "Dan", tenantId: "t4", tenantName: "Dan's workspace" };
@@ -59,7 +61,7 @@ function finished(count: number, over: (n: number) => Partial<ChunkRow> = () => 
 }
 
 beforeEach(() => {
-  server.documents[DATASET_ID] = [documentRow(1, { run: "3", chunk_num: 3 }), documentRow(2), documentRow(3)];
+  server.documents[DATASET_ID] = [firstDoc({ run: "3", chunk_num: 3 }), documentRow(2), documentRow(3)];
 });
 
 describe("Structure (UI-16)", () => {
@@ -128,14 +130,14 @@ describe("Document not found and errors", () => {
   });
 
   it("shows the same block when the server says the document does not exist", async () => {
-    renderPage(chunkPath(DATASET_ID, documentRow(77).id));
+    renderPage(chunkPath(DATASET_ID, "b".repeat(32)));
     const block = await screen.findByTestId("chunk-not-found");
     expect(block).toHaveTextContent("It may have been deleted, or it isn't shared with you.");
     expect(within(block).getByRole("link", { name: "Back to datasets" })).toBeInTheDocument();
   });
 
   it("shows the same block when the dataset does not exist", async () => {
-    renderPage(chunkPath(documentRow(1, {}, "a".repeat(32)).dataset_id, DOC));
+    renderPage(chunkPath("c".repeat(32), DOC));
     expect(await screen.findByTestId("chunk-not-found")).toBeInTheDocument();
   });
 
@@ -163,7 +165,7 @@ describe("The page preview beside the chunks (UI-16, CHUNK-18)", () => {
   });
 
   it("shows only the list and the one-line note for a DOCX", async () => {
-    server.documents[DATASET_ID] = [documentRow(1, { run: "3", chunk_num: 2, name: "notes.docx", suffix: "docx", type: "doc" })];
+    server.documents[DATASET_ID] = [firstDoc({ run: "3", chunk_num: 2, name: "notes.docx", suffix: "docx", type: "doc" })];
     setChunks(server, DOC, [chunkRow(1, { positions: [] }), chunkRow(2, { positions: [] })]);
     renderPage();
     expect(await screen.findByTestId("no-preview-note")).toHaveTextContent("DOCX files have no page preview. Chunks are shown as the text that was read from the file.");
@@ -298,11 +300,18 @@ describe("URL state and FE-02", () => {
   });
 
   it("leaves for the datasets page when the reader switches workspace afterwards", async () => {
+    const joined = [membershipRow("t1", "Ada's workspace", "owner", "Ada"), membershipRow("t9", "Grace's workspace", "normal", "Grace")];
+    server.memberships = joined;
+    server.datasets[DATASET_ID] = datasetRow({ tenant_id: "t9", created_by: "u1" });
+    useWorkspaceStore.getState().reset();
+    useWorkspaceStore.getState().initialise("u1", "t1", storedMemberships(joined));
     finished(1);
     renderPage();
     await waitFor(() => expect(cards()).toHaveLength(1));
-    useWorkspaceStore.getState().setActive("t1");
-    expect(useWorkspaceStore.getState().activeTenantId).toBe("t1");
+    await waitFor(() => expect(useWorkspaceStore.getState().activeTenantId).toBe("t9"));
+    act(() => useWorkspaceStore.getState().setActive("t1"));
+    expect(await screen.findByTestId("gallery-page")).toBeInTheDocument();
+    expect(router.state.location.pathname).toBe("/datasets");
   });
 });
 
@@ -369,7 +378,7 @@ describe("Notices and states of the whole page", () => {
   });
 
   it("offers 'Parse document' for a document that was never parsed and sends the request", async () => {
-    server.documents[DATASET_ID] = [documentRow(1), documentRow(2)];
+    server.documents[DATASET_ID] = [firstDoc(), documentRow(2)];
     setChunks(server, DOC, []);
     const user = userEvent.setup();
     renderPage();
@@ -379,7 +388,7 @@ describe("Notices and states of the whole page", () => {
   });
 
   it("offers nothing to parse to a read-only caller", async () => {
-    server.documents[DATASET_ID] = [documentRow(1), documentRow(2)];
+    server.documents[DATASET_ID] = [firstDoc(), documentRow(2)];
     setChunks(server, DOC, []);
     actAs(MEMBER, "normal", "u1");
     renderPage();
@@ -388,7 +397,7 @@ describe("Notices and states of the whole page", () => {
   });
 
   it("shows the parsing state for a document that is parsing with no chunks yet, with a cancel", async () => {
-    server.documents[DATASET_ID] = [documentRow(1, { run: "1", progress: 0.3 }), documentRow(2)];
+    server.documents[DATASET_ID] = [firstDoc({ run: "1", progress: 0.3 }), documentRow(2)];
     setChunks(server, DOC, []);
     renderPage();
     expect(await screen.findByRole("heading", { name: "Parsing in progress" })).toBeInTheDocument();
@@ -396,7 +405,7 @@ describe("Notices and states of the whole page", () => {
   });
 
   it("shows the failed state with its reason and a way to parse again", async () => {
-    server.documents[DATASET_ID] = [documentRow(1, { run: "4" }), documentRow(2)];
+    server.documents[DATASET_ID] = [firstDoc({ run: "4" }), documentRow(2)];
     setFileExtra(server, DOC, { error: { step: "parse", code: "no_readable_text", message: "x" } });
     setChunks(server, DOC, []);
     renderPage();
@@ -405,7 +414,7 @@ describe("Notices and states of the whole page", () => {
   });
 
   it("refetches the list when the polled chunk count changes and once when parsing ends", async () => {
-    server.documents[DATASET_ID] = [documentRow(1, { run: "1", progress: 0.2 }), documentRow(2)];
+    server.documents[DATASET_ID] = [firstDoc({ run: "1", progress: 0.2 }), documentRow(2)];
     setChunks(server, DOC, []);
     renderPage();
     expect(await screen.findByRole("heading", { name: "Parsing in progress" })).toBeInTheDocument();

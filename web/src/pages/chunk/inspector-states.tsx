@@ -73,7 +73,8 @@ export interface DocumentEmptyProps {
   busy: boolean;
   onParse: () => void;
   onCancel: () => void;
-  onDetails: () => void;
+  /** Receives the link-button so focus can return to it when the sheet closes. */
+  onDetails: (opener: HTMLElement) => void;
 }
 
 type EmptyKind = "never" | "unavailable" | "parsing" | "failed" | "cancelled";
@@ -154,7 +155,7 @@ export function DocumentEmpty({ document, canChange, busy, onParse, onCancel, on
               <div className="flex flex-col items-center gap-1">
                 {canChange ? parse(t("datasets.parse.again")) : null}
                 {document.lastLogId !== null ? (
-                  <Button type="button" variant="link" onClick={onDetails}>
+                  <Button type="button" variant="link" onClick={(event) => onDetails(event.currentTarget)}>
                     {t("datasets.files.menu.details")}
                   </Button>
                 ) : null}

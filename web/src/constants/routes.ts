@@ -1,7 +1,7 @@
 import { Activity, Cpu, Database, House, KeyRound, UserRound, Users, type LucideIcon } from "lucide-react";
 import type { ComponentType } from "react";
 import { HOME_PATH } from "@/utils/safe-next";
-import { DATASET_LOGS_ROUTE } from "./app-paths";
+import { CHUNK_ROUTE, DATASET_LOGS_ROUTE } from "./app-paths";
 
 /**
  * The single typed route registry (UI-01, D-19, 01-UI-SPEC.md).
@@ -90,6 +90,13 @@ export const routes: readonly RouteEntry[] = [
     layout: "standard",
     auth: "required",
     component: () => import("@/pages/dataset/logs"),
+  },
+  {
+    // The chunk inspector of one document: no navigation entry; Datasets stays highlighted (nested-path match).
+    path: CHUNK_ROUTE,
+    layout: "standard",
+    auth: "required",
+    component: () => import("@/pages/chunk"),
   },
   {
     path: "/system-status",

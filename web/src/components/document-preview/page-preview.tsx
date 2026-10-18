@@ -78,7 +78,9 @@ export function PagePreview({ datasetId, docId, name, pages, page, onPageChange,
   const chunkId = selection?.chunkId;
   useEffect(() => {
     if (chunkId === undefined || !hasBoxes) return;
-    firstBox.current?.scrollIntoView({ block: "center", inline: "center", behavior: prefersReducedMotion() ? "auto" : "smooth" });
+    const element = firstBox.current;
+    // Older engines and test DOMs have no scrollIntoView: the box is then simply not centred.
+    if (element !== null && typeof element.scrollIntoView === "function") element.scrollIntoView({ block: "center", inline: "center", behavior: prefersReducedMotion() ? "auto" : "smooth" });
   }, [chunkId, shown, hasBoxes]);
 
   if (total < 1) return null;
