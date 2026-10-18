@@ -1,0 +1,116 @@
+{
+  "dataset": {
+    "meta": {
+      "chunks_one": "{{count}} chunk",
+      "chunks_other": "{{count}} chunks"
+    }
+  },
+  "datasets": {
+    "files": {
+      "col": {
+        "select": "Select",
+        "inSearch": "In search"
+      },
+      "selectAll": "Select all on this page",
+      "selectLabel": "Select {{name}}",
+      "status": {
+        "unavailable": "Parsing not available yet",
+        "parsing": "Parsing",
+        "finished": "Finished",
+        "failed": "Failed",
+        "cancelled": "Cancelled",
+        "partial": "Partly indexed"
+      },
+      "detail": {
+        "chunks_one": "{{count}} chunk",
+        "chunks_other": "{{count}} chunks",
+        "skipped": "{{skipped}} of {{total}} pages had no readable text",
+        "partialFailed_one": "{{count}} chunk searchable. Parsing failed: {{reason}}",
+        "partialFailed_other": "{{count}} chunks searchable. Parsing failed: {{reason}}",
+        "partialCancelled_one": "{{count}} chunk searchable. Parsing was cancelled.",
+        "partialCancelled_other": "{{count}} chunks searchable. Parsing was cancelled."
+      },
+      "detailsLink": "Details",
+      "detailsLabel": "Parsing details for {{name}}",
+      "progress": {
+        "label": "Parsing progress for {{name}}",
+        "percent": "{{percent}}%",
+        "waiting": "Waiting for a worker",
+        "none": "No progress"
+      },
+      "inSearch": {
+        "on": "On",
+        "off": "Off",
+        "label": "Include {{name}} in search"
+      },
+      "more": "More actions for {{name}}",
+      "menu": {
+        "viewChunks": "View chunks",
+        "open": "Open document",
+        "details": "Parsing details",
+        "reparse": "Parse again"
+      },
+      "pollPaused": "Live updates are paused. The status below may be out of date."
+    },
+    "parse": {
+      "action": "Parse",
+      "actionLabel": "Parse {{name}}",
+      "cancel": "Cancel parsing",
+      "cancelLabel": "Cancel parsing {{name}}",
+      "again": "Parse again",
+      "againLabel": "Parse {{name}} again",
+      "selection": {
+        "toolbar": "Selected documents",
+        "count_one": "{{count}} document selected",
+        "count_other": "{{count}} documents selected",
+        "parse_one": "Parse {{count}} document",
+        "parse_other": "Parse {{count}} documents",
+        "cancel_one": "Cancel parsing for {{count}} document",
+        "cancel_other": "Cancel parsing for {{count}} documents",
+        "clear": "Clear selection"
+      },
+      "live": {
+        "started": "{{name}}: parsing started",
+        "finished_one": "{{name}}: parsing finished, {{count}} chunk",
+        "finished_other": "{{name}}: parsing finished, {{count}} chunks",
+        "failed": "{{name}}: parsing failed",
+        "cancelled": "{{name}}: parsing cancelled"
+      }
+    },
+    "reparse": {
+      "title": "Parse again and replace chunks?",
+      "titleMany": "Parse {{count}} documents again?",
+      "body": "\"{{name}}\" will be rebuilt from its stored file. Every chunk it has now is replaced.",
+      "bodyMany": "{{affected}} of the selected documents already have chunks. Each one is rebuilt from its stored file and its chunks are replaced.",
+      "count": {
+        "chunks": "Chunks that will be replaced",
+        "edited": "Edited chunks that will be lost",
+        "manual": "Hand-added chunks that will be lost"
+      },
+      "lossNote": "Edits and hand-added chunks can't be recovered.",
+      "noLoss": "No chunk of this document was edited or added by hand.",
+      "noLossMany": "No chunk of these documents was edited or added by hand.",
+      "searchNote": "Until parsing finishes, this document returns fewer results in search.",
+      "searchNoteMany": "Until parsing finishes, these documents return fewer results in search.",
+      "rowHand": "{{edited}} edited, {{manual}} added by hand",
+      "keep": "Keep chunks",
+      "confirm": "Replace chunks",
+      "changed": "The counts changed. Check them and confirm again."
+    },
+    "ingestion": {
+      "title": "Parsing",
+      "logLink": "Parsing log",
+      "count": {
+        "unstart": "Not started",
+        "running": "Parsing",
+        "done": "Finished",
+        "failed": "Failed",
+        "cancelled": "Cancelled",
+        "partial": "Partly indexed",
+        "chunkTotal": "Chunks",
+        "tokenTotal": "Tokens"
+      },
+      "summaryError": "Couldn't load the parsing summary."
+    }
+  }
+}

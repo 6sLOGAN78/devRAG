@@ -226,6 +226,7 @@ export function DatasetWorkspace({ dataset, ready, onDeleted, onDeleteDialogChan
             {shared ? t("datasets.visibility.team") : t("datasets.visibility.me")}
           </Badge>
           <span className="tabular-nums">{t("datasets.card.documents", { count: dataset.docNum })}</span>
+          <span className="tabular-nums">{t("dataset.meta.chunks", { count: dataset.chunkNum })}</span>
           {dataset.embdId === "" ? null : (
             <span className="flex items-center gap-1">
               <span>{t("dataset.meta.embedding")}</span>

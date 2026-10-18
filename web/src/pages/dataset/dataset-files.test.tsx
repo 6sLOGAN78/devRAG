@@ -1,11 +1,14 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { useState } from "react";
+import { MemoryRouter } from "react-router";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { Toaster } from "@/components/ui/sonner";
 import type { SessionUser } from "@/interfaces/user";
+import { chunkPath, documentViewerPath } from "@/constants/app-paths";
 import { ApiError, http, registerQueryClient } from "@/services/http";
+import { toDocument, type DocumentView } from "@/services/document-service";
 import {
   DATASET_ID,
   UPDATED,
@@ -18,6 +21,7 @@ import {
 import { useUserStore } from "@/stores/user-store";
 import { useWorkspaceStore } from "@/stores/workspace-store";
 import { setAuthorization } from "@/utils/authorization";
+import { setFileExtra } from "@/test/server-areas/files";
 import { DocumentStatusBadge } from "./document-status-badge";
 import { DatasetFiles } from "./dataset-files";
 import { datasetPageState } from "./errors";
@@ -74,10 +78,12 @@ function renderTable(props: HarnessProps = {}) {
   const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   registerQueryClient(client);
   const view = render(
-    <QueryClientProvider client={client}>
-      <Harness {...props} />
-      <Toaster />
-    </QueryClientProvider>,
+    <MemoryRouter>
+      <QueryClientProvider client={client}>
+        <Harness {...props} />
+        <Toaster />
+      </QueryClientProvider>
+    </MemoryRouter>,
   );
   return { ...view, client };
 }
@@ -107,13 +113,13 @@ afterEach(() => {
 });
 
 describe("Document table structure (UI-11)", () => {
-  it("is a table with a screen-reader caption, six scoped column headers and one row per document", async () => {
+  it("is a table with a screen-reader caption, scoped column headers and one row per document", async () => {
     renderTable();
     const table = await screen.findByTestId("documents-table");
     expect(table.tagName).toBe("TABLE");
     expect(within(table).getByText("Documents in Reports").tagName).toBe("CAPTION");
     const headers = within(table).getAllByRole("columnheader");
-    expect(headers.map((h) => h.textContent)).toEqual(["Name", "Size", "Uploaded", "Status", "Progress", "Actions"]);
+    expect(headers.map((h) => h.textContent)).toEqual(["Select", "Name", "Size", "Uploaded", "Status", "Progress", "In search", "Actions"]);
     for (const header of headers) expect(header).toHaveAttribute("scope", "col");
     expect(rows()).toHaveLength(3);
   });
@@ -135,13 +141,14 @@ describe("Document table structure (UI-11)", () => {
     expect(within(row).getByTestId("document-progress").className).toContain("tabular-nums");
   });
 
-  it("shows 'Unknown status' as an outline badge for any run value other than 0, never a Parse control", async () => {
-    server.documents[DATASET_ID] = [documentRow(1, { run: "1" }), documentRow(2, { run: "DONE" }), documentRow(3)];
+  it("shows 'Unknown status' as an outline badge for a run value the table does not know, and no Parse control for it", async () => {
+    server.documents[DATASET_ID] = [documentRow(1, { run: "DONE" })];
     renderTable();
     await screen.findByTestId("documents-table");
-    const statuses = screen.getAllByTestId("document-status").map((s) => s.textContent);
-    expect(statuses).toEqual(["Unknown status", "Unknown status", "Not started"]);
-    expect(screen.queryByRole("button", { name: /parse/i })).toBeNull();
+    expect(screen.getAllByTestId("document-status").map((s) => s.textContent)).toEqual(["Unknown status"]);
+    expect(screen.queryByTestId("document-parse")).toBeNull();
+    expect(screen.queryByTestId("document-cancel")).toBeNull();
+    expect(screen.queryByTestId("document-reparse")).toBeNull();
     expect(screen.queryByText(/coming/i)).toBeNull();
   });
 
@@ -167,16 +174,7 @@ describe("Document table structure (UI-11)", () => {
   });
 });
 
-describe("DocumentStatusBadge (UI-SPEC choice 22)", () => {
-  it("renders 'Not started' for run 0 and 'Unknown status' for anything else", () => {
-    const { rerender } = render(<DocumentStatusBadge run="0" />);
-    expect(screen.getByText("Not started")).toBeInTheDocument();
-    rerender(<DocumentStatusBadge run="3" />);
-    expect(screen.getByText("Unknown status")).toBeInTheDocument();
-    rerender(<DocumentStatusBadge run="" />);
-    expect(screen.getByText("Unknown status")).toBeInTheDocument();
-  });
-});
+const view = (over: Partial<DocumentView> = {}): DocumentView => toDocument({ ...documentRow(1), ...over });
 
 describe("datasetPageState", () => {
   it("maps a 404 to notFound and everything else to error", () => {
@@ -301,7 +299,8 @@ describe("Delete icons and the delete dialog (DOC-14, D-09)", () => {
     const [first, second] = rows() as [HTMLElement, HTMLElement];
     expect(within(first).queryByTestId("document-delete")).toBeNull();
     expect(within(second).getByTestId("document-delete")).toBeInTheDocument();
-    expect(within(first).queryByRole("button")).toBeNull();
+    expect(within(first).queryByTestId("document-parse")).toBeNull();
+    expect(within(first).queryByTestId("document-search-switch")).toBeNull();
   });
 
   it("opens the named confirmation, deletes the one document and moves focus to the table caption", async () => {
@@ -350,5 +349,169 @@ describe("Delete icons and the delete dialog (DOC-14, D-09)", () => {
     const alert = await screen.findByTestId("document-delete-error");
     expect(alert).toHaveTextContent("You don't have permission to do that in Ada's workspace. Your role may have changed.");
     await waitFor(() => expect(listCalls().length).toBeGreaterThan(before));
+  });
+});
+
+describe("DocumentStatusBadge status map (D-07, D-13, D-14)", () => {
+  const error = { step: "chunk", code: "no_readable_text", message: "" };
+  const cases: Array<[string, Partial<DocumentView> & Record<string, unknown>, string, string[]]> = [
+    ["not started", { run: "0" }, "Not started", []],
+    ["not started, with chunks left from before (R-163)", { run: "0", chunk_count: 4 }, "Not started", ["4 chunks"]],
+    ["not parseable", { run: "0", parseable: false }, "Parsing not available yet", []],
+    ["parsing", { run: "1" }, "Parsing", []],
+    ["finished", { run: "3", chunk_count: 1 }, "Finished", ["1 chunk"]],
+    ["finished with skipped pages", { run: "3", chunk_count: 7, pages_total: 13, pages_without_text: 2 }, "Finished", ["7 chunks", "2 of 13 pages had no readable text"]],
+    ["failed", { run: "4", error }, "Failed", ["This PDF has no readable text; scanned documents are not supported yet."]],
+    ["cancelled", { run: "2" }, "Cancelled", []],
+    ["failed with chunks left", { run: "4", chunk_count: 3, error }, "Partly indexed", ["3 chunks searchable. Parsing failed: This PDF has no readable text; scanned documents are not supported yet."]],
+    ["cancelled with chunks left", { run: "2", chunk_count: 2 }, "Partly indexed", ["2 chunks searchable. Parsing was cancelled."]],
+    ["unknown", { run: "7" }, "Unknown status", []],
+    ["empty", { run: "" }, "Unknown status", []],
+  ];
+  it.each(cases)("%s", (_name, over, text, details) => {
+    render(<DocumentStatusBadge document={view(over as never)} />);
+    expect(screen.getByTestId("document-status")).toHaveTextContent(text);
+    expect(screen.queryAllByTestId("document-status-detail").map((d) => d.textContent)).toEqual(details);
+  });
+
+  it("shows the server's plain message for an unknown failure code, as text", () => {
+    render(<DocumentStatusBadge document={view({ run: "4", error: { step: "x", code: "weird", message: "<b>odd</b> thing" } } as never)} />);
+    expect(screen.getByTestId("document-status-detail")).toHaveTextContent("<b>odd</b> thing");
+    expect(document.querySelector("b")).toBeNull();
+  });
+
+  it("gives every state an icon, except the unknown one", () => {
+    for (const run of ["0", "1", "2", "3", "4"]) {
+      const { unmount } = render(<DocumentStatusBadge document={view({ run } as never)} />);
+      expect(screen.getByTestId("document-status").querySelector("svg")).not.toBeNull();
+      unmount();
+    }
+  });
+
+  it("stops the spinner under reduced motion", () => {
+    const original = window.matchMedia;
+    window.matchMedia = ((query: string) => ({ matches: true, media: query, addEventListener: () => {}, removeEventListener: () => {} })) as never;
+    try {
+      render(<DocumentStatusBadge document={view({ run: "1" } as never)} />);
+      expect(screen.getByTestId("document-status").querySelector("svg")?.getAttribute("class") ?? "").not.toContain("animate-spin");
+    } finally {
+      window.matchMedia = original;
+    }
+    cleanup();
+    render(<DocumentStatusBadge document={view({ run: "1" } as never)} />);
+    expect(screen.getByTestId("document-status").querySelector("svg")?.getAttribute("class") ?? "").toContain("animate-spin");
+  });
+});
+
+describe("Progress cell (FE-18)", () => {
+  const cell = async (over: Record<string, unknown>) => {
+    server.documents[DATASET_ID] = [documentRow(1, over as never)];
+    renderTable();
+    await screen.findByTestId("documents-table");
+    return screen.getByTestId("document-progress");
+  };
+
+  it("floors a running 0.996 to 99, never 100", async () => {
+    const progress = await cell({ run: "1", progress: 0.996 });
+    expect(progress).toHaveTextContent("99%");
+    expect(progress).not.toHaveTextContent("100%");
+    expect(within(progress).getByRole("progressbar", { name: "Parsing progress for report-01.pdf" })).toHaveAttribute("aria-valuenow", "99");
+  });
+
+  it("shows the latest server progress line, or 'Waiting for a worker', with the full text in title", async () => {
+    const first = await cell({ run: "1", progress: 0.3 });
+    expect(within(first).getByTestId("document-progress-message")).toHaveTextContent("Waiting for a worker");
+    cleanup();
+    setFileExtra(server, documentRow(1).id, { progressMessage: "Embedding chunk 4 of 9 <i>x</i>" });
+    renderTable();
+    const message = await screen.findByText("Embedding chunk 4 of 9 <i>x</i>");
+    expect(message).toHaveAttribute("title", "Embedding chunk 4 of 9 <i>x</i>");
+    expect(message.className).toContain("truncate");
+    expect(message.querySelector("i")).toBeNull();
+  });
+
+  it("shows 100% when finished, the percentage reached when cancelled, an em dash when failed", async () => {
+    expect(await cell({ run: "3", progress: 1, chunk_num: 2 })).toHaveTextContent("100%");
+    cleanup();
+    const cancelled = await cell({ run: "2", progress: 0.42 });
+    expect(cancelled).toHaveTextContent("42%");
+    expect(within(cancelled).queryByRole("progressbar")).toBeNull();
+    cleanup();
+    const failed = await cell({ run: "4", progress: 0.5 });
+    expect(failed).toHaveTextContent("—");
+    expect(failed).toHaveTextContent("No progress");
+  });
+});
+
+describe("Document row (UI-15)", () => {
+  it("carries data-run and data-doc-id, links the name to the chunk screen and dims a document switched off", async () => {
+    server.documents[DATASET_ID] = [documentRow(1), documentRow(2)];
+    setFileExtra(server, documentRow(2).id, { enabled: false });
+    renderTable();
+    await screen.findByTestId("documents-table");
+    const [first, second] = rows() as [HTMLElement, HTMLElement];
+    expect(first).toHaveAttribute("data-run", "0");
+    expect(first).toHaveAttribute("data-doc-id", documentRow(1).id);
+    const link = within(first).getByTestId("document-name-link");
+    expect(link).toHaveAttribute("href", chunkPath(DATASET_ID, documentRow(1).id));
+    expect(link.className).toContain("break-all");
+    expect(link.className).toContain("line-clamp-2");
+    expect(link).toHaveAttribute("title", "report-01.pdf");
+    expect(within(second).getByTestId("document-name-link").className).toContain("text-muted-foreground");
+  });
+
+  it("builds the menu links with the path builders", async () => {
+    renderTable();
+    await screen.findByTestId("documents-table");
+    await userEvent.click(within(rows()[0] as HTMLElement).getByRole("button", { name: "More actions for report-01.pdf" }));
+    const id = documentRow(1).id;
+    expect(await screen.findByTestId("document-menu-chunks")).toHaveAttribute("href", chunkPath(DATASET_ID, id));
+    expect(screen.getByTestId("document-menu-open")).toHaveAttribute("href", documentViewerPath(DATASET_ID, id));
+    expect(screen.queryByTestId("document-menu-details")).toBeNull();
+  });
+
+  it("shows a thumbnail only from the validated field and falls back to the icon when it cannot be decoded", async () => {
+    const png = "data:image/png;base64,iVBORw0KGgo=";
+    setFileExtra(server, documentRow(1).id, { thumbnail: png });
+    setFileExtra(server, documentRow(2).id, { thumbnail: "https://evil.test/x.png" });
+    renderTable();
+    await screen.findByTestId("documents-table");
+    const thumbnails = screen.getAllByTestId("document-thumbnail");
+    expect(thumbnails).toHaveLength(1);
+    expect(thumbnails[0]).toHaveAttribute("src", png);
+    expect(thumbnails[0]).toHaveAttribute("alt", "");
+    expect(thumbnails[0]).toHaveAttribute("loading", "lazy");
+    fireEvent.error(thumbnails[0] as HTMLElement);
+    expect(screen.queryByTestId("document-thumbnail")).toBeNull();
+  });
+
+  it("renders a hostile name as text everywhere it appears", async () => {
+    const hostile = "<img src=x onerror=alert(1)>.pdf";
+    server.documents[DATASET_ID] = [documentRow(1, { name: hostile })];
+    renderTable();
+    const table = await screen.findByTestId("documents-table");
+    expect(table.querySelector("img, script")).toBeNull();
+    expect(within(table).getByRole("checkbox", { name: `Select ${hostile}` })).toBeInTheDocument();
+    expect(within(table).getByRole("button", { name: `Parse ${hostile}` })).toBeInTheDocument();
+  });
+
+  it("draws the select column only when a row qualifies, and the 'In search' cell as text for a caller who may not change", async () => {
+    const MEMBER: SessionUser = { ...OWNER, id: "u4", tenantId: "t4", tenantName: "Dan's workspace" };
+    server.memberships = [membershipRow("t4", "Dan's workspace", "owner", "Dan"), membershipRow("t1", "Ada's workspace", "normal", "Ada")];
+    server.documents[DATASET_ID] = [documentRow(1, { created_by: "u1" })];
+    useUserStore.getState().reset();
+    useWorkspaceStore.getState().reset();
+    useUserStore.getState().setUser(MEMBER);
+    useWorkspaceStore.getState().initialise("u4", "t4", storedMemberships(server.memberships));
+    useWorkspaceStore.getState().setActive("t1");
+    renderTable();
+    await screen.findByTestId("documents-table");
+    expect(screen.queryByTestId("documents-select-all")).toBeNull();
+    expect(screen.queryByTestId("document-select")).toBeNull();
+    expect(screen.getAllByRole("columnheader").map((h) => h.textContent)).toEqual(["Name", "Size", "Uploaded", "Status", "Progress", "In search", "Actions"]);
+    expect(screen.getByTestId("document-search-text")).toHaveTextContent("On");
+    expect(screen.queryByTestId("document-search-switch")).toBeNull();
+    expect(screen.queryByTestId("document-parse")).toBeNull();
+    expect(screen.getByRole("button", { name: "More actions for report-01.pdf" })).toBeInTheDocument();
   });
 });

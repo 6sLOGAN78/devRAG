@@ -5,19 +5,27 @@ import { formatBytes, resolveUploadLimits } from "@/components/file-upload-dialo
 import { DeleteDocumentDialog } from "@/components/delete-document-dialog";
 import { EmptyState } from "@/components/empty-state";
 import { ErrorState } from "@/components/error-state";
+import { Alert } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Pagination } from "@/components/ui/pagination";
 import { SearchInput } from "@/components/ui/search-input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCaption, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { DOCUMENTS_PAGE_SIZE, useDocumentsRequest } from "@/hooks/use-document-request";
+import { canChangeDocument, useRoleIn } from "@/hooks/use-dataset-permissions";
+import { DOCUMENTS_PAGE_SIZE, useDocumentsRequest, useInvalidateOnParseEnd, usePollHealth } from "@/hooks/use-document-request";
+import { useUserStore } from "@/stores/user-store";
 import type { UploadLimitsView } from "@/services/dataset-service";
 import { MAX_DOCUMENT_KEYWORDS_LENGTH, type DocumentView } from "@/services/document-service";
 import { DocumentRow } from "./document-row";
+import { IngestionSummary } from "./ingestion-summary";
+import { useParseActions, useParseAnnouncements } from "./parse-actions";
+import { ReparseDialog } from "./reparse-dialog";
+import { SelectionBar } from "./selection-bar";
 
 const SKELETON_ROWS = 5;
-const COLUMNS = ["name", "size", "uploaded", "status", "progress", "actions"] as const;
+const COLUMNS = ["name", "size", "uploaded", "status", "progress", "inSearch", "actions"] as const;
 
 export interface DatasetFilesProps {
   dataset: { id: string; name: string; createdBy: string; tenantId: string };
@@ -33,6 +41,8 @@ export interface DatasetFilesProps {
   onUpload: () => void;
   /** Called when the empty state starts or stops showing, so the page can hide its own header action. */
   onEmptyChange?: (empty: boolean) => void;
+  /** Opens the parsing details of a log entry (plan 04-28). Row links to it are drawn only when this is given. */
+  onShowDetails?: (logId: string) => void;
 }
 
 function TableSkeleton() {
@@ -56,9 +66,15 @@ function TableSkeleton() {
  * the table caption (the row is gone) and a page that became empty steps back to the last page that exists. Names are
  * user text and render as text nodes only.
  */
-export function DatasetFiles({ dataset, limits, page, keywords, onPageChange, onSearch, onUpload, onEmptyChange }: DatasetFilesProps) {
+export function DatasetFiles({ dataset, limits, page, keywords, onPageChange, onSearch, onUpload, onEmptyChange, onShowDetails }: DatasetFilesProps) {
   const { t, i18n } = useTranslation();
   const documents = useDocumentsRequest({ datasetId: dataset.id, page, keywords });
+  const { pollPaused } = usePollHealth(documents);
+  useInvalidateOnParseEnd(dataset.id, documents.data?.items);
+  const announcement = useParseAnnouncements(documents.data?.items);
+  const actions = useParseActions(dataset.id);
+  const userId = useUserStore((state) => state.user?.id ?? null);
+  const role = useRoleIn(dataset.tenantId);
   const items = documents.data?.items ?? [];
   const total = documents.data?.total ?? 0;
   const pages = Math.max(1, Math.ceil(total / DOCUMENTS_PAGE_SIZE));
@@ -73,6 +89,34 @@ export function DatasetFiles({ dataset, limits, page, keywords, onPageChange, on
   const [confirming, setConfirming] = useState(false);
   const [focusCaption, setFocusCaption] = useState(false);
   const [seenDocuments, setSeenDocuments] = useState(false);
+  const [selected, setSelected] = useState<ReadonlySet<string>>(new Set());
+  const reparseIds = useRef<string[]>([]);
+
+  // A row the caller may select: they may change it and it can be parsed or is parsing. The same rule the row draws.
+  const qualifies = (document: DocumentView): boolean => canChangeDocument(dataset.createdBy, document.createdBy, userId, role) && (document.parseable || document.run === "1");
+  const qualifying = items.filter(qualifies);
+  const selectedItems = items.filter((document) => selected.has(document.id));
+  const parseIds = selectedItems.filter((document) => document.run !== "1").map((document) => document.id);
+  const cancelIds = selectedItems.filter((document) => document.run === "1").map((document) => document.id);
+
+  // Selection is per page: a page change, a search change or another workspace's dataset starts it over.
+  useEffect(() => {
+    setSelected((current) => (current.size === 0 ? current : new Set()));
+  }, [page, keywords, dataset.id]);
+
+  // A row that disappeared from the page (deleted elsewhere) is dropped from the selection; a polled refetch keeps the rest.
+  useEffect(() => {
+    if (documents.data === undefined) return;
+    const present = new Set(documents.data.items.map((document) => document.id));
+    setSelected((current) => {
+      const kept = [...current].filter((id) => present.has(id));
+      return kept.length === current.size ? current : new Set(kept);
+    });
+  }, [documents.data]);
+
+  useEffect(() => {
+    if (actions.confirm !== null) reparseIds.current = actions.confirm.ids;
+  }, [actions.confirm]);
 
   const onEmptyChangeRef = useRef(onEmptyChange);
   onEmptyChangeRef.current = onEmptyChange;
@@ -113,13 +157,53 @@ export function DatasetFiles({ dataset, limits, page, keywords, onPageChange, on
     if (!deleted.current && opener.current?.isConnected === true) opener.current.focus();
   }
 
+  /** After a bulk action the bar is gone with the focus on it: the caption takes it. */
+  function afterBulk(): void {
+    setSelected(new Set());
+    setFocusCaption(true);
+  }
+
+  function toggleSelected(id: string, checked: boolean): void {
+    setSelected((current) => {
+      const next = new Set(current);
+      if (checked) next.add(id);
+      else next.delete(id);
+      return next;
+    });
+  }
+
+  function toggleAll(checked: boolean): void {
+    setSelected((current) => {
+      const next = new Set(current);
+      for (const document of qualifying) {
+        if (checked) next.add(document.id);
+        else next.delete(document.id);
+      }
+      return next;
+    });
+  }
+
+  /** Back to the menu button of the row the dialog was about (the selection's first row for several); else the caption. */
+  function restoreAfterReparse(event: Event): void {
+    event.preventDefault();
+    const table = caption.current?.closest("table");
+    const id = reparseIds.current[0];
+    const row = id === undefined ? null : Array.from(table?.querySelectorAll<HTMLElement>("[data-doc-id]") ?? []).find((element) => element.dataset.docId === id);
+    const target = row?.querySelector<HTMLElement>('[data-testid="document-more"]') ?? caption.current;
+    target?.focus();
+  }
+
+  const selectColumn = qualifying.length > 0;
+  const allSelected = selectColumn && qualifying.every((document) => selected.has(document.id));
+  const someSelected = qualifying.some((document) => selected.has(document.id));
+  const showSummary = documents.data !== undefined && !empty;
   const showToolbar = items.length > 0 || searching || (documents.isPending && seenDocuments);
   const maxFile = formatBytes(resolveUploadLimits(limits).maxFileBytes, i18n.language);
 
   let body;
   if (documents.isPending || pastEnd) {
     body = <TableSkeleton />;
-  } else if (documents.isError) {
+  } else if (documents.isError && documents.data === undefined) {
     body = (
       <div className="p-6">
         <ErrorState heading={t("datasets.files.error.heading")} onAction={() => void documents.refetch()} />
@@ -161,6 +245,12 @@ export function DatasetFiles({ dataset, limits, page, keywords, onPageChange, on
         </TableCaption>
         <TableHeader>
           <TableRow className="h-10">
+            {selectColumn ? (
+              <TableHead className="w-12 px-2">
+                <span className="sr-only">{t("datasets.files.col.select")}</span>
+                <Checkbox checked={allSelected} indeterminate={someSelected && !allSelected} onChange={toggleAll} aria-label={t("datasets.files.selectAll")} data-testid="documents-select-all" />
+              </TableHead>
+            ) : null}
             {COLUMNS.map((column) => (
               <TableHead key={column} className={column === "actions" ? "text-right" : undefined}>
                 {t(`datasets.files.col.${column}`)}
@@ -170,7 +260,17 @@ export function DatasetFiles({ dataset, limits, page, keywords, onPageChange, on
         </TableHeader>
         <TableBody>
           {items.map((document) => (
-            <DocumentRow key={document.id} dataset={dataset} document={document} onDelete={askDelete} />
+            <DocumentRow
+              key={document.id}
+              dataset={dataset}
+              document={document}
+              actions={actions}
+              selectColumn={selectColumn}
+              selected={selected.has(document.id)}
+              onSelect={(checked) => toggleSelected(document.id, checked)}
+              onDelete={askDelete}
+              onShowDetails={onShowDetails}
+            />
           ))}
         </TableBody>
       </Table>
@@ -179,15 +279,42 @@ export function DatasetFiles({ dataset, limits, page, keywords, onPageChange, on
 
   return (
     <div className="flex flex-col gap-4">
+      <p role="status" data-testid="documents-live" className="sr-only">
+        {announcement}
+      </p>
+      {showSummary ? <IngestionSummary datasetId={dataset.id} /> : null}
       {showToolbar ? (
-        <div data-testid="documents-search" className="max-w-sm">
-          <SearchInput
-            value={keywords}
-            onSearch={(next) => onSearch(next.slice(0, MAX_DOCUMENT_KEYWORDS_LENGTH))}
-            label={t("datasets.files.search")}
-            clearLabel={t("common.search.clear")}
-          />
+        <div className="flex flex-wrap items-center gap-3">
+          <div data-testid="documents-search" className="w-full max-w-sm">
+            <SearchInput
+              value={keywords}
+              onSearch={(next) => onSearch(next.slice(0, MAX_DOCUMENT_KEYWORDS_LENGTH))}
+              label={t("datasets.files.search")}
+              clearLabel={t("common.search.clear")}
+            />
+          </div>
+          {selectedItems.length > 0 ? (
+            <SelectionBar
+              count={selectedItems.length}
+              parseCount={parseIds.length}
+              cancelCount={cancelIds.length}
+              busy={selectedItems.some((document) => actions.isBusy(document.id))}
+              onParse={() => void actions.parse(parseIds, afterBulk)}
+              onCancel={() => void actions.cancel(cancelIds, afterBulk)}
+              onClear={() => setSelected(new Set())}
+            />
+          ) : null}
         </div>
+      ) : null}
+      {pollPaused && documents.data !== undefined ? (
+        <Alert variant="info" data-testid="documents-poll-paused">
+          <span className="flex flex-wrap items-center gap-2">
+            {t("datasets.files.pollPaused")}
+            <Button type="button" variant="ghost" size="sm" onClick={() => void documents.refetch()}>
+              {t("errorState.action")}
+            </Button>
+          </span>
+        </Alert>
       ) : null}
       <Card className="overflow-x-auto">{body}</Card>
       {!documents.isPending && !documents.isError && !pastEnd && items.length > 0 ? (
@@ -200,6 +327,7 @@ export function DatasetFiles({ dataset, limits, page, keywords, onPageChange, on
           statusLabel={t("common.pagination.status", { page, pages })}
         />
       ) : null}
+      <ReparseDialog confirm={actions.confirm} onReplace={actions.replace} onDismiss={actions.dismiss} onCloseAutoFocus={restoreAfterReparse} />
       {target === null ? null : (
         <DeleteDocumentDialog
           datasetId={dataset.id}

@@ -1,0 +1,116 @@
+{
+  "dataset": {
+    "meta": {
+      "chunks_one": "{{count}} 个分块",
+      "chunks_other": "{{count}} 个分块"
+    }
+  },
+  "datasets": {
+    "files": {
+      "col": {
+        "select": "选择",
+        "inSearch": "参与检索"
+      },
+      "selectAll": "全选本页",
+      "selectLabel": "选择 {{name}}",
+      "status": {
+        "unavailable": "暂不支持解析",
+        "parsing": "解析中",
+        "finished": "已完成",
+        "failed": "失败",
+        "cancelled": "已取消",
+        "partial": "部分已索引"
+      },
+      "detail": {
+        "chunks_one": "{{count}} 个分块",
+        "chunks_other": "{{count}} 个分块",
+        "skipped": "{{total}} 页中有 {{skipped}} 页没有可读文本",
+        "partialFailed_one": "{{count}} 个分块可检索。解析失败：{{reason}}",
+        "partialFailed_other": "{{count}} 个分块可检索。解析失败：{{reason}}",
+        "partialCancelled_one": "{{count}} 个分块可检索。解析已取消。",
+        "partialCancelled_other": "{{count}} 个分块可检索。解析已取消。"
+      },
+      "detailsLink": "详情",
+      "detailsLabel": "{{name}} 的解析详情",
+      "progress": {
+        "label": "{{name}} 的解析进度",
+        "percent": "{{percent}}%",
+        "waiting": "等待工作进程",
+        "none": "无进度"
+      },
+      "inSearch": {
+        "on": "开",
+        "off": "关",
+        "label": "将 {{name}} 纳入检索"
+      },
+      "more": "{{name}} 的更多操作",
+      "menu": {
+        "viewChunks": "查看分块",
+        "open": "打开文档",
+        "details": "解析详情",
+        "reparse": "重新解析"
+      },
+      "pollPaused": "实时更新已暂停。下方状态可能已过期。"
+    },
+    "parse": {
+      "action": "解析",
+      "actionLabel": "解析 {{name}}",
+      "cancel": "取消解析",
+      "cancelLabel": "取消解析 {{name}}",
+      "again": "重新解析",
+      "againLabel": "重新解析 {{name}}",
+      "selection": {
+        "toolbar": "已选文档",
+        "count_one": "已选 {{count}} 个文档",
+        "count_other": "已选 {{count}} 个文档",
+        "parse_one": "解析 {{count}} 个文档",
+        "parse_other": "解析 {{count}} 个文档",
+        "cancel_one": "取消解析 {{count}} 个文档",
+        "cancel_other": "取消解析 {{count}} 个文档",
+        "clear": "清除选择"
+      },
+      "live": {
+        "started": "{{name}}：已开始解析",
+        "finished_one": "{{name}}：解析完成，{{count}} 个分块",
+        "finished_other": "{{name}}：解析完成，{{count}} 个分块",
+        "failed": "{{name}}：解析失败",
+        "cancelled": "{{name}}：解析已取消"
+      }
+    },
+    "reparse": {
+      "title": "重新解析并替换分块？",
+      "titleMany": "重新解析 {{count}} 个文档？",
+      "body": "“{{name}}”将根据已存储的文件重新生成，当前所有分块都会被替换。",
+      "bodyMany": "所选文档中有 {{affected}} 个已有分块。每个文档都将根据已存储的文件重新生成，其分块会被替换。",
+      "count": {
+        "chunks": "将被替换的分块",
+        "edited": "将丢失的已编辑分块",
+        "manual": "将丢失的手动添加分块"
+      },
+      "lossNote": "编辑内容和手动添加的分块无法恢复。",
+      "noLoss": "此文档没有被编辑或手动添加的分块。",
+      "noLossMany": "这些文档没有被编辑或手动添加的分块。",
+      "searchNote": "解析完成前，此文档在检索中返回的结果会减少。",
+      "searchNoteMany": "解析完成前，这些文档在检索中返回的结果会减少。",
+      "rowHand": "{{edited}} 个已编辑，{{manual}} 个手动添加",
+      "keep": "保留分块",
+      "confirm": "替换分块",
+      "changed": "数量已变化。请核对后再次确认。"
+    },
+    "ingestion": {
+      "title": "解析",
+      "logLink": "解析日志",
+      "count": {
+        "unstart": "未开始",
+        "running": "解析中",
+        "done": "已完成",
+        "failed": "失败",
+        "cancelled": "已取消",
+        "partial": "部分已索引",
+        "chunkTotal": "分块",
+        "tokenTotal": "词元"
+      },
+      "summaryError": "无法加载解析概况。"
+    }
+  }
+}
