@@ -64,6 +64,7 @@ var policyRows = []policyRow{
 	{"DELETE", "python", "api", "tenant", []string{"api", "v1", "datasets"}, []string{"owner", "admin", "normal"}},
 	{"GET", "python", "api", "tenant", []string{"api", "v1", "datasets"}, []string{"owner", "admin", "normal"}},
 	{"POST", "python", "api", "tenant", []string{"api", "v1", "datasets"}, []string{"owner", "admin", "normal"}},
+	{"POST", "python", "api", "tenant", []string{"api", "v1", "datasets", "search"}, []string{"owner", "admin", "normal"}},
 	{"GET", "python", "api", "tenant", []string{"api", "v1", "datasets", "{dataset_id}"}, []string{"owner", "admin", "normal"}},
 	{"PUT", "python", "api", "tenant", []string{"api", "v1", "datasets", "{dataset_id}"}, []string{"owner", "admin", "normal"}},
 	{"DELETE", "python", "api", "tenant", []string{"api", "v1", "datasets", "{dataset_id}", "documents"}, []string{"owner", "admin", "normal"}},

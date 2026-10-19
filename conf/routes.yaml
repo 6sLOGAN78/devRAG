@@ -182,6 +182,8 @@ endpoints:
      note: "plan 04-18 adds a hand-made chunk, embedded before it is written; the uploader, the dataset creator, owner or admin (D-10, D-11)"}
   - {method: PATCH, path: "/api/v1/datasets/{dataset_id}/documents/{doc_id}/chunks/{chunk_id}", owner: python, auth: api, roles: [owner, admin, normal], scope: tenant, implemented: true,
      note: "plan 04-18 edits a chunk's text and/or its own search switch; text is embedded before it is written (D-11, D-26)"}
+  - {method: POST, path: "/api/v1/datasets/search", owner: python, auth: api, roles: [owner, admin, normal], scope: tenant, implemented: true,
+     note: "plan 05-04 retrieval test over one or more datasets of one workspace; one embedding call per request, rate limited per workspace and user; any id the caller cannot open is the one 404 (RETR-16..18, KB-18, D-19, D-20, R-194, R-205)"}
   - {method: GET, path: "/api/v1/datasets/{dataset_id}/ingestions/summary", owner: python, auth: api, roles: [owner, admin, normal], scope: tenant, implemented: true,
      note: "plan 04-19 counts documents by state from one grouped query; reads need only dataset visibility (KB-14, D-07)"}
   - {method: GET, path: "/api/v1/datasets/{dataset_id}/ingestions", owner: python, auth: api, roles: [owner, admin, normal], scope: tenant, implemented: true,
