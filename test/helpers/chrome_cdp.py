@@ -243,3 +243,22 @@ class ChromeSession:
                 "uploadThroughput": -1 if bytes_per_second is None else bytes_per_second,
             },
         )
+
+    # -- downloads, screenshots and element rectangles (plan 04-34) -------------------------------
+
+    def allow_downloads(self, folder: str) -> None:
+        """Let the page save files into ``folder`` and report each one as a ``Browser.downloadWillBegin`` event."""
+        self.call("Browser.setDownloadBehavior", {"behavior": "allow", "downloadPath": folder, "eventsEnabled": True}, session=False)
+
+    def download_names(self) -> list[str]:
+        """Suggested file names of the downloads that began since the last navigation."""
+        self._pump(0.05)
+        return [str(e["params"].get("suggestedFilename", "")) for e in self._events if e.get("method") in ("Browser.downloadWillBegin", "Page.downloadWillBegin")]
+
+    def screenshot(self, path: str) -> None:
+        """Write a PNG of the viewport to ``path`` (the caller picks a scratch directory, never the repository)."""
+        import base64
+
+        data = self.call("Page.captureScreenshot", {"format": "png"})["data"]
+        with open(path, "wb") as handle:
+            handle.write(base64.b64decode(data))
