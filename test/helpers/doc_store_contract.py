@@ -48,6 +48,24 @@ def row(chunk_id: str, doc_id: str, text: str, axis: int, position: int = 0) -> 
     }
 
 
+QUERY_VECTOR = unit_vector(0)  # the query side of the golden fusion test (plan 05-01); chunk S sits on this axis
+RARE_KEYWORD = "zyphrolite"  # appears in chunk K only
+
+
+def planted_vector_rows(index_dim: int = DIM) -> list[dict]:
+    """Two rows for the golden fusion test (plan 05-01, D-07), written into ``q_{index_dim}_vec``.
+
+    Chunk K holds the rare keyword in ``content_ltks`` and its vector is on axis 1, so only the text side finds it for ``QUERY_VECTOR``.
+    Chunk S has no keyword and its vector equals ``QUERY_VECTOR`` (axis 0), so only the dense side finds it. A fusion test then fixes
+    the blend by the weights alone.
+    """
+    base = {"doc_id": "d1", "title_tks": "title", "available_int": 1}
+    return [
+        {**base, "id": "chunk-k", "content_ltks": f"notes about {RARE_KEYWORD} samples", "position_int": 0, f"q_{index_dim}_vec": unit_vector(1, index_dim)},
+        {**base, "id": "chunk-s", "content_ltks": "plain unrelated sentence", "position_int": 1, f"q_{index_dim}_vec": unit_vector(0, index_dim)},
+    ]
+
+
 def search(store, index, dataset_ids, *, condition=None, matches=None, order_by=None, offset=0, limit=20, select=None, highlight=None):
     return store.search(
         select_fields=select or [],
@@ -248,6 +266,22 @@ class DocStoreContract:
         store.insert([row("c1", "d1", "x", 0), row("c2", "d2", "x", 1), row("c3", "d3", "x", 2)], tenant_index, ds)
         got = search(store, tenant_index, [ds], condition={"doc_id": ["d1", "d3"]})
         assert {h["id"] for h in got.hits} == {"c1", "c3"}
+
+    @pytest.mark.xfail(strict=True, reason="plan 05-03 adds must_not")  # plan 05-03 removes this marker when it implements the key
+    def test_must_not_excludes_matches(self, store, tenant_index, dataset_ids):
+        ds = dataset_ids[0]
+        store.create_idx(tenant_index, ds, DIM)
+        store.insert([row("c1", "d1", "shared", 0), row("c2", "d2", "shared", 1), row("c3", "d3", "shared", 2)], tenant_index, ds)
+        exclude = {"must_not": {"doc_id": ["d1"]}}
+        text = MatchTextExpr(["content_ltks"], "shared", 10)
+        text_only = search(store, tenant_index, [ds], condition=exclude, matches=[text], limit=10)
+        assert {h["id"] for h in text_only.hits} == {"c2", "c3"}
+        near_c1 = MatchDenseExpr(f"q_{DIM}_vec", unit_vector(0), "float", "cosine", 3)
+        dense_only = search(store, tenant_index, [ds], condition=exclude, matches=[near_c1], limit=3)
+        assert {h["id"] for h in dense_only.hits} == {"c2", "c3"}  # the nearest row (c1) is excluded before kNN picks its candidates
+        fusion = FusionExpr("weighted_sum", 10, {"weights": "0.5,0.5"})
+        hybrid = search(store, tenant_index, [ds], condition=exclude, matches=[text, near_c1, fusion], limit=10)
+        assert {h["id"] for h in hybrid.hits} == {"c2", "c3"}
 
     # --- refusals, all before any request -------------------------------------------------------------------------
     def test_search_with_empty_dataset_ids_is_refused(self, store, tenant_index):
