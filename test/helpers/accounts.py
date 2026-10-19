@@ -123,6 +123,7 @@ def delete_accounts(accounts: list[Account]) -> None:
                 cur.execute("DELETE FROM `tenant_model_provider` WHERE `tenant_id` = %s", (acc.tenant_id,))
                 cur.execute("DELETE FROM `tenant_llm` WHERE `tenant_id` = %s", (acc.tenant_id,))
                 _delete_dataset_rows(cur, acc.tenant_id)
+                _delete_chat_rows(cur, acc.tenant_id)
                 cur.execute("DELETE FROM `user_tenant` WHERE `user_id` = %s", (acc.user_id,))
                 cur.execute("DELETE FROM `tenant` WHERE `id` = %s", (acc.tenant_id,))
                 cur.execute("DELETE FROM `user` WHERE `id` = %s", (acc.user_id,))
@@ -148,6 +149,12 @@ def _delete_dataset_rows(cur: Any, tenant_id: str) -> None:
     cur.execute("DELETE FROM `document` WHERE `kb_id` IN (SELECT `id` FROM `knowledgebase` WHERE `tenant_id` = %s)", (tenant_id,))
     cur.execute("DELETE FROM `file` WHERE `tenant_id` = %s", (tenant_id,))
     cur.execute("DELETE FROM `knowledgebase` WHERE `tenant_id` = %s", (tenant_id,))
+
+
+def _delete_chat_rows(cur: Any, tenant_id: str) -> None:
+    """Delete the chat assistants of one recorded tenant and every session of those assistants (plan 05-07)."""
+    cur.execute("DELETE FROM `conversation` WHERE `dialog_id` IN (SELECT `id` FROM `dialog` WHERE `tenant_id` = %s)", (tenant_id,))
+    cur.execute("DELETE FROM `dialog` WHERE `tenant_id` = %s", (tenant_id,))
 
 
 def delete_tenant_artifacts(tenant_id: str) -> None:

@@ -62,3 +62,10 @@ PREVIEW_UNAVAILABLE = "preview_unavailable"
 QUESTION_INVALID = "question_invalid"
 EMBEDDING_MISMATCH = "embedding_mismatch"
 RERANK_UNAVAILABLE = "rerank_unavailable"
+# Plan 05-07: chat assistants and turns.
+ASSISTANT_NOT_FOUND = "assistant_not_found"  # internal only: a NOT_FOUND answer never carries its reason
+ASSISTANT_DATASET_NOT_SHARED = "assistant_dataset_not_shared"
+ASSISTANT_HAS_MEMBER_CHATS = "assistant_has_member_chats"
+DATASETS_UNAVAILABLE = "datasets_unavailable"
+TURN_IN_PROGRESS = "turn_in_progress"
+SESSION_FULL = "session_full"
