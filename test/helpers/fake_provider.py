@@ -11,7 +11,8 @@ recorder, so a test that drives the dockerised app can hand it ``stack_base_url`
 read what the app sent. They exist for the lifetime of the test only and serve fake answers and fake keys.
 Plan 05-01 additions: ``chat_mode`` picks the streamed text (plain, marker, split_marker, gated, error_midstream; a gated stream
 holds after its first piece until ``release_chat()``), ``chat_requests()`` returns the bodies of the chat calls, ``POST /rerank``
-answers in the TEI shape and ``POST /api/v1/rerank`` in the OpenRouter shape (scores are the share of query words found in the text).
+answers in the TEI shape and ``POST /api/v1/rerank`` in the OpenRouter shape (scores are the share of query words found in the text);
+plan 05-05 adds ``/scripted/<name>/rerank`` and ``/scripted/<name>/api/v1/rerank``, where ``<name>`` picks a scripted failure (fake-401, fake-429-once, fake-500, fake-413, ...).
 No fixed waits: readiness is polled with ``wait_until``; ``/slow`` and a gated chat stream wait on ``asyncio.Event`` objects that teardown releases.
 """
 from __future__ import annotations
@@ -298,21 +299,36 @@ def build_app(state: FakeProvider) -> Quart:
     def document_text(item: Any) -> str:
         return str(item.get("text", "")) if isinstance(item, dict) else str(item)
 
-    @app.post("/rerank")
-    async def tei_rerank() -> Response:
-        body = await request.get_json(force=True, silent=True) or {}
-        if str(body.get("model", request.args.get("model", ""))) == "fake-rerank-500":
+    def rerank_failure(name: str) -> Response | None:
+        """Scripted rerank failures chosen by the path (``/scripted/<name>/...``): the TEI wire has no model field to select them by."""
+        statuses = {"fake-413": 413, "fake-422": 422, "fake-424": 424, "fake-503": 503}
+        if name in statuses:
+            return _json({"error": "scripted failure", "error_type": "scripted"}, statuses[name])
+        if name == "fake-redirect":
+            return _redirect()
+        if name == "fake-rerank-500":
             return _json({"error": "Inference failed", "error_type": "backend"}, 500)
+        return _scripted_failure(state, name)
+
+    async def tei_answer(name: str | None = None) -> Response:
+        body = await request.get_json(force=True, silent=True) or {}
+        failure = rerank_failure(name) if name else None
+        if failure is None and str(body.get("model", request.args.get("model", ""))) == "fake-rerank-500":
+            failure = rerank_failure("fake-rerank-500")
+        if failure is not None:
+            return failure
         texts = [document_text(t) for t in body.get("texts", [])]
         if len(texts) > TEI_MAX_BATCH:
             return _json({"error": f"batch size {len(texts)} > maximum allowed batch size {TEI_MAX_BATCH}", "error_type": "validation"}, 413)
         return Response(json.dumps([{"index": i, "score": s} for i, s in ranked(str(body.get("query", "")), texts)]), mimetype="application/json")
 
-    @app.post("/api/v1/rerank")
-    async def openrouter_rerank() -> Response:
+    async def openrouter_answer(name: str | None = None) -> Response:
         body = await request.get_json(force=True, silent=True) or {}
-        if str(body.get("model", "")) == "fake-rerank-500":
-            return _json({"error": {"message": "Provider returned error", "code": 500}}, 500)
+        failure = rerank_failure(name) if name else None
+        if failure is None and str(body.get("model", "")) == "fake-rerank-500":
+            failure = _json({"error": {"message": "Provider returned error", "code": 500}}, 500)
+        if failure is not None:
+            return failure
         documents = [document_text(d) for d in body.get("documents", [])]
         order = ranked(str(body.get("query", "")), documents)
         top_n = body.get("top_n")
@@ -321,6 +337,22 @@ def build_app(state: FakeProvider) -> Quart:
         results = [{"index": i, "relevance_score": s, "document": {"text": documents[i]}} for i, s in order]
         tokens = sum(len(d.split()) or 1 for d in documents)
         return _json({"id": "rerank-fake", "model": str(body.get("model", "")), "results": results, "usage": {"search_units": 1, "total_tokens": tokens}})
+
+    @app.post("/rerank")
+    async def tei_rerank() -> Response:
+        return await tei_answer()
+
+    @app.post("/api/v1/rerank")
+    async def openrouter_rerank() -> Response:
+        return await openrouter_answer()
+
+    @app.post("/scripted/<name>/rerank")
+    async def scripted_tei_rerank(name: str) -> Response:
+        return await tei_answer(name)
+
+    @app.post("/scripted/<name>/api/v1/rerank")
+    async def scripted_openrouter_rerank(name: str) -> Response:
+        return await openrouter_answer(name)
 
     @app.post("/slow/v1/chat/completions")
     async def slow_chat() -> Response:

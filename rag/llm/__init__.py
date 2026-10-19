@@ -1,6 +1,6 @@
 """Model provider registry (plan 03-05, LLM-02, D-15).
 
-One source of truth for the five supported providers: the display name used in the settings page and stored on a provider
+One source of truth for the six supported providers: the display name used in the settings page and stored on a provider
 row, a URL-safe slug used in routes, the LiteLLM model prefix, the documented default base URL, and what a workspace must
 supply (key, base URL, API version). Routes, services and drivers read this table; none of them hard-codes a provider.
 
@@ -20,6 +20,7 @@ class Provider(StrEnum):
     OLLAMA = "Ollama"
     OPENROUTER = "OpenRouter"
     OPENAI_COMPATIBLE = "OpenAI-API-Compatible"
+    TEI = "TEI"
 
 
 class UnknownProvider(ValueError):
@@ -36,6 +37,7 @@ class ProviderSpec:
     base_url: Literal["default", "required"]
     requires_api_version: bool
     ollama_style: bool
+    model_types: tuple[str, ...] = ("chat", "embedding")  # the model types a workspace may save on this provider (plan 05-05)
 
 
 # Settings page order (D-15).
@@ -43,8 +45,10 @@ PROVIDER_SPECS: tuple[ProviderSpec, ...] = (
     ProviderSpec(Provider.OPENAI, "openai", "openai/", "https://api.openai.com/v1", "required", "default", False, False),
     ProviderSpec(Provider.AZURE_OPENAI, "azure-openai", "azure/", None, "required", "required", True, False),
     ProviderSpec(Provider.OLLAMA, "ollama", "ollama_chat/", None, "none", "required", False, True),
-    ProviderSpec(Provider.OPENROUTER, "openrouter", "openai/", "https://openrouter.ai/api/v1", "required", "default", False, False),
+    ProviderSpec(Provider.OPENROUTER, "openrouter", "openai/", "https://openrouter.ai/api/v1", "required", "default", False, False, ("chat", "embedding", "rerank")),
     ProviderSpec(Provider.OPENAI_COMPATIBLE, "openai-compatible", "openai/", None, "optional", "required", False, False),
+    # Rerank only, no key, the compose service address (D-01, R-206). The exact default address skips the SSRF guard.
+    ProviderSpec(Provider.TEI, "tei", "", "http://tei:80", "none", "default", False, False, ("rerank",)),
 )
 
 # Names kept after the reference implementation (rag/llm/__init__.py) so docs and code read alike.

@@ -22,10 +22,19 @@ EXPECTED = [
     ("Ollama", "ollama", "ollama_chat/", None, "none", "required", False, True),
     ("OpenRouter", "openrouter", "openai/", "https://openrouter.ai/api/v1", "required", "default", False, False),
     ("OpenAI-API-Compatible", "openai-compatible", "openai/", None, "optional", "required", False, False),
+    ("TEI", "tei", "", "http://tei:80", "none", "default", False, False),
 ]
+MODEL_TYPES = {
+    "OpenAI": ("chat", "embedding"),
+    "Azure-OpenAI": ("chat", "embedding"),
+    "Ollama": ("chat", "embedding"),
+    "OpenRouter": ("chat", "embedding", "rerank"),
+    "OpenAI-API-Compatible": ("chat", "embedding"),
+    "TEI": ("rerank",),
+}
 
 
-def test_five_providers_in_settings_page_order():
+def test_six_providers_in_settings_page_order():
     assert [s.name for s in PROVIDER_SPECS] == [row[0] for row in EXPECTED]
     assert [p.value for p in Provider] == [row[0] for row in EXPECTED]
 
@@ -37,6 +46,17 @@ def test_spec_fields(name, slug, prefix, default, key, base, api_version, ollama
     assert (spec.key, spec.base_url, spec.requires_api_version, spec.ollama_style) == (key, base, api_version, ollama)
     assert LITELLM_PROVIDER_PREFIX[Provider(name)] == prefix
     assert FACTORY_DEFAULT_BASE_URL.get(Provider(name)) == default
+
+
+@pytest.mark.parametrize("name", list(MODEL_TYPES))
+def test_each_provider_lists_the_model_types_it_accepts(name):
+    assert resolve_provider(name).model_types == MODEL_TYPES[name]
+
+
+def test_tei_is_keyless_rerank_only_and_its_default_address_is_the_compose_service():
+    spec = resolve_provider("tei")
+    assert (spec.name, spec.key, spec.default_base_url, spec.model_types) == ("TEI", "none", "http://tei:80", ("rerank",))
+    assert validate_base_url_shape(spec, None) is None and validate_base_url_shape(spec, "") is None
 
 
 def test_spec_is_frozen():
