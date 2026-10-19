@@ -449,33 +449,116 @@ Scope notes: thin by design: one engine, one embedding provider, one chunker, te
 **Plans**: 28 plans (execution is plan order; each plan is its own wave)
 Plans:
 
+**Wave 1**
+
 - [ ] 05-01-PLAN.md — Wave 0: decision rows R-192..R-202 (R-26 closed, R-27 refined), fake provider gated stream and rerank endpoints, planted-fact corpus
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
 - [ ] 05-02-PLAN.md — Fusion arithmetic with golden numbers, query builder, synonym source, `retrieval` settings
+
+**Wave 3** *(blocked on Wave 2 completion)*
+
 - [ ] 05-03-PLAN.md — `must_not` and `removed_kwd` filtering, Retriever over real Elasticsearch (two-stage search, prune, rerank blend, RRF)
+
+**Wave 4** *(blocked on Wave 3 completion)*
+
 - [ ] 05-04-PLAN.md — `POST /api/v1/datasets/search`: service, route, registry row, isolation, matrix and leak-sweep coverage
+
+**Wave 5** *(blocked on Wave 4 completion)*
+
 - [ ] 05-05-PLAN.md — Rerank drivers (TEI, OpenRouter), `rerank` model type and TEI provider row, rerank in the retrieval route (fail closed)
+
+**Wave 6** *(blocked on Wave 5 completion)*
+
 - [ ] 05-06-PLAN.md — Calibration probe with real `bge-m3` vectors for the similarity threshold default
+
+**Wave 7** *(blocked on Wave 6 completion)*
+
 - [ ] 05-07-PLAN.md — Assistant schema (migration 0003), visibility helpers, `dialog_service` with D-10 and D-23..D-26 rules
+
+**Wave 8** *(blocked on Wave 7 completion)*
+
 - [ ] 05-08-PLAN.md — Assistant routes under `/api/v1/chats`, Nginx families, e2e flow, isolation/matrix/leak coverage
+
+**Wave 9** *(blocked on Wave 8 completion)*
+
 - [ ] 05-09-PLAN.md — Sessions per user, read-time redaction, feedback, turn lock and rate guard, `ChatSettings`, session routes and harness
+
+**Wave 10** *(blocked on Wave 9 completion)*
+
 - [ ] 05-10-PLAN.md — Prompt, context and citation modules (marker canonicalisation, fallback insertion, pinned citation rules)
+
+**Wave 11** *(blocked on Wave 10 completion)*
+
 - [ ] 05-11-PLAN.md — Turn service and non-streaming completion: thin cited answer, empty response without a model call, BE-07
+
+**Wave 12** *(blocked on Wave 11 completion)*
+
 - [ ] 05-12-PLAN.md — SSE streaming, deadline, stop persistence (cited subset), mid-stream failure frames, first-frame-before-last through Nginx
+
+**Wave 13** *(blocked on Wave 12 completion)*
+
 - [ ] 05-13-PLAN.md — Citation adherence probe for the live chat model (temperature 0, 14 of 15 bar) and the D-05 switch rule
+
+**Wave 14** *(blocked on Wave 13 completion)*
+
 - [ ] 05-14-PLAN.md — Package, TEI image and model audit table, blocking human checkpoint (incl. UI-22 Partial and TEI provider row), approved web install
+
+**Wave 15** *(blocked on Wave 14 completion)*
+
 - [ ] 05-15-PLAN.md — TEI container in the stack, timing probe (R-52 closed), rerank cap and memory limit, real cross-encoder proof
+
+**Wave 16** *(blocked on Wave 15 completion)*
+
 - [ ] 05-16-PLAN.md — Web SSE client, turn state machine, services and mappers, path constants
+
+**Wave 17** *(blocked on Wave 16 completion)*
+
 - [ ] 05-17-PLAN.md — Web hooks (`useChatTurn`, queries, mutations) and test-server areas
+
+**Wave 18** *(blocked on Wave 17 completion)*
+
 - [ ] 05-18-PLAN.md — Safe answer renderer, citation pills, marker hold-back, source gate
+
+**Wave 19** *(blocked on Wave 18 completion)*
+
 - [ ] 05-19-PLAN.md — Assistant dialog (create and settings), range field, avatar picker, dataset checklist
+
+**Wave 20** *(blocked on Wave 19 completion)*
+
 - [ ] 05-20-PLAN.md — Chat page shell: route and nav, assistant and chat rails, assistant-dialog mount, page states
+
+**Wave 21** *(blocked on Wave 20 completion)*
+
 - [ ] 05-21-PLAN.md — Conversation header, delete confirmations, notices, stored message list
+
+**Wave 22** *(blocked on Wave 21 completion)*
+
 - [ ] 05-22-PLAN.md — Message input, streaming turn, stop, refusals, live region, scroll behaviour
+
+**Wave 23** *(blocked on Wave 22 completion)*
+
 - [ ] 05-23-PLAN.md — Source drawer with PDF highlight, sources row, feedback buttons
+
+**Wave 24** *(blocked on Wave 23 completion)*
+
 - [ ] 05-24-PLAN.md — Retrieval-testing page and dataset entry button
+
+**Wave 25** *(blocked on Wave 24 completion)*
+
 - [ ] 05-25-PLAN.md — Live tier: planted facts with real chat, embeddings and TEI rerank, OpenRouter rerank smoke call, SSE client live
+
+**Wave 26** *(blocked on Wave 25 completion)*
+
 - [ ] 05-26-PLAN.md — Real-Chrome criterion-5 journey and deterministic stop, empty, retrieval and hostile-text scenes
+
+**Wave 27** *(blocked on Wave 26 completion)*
+
 - [ ] 05-27-PLAN.md — Real-Chrome sharing journeys for D-23..D-26
+
+**Wave 28** *(blocked on Wave 27 completion)*
+
 - [ ] 05-28-PLAN.md — Phase gate: pinned records, all tiers and CI gates, review checklist, human-only checks
 
 Partial requirements (hand-offs recorded in DECISIONS.md R-230): RETR-03 (term weighting left to BM25 IDF), RETR-04 (small dictionary, no WordNet), RETR-09 (chunk-field conditions only; document metadata filter later), RETR-13 (formula built; tag and pagerank producers arrive in Phase 6), RETR-16 (several datasets of one workspace; several workspaces' indices in one call later), CHAT-05 (system prompt, prologue and empty response; prompt variables later), LLM-09 (TEI and OpenRouter rerank drivers; other direct drivers later), ING-21 (synonym cache; LLM cache and session store consumers later), UI-22 (GFM only; math, highlighting and image popovers later), UI-25 (core settings; temperature, top-p, penalty and max-token sliders later).

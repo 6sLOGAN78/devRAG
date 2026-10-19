@@ -157,7 +157,7 @@ Use `uv run python -m pytest` (the venv `pytest` script has a stale shebang). Pi
 
 ## Live Budget (D-06)
 
-At most **15 chat turns** reach the model per gate run (planned: 9), plus about 10 query embeddings. The OpenRouter rerank driver gets at most one smoke call per run. The app counts turns from the persisted messages and the test keeps its own counter; both are asserted.
+At most **15 chat turns** reach the model per gate run (planned: 9), plus 13 planned query embeddings (hard cap 17, R-227). The OpenRouter rerank driver gets at most one smoke call per run. The app counts turns from the persisted messages and the test keeps its own counter; both are asserted.
 
 ---
 
