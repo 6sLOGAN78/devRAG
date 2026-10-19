@@ -422,7 +422,7 @@ Plans:
 
 **Wave 20** *(blocked on Wave 19 completion)*
 
-- [ ] 04-34-PLAN.md — vitest live and real-Chrome journeys
+- [x] 04-34-PLAN.md — vitest live and real-Chrome journeys
 
 **Wave 21** *(blocked on Wave 20 completion)*
 
