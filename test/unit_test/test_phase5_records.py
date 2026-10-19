@@ -34,6 +34,7 @@ REQUIRED_TITLES = [
     "Retrieval-test limits and shape",
     "TEI provider and rerank type",
     "OpenRouter rerank driver",
+    "Calibration result",
 ]
 
 
