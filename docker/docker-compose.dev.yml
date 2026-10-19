@@ -41,11 +41,11 @@ services:
       LLM_ALLOW_PRIVATE_BASE_URLS: ${DEV_LLM_ALLOW_PRIVATE_BASE_URLS:-true}
     extra_hosts:
       - "host.docker.internal:host-gateway"
-  # Parsing worker: starting limit 768m (D-29), measured in plan 04-35. Same dev-only SSRF relaxation as app; never copy into docker-compose.yml.
+  # Parsing worker: 384m (D-29), set in plan 04-35 from a measured peak of about 193 MiB (R-188); the starting limit was 768m. Same dev-only SSRF relaxation as app; never copy into docker-compose.yml.
   task-executor:
     profiles: [cpu]
     image: ${RAGFLOW_IMAGE:-devrag-app:local}
-    mem_limit: 768m
+    mem_limit: 384m
     environment:
       LLM_ALLOW_PRIVATE_BASE_URLS: ${DEV_LLM_ALLOW_PRIVATE_BASE_URLS:-true}
     extra_hosts:

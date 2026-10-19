@@ -34,7 +34,7 @@ def test_task_executor_service_shape() -> None:
 
 def test_dev_override_carries_the_dev_only_settings() -> None:
     svc = _load("docker-compose.dev.yml")["services"]["task-executor"]
-    assert svc["mem_limit"] == "768m"
+    assert svc["mem_limit"] == "384m"
     assert "host.docker.internal:host-gateway" in svc["extra_hosts"]
     assert "LLM_ALLOW_PRIVATE_BASE_URLS" in svc["environment"]
 
