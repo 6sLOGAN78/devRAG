@@ -1,4 +1,4 @@
-"""Phase 4 records: decision rows R-154..R-167 exist and are well formed, R-11 is resolved by R-155,
+"""Phase 4 records: decision rows R-154..R-191 exist and are well formed, R-11 is resolved by R-155,
 the four partially delivered requirements are marked in both records, and the layering carve-out is stated."""
 
 import re
@@ -9,7 +9,7 @@ import pytest
 pytestmark = pytest.mark.unit
 
 FIRST_ROW = 154
-LAST_ROW = 167
+LAST_ROW = 191
 STATUS = "accepted (auto, not user-reviewed)"
 ROW = re.compile(r"^\| R-(\d+) \|")
 
@@ -29,6 +29,30 @@ REQUIRED_TITLES = [
     "Ingest configuration",
     "Phase 3 findings taken on",
     "SPA locale areas and test-server areas",
+    "Parser security hardening",
+    "Structural versus field reasons",
+    "Document row key names",
+    "Progress line for failed rows",
+    "Document settings route",
+    "Document switch route details",
+    "Chunk API names and shapes",
+    "Chunk writes",
+    "Ingestion read surface",
+    "Page image and original-file serving",
+    "SPA Phase 4 service layer",
+    "Totals after a cancel",
+    "SPA data hooks",
+    "Document table parse controls",
+    "Live PDF chunk budget",
+    "Parsing details sheet",
+    "Chunking method dialog",
+    "Chunk inspector",
+    "Chunk editor",
+    "Document viewer",
+    "Executor memory limit",
+    "PDF page cap",
+    "PDF chunk boxes",
+    "Library log levels",
 ]
 
 PARTIAL_IDS = ["CHUNK-17", "PARSE-09", "PARSE-11", "UI-14"]

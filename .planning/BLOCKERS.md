@@ -261,3 +261,17 @@ Also this phase: WR-16, WR-19, WR-26 (plan 02-02) and CR-02, WR-04, WR-24 (plan 
 - Evidence: (1) `vm.max_map_count` returns to 65530 after a host restart, so `make up` and the gate need `PREFLIGHT_ALLOW_LOW_MAP_COUNT=1` (B-02). (2) `make up` on an already running stack fails the preflight port check against this checkout's own containers, so it needs `PREFLIGHT_PORTS=` (empty). (3) The live web tests default to port 8080, but this checkout's ingress is on 8088, so they need `LIVE_BASE_URL=http://127.0.0.1:8088` (the integration tests that talk to the stack need it too). Each override is recorded by the script in `ragflow-logs/preflight-overrides.log` where applicable. (4) The host restarted about five times during Phase 3 (count reported by the orchestrator, not logged anywhere), and each restart stopped the stack, so plans rebuilt it with the overrides above.
 - Needed from user: `sudo sysctl -w vm.max_map_count=262144` (B-02) and, if wanted, a default web port that matches `.env`.
 - Workaround in repo: the three overrides above, passed on the command line; no file was changed to hide a failure.
+
+## B-34 PDF page cap of 20,000 has not been reviewed (R-168, R-189)
+- Status: open
+- Affects: PARSE-02, PARSE-03 (limit on very long PDFs)
+- Evidence: `ParseLimits.max_pages` defaults to 20,000. No document in `docs/` gives a number; an agent chose it in plan 04-08. A file above it fails with `FileTooLarge`.
+- Needed from user: confirm 20,000 or name another cap.
+- Workaround in repo: the limit is a `ParseLimits` field, so a change is one value.
+
+## B-35 Manual-only Phase 4 checks and unverified research assumptions
+- Status: open
+- Affects: UI-16, UI-13 to UI-19 (Chinese copy), research assumptions A2 and A4
+- Evidence: (1) Box alignment on the page image is asserted by tests only as "inside the image" (real Chrome, pages 1 and 13); whether the box sits on the right text needs an eye (see `04-HUMAN-UAT.md`). (2) Every Phase 4 locale area under `web/src/locales/areas/zh/` is draft Chinese nobody reviewed; it joins B-18. (3) PDF chunks cut from one text block share that block's box (R-190), so highlights are coarser than the chunk. (4) Research assumptions: A1 (nested positions in Elasticsearch) was measured in plan 04-04 and holds; A5 (executor memory) was measured in plan 04-35 (R-188); A2 (pdfium thread safety) is not verified, the process lock is applied regardless; A4 (embedding cost per gate run) was never priced.
+- Needed from user: a human look at the two screenshots, a Chinese reader, and a decision on whether finer PDF chunk boxes are wanted.
+- Workaround in repo: none needed; nothing is hidden behind a skip.
