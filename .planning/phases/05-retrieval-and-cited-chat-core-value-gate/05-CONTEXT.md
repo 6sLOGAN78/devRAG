@@ -47,6 +47,12 @@ Requirements: RETR-01..19, RETR-23, CHAT-01..23, CHAT-31, LLM-09, ING-21, TEN-03
   - Retrieval always filters by tenant and by dataset ids the caller may open (criterion 4).
 - **D-11:** **Chat sessions are private to the user who created them**, even on a shared assistant. Another member using the same shared assistant has their own sessions only.
 
+### Assistants: rulings after the UI check (user, 2026-10-19)
+- **D-23:** **Switching a shared assistant back to "Only me" is refused while any other member has sessions with it.** The server answers with a clear reason and the count of members with chats; nothing is deleted. Once no other member has sessions, the switch succeeds. No teammate chat is ever deleted by a visibility change.
+- **D-24:** **The creator, and workspace owners and admins, may edit a shared (`team`) assistant**: settings, visibility and datasets. Ordinary members can use it but not edit it. A private assistant stays creator-only (D-09 / Phase 3 D-27). An owner or admin narrowing a `team` assistant to "Only me" is subject to D-23, and the assistant then belongs to its creator only.
+- **D-25:** **Saving an assistant never unbinds a dataset the saver cannot see.** The server keeps every bound dataset id the saver cannot open and only applies changes to the ids the saver can see. A bound dataset that is unavailable at answer time is skipped for that reader (D-10), with a notice; the notice is computed per reader. If no usable dataset remains for the reader, the chat answers with a refusal (409), not an empty retrieval.
+- **D-26:** **Deleting a shared assistant deletes every member's sessions with it**, after a confirmation that states how many members' chats will be removed. Only the creator, an owner or an admin can delete it. This matches dataset deletion.
+
 ### Chat page and citations
 - **D-12:** **Core assistant settings only** in this phase: name, avatar, bound datasets, chat model, empty-response text, opening greeting, system prompt, similarity threshold, keyword/vector weight, top N and rerank model. Advanced settings move to later phases. These include prompt variables, keyword extraction, multi-turn question refinement, TTS and similar. Any Phase 5 requirement covering them is marked **Partial** with the hand-off recorded, in the same way as Phase 4 D-27.
 - **D-13:** **Clicking a citation opens a side drawer**:

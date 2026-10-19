@@ -237,6 +237,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-10-19T08:02:05.177Z
-Stopped at: Phase 5 context gathered
-Resume file: .planning/phases/05-retrieval-and-cited-chat-core-value-gate/05-CONTEXT.md
+Last session: 2026-10-19
+Stopped at: Session resumed inside plan-phase 5 --auto; UI-SPEC drafted and checker-approved, waiting on 4 user rulings (unshare, edit rights, unavailable datasets on save, delete of a shared assistant)
+Resume file: .planning/phases/05-retrieval-and-cited-chat-core-value-gate/05-UI-SPEC.md
