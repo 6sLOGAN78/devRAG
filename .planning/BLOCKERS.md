@@ -275,3 +275,10 @@ Also this phase: WR-16, WR-19, WR-26 (plan 02-02) and CR-02, WR-04, WR-24 (plan 
 - Evidence: (1) Box alignment on the page image is asserted by tests only as "inside the image" (real Chrome, pages 1 and 13); whether the box sits on the right text needs an eye (see `04-HUMAN-UAT.md`). (2) Every Phase 4 locale area under `web/src/locales/areas/zh/` is draft Chinese nobody reviewed; it joins B-18. (3) PDF chunks cut from one text block share that block's box (R-190), so highlights are coarser than the chunk. (4) Research assumptions: A1 (nested positions in Elasticsearch) was measured in plan 04-04 and holds; A5 (executor memory) was measured in plan 04-35 (R-188); A2 (pdfium thread safety) is not verified, the process lock is applied regardless; A4 (embedding cost per gate run) was never priced.
 - Needed from user: a human look at the two screenshots, a Chinese reader, and a decision on whether finer PDF chunk boxes are wanted.
 - Workaround in repo: none needed; nothing is hidden behind a skip.
+
+## B-36 Phase 4 exit gate refused by the project guard (stray mailpit container)
+- Status: open
+- Affects: plan 04-35 task 3, TEST-11, E2E-05, E2E-06 (the three clean-room runs)
+- Evidence: `scripts/clean_room.sh` step `project-guard` fails: the `devrag-stack-mailpit-1` container has working-dir label `/home/logan78/desktop x/devRag_@/docker`, the other seven have `/home/logan78/desktop x/devRAG/docker` (see `04-35-GATE-LOG.md`).
+- Needed from user: run `docker rm -f devrag-stack-mailpit-1` (no volume), then `PREFLIGHT_ALLOW_LOW_MAP_COUNT=1 LIVE_BASE_URL=http://127.0.0.1:8088 scripts/clean_room.sh --runs 3`, then finish the plan (tick requirements, approve `04-VALIDATION.md`).
+- Workaround in repo: none; the guard was not bypassed.

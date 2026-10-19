@@ -9,6 +9,8 @@ created: 2026-10-10
 
 # Phase 4 — Validation Strategy
 
+> Plan 04-35 status: NOT approved. The unit, web and CI tiers pass, but the three clean-room runs have not run: the gate's project guard refused (see `04-35-GATE-LOG.md`). `status`, `nyquist_compliant` and `wave_0_complete` stay as they are until the gate passes.
+
 > Per-phase validation contract for feedback sampling during execution.
 > Source: `04-RESEARCH.md`, section "Validation Architecture".
 
