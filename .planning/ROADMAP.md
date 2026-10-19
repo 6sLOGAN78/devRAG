@@ -459,7 +459,7 @@ Plans:
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
-- [ ] 05-03-PLAN.md — `must_not` and `removed_kwd` filtering, Retriever over real Elasticsearch (two-stage search, prune, rerank blend, RRF)
+- [x] 05-03-PLAN.md — `must_not` and `removed_kwd` filtering, Retriever over real Elasticsearch (two-stage search, prune, rerank blend, RRF)
 
 **Wave 4** *(blocked on Wave 3 completion)*
 
