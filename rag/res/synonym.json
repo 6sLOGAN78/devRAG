@@ -1,0 +1,208 @@
+{
+ "address": [
+  "location"
+ ],
+ "begin": [
+  "commence"
+ ],
+ "big": [
+  "large",
+  "huge"
+ ],
+ "boss": [
+  "manager",
+  "supervisor"
+ ],
+ "budget": [
+  "funding",
+  "allocation"
+ ],
+ "bug": [
+  "defect",
+  "issue"
+ ],
+ "buy": [
+  "purchase"
+ ],
+ "car": [
+  "automobile",
+  "vehicle"
+ ],
+ "company": [
+  "firm",
+  "business",
+  "organization"
+ ],
+ "contract": [
+  "agreement"
+ ],
+ "create": [
+  "make",
+  "generate"
+ ],
+ "customer": [
+  "client"
+ ],
+ "deadline": [
+  "due",
+  "cutoff"
+ ],
+ "delete": [
+  "remove",
+  "erase"
+ ],
+ "doctor": [
+  "physician"
+ ],
+ "email": [
+  "mail"
+ ],
+ "employee": [
+  "staff",
+  "worker"
+ ],
+ "end": [
+  "finish",
+  "terminate"
+ ],
+ "error": [
+  "fault",
+  "mistake",
+  "defect"
+ ],
+ "help": [
+  "assist",
+  "support"
+ ],
+ "illness": [
+  "disease",
+  "sickness"
+ ],
+ "install": [
+  "setup",
+  "deploy"
+ ],
+ "invoice": [
+  "bill",
+  "statement"
+ ],
+ "job": [
+  "position",
+  "role"
+ ],
+ "law": [
+  "regulation",
+  "statute"
+ ],
+ "login": [
+  "signin",
+  "authenticate"
+ ],
+ "loss": [
+  "deficit"
+ ],
+ "manager": [
+  "supervisor"
+ ],
+ "medicine": [
+  "drug",
+  "medication"
+ ],
+ "meeting": [
+  "conference",
+  "session"
+ ],
+ "password": [
+  "passcode",
+  "credential"
+ ],
+ "payment": [
+  "remittance",
+  "settlement"
+ ],
+ "phone": [
+  "telephone",
+  "mobile"
+ ],
+ "policy": [
+  "rule",
+  "guideline"
+ ],
+ "price": [
+  "cost",
+  "fee"
+ ],
+ "problem": [
+  "issue",
+  "trouble"
+ ],
+ "profit": [
+  "gain",
+  "margin"
+ ],
+ "purchase": [
+  "buy",
+  "order"
+ ],
+ "quick": [
+  "fast",
+  "rapid"
+ ],
+ "refund": [
+  "reimbursement",
+  "repayment"
+ ],
+ "report": [
+  "document",
+  "summary"
+ ],
+ "revenue": [
+  "income",
+  "earnings",
+  "sales"
+ ],
+ "salary": [
+  "pay",
+  "wage",
+  "compensation"
+ ],
+ "shipment": [
+  "delivery",
+  "consignment"
+ ],
+ "small": [
+  "little",
+  "tiny"
+ ],
+ "start": [
+  "begin",
+  "launch"
+ ],
+ "student": [
+  "pupil",
+  "learner"
+ ],
+ "supplier": [
+  "vendor",
+  "provider"
+ ],
+ "tax": [
+  "levy",
+  "duty"
+ ],
+ "teacher": [
+  "instructor",
+  "educator"
+ ],
+ "update": [
+  "upgrade",
+  "patch"
+ ],
+ "user": [
+  "account",
+  "member"
+ ],
+ "warranty": [
+  "guarantee"
+ ]
+}

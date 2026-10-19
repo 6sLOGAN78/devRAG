@@ -27,7 +27,7 @@ def cosine_from_es_score(score: float) -> float:
     return min(1.0, max(0.0, 2.0 * score - 1.0))
 
 
-def token_overlap(query_tokens: list[str], doc_tokens: list[str]) -> float:
+def token_overlap(query_tokens: list[str] | tuple[str, ...], doc_tokens: list[str] | tuple[str, ...]) -> float:
     """``|Q intersect D| / |Q|`` over the de-duplicated query tokens; 0.0 when the query has none."""
     query = set(query_tokens)
     if not query:
