@@ -4,13 +4,13 @@ milestone: v1.0
 milestone_name: milestone
 status: executing
 stopped_at: Session resumed inside plan-phase 5 --auto; UI-SPEC drafted and checker-approved, waiting on 4 user rulings (unshare, edit rights, unavailable datasets on save, delete of a shared assistant)
-last_updated: "2026-10-19T16:34:44.707Z"
-last_activity: 2026-10-19 -- Phase 5 planning complete
+last_updated: "2026-10-19T16:41:26.119Z"
+last_activity: 2026-10-19
 progress:
   total_phases: 8
   completed_phases: 4
   total_plans: 146
-  completed_plans: 118
+  completed_plans: 119
   percent: 50
 ---
 
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-10-05)
 
 **Core value:** A user can upload a document into a knowledge base and get an accurate, cited answer to a question about it, end-to-end through the real pipeline (parse, chunk, embed, index, hybrid retrieve, rerank, generate), with no mocked stages.
-**Current focus:** Phase 4 — ingestion-pipeline
+**Current focus:** Phase 5 — retrieval-and-cited-chat-core-value-gate
 
 ## Current Position
 
-Phase: 5 (retrieval-and-cited-chat-core-value-gate) — CONTEXT GATHERED, ready to plan
-Plan: 0 of TBD (Phase 4 complete: 35 of 35, verification human_needed, clean-room gate deferred — B-36)
+Phase: 5 (retrieval-and-cited-chat-core-value-gate) — EXECUTING
+Plan: 2 of 28
 Status: Ready to execute
-Last activity: 2026-10-19 -- Phase 5 planning complete
+Last activity: 2026-10-19
 
-Progress: [██████████] 99%
+Progress: [████████░░] 82%
 
 ## Performance Metrics
 
@@ -120,6 +120,7 @@ Progress: [██████████] 99%
 | Phase 04 P31 | ~1h15 | 2 tasks | 14 files |
 | Phase 04 P32 | 45min | 2 tasks | 17 files |
 | Phase 4 P34 | ~2h | 2 tasks | 7 files |
+| Phase 05 P01 | 45min | 3 tasks | 8 files |
 
 ## Accumulated Context
 
@@ -202,6 +203,7 @@ Recent decisions affecting current work:
 - [Phase 04]: R-185: chunk inspector requests binding, then document detail, then the chunk list; boxes are percent of the page clipped to it; usePageImage is the only object-URL site
 - [Phase 04]: R-186: chunk editor keeps an Editing snapshot; blocker only on pathname or id/doc; leaving actions guarded as actions — typed text must survive a 404 refetch and the list's own page step
 - [Phase 04]: R-187: useBlobUrl is the single object-URL site; downloads re-typed as octet-stream; text previews are pre text nodes capped at 262144 characters — plan 04-32
+- [Phase 05]: 05-01: R-192..R-202 recorded; R-26 closed (SSE framing), R-27 refined (0-based marker index); fake provider gains gated chat stream, request record, TEI/OpenRouter rerank; strict xfail must_not case awaits 05-03
 
 ### Pending Todos
 
@@ -237,6 +239,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-10-19
+Last session: 2026-10-19T16:41:21.658Z
 Stopped at: Session resumed inside plan-phase 5 --auto; UI-SPEC drafted and checker-approved, waiting on 4 user rulings (unshare, edit rights, unavailable datasets on save, delete of a shared assistant)
-Resume file: .planning/phases/05-retrieval-and-cited-chat-core-value-gate/05-UI-SPEC.md
+Resume file: None

@@ -451,7 +451,7 @@ Plans:
 
 **Wave 1**
 
-- [ ] 05-01-PLAN.md — Wave 0: decision rows R-192..R-202 (R-26 closed, R-27 refined), fake provider gated stream and rerank endpoints, planted-fact corpus
+- [x] 05-01-PLAN.md — Wave 0: decision rows R-192..R-202 (R-26 closed, R-27 refined), fake provider gated stream and rerank endpoints, planted-fact corpus
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
