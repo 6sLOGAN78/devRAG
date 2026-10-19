@@ -475,7 +475,7 @@ Plans:
 
 **Wave 7** *(blocked on Wave 6 completion)*
 
-- [ ] 05-07-PLAN.md — Assistant schema (migration 0003), visibility helpers, `dialog_service` with D-10 and D-23..D-26 rules
+- [x] 05-07-PLAN.md — Assistant schema (migration 0003), visibility helpers, `dialog_service` with D-10 and D-23..D-26 rules
 
 **Wave 8** *(blocked on Wave 7 completion)*
 

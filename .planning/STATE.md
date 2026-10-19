@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 05-06-PLAN.md (retrieval threshold calibration, outcome keep); next plan 05-07
-last_updated: "2026-10-19T22:26:19.875Z"
+stopped_at: Completed 05-07-PLAN.md (assistant model and service layer); next plan 05-08
+last_updated: "2026-10-19T22:51:08.248Z"
 last_activity: 2026-10-19
 progress:
   total_phases: 8
   completed_phases: 4
   total_plans: 146
-  completed_plans: 124
+  completed_plans: 125
   percent: 50
 ---
 
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-10-05)
 ## Current Position
 
 Phase: 5 (retrieval-and-cited-chat-core-value-gate) — EXECUTING
-Plan: 7 of 28
+Plan: 8 of 28
 Status: Ready to execute
 Last activity: 2026-10-19
 
-Progress: [█████████░] 85%
+Progress: [█████████░] 86%
 
 ## Performance Metrics
 
@@ -126,6 +126,7 @@ Progress: [█████████░] 85%
 | Phase 5 P04 | 1h45m | 3 tasks | 17 files |
 | Phase 5 P05 | ~3h | 3 tasks | 22 files |
 | Phase 5 P6 | ~1h | 2 tasks | 6 files |
+| Phase 05 P07 | 1h45m | 3 tasks | 18 files |
 
 ## Accumulated Context
 
@@ -214,6 +215,8 @@ Recent decisions affecting current work:
 - [Phase 5]: R-205: retrieval-test body bounds, embedding_mismatch, rate key retrieval:{tenant}:{user}, 45 s handler; rate guard runs before dataset authorisation; RETR-16 Partial
 - [Phase 5]: R-206/R-207: rerank is model type bit 16 with a rerank_id slot; TEI is a keyless rerank-only sixth provider (default http://tei:80 skips the SSRF guard by exact match); OpenRouter rerank exists (D-02); rerank_id on the retrieval route fails closed (502 rerank_unavailable, 409 model_unavailable); LLM-09 Partial
 - [Phase 5]: R-208: similarity threshold 0.2 kept; measured on real bge-m3, relevant 0.2867..0.6381, irrelevant 0.0783..0.1221, planted-fact wording 0.6796..0.7979; probe is manual (scripts/probe), 19 of 24 query embeddings, no chat call
+- [Phase 05]: R-209: assistant rules as built (D-10 binding, per-reader chat-time set, keep-hidden save, D-23 count, D-24 manage matrix, D-26 cascade); deleted dataset ids are dropped by the next save that sends kb_ids
+- [Phase 05]: R-210: assistant view keys explicit; icon is a PNG or JPEG data URL up to 400,000 chars, detail only; plan 05-08 must carry data.reason dataset_not_found on its 404
 
 ### Pending Todos
 
@@ -249,6 +252,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-10-19T22:26:19.864Z
-Stopped at: Completed 05-06-PLAN.md (retrieval threshold calibration, outcome keep); next plan 05-07
+Last session: 2026-10-19T22:51:08.236Z
+Stopped at: Completed 05-07-PLAN.md (assistant model and service layer); next plan 05-08
 Resume file: None
