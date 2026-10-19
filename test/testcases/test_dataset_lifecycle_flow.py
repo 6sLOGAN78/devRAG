@@ -95,12 +95,13 @@ def test_the_owner_updates_every_editable_field_and_the_answer_is_the_dataset(in
     made = ok(create(ingress, owner, "  First  "))
     assert made["name"] == "First"
 
-    body = {"name": "  Renamed  ", "description": "changed", "permission": "team", "avatar": "data:image/png;base64,AAAA", "language": "German", "parser_id": "book"}
+    # parser_id stays out: only "naive" has a built chunker in Phase 4 (D-27); refusing an unbuilt method is covered below.
+    body = {"name": "  Renamed  ", "description": "changed", "permission": "team", "avatar": "data:image/png;base64,AAAA", "language": "German"}
     resp = update(ingress, owner, made["id"], body)
     data = ok(resp)
     assert resp.headers["x-api-source"] == "python"
     assert set(data) == DTO_KEYS, "the same dataset body as create, list and detail"
-    assert (data["name"], data["description"], data["permission"], data["avatar"], data["language"], data["parser_id"]) == ("Renamed", "changed", "team", body["avatar"], "German", "book")
+    assert (data["name"], data["description"], data["permission"], data["avatar"], data["language"], data["parser_id"]) == ("Renamed", "changed", "team", body["avatar"], "German", made["parser_id"])
     assert (data["id"], data["tenant_id"], data["created_by"], data["embd_id"], data["doc_num"]) == (made["id"], made["tenant_id"], made["created_by"], made["embd_id"], 0)
     assert data["update_time"] >= made["update_time"] and data["create_time"] == made["create_time"]
     assert_clean(resp)
@@ -112,6 +113,10 @@ def test_the_owner_updates_every_editable_field_and_the_answer_is_the_dataset(in
     assert "pages" in again["parser_config"], "the documented defaults stay"
     cleared = ok(update(ingress, owner, made["id"], {"description": None, "avatar": None}))
     assert cleared["description"] == "" and cleared["avatar"] == ""
+
+    refused = update(ingress, owner, made["id"], {"parser_id": "book"})
+    assert refused.status_code == 400 and refused.json()["data"]["reason"] == "chunker_unavailable"
+    assert ok(api(ingress, "GET", dataset_path(made["id"]), owner.token))["parser_id"] == made["parser_id"]
 
 
 def test_renaming_checks_duplicates_against_other_datasets_only(ingress: httpx.Client, registry: AccountRegistry, fake_provider_stack: FakeProvider) -> None:  # noqa: F811
