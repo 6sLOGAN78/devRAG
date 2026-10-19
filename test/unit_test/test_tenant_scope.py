@@ -8,6 +8,8 @@ from __future__ import annotations
 import pytest
 
 from api.db.services.tenant_scope import (
+    assistant_visible,
+    can_manage_assistant,
     can_manage_dataset,
     can_remove_document,
     dataset_visible,
@@ -66,3 +68,46 @@ def test_can_manage_dataset(creator: str, caller: str, role: str, expected: bool
 )
 def test_can_remove_document(doc_creator: str, kb_creator: str, caller: str, role: str, expected: bool) -> None:
     assert can_remove_document(doc_creator, kb_creator, caller, role) is expected
+
+
+def test_assistant_visibility_has_the_dataset_truth_table() -> None:
+    for creator, permission, caller, member in [
+        ("u1", "me", "u1", True),
+        ("u1", "team", "u2", True),
+        ("u1", "me", "u2", True),
+        ("u1", "team", "u2", False),
+        ("u1", "me", "u1", False),
+        ("u1", "", "u2", True),
+        ("u1", "other", "u2", True),
+        ("u1", "team", "", True),
+    ]:
+        assert assistant_visible(creator, permission, caller, member) is dataset_visible(creator, permission, caller, member), (creator, permission, caller, member)
+
+
+def test_a_private_assistant_is_invisible_to_owner_and_admin() -> None:
+    """D-09 and D-27 carry over: no override for a ``me`` assistant, whatever the caller's role."""
+    assert assistant_visible("u1", "me", "owner1", True) is False
+    assert assistant_visible("u1", "me", "admin1", True) is False
+    assert assistant_visible("u1", "team", "admin1", True) is True
+
+
+@pytest.mark.parametrize(
+    ("creator", "permission", "caller", "role", "expected"),
+    [
+        ("u1", "me", "u1", "normal", True),
+        ("u1", "team", "u1", "normal", True),
+        ("u1", "me", "admin1", "admin", False),
+        ("u1", "me", "owner1", "owner", False),
+        ("u1", "team", "admin1", "admin", True),
+        ("u1", "team", "owner1", "owner", True),
+        ("u1", "team", "u2", "normal", False),
+        ("u1", "me", "u2", "normal", False),
+        ("u1", "team", "u2", "invite", False),
+        ("u1", "team", "", "admin", False),
+        ("u1", "team", "", "owner", False),
+        ("", "team", "", "normal", False),
+        ("u1", "other", "admin1", "admin", False),
+    ],
+)
+def test_can_manage_assistant_d24(creator: str, permission: str, caller: str, role: str, expected: bool) -> None:
+    assert can_manage_assistant(creator, permission, caller, role) is expected

@@ -74,6 +74,8 @@ class Dialog(BaseModel):
     rerank_id = peewee.CharField(max_length=128, null=False, help_text="default rerank model ID")
     tenant_rerank_id = peewee.CharField(max_length=32, null=True, help_text="id in tenant_model", index=True)
     kb_ids = JSONField(null=False, default=list)
+    created_by = peewee.CharField(max_length=32, null=False, default="", help_text="user id of the assistant's creator", index=True)
+    permission = peewee.CharField(max_length=16, null=False, default="me", help_text="me|team", index=True)
     status = peewee.CharField(max_length=1, null=True, help_text=_STATUS_HELP, default="1", index=True)
 
     class Meta:

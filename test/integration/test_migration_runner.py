@@ -236,3 +236,57 @@ def test_unique_index_request_with_nonunique_existing_index_fails_loudly(scratch
         assert not add_index_if_missing(DB, "idx_t", ("d",), unique=True)
         with pytest.raises(MigrationError, match="different uniqueness"):
             add_index_if_missing(DB, "idx_t", ("d",), unique=False)
+
+
+def _s(value) -> str:
+    return value.decode() if isinstance(value, bytes) else value
+
+
+def _dialog_columns() -> set[str]:
+    with DB.connection_context():
+        return {c.name for c in DB.get_columns("dialog")}
+
+
+def _dialog_indexed() -> set[tuple[str, ...]]:
+    with DB.connection_context():
+        return {tuple(i.columns) for i in DB.get_indexes("dialog")}
+
+
+def test_migration_0003_adds_the_assistant_columns_to_an_old_database_and_is_idempotent(scratch):
+    """An existing 0002 database gets ``created_by`` and ``permission`` with their indexes; a rerun of the body changes nothing."""
+    assert run_migrations(DB) == ["0001", "0002", "0003"]  # a fresh database: 0002 builds from the current models, 0003 then finds both columns
+    with DB.connection_context():
+        DB.execute_sql("INSERT INTO dialog (id, tenant_id, llm_id, rerank_id, llm_setting, prompt_config, kb_ids, created_by, permission) VALUES ('d1', 't1', 'm', '', '{}', '{}', '[]', 'x', 'team')")
+        DB.execute_sql("ALTER TABLE dialog DROP INDEX dialog_created_by, DROP INDEX dialog_permission")
+        DB.execute_sql("ALTER TABLE dialog DROP COLUMN created_by, DROP COLUMN permission")
+        DB.execute_sql("UPDATE system_settings SET value = '0002' WHERE name = 'schema.version'")
+    assert {"created_by", "permission"}.isdisjoint(_dialog_columns())
+
+    assert run_migrations(DB) == ["0003"]
+    assert {"created_by", "permission"} <= _dialog_columns()
+    assert {("created_by",), ("permission",)} <= _dialog_indexed()
+    with DB.connection_context():
+        row = DB.execute_sql("SELECT created_by, permission FROM dialog WHERE id = 'd1'").fetchone()
+        shape = DB.execute_sql(
+            "SELECT column_name, column_type, is_nullable FROM information_schema.columns WHERE table_schema = DATABASE() AND table_name = 'dialog' AND column_name IN ('created_by', 'permission')"
+        ).fetchall()
+    assert tuple(row) == ("", "me"), "existing rows get the column defaults"
+    assert {(_s(n), _s(t), _s(null)) for n, t, null in shape} == {("created_by", "varchar(32)", "NO"), ("permission", "varchar(16)", "NO")}
+
+    # The body again, as a crash between the ALTER and the version write would leave it.
+    migration = next(m for number, _, m in discover(DEFAULT_MIGRATIONS_DIR) if number == 3)
+    before = (_dialog_columns(), _dialog_indexed())
+    with DB.connection_context():
+        migration.upgrade(DB)
+        migration.upgrade(DB)
+    assert (_dialog_columns(), _dialog_indexed()) == before
+
+
+def test_migration_0003_finishes_after_the_columns_were_added_but_not_the_indexes(scratch):
+    run_migrations(DB)
+    with DB.connection_context():
+        DB.execute_sql("ALTER TABLE dialog DROP INDEX dialog_permission")
+        DB.execute_sql("UPDATE system_settings SET value = '0002' WHERE name = 'schema.version'")
+    assert ("permission",) not in _dialog_indexed()
+    assert run_migrations(DB) == ["0003"]
+    assert ("permission",) in _dialog_indexed()

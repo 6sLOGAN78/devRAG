@@ -8,6 +8,7 @@ import "time"
 type Dialog struct {
 	CreateDate             *time.Time `gorm:"column:create_date" json:"create_date"`
 	CreateTime             *int64     `gorm:"column:create_time" json:"create_time"`
+	CreatedBy              string     `gorm:"column:created_by;not null" json:"created_by"`
 	Description            *string    `gorm:"column:description" json:"description"`
 	DoRefer                string     `gorm:"column:do_refer;not null" json:"do_refer"`
 	Icon                   *string    `gorm:"column:icon" json:"icon"`
@@ -18,6 +19,7 @@ type Dialog struct {
 	LLMSetting             string     `gorm:"column:llm_setting;not null" json:"llm_setting"`
 	MetaDataFilter         *string    `gorm:"column:meta_data_filter" json:"meta_data_filter"`
 	Name                   *string    `gorm:"column:name" json:"name"`
+	Permission             string     `gorm:"column:permission;not null" json:"permission"`
 	PromptConfig           string     `gorm:"column:prompt_config;not null" json:"prompt_config"`
 	PromptType             string     `gorm:"column:prompt_type;not null" json:"prompt_type"`
 	RerankID               string     `gorm:"column:rerank_id;not null" json:"rerank_id"`

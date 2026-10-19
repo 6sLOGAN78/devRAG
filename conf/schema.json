@@ -1578,6 +1578,15 @@
           "auto_increment": false
         },
         {
+          "name": "created_by",
+          "type": "varchar(32)",
+          "nullable": false,
+          "default": null,
+          "app_default": "",
+          "primary_key": false,
+          "auto_increment": false
+        },
+        {
           "name": "description",
           "type": "longtext",
           "nullable": true,
@@ -1664,6 +1673,15 @@
           "nullable": true,
           "default": null,
           "app_default": null,
+          "primary_key": false,
+          "auto_increment": false
+        },
+        {
+          "name": "permission",
+          "type": "varchar(16)",
+          "nullable": false,
+          "default": null,
+          "app_default": "me",
           "primary_key": false,
           "auto_increment": false
         },
@@ -1801,6 +1819,13 @@
           "unique": false
         },
         {
+          "name": "dialog_created_by",
+          "columns": [
+            "created_by"
+          ],
+          "unique": false
+        },
+        {
           "name": "dialog_language",
           "columns": [
             "language"
@@ -1811,6 +1836,13 @@
           "name": "dialog_name",
           "columns": [
             "name"
+          ],
+          "unique": false
+        },
+        {
+          "name": "dialog_permission",
+          "columns": [
+            "permission"
           ],
           "unique": false
         },

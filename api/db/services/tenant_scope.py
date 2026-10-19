@@ -123,3 +123,26 @@ def can_remove_document(document_creator_id: str, dataset_creator_id: str, calle
     if not caller_id:
         return False
     return document_creator_id == caller_id or can_manage_dataset(dataset_creator_id, caller_id, role)
+
+
+def assistant_visible(creator_id: str, permission: str, caller_id: str, caller_in_tenant: bool) -> bool:
+    """Whether the caller may see a chat assistant of the workspace (plan 05-07; D-09, D-19).
+
+    The same truth table as :func:`dataset_visible`: a ``me`` assistant belongs to its creator alone, with no owner or
+    admin override; a ``team`` assistant is visible to every member. It has its own name so a call site says which object
+    it is deciding about.
+    """
+    return dataset_visible(creator_id, permission, caller_id, caller_in_tenant)
+
+
+def can_manage_assistant(creator_id: str, permission: str, caller_id: str, role: str) -> bool:
+    """Edit, re-share or delete an assistant (D-24, D-26): its creator, or an owner or admin when it is shared with the team.
+
+    This differs from :func:`can_manage_dataset` in one place: a private (``me``) assistant is the creator's alone, so an
+    owner or admin is not elevated over it. Callers check visibility first; a missing caller id is never allowed.
+    """
+    if not caller_id:
+        return False
+    if creator_id == caller_id:
+        return True
+    return permission == PERMISSION_TEAM and is_elevated(role)
