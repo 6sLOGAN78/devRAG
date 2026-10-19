@@ -455,7 +455,7 @@ Plans:
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 05-02-PLAN.md — Fusion arithmetic with golden numbers, query builder, synonym source, `retrieval` settings
+- [x] 05-02-PLAN.md — Fusion arithmetic with golden numbers, query builder, synonym source, `retrieval` settings
 
 **Wave 3** *(blocked on Wave 2 completion)*
 

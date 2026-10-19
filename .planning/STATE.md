@@ -4,13 +4,13 @@ milestone: v1.0
 milestone_name: milestone
 status: executing
 stopped_at: Session resumed inside plan-phase 5 --auto; UI-SPEC drafted and checker-approved, waiting on 4 user rulings (unshare, edit rights, unavailable datasets on save, delete of a shared assistant)
-last_updated: "2026-10-19T16:41:26.119Z"
+last_updated: "2026-10-19T16:47:24.426Z"
 last_activity: 2026-10-19
 progress:
   total_phases: 8
   completed_phases: 4
   total_plans: 146
-  completed_plans: 119
+  completed_plans: 120
   percent: 50
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-10-05)
 ## Current Position
 
 Phase: 5 (retrieval-and-cited-chat-core-value-gate) — EXECUTING
-Plan: 2 of 28
+Plan: 3 of 28
 Status: Ready to execute
 Last activity: 2026-10-19
 
@@ -121,6 +121,7 @@ Progress: [████████░░] 82%
 | Phase 04 P32 | 45min | 2 tasks | 17 files |
 | Phase 4 P34 | ~2h | 2 tasks | 7 files |
 | Phase 05 P01 | 45min | 3 tasks | 8 files |
+| Phase 05 P02 | 50min | 3 tasks | 17 files |
 
 ## Accumulated Context
 
@@ -204,6 +205,7 @@ Recent decisions affecting current work:
 - [Phase 04]: R-186: chunk editor keeps an Editing snapshot; blocker only on pathname or id/doc; leaving actions guarded as actions — typed text must survive a 404 refetch and the list's own page step
 - [Phase 04]: R-187: useBlobUrl is the single object-URL site; downloads re-typed as octet-stream; text previews are pre text nodes capped at 262144 characters — plan 04-32
 - [Phase 05]: 05-01: R-192..R-202 recorded; R-26 closed (SSE framing), R-27 refined (0-based marker index); fake provider gains gated chat stream, request record, TEI/OpenRouter rerank; strict xfail must_not case awaits 05-03
+- [Phase 05]: 05-02: R-203 retrieval settings and synonyms; fuse uses the vector share (1-w)*term + w*vector; synonym cache fails open to the in-repo dictionary; compose passes RETRIEVAL_* to the app
 
 ### Pending Todos
 
@@ -239,6 +241,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-10-19T16:41:21.658Z
+Last session: 2026-10-19T16:47:18.532Z
 Stopped at: Session resumed inside plan-phase 5 --auto; UI-SPEC drafted and checker-approved, waiting on 4 user rulings (unshare, edit rights, unavailable datasets on save, delete of a shared assistant)
 Resume file: None
