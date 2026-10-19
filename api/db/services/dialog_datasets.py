@@ -9,6 +9,7 @@ from collections.abc import Iterable, Mapping, Sequence
 from dataclasses import dataclass
 
 from api.db.models import Knowledgebase
+from api.db.services.dialog_rules import MAX_STORED_KB_IDS
 from api.db.services.service_errors import Kind, ServiceError
 from api.db.services.tenant_scope import PERMISSION_TEAM, dataset_visible
 from api.utils import reasons
@@ -67,3 +68,12 @@ def require_shareable(ids: Sequence[str], known: Mapping[str, Dataset], tenant_i
         raise ServiceError(
             Kind.CONFLICT, reasons.ASSISTANT_DATASET_NOT_SHARED, "a shared assistant can only use datasets that are shared with the team", data={"dataset_ids": shown}
         )
+
+
+def next_kb_ids(stored: Sequence[str], requested: Sequence[str], tenant_id: str, user_id: str, known: Mapping[str, Dataset]) -> list[str]:
+    """The stored ids after a save that sends ``requested``: the live ids the saver cannot open stay, the saver's own choice follows (D-25)."""
+    kept = [i for i in stored if i in known and not openable(known[i], tenant_id, user_id)]
+    merged = kept + [i for i in requested if i not in kept]
+    if len(merged) > MAX_STORED_KB_IDS:
+        raise ServiceError(Kind.INVALID, reasons.FIELDS_INVALID, "too many datasets are bound to this assistant")
+    return merged

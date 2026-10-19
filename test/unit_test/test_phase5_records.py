@@ -35,6 +35,8 @@ REQUIRED_TITLES = [
     "TEI provider and rerank type",
     "OpenRouter rerank driver",
     "Calibration result",
+    "Assistant rules as built",
+    "Assistant view keys",
 ]
 
 

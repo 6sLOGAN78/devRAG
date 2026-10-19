@@ -41,6 +41,16 @@ class VisibleAssistant:
     scope: ActingScope
 
 
+@dataclass(frozen=True)
+class ChatBinding:
+    """What a turn may retrieve from, decided for one reader (D-25)."""
+
+    assistant: AssistantRecord
+    usable_dataset_ids: tuple[str, ...]
+    unavailable_count: int
+    tenant_id: str
+
+
 def record_of(row: Dialog, *, with_icon: bool = True) -> AssistantRecord:
     stored_ids = row.kb_ids if isinstance(row.kb_ids, list) else []
     prompt = row.prompt_config if isinstance(row.prompt_config, dict) else {}

@@ -31,17 +31,18 @@ from __future__ import annotations
 import logging
 import uuid
 from collections.abc import Iterator, Mapping
-from contextlib import contextmanager
+from contextlib import ExitStack, contextmanager
 from typing import Any
 
 import peewee
 
 from api.db.database import DB, DatabaseLock, LockError, LockTimeoutError, transaction
 from api.db.models import Conversation, Dialog
+from api.db.models.base import current_timestamp_ms, timestamp_to_date
 from api.db.services import tenant_model_service
 from api.db.services.auth_service import Principal
-from api.db.services.dialog_datasets import live_datasets, requested_datasets, require_shareable, usable_ids
-from api.db.services.dialog_records import AssistantRecord, VisibleAssistant, assistant_view, record_of
+from api.db.services.dialog_datasets import live_datasets, next_kb_ids, requested_datasets, require_shareable, usable_ids
+from api.db.services.dialog_records import AssistantRecord, ChatBinding, VisibleAssistant, assistant_view, record_of
 from api.db.services.dialog_rules import (
     DEFAULT_LLM_SETTING,
     DEFAULT_PROMPT_CONFIG,
@@ -61,6 +62,7 @@ from common.model_ref import InvalidModelRef, parse_model_ref
 
 __all__ = [
     "AssistantRecord",
+    "ChatBinding",
     "VisibleAssistant",
     "assistant_view",
     "create_assistant",
@@ -68,7 +70,9 @@ __all__ = [
     "get_assistant",
     "list_assistants",
     "load_visible_assistant",
+    "resolve_for_chat",
     "sanitize_llm_setting",
+    "update_assistant",
 ]
 
 logger = logging.getLogger(__name__)
@@ -273,6 +277,71 @@ def get_assistant(principal: Principal, chat_id: str) -> dict[str, Any]:
         return _detail(visible.assistant, principal.user_id, visible.scope.subject)
 
 
+# ----------------------------------------------------------------------------- update
+
+
+def update_assistant(principal: Principal, chat_id: str, changes: Mapping[str, Any]) -> dict[str, Any]:
+    """Apply ``changes`` (only the keys sent) and return the detail view for the caller. Nothing is written unless every check passes."""
+    visible = load_visible_assistant(principal, chat_id)
+    current, scope, user_id = visible.assistant, visible.scope, principal.user_id
+    _require_manage(current.created_by, current.permission, user_id, scope)
+    patch = validate_fields(changes, creating=False)
+    tenant_id = current.tenant_id
+    models = _model_columns(tenant_id, patch, current)  # before our connection scope
+    renamed = "name" in patch and patch["name"] != current.name
+    with ExitStack() as locks:
+        if renamed:
+            locks.enter_context(_named_lock(lock_name(tenant_id), "another assistant is being saved, try again shortly"))
+        with DB.connection_context(), transaction():
+            row = Dialog.select().where((Dialog.id == chat_id) & (Dialog.status == _VALID)).for_update().first()
+            if row is None:
+                raise _not_found()
+            _recheck(row, user_id, scope)
+            values = _changed_values(row, patch, models, tenant_id, user_id)
+            if renamed and _name_taken(tenant_id, patch["name"], chat_id):
+                raise ServiceError(Kind.CONFLICT, reasons.DUPLICATE_NAME, "an assistant with that name already exists")
+            now = current_timestamp_ms()
+            Dialog.update(update_time=now, update_date=timestamp_to_date(now), **values).where(Dialog.id == chat_id).execute()
+            view = _detail(record_of(Dialog.get_by_id(chat_id)), user_id, scope.subject)
+    logger.info("assistant updated tenant=%s assistant=%s fields=%s", tenant_id, chat_id, ",".join(sorted(patch)))
+    return view
+
+
+def _changed_values(row: Dialog, patch: Mapping[str, Any], models: Mapping[str, Any], tenant_id: str, user_id: str) -> dict[str, Any]:
+    """Column values for an update, applying the binding (D-10, D-25) and narrowing (D-23) rules to the locked row. Needs an open scope."""
+    stored = list(row.kb_ids) if isinstance(row.kb_ids, list) else []
+    after = patch.get("permission", row.permission)
+    values: dict[str, Any] = dict(models)
+    for key in ("name", "permission", "similarity_threshold", "vector_similarity_weight", "top_n"):
+        if key in patch:
+            values[key] = patch[key]
+    if "icon" in patch:
+        values["icon"] = patch["icon"] or None
+    if "prompt_config" in patch:
+        values["prompt_config"] = merge_prompt_config(patch["prompt_config"], row.prompt_config or {})
+    if "llm_setting" in patch:
+        values["llm_setting"] = sanitize_llm_setting(patch["llm_setting"], {**DEFAULT_LLM_SETTING, **(row.llm_setting or {})})
+
+    if "kb_ids" in patch:
+        requested = patch["kb_ids"]
+        known = {**live_datasets(stored), **requested_datasets(requested, tenant_id, user_id)}
+        final = next_kb_ids(stored, requested, tenant_id, user_id, known)
+        if after == PERMISSION_TEAM and row.permission == PERMISSION_TEAM:
+            require_shareable([i for i in requested if i not in stored], known, tenant_id, user_id)  # only what this save adds
+        values["kb_ids"] = final
+    else:
+        final = stored
+    if after == PERMISSION_TEAM and row.permission != PERMISSION_TEAM:  # widening checks everything bound that still exists
+        require_shareable(final, live_datasets(final), tenant_id, user_id)
+    if row.permission == PERMISSION_TEAM and after == PERMISSION_ME:  # narrowing (D-23): the creator is not a "member with chats"
+        others = _members_with_chats(row.id, row.created_by)
+        if others:
+            raise ServiceError(
+                Kind.CONFLICT, reasons.ASSISTANT_HAS_MEMBER_CHATS, "other members have chats with this assistant", data={"count": others}
+            )
+    return values
+
+
 # ----------------------------------------------------------------------------- delete
 
 
@@ -293,3 +362,19 @@ def delete_assistant(principal: Principal, chat_id: str) -> str:
         Dialog.delete().where(Dialog.id == chat_id).execute()
     logger.info("assistant deleted tenant=%s assistant=%s sessions=%d", current.tenant_id, chat_id, removed)
     return chat_id
+
+
+# ----------------------------------------------------------------------------- chat time
+
+
+def resolve_for_chat(principal: Principal, chat_id: str) -> ChatBinding:
+    """The datasets a turn by this caller may retrieve from (D-10, D-25), and how many bound ids are skipped for them.
+
+    Per reader: a bound id is usable when the dataset still exists in the workspace and the caller can open it. It does not raise when none are
+    usable (the turn refuses with 409 ``datasets_unavailable``); an assistant with no bound dataset has an empty set and a count of 0 (plain chat).
+    """
+    visible = load_visible_assistant(principal, chat_id)
+    assistant = visible.assistant
+    with DB.connection_context():
+        usable = usable_ids(assistant.tenant_id, principal.user_id, assistant.kb_ids, live_datasets(assistant.kb_ids))
+    return ChatBinding(assistant, tuple(usable), len(assistant.kb_ids) - len(usable), assistant.tenant_id)
