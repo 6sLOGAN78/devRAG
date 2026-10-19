@@ -9,13 +9,17 @@ Use the ``fake_provider`` fixture (one fresh server per test) or the ``running_f
 The stack variants (``fake_provider_stack`` and ``running_stack_fake_provider``) bind 0.0.0.0 on two ephemeral ports that share one
 recorder, so a test that drives the dockerised app can hand it ``stack_base_url`` (``host.docker.internal``, dev compose only) and
 read what the app sent. They exist for the lifetime of the test only and serve fake answers and fake keys.
-No fixed waits: readiness is polled with ``wait_until``; ``/slow`` waits on an ``asyncio.Event`` that teardown releases.
+Plan 05-01 additions: ``chat_mode`` picks the streamed text (plain, marker, split_marker, gated, error_midstream; a gated stream
+holds after its first piece until ``release_chat()``), ``chat_requests()`` returns the bodies of the chat calls, ``POST /rerank``
+answers in the TEI shape and ``POST /api/v1/rerank`` in the OpenRouter shape (scores are the share of query words found in the text).
+No fixed waits: readiness is polled with ``wait_until``; ``/slow`` and a gated chat stream wait on ``asyncio.Event`` objects that teardown releases.
 """
 from __future__ import annotations
 
 import asyncio
 import contextlib
 import json
+import re
 import socket
 import threading
 from collections.abc import AsyncIterator, Iterator
@@ -37,6 +41,13 @@ CHAT_PIECES = ("Hel", "lo ", "from ", "the fake")
 CHAT_TEXT = "".join(CHAT_PIECES)
 PROMPT_TOKENS = 11
 COMPLETION_TOKENS = 5
+MARKER_PIECES = ("Answer text ", "##0$$", " more.")
+SPLIT_MARKER_PIECES = ("See ", "##", "1$$", " end.")
+GATED_FIRST_PIECE = "Start ##2$$ "
+GATED_LAST_PIECE = "end."
+ERROR_MIDSTREAM_PIECES = ("Par", "tial ")
+TEI_MAX_BATCH = 32
+CHAT_MODES = ("plain", "marker", "split_marker", "gated", "error_midstream")
 STACK_HOST = "host.docker.internal"  # how the dev app container reaches the host (extra_hosts in docker-compose.dev.yml)
 
 
@@ -57,10 +68,12 @@ class FakeProvider:
     embedding_dim: int = 8
     shuffle_embeddings: bool = False
     delay_ms: int = 0  # embedding endpoints answer after this many milliseconds (plan 04-11: slows a call so a cancel can land mid-request)
+    chat_mode: str = "plain"  # plan 05-01: one of CHAT_MODES, selects the text streamed by /v1/chat/completions
     embed_mode: str = "ok"  # plan 04-18: "ok", "refuse" (400), "timeout" (no answer until teardown) or "ratelimit" (429) on the embedding endpoints
     _counters: dict[str, int] = field(default_factory=dict)
     _loop: asyncio.AbstractEventLoop | None = None
     _release: asyncio.Event | None = None
+    _chat_gate: asyncio.Event | None = None
     secondary: FakeProvider | None = None  # stack mode only: the second listener, same recorder
 
     @property
@@ -118,6 +131,15 @@ class FakeProvider:
         if self._loop is not None and self._release is not None:
             self._loop.call_soon_threadsafe(self._release.set)
 
+    def release_chat(self) -> None:
+        """Let a gated chat stream continue. Callable from any thread; teardown calls it too so no stream hangs."""
+        if self._loop is not None and self._chat_gate is not None:
+            self._loop.call_soon_threadsafe(self._chat_gate.set)
+
+    def chat_requests(self) -> list[Any]:
+        """The parsed bodies of every ``POST /v1/chat/completions`` so far, in arrival order (all listeners)."""
+        return [r.body for r in self.requests if r.method == "POST" and r.path == "/v1/chat/completions"]
+
     def _bump(self, key: str) -> int:
         self._counters[key] = self._counters.get(key, 0) + 1
         return self._counters[key]
@@ -171,7 +193,11 @@ def _chat_completion(model: str) -> dict[str, Any]:
     return body
 
 
-def _sse(model: str, wants_usage: bool) -> AsyncIterator[bytes]:
+def _chat_pieces(mode: str) -> tuple[str, ...]:
+    return {"marker": MARKER_PIECES, "split_marker": SPLIT_MARKER_PIECES, "error_midstream": ERROR_MIDSTREAM_PIECES}.get(mode, CHAT_PIECES)
+
+
+def _sse(state: FakeProvider, model: str, wants_usage: bool) -> AsyncIterator[bytes]:
     def frame(payload: dict[str, Any]) -> bytes:
         return b"data: " + json.dumps(payload).encode() + b"\n\n"
 
@@ -179,8 +205,21 @@ def _sse(model: str, wants_usage: bool) -> AsyncIterator[bytes]:
 
     async def generate() -> AsyncIterator[bytes]:
         yield frame({**base, "choices": [{"index": 0, "delta": {"role": "assistant"}, "finish_reason": None}]})
-        for piece in CHAT_PIECES:
-            yield frame({**base, "choices": [{"index": 0, "delta": {"content": piece}, "finish_reason": None}]})
+        mode = state.chat_mode
+
+        def content(piece: str) -> bytes:
+            return frame({**base, "choices": [{"index": 0, "delta": {"content": piece}, "finish_reason": None}]})
+
+        if mode == "gated":
+            assert state._chat_gate is not None
+            yield content(GATED_FIRST_PIECE)
+            await state._chat_gate.wait()
+            yield content(GATED_LAST_PIECE)
+        else:
+            for piece in _chat_pieces(mode):
+                yield content(piece)
+            if mode == "error_midstream":
+                raise ConnectionAbortedError("fake provider closes the stream without [DONE]")
         yield frame({**base, "choices": []})  # annotation chunk with no choices
         yield frame({**base, "choices": [{"index": 0, "delta": {}, "finish_reason": "stop"}]})
         if wants_usage and model != "fake-no-usage":
@@ -238,12 +277,50 @@ def build_app(state: FakeProvider) -> Quart:
             return response
         if body.get("stream"):
             usage = bool((body.get("stream_options") or {}).get("include_usage"))
-            return Response(_sse(model, usage), mimetype="text/event-stream")
+            return Response(_sse(state, model, usage), mimetype="text/event-stream")
         return _json(_chat_completion(model))
 
     @app.post("/v1/chat/completions")
     async def chat() -> Response:
         return await openai_chat()
+
+    def rerank_score(query: str, text: str) -> float:
+        words = re.findall(r"\w+", query.lower())
+        if not words:
+            return 0.0
+        present = set(re.findall(r"\w+", text.lower()))
+        return sum(1 for w in words if w in present) / len(words)
+
+    def ranked(query: str, texts: list[str]) -> list[tuple[int, float]]:
+        scored = [(i, rerank_score(query, t)) for i, t in enumerate(texts)]
+        return sorted(scored, key=lambda pair: (-pair[1], pair[0]))
+
+    def document_text(item: Any) -> str:
+        return str(item.get("text", "")) if isinstance(item, dict) else str(item)
+
+    @app.post("/rerank")
+    async def tei_rerank() -> Response:
+        body = await request.get_json(force=True, silent=True) or {}
+        if str(body.get("model", request.args.get("model", ""))) == "fake-rerank-500":
+            return _json({"error": "Inference failed", "error_type": "backend"}, 500)
+        texts = [document_text(t) for t in body.get("texts", [])]
+        if len(texts) > TEI_MAX_BATCH:
+            return _json({"error": f"batch size {len(texts)} > maximum allowed batch size {TEI_MAX_BATCH}", "error_type": "validation"}, 413)
+        return Response(json.dumps([{"index": i, "score": s} for i, s in ranked(str(body.get("query", "")), texts)]), mimetype="application/json")
+
+    @app.post("/api/v1/rerank")
+    async def openrouter_rerank() -> Response:
+        body = await request.get_json(force=True, silent=True) or {}
+        if str(body.get("model", "")) == "fake-rerank-500":
+            return _json({"error": {"message": "Provider returned error", "code": 500}}, 500)
+        documents = [document_text(d) for d in body.get("documents", [])]
+        order = ranked(str(body.get("query", "")), documents)
+        top_n = body.get("top_n")
+        if isinstance(top_n, int) and top_n > 0:
+            order = order[:top_n]
+        results = [{"index": i, "relevance_score": s, "document": {"text": documents[i]}} for i, s in order]
+        tokens = sum(len(d.split()) or 1 for d in documents)
+        return _json({"id": "rerank-fake", "model": str(body.get("model", "")), "results": results, "usage": {"search_units": 1, "total_tokens": tokens}})
 
     @app.post("/slow/v1/chat/completions")
     async def slow_chat() -> Response:
@@ -349,6 +426,7 @@ def _serve_in_thread(state: FakeProvider, sock: socket.socket, ready: threading.
         loop = asyncio.get_running_loop()
         state._loop = loop
         state._release = asyncio.Event()
+        state._chat_gate = asyncio.Event()
         stop = asyncio.Event()
         stop_box.extend([loop, stop])
         config = Config()
@@ -388,6 +466,7 @@ def _serving(bind_host: str, shared: FakeProvider | None = None) -> Iterator[Fak
         yield state
     finally:
         state.release_slow()
+        state.release_chat()
         if stop_box:
             loop, stop = stop_box
             loop.call_soon_threadsafe(stop.set)
