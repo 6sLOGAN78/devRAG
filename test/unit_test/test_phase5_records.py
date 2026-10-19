@@ -30,6 +30,7 @@ REQUIRED_TITLES = [
     "Stopped-turn usage",
     "Live budget and planted facts",
     "Retrieval settings and synonyms",
+    "Condition `must_not` and stage-2 kNN",
 ]
 
 
