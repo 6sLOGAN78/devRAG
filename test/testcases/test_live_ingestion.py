@@ -172,10 +172,14 @@ def stored_vectors(settings: Settings, live: LiveEnv, tenant_id: str, dataset_id
 
 
 def nearest(settings: Settings, live: LiveEnv, owner: Account, dataset_id: str, text: str) -> list[dict[str, Any]]:
-    """The three nearest chunks of the dataset to the real embedding of ``text``."""
+    """The three nearest chunks of the dataset to the real embedding of ``text``.
+
+    The kNN asks for 32 neighbours (64 HNSW candidates, the adapter's 2k rule, as in the reference) and keeps the first three:
+    with k=3 the approximate search had only 6 candidates and could miss an exact match written moments before.
+    """
     llm = LLMBundle(owner.tenant_id, live.embed_id, "embedding", settings=bundle_settings(live), expected_dimension=live.dimension)
     query, _ = llm.encode_queries(text)
-    near = MatchDenseExpr(vector_field(live), query, "float", "cosine", 3)
+    near = MatchDenseExpr(vector_field(live), query, "float", "cosine", 32)
     result = search(
         get_doc_store(settings),
         index_name(owner.tenant_id),
