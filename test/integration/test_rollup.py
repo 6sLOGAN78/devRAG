@@ -115,6 +115,29 @@ def test_progress_is_the_mean_and_the_merged_lines_reach_the_log_row(world):
     assert log["progress"] == pytest.approx(0.75)
 
 
+def test_the_final_state_and_the_log_row_are_written_together(world, monkeypatch):
+    """A failure while writing the log row must not leave the document finished and its log 'running' for ever."""
+    from rag.svr import progress
+
+    doc, (a,) = running_doc(world)
+    set_task(a, 1.0, f"10:00:01  done\n10:00:01  {PAGES}\n10:00:01  {SKIPPED}")
+    put_chunks(world, doc, 3)
+    real = progress._update_log
+
+    def broken(doc_id, **kwargs):
+        if kwargs.get("status") is not None:
+            raise RuntimeError("log write failed")
+        return real(doc_id, **kwargs)
+
+    monkeypatch.setattr(progress, "_update_log", broken)
+    roll(world, doc)
+    assert doc_state(doc)["run"] == "1", "the document stays running so the next cycle can finish it"
+    assert log_state(doc)["status"] == "running"
+    monkeypatch.setattr(progress, "_update_log", real)
+    assert roll(world, doc).finished == 1
+    assert doc_state(doc)["run"] == "3" and log_state(doc)["status"] == "done"
+
+
 def test_merged_message_keeps_at_most_3000_lines(world):
     doc, (a,) = running_doc(world)
     set_task(a, 0.2, "\n".join(f"10:00:00  line {i}" for i in range(3500)))
