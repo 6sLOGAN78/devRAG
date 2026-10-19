@@ -1,7 +1,7 @@
 """Retrieval test route (plan 05-04; RETR-16..18, RETR-23, KB-18, TEN-03, E2E-07, D-19, D-20, R-194, R-205).
 
 ``POST /api/v1/datasets/search`` with ``{"dataset_ids": [...], "question": "...", "doc_ids"?, "similarity_threshold"?, "vector_similarity_weight"?,
-"top_k"?, "fusion"?, "page"?, "size"?, "tenant_id"?}`` answers ``{"total", "chunks", "doc_aggs", "rerank_applied", "timings"}``.
+"top_k"?, "fusion"?, "rerank_id"?, "page"?, "size"?, "tenant_id"?}`` answers ``{"total", "chunks", "doc_aggs", "rerank_applied", "timings"}``.
 
 The call acts in one workspace (``tenant_id`` or the caller's own). A dataset id the caller cannot open, that belongs to another workspace or that
 does not exist is the one 404 for the whole request and no search runs. Numeric bounds are the service's check so the reason reaches the client.
@@ -49,6 +49,7 @@ class SearchBody(BaseModel):
     vector_similarity_weight: float = 0.3
     top_k: int | None = None
     fusion: str = "weighted_sum"
+    rerank_id: str | None = None
     page: int = 1
     size: int = 10
     tenant_id: str | None = Field(default=None, pattern=_TENANT_ID_PATTERN)

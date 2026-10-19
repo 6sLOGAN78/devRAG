@@ -5,6 +5,9 @@ Partial: several datasets of that workspace, never several workspaces). Every da
 workspace; any id the caller cannot open, that belongs elsewhere or that does not exist is the one NOT_FOUND for the whole request and no search runs.
 All datasets of a call share one embedding model, because the question is embedded once (``embedding_mismatch``).
 
+An optional ``rerank_id`` adds a rerank stage (plan 05-05, D-03, R-197): the first ``rerank_max_candidates`` candidates are scored by the workspace's rerank
+model and a failure of that stage is a 502 ``rerank_unavailable``; there is never a silent fall back to the fusion order.
+
 The question text is never logged and never copied into an error. Logs carry dataset ids and exception class names only. The function blocks (database,
 provider, index): the caller runs it, and the rate guard, in a bounded executor.
 """
@@ -46,9 +49,11 @@ MAX_DATASETS = 10
 MAX_DOC_IDS = 100
 MIN_TOP_K = 16
 MAX_PAGE_SIZE = 100
+MAX_MODEL_ID_CHARS = 128
 DEFAULT_PAGE_SIZE = 10
 
 Embedder = Callable[[str], list[float]]
+Reranker = Callable[[str, list[str]], list[float]]
 
 
 def _invalid(message: str, reason: str = reasons.FIELDS_INVALID) -> ServiceError:
@@ -104,6 +109,21 @@ def _question(value: object) -> str:
     return text
 
 
+def _model_unavailable() -> ServiceError:
+    return ServiceError(Kind.CONFLICT, reasons.MODEL_UNAVAILABLE, "that model is not available in this workspace")
+
+
+def _rerank_id(value: object) -> str | None:
+    """``None`` for no rerank; otherwise a non-empty composite model id. One that is too long cannot name any model: ``model_unavailable``."""
+    if value is None:
+        return None
+    if not isinstance(value, str) or not value.strip():
+        raise _invalid("rerank_id must be a model id")
+    if len(value) > MAX_MODEL_ID_CHARS:
+        raise _model_unavailable()
+    return value
+
+
 def parse_body(body: Mapping[str, Any], settings: Settings) -> dict[str, Any]:
     """The checked request values. Nothing from the body is echoed into a message."""
     top_k = body.get("top_k")
@@ -118,6 +138,7 @@ def parse_body(body: Mapping[str, Any], settings: Settings) -> dict[str, Any]:
         "doc_ids": None if doc_ids is None else _ids(doc_ids, "doc_ids", 0, MAX_DOC_IDS, reasons.IDS_INVALID),
         "similarity_threshold": _unit(body.get("similarity_threshold", 0.2), "similarity_threshold"),
         "vector_similarity_weight": _unit(body.get("vector_similarity_weight", 0.3), "vector_similarity_weight"),
+        "rerank_id": _rerank_id(body.get("rerank_id")),
         "top_k": ceiling if top_k is None else _whole(top_k, "top_k", min(MIN_TOP_K, ceiling), ceiling),
         "fusion": fusion,
         "page": _whole(body.get("page", 1), "page", 1, 10**6),
@@ -156,6 +177,36 @@ def _embed_question(settings: Settings, tenant_id: str, model_id: str, question:
         return l2_normalize(list(raw))
     except TaskFailure:
         raise ServiceError(Kind.INVALID, reasons.PROVIDER_REFUSED, "the provider returned an unusable vector") from None
+
+
+def _build_reranker(settings: Settings, tenant_id: str, rerank_id: str | None, reranker: Reranker | None) -> Reranker | None:
+    """The reranker seam for the Retriever, or ``None`` without a rerank model.
+
+    The bundle is built from the acting workspace's own credential rows, so another workspace's model is the same ``model_unavailable`` as an unknown id.
+    Any failure of the rerank call itself (provider error, timeout, an answer of the wrong size) becomes one 502 ``rerank_unavailable`` and no partial result.
+    """
+    if rerank_id is None:
+        return None
+    if reranker is None:
+        try:
+            bundle = LLMBundle(tenant_id, rerank_id, "rerank", settings=settings)
+        except ServiceError as refused:
+            if refused.reason == reasons.MODEL_UNAVAILABLE:
+                raise _model_unavailable() from None
+            raise
+        reranker = bundle.rerank
+
+    def guarded(query: str, texts: list[str]) -> list[float]:
+        try:
+            scores = reranker(query, texts)
+            if len(scores) != len(texts):
+                raise ValueError("score count")
+            return scores
+        except Exception as exc:  # noqa: BLE001 - fail closed: every failure of this stage is the one typed answer
+            logger.warning("rerank stage failed tenant=%s error=%s", tenant_id, type(exc).__name__)
+        raise ServiceError(Kind.BAD_GATEWAY, reasons.RERANK_UNAVAILABLE, "the rerank model could not be used, try again shortly")
+
+    return guarded
 
 
 def _documents_that_exist(dataset_ids: list[str]) -> Callable[[set[str]], Iterable[str]]:
@@ -208,11 +259,13 @@ def search(
     *,
     doc_store: DocStoreConnection | None = None,
     embedder: Embedder | None = None,
+    reranker: Reranker | None = None,
 ) -> dict[str, Any]:
     """``{"total", "chunks", "doc_aggs", "rerank_applied", "timings"}`` for one question over one or more datasets of the acting workspace."""
     params = parse_body(body, settings)
     opened = _authorize(principal, scope, params["dataset_ids"])
     model_id = _one_model(opened)
+    rerank = _build_reranker(settings, scope.tenant_id, params["rerank_id"], reranker)  # before the embedding: a bad model id costs nothing
     started = time.monotonic()
     vector = _embed_question(settings, scope.tenant_id, model_id, params["question"], embedder)
     embed_ms = (time.monotonic() - started) * 1000.0
@@ -234,7 +287,7 @@ def search(
     engine = doc_store if doc_store is not None else get_doc_store(settings)
     retriever = Retriever(engine, settings, SynonymSource(settings.redis, settings.retrieval))
     try:
-        result = retriever.retrieve(request, document_exists=_documents_that_exist(params["dataset_ids"]))
+        result = retriever.retrieve(request, document_exists=_documents_that_exist(params["dataset_ids"]), reranker=rerank)
     except DocStoreError as exc:
         logger.warning("retrieval could not read the index datasets=%s error=%s", ",".join(params["dataset_ids"]), type(exc).__name__)
         raise ServiceError(Kind.UNAVAILABLE, reasons.INDEX_UNAVAILABLE, "the search index is not available, try again shortly") from None

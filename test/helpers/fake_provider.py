@@ -71,6 +71,7 @@ class FakeProvider:
     delay_ms: int = 0  # embedding endpoints answer after this many milliseconds (plan 04-11: slows a call so a cancel can land mid-request)
     chat_mode: str = "plain"  # plan 05-01: one of CHAT_MODES, selects the text streamed by /v1/chat/completions
     embed_mode: str = "ok"  # plan 04-18: "ok", "refuse" (400), "timeout" (no answer until teardown) or "ratelimit" (429) on the embedding endpoints
+    rerank_mode: str = "ok"  # plan 05-05: "fail" makes both rerank endpoints answer 500, so a test can save a model and then break it
     _counters: dict[str, int] = field(default_factory=dict)
     _loop: asyncio.AbstractEventLoop | None = None
     _release: asyncio.Event | None = None
@@ -313,7 +314,7 @@ def build_app(state: FakeProvider) -> Quart:
     async def tei_answer(name: str | None = None) -> Response:
         body = await request.get_json(force=True, silent=True) or {}
         failure = rerank_failure(name) if name else None
-        if failure is None and str(body.get("model", request.args.get("model", ""))) == "fake-rerank-500":
+        if failure is None and (state.rerank_mode == "fail" or str(body.get("model", request.args.get("model", ""))) == "fake-rerank-500"):
             failure = rerank_failure("fake-rerank-500")
         if failure is not None:
             return failure
@@ -325,7 +326,7 @@ def build_app(state: FakeProvider) -> Quart:
     async def openrouter_answer(name: str | None = None) -> Response:
         body = await request.get_json(force=True, silent=True) or {}
         failure = rerank_failure(name) if name else None
-        if failure is None and str(body.get("model", "")) == "fake-rerank-500":
+        if failure is None and (state.rerank_mode == "fail" or str(body.get("model", "")) == "fake-rerank-500"):
             failure = _json({"error": {"message": "Provider returned error", "code": 500}}, 500)
         if failure is not None:
             return failure

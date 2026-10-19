@@ -32,6 +32,8 @@ REQUIRED_TITLES = [
     "Retrieval settings and synonyms",
     "Condition `must_not` and stage-2 kNN",
     "Retrieval-test limits and shape",
+    "TEI provider and rerank type",
+    "OpenRouter rerank driver",
 ]
 
 

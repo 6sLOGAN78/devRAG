@@ -52,15 +52,19 @@ def owner(ingress: httpx.Client, registry: AccountRegistry, fake: FakeProvider) 
     return workspace(ingress, registry, fake, "retr")
 
 
-@pytest.fixture(scope="module")
-def planted(ingress: httpx.Client, owner: Account) -> SimpleNamespace:
+def make_planted(ingress: httpx.Client, who: Account) -> SimpleNamespace:
     """A dataset holding the planted TXT (six paragraphs, six chunks), parsed and finished."""
-    dataset_id = ok(create(ingress, owner))["id"]
-    doc = upload_text(ingress, owner, dataset_id, planted_txt(), "planted.txt")
-    assert start_parse(ingress, owner, dataset_id, [doc["id"]]).status_code == 200
-    row = wait_run(ingress, owner, dataset_id, doc["id"], "3", timeout=180)
+    dataset_id = ok(create(ingress, who))["id"]
+    doc = upload_text(ingress, who, dataset_id, planted_txt(), "planted.txt")
+    assert start_parse(ingress, who, dataset_id, [doc["id"]]).status_code == 200
+    row = wait_run(ingress, who, dataset_id, doc["id"], "3", timeout=180)
     assert row["chunk_count"] == len(FACTS)
     return SimpleNamespace(dataset_id=dataset_id, doc_id=doc["id"])
+
+
+@pytest.fixture(scope="module")
+def planted(ingress: httpx.Client, owner: Account) -> SimpleNamespace:
+    return make_planted(ingress, owner)
 
 
 def search(ingress: httpx.Client, who: Account, dataset_ids: list[str], question: str, **body: Any) -> httpx.Response:
@@ -194,3 +198,88 @@ def test_the_route_needs_a_credential(ingress: httpx.Client, planted: SimpleName
     ingress.cookies.clear()
     resp = ingress.post(SEARCH, json={"dataset_ids": [planted.dataset_id], "question": "q"}, headers=_bearer("not-a-token"))
     assert resp.status_code == 401
+
+
+# ----------------------------------------------------------------------------- the optional rerank stage (plan 05-05; RETR-11, RETR-12, D-03, R-197)
+
+RERANK_PATH = "/api/v1/rerank"
+RERANK_ID = "fake-rerank@OpenRouter"
+CANDIDATE_CAP = 64  # the interim retrieval.rerank_max_candidates (R-203); the planted dataset holds far fewer chunks
+
+
+STRANGER_RERANK_ID = "stranger-rerank@OpenRouter"
+
+
+def save_rerank_model(ingress: httpx.Client, who: Account, fake: FakeProvider, name: str = "fake-rerank") -> None:
+    body = {"provider": "OpenRouter", "api_key": KEY_ONE, "base_url": f"{fake.stack_root}/api/v1", "models": [{"name": name, "type": "rerank"}]}
+    ok(api(ingress, "PUT", "/api/v1/providers", who.token, body=body))
+
+
+@pytest.fixture(scope="module")
+def ranker(ingress: httpx.Client, registry: AccountRegistry, fake: FakeProvider) -> Account:
+    """Its own workspace, so the rerank cases do not spend the shared retrieval-test budget (30 per 60 s per workspace and user)."""
+    who = workspace(ingress, registry, fake, "retrk")
+    save_rerank_model(ingress, who, fake)
+    return who
+
+
+@pytest.fixture(scope="module")
+def ranked(ingress: httpx.Client, ranker: Account) -> SimpleNamespace:
+    return make_planted(ingress, ranker)
+
+
+def rerank_calls(fake: FakeProvider) -> list[Any]:
+    return fake.hits(RERANK_PATH)
+
+
+def test_a_rerank_model_changes_the_first_hit_and_reports_it(ingress: httpx.Client, ranker: Account, ranked: SimpleNamespace, fake: FakeProvider) -> None:
+    plain = hits_of(ingress, ranker, ranked, FIRST.token, vector_similarity_weight=1, similarity_threshold=0)
+    target = next(f for f in FACTS if f.token in plain[-1]["content"])  # the chunk the vector order puts last
+    assert target.token not in plain[0]["content"]
+    before = len(rerank_calls(fake))
+
+    view = ok(search(ingress, ranker, [ranked.dataset_id], target.token, vector_similarity_weight=1, similarity_threshold=0, rerank_id=RERANK_ID))
+    assert view["rerank_applied"] is True and view["timings"]["rerank_ms"] > 0
+    assert target.token in view["chunks"][0]["content"], "the rerank order differs from the fusion order"
+    assert view["chunks"][0]["rerank_similarity"] == pytest.approx(1.0) and all("rerank_similarity" in c for c in view["chunks"])
+    calls = rerank_calls(fake)[before:]
+    assert len(calls) == 1, "exactly one rerank request per reranked call"
+    assert len(calls[0].body["documents"]) <= CANDIDATE_CAP and calls[0].body["model"] == "fake-rerank"
+    assert KEY_ONE not in str(view)
+
+    unranked = ok(search(ingress, ranker, [ranked.dataset_id], target.token, vector_similarity_weight=1, similarity_threshold=0))
+    assert unranked["rerank_applied"] is False and target.token not in unranked["chunks"][0]["content"]
+    assert all("rerank_similarity" not in c for c in unranked["chunks"])
+    assert len(rerank_calls(fake)) == before + 1, "a call without rerank_id makes no rerank request"
+
+
+def test_a_failing_rerank_model_is_a_502_with_the_reason_and_no_chunks(ingress: httpx.Client, ranker: Account, ranked: SimpleNamespace, fake: FakeProvider) -> None:
+    fake.rerank_mode = "fail"
+    try:
+        resp = search(ingress, ranker, [ranked.dataset_id], FIRST.token, similarity_threshold=0, rerank_id=RERANK_ID)
+    finally:
+        fake.rerank_mode = "ok"
+    body = resp.json()
+    assert resp.status_code == 502 and body["code"] != 0 and body["data"]["reason"] == "rerank_unavailable", resp.text
+    assert not body["data"].get("chunks") and KEY_ONE not in resp.text and fake.stack_root not in resp.text
+    assert ingress.get("/v1/user/info", headers=_bearer(ranker.token)).status_code == 200, "a rerank failure never ends the session"
+
+
+def test_an_unknown_and_another_workspaces_rerank_model_are_model_unavailable(
+    ingress: httpx.Client, registry: AccountRegistry, ranker: Account, ranked: SimpleNamespace, fake: FakeProvider
+) -> None:
+    stranger = workspace(ingress, registry, fake, "retrr")
+    save_rerank_model(ingress, stranger, fake, "stranger-rerank")
+    own = search(ingress, stranger, [make_planted(ingress, stranger).dataset_id], FIRST.token, rerank_id=STRANGER_RERANK_ID)
+    assert own.status_code == 200 and own.json()["data"]["rerank_applied"] is True, "the model works in the workspace that owns it"
+    before = len(fake.hits(EMBEDDINGS)) + len(rerank_calls(fake))
+    for rerank_id in ("missing@OpenRouter", "fake-rerank@NoSuchProvider", "x" * 129, STRANGER_RERANK_ID):
+        resp = search(ingress, ranker, [ranked.dataset_id], FIRST.token, rerank_id=rerank_id)
+        assert resp.status_code == 409 and resp.json()["data"]["reason"] == "model_unavailable", (rerank_id, resp.text)
+    assert len(fake.hits(EMBEDDINGS)) + len(rerank_calls(fake)) == before, "a refused model id spends no embedding and no rerank request"
+
+
+def test_a_malformed_rerank_id_is_a_400(ingress: httpx.Client, ranker: Account, ranked: SimpleNamespace) -> None:
+    for bad in (5, "", ["a"]):
+        resp = search(ingress, ranker, [ranked.dataset_id], FIRST.token, rerank_id=bad)
+        assert resp.status_code in (400, 422) and resp.json()["code"] != 0, (bad, resp.text)

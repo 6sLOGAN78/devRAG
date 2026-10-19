@@ -16,9 +16,11 @@ import pytest
 import valkey
 
 from api.db.services import knowledgebase_service as kb
+from api.db.services import tenant_model_service as structure
 from api.db.services import retrieval_service as rs
 from api.db.services.auth_service import AUTH_JWT, Principal
 from api.db.services.service_errors import Kind, ServiceError
+from api.db.services.tenant_model_service import NewModel
 from api.db.services.tenant_scope import ActingScope
 from common.doc_store.doc_store_base import DocStoreError, SearchResult
 from rag.chunking.types import Chunk
@@ -89,9 +91,9 @@ def plant_golden(world: World, dataset=None) -> str:
     return doc_id
 
 
-def ask(world: World, body: dict[str, Any], *, who=None, scope: ActingScope | None = None, settings=None, doc_store=None, embedder=planted_query) -> dict[str, Any]:
+def ask(world: World, body: dict[str, Any], *, who=None, scope: ActingScope | None = None, settings=None, doc_store=None, embedder=planted_query, reranker=None) -> dict[str, Any]:
     who = who or world.owner
-    return rs.search(principal_of(who), scope or scope_of(world), body, settings or world.embed_settings, doc_store=doc_store or world.store(), embedder=embedder)
+    return rs.search(principal_of(who), scope or scope_of(world), body, settings or world.embed_settings, doc_store=doc_store or world.store(), embedder=embedder, reranker=reranker)
 
 
 def body_of(world: World, **overrides: Any) -> dict[str, Any]:
@@ -334,3 +336,105 @@ def test_an_unreachable_counter_store_refuses(world):
     closed = dataclasses.replace(world.settings, redis=dataclasses.replace(world.settings.redis, host="127.0.0.1", port=1))
     err = refused(lambda: rs.retrieval_rate_guard(closed, world.owner.tenant_id, world.owner.user_id))
     assert err.kind is Kind.UNAVAILABLE and err.reason == "busy"
+
+
+# ----------------------------------------------------------------------------- the optional rerank stage (plan 05-05)
+
+RERANK_PATH = "/api/v1/rerank"
+RERANK_ID = "fake-rerank@OpenRouter"
+
+
+def seed_rerank(world: World, owner=None) -> None:
+    """Save an OpenRouter-style rerank model pair on the fake provider's rerank path for ``owner``'s workspace."""
+    owner = owner or world.owner
+    structure.save_instance(
+        world.settings.llm, owner.tenant_id, "OpenRouter", "default", api_key="-".join(("sk", "fake", uuid.uuid4().hex[:20])), api_base=f"{world.fake.root}/api/v1",
+        api_version=None, models=[NewModel("fake-rerank", "rerank", None, 8192), NewModel("fake-rerank-500", "rerank", None, 8192)], replace_key=True,
+    )  # fmt: skip
+
+
+def with_cap(world: World, cap: int):
+    return dataclasses.replace(world.embed_settings, retrieval=dataclasses.replace(world.embed_settings.retrieval, rerank_max_candidates=cap))
+
+
+def test_without_a_rerank_id_the_order_is_the_fusion_order_and_no_rerank_request_is_made(world, fake):
+    plant_golden(world)
+    seed_rerank(world)
+    view = ask(world, body_of(world, vector_similarity_weight=1))
+    assert kinds_of_ids(view) == ["s", "k"] and view["rerank_applied"] is False
+    assert all("rerank_similarity" not in c for c in view["chunks"]) and view["timings"]["rerank_ms"] == 0.0
+    assert fake.hits(RERANK_PATH) == []
+
+
+def test_a_rerank_model_reorders_the_candidates_through_one_real_http_call(world, fake):
+    plant_golden(world)
+    seed_rerank(world)
+    view = ask(world, body_of(world, vector_similarity_weight=1, rerank_id=RERANK_ID))
+    assert kinds_of_ids(view) == ["k", "s"], "the rerank order differs from the fusion order"
+    assert view["rerank_applied"] is True and view["timings"]["rerank_ms"] > 0
+    assert [c["rerank_similarity"] for c in view["chunks"]] == pytest.approx([1.0, 0.0])
+    (call,) = fake.hits(RERANK_PATH)
+    assert call.body["model"] == "fake-rerank" and call.body["query"] == RARE_KEYWORD and sorted(call.body["documents"]) == sorted([K_TEXT, S_TEXT])
+    assert world.api_key not in json.dumps(view)
+    json.dumps(view, allow_nan=False)
+
+
+def test_the_rerank_request_carries_at_most_the_candidate_cap(world, fake):
+    doc_id = add_document(world, "many.txt", b"many body")
+    for index in range(12):
+        plant(world, world.dataset, doc_id, f"m{index:02d}-{doc_id[:6]}", f"{RARE_KEYWORD} passage number {index}", index % DIMENSION)
+    seed_rerank(world)
+    view = ask(world, body_of(world, rerank_id=RERANK_ID), settings=with_cap(world, 8))
+    (call,) = fake.hits(RERANK_PATH)
+    assert len(call.body["documents"]) == 8
+    assert view["rerank_applied"] is True and view["total"] <= 8
+
+
+def test_a_failing_rerank_model_is_a_502_with_no_partial_result(world, fake):
+    plant_golden(world)
+    seed_rerank(world)
+    err = refused(lambda: ask(world, body_of(world, rerank_id="fake-rerank-500@OpenRouter")))
+    assert (err.kind, err.reason) == (Kind.BAD_GATEWAY, "rerank_unavailable")
+    assert len(fake.hits(RERANK_PATH)) == 1, "one call, no retry on a plain 500"
+    assert world.api_key not in err.message
+
+
+@pytest.mark.parametrize("bad", [lambda q, t: [0.1], lambda q, t: (_ for _ in ()).throw(RuntimeError("boom"))])
+def test_a_reranker_that_breaks_is_the_same_typed_failure(world, bad):
+    plant_golden(world)
+    err = refused(lambda: ask(world, body_of(world, rerank_id="any@OpenRouter"), reranker=bad))
+    assert (err.kind, err.reason) == (Kind.BAD_GATEWAY, "rerank_unavailable")
+    assert "boom" not in err.message
+
+
+def test_an_unknown_or_overlong_rerank_id_is_model_unavailable_and_spends_no_embedding(world, fake):
+    plant_golden(world)
+    before = len(fake.hits(EMBEDDINGS))
+    for rerank_id in ("missing@OpenRouter", "fake-rerank@NoSuchProvider", "not a model id", "x" * 129):
+        err = refused(lambda: rs.search(principal_of(world.owner), scope_of(world), body_of(world, rerank_id=rerank_id), world.embed_settings, doc_store=world.store()))
+        assert (err.kind, err.reason) == (Kind.CONFLICT, "model_unavailable"), rerank_id
+    assert len(fake.hits(EMBEDDINGS)) == before and fake.hits(RERANK_PATH) == []
+
+
+def test_a_chat_model_id_cannot_be_used_as_a_rerank_model(world):
+    plant_golden(world)
+    structure.save_instance(
+        world.settings.llm, world.owner.tenant_id, "OpenRouter", "default", api_key="-".join(("sk", "fake", uuid.uuid4().hex[:20])), api_base=world.fake.base_url,
+        api_version=None, models=[NewModel("fake-chat", "chat", None, 8192)], replace_key=True,
+    )  # fmt: skip
+    err = refused(lambda: ask(world, body_of(world, rerank_id="fake-chat@OpenRouter")))
+    assert (err.kind, err.reason) == (Kind.CONFLICT, "model_unavailable")
+
+
+def test_another_workspaces_rerank_model_is_model_unavailable(world, registry, fake):
+    plant_golden(world)
+    stranger = registry.register(prefix="rrstr")
+    seed_rerank(world, stranger)
+    err = refused(lambda: ask(world, body_of(world, rerank_id=RERANK_ID)))
+    assert (err.kind, err.reason) == (Kind.CONFLICT, "model_unavailable") and fake.hits(RERANK_PATH) == []
+
+
+@pytest.mark.parametrize("bad", [5, "", "   ", ["a"]])
+def test_a_malformed_rerank_id_is_a_fields_error(world, bad):
+    err = refused(lambda: ask(world, body_of(world, rerank_id=bad), embedder=lambda _t: pytest.fail("the provider must not be called")))
+    assert err.kind is Kind.INVALID and err.reason == "fields_invalid"

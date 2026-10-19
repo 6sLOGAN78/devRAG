@@ -61,3 +61,4 @@ PREVIEW_UNAVAILABLE = "preview_unavailable"
 # Plan 05-04: retrieval test.
 QUESTION_INVALID = "question_invalid"
 EMBEDDING_MISMATCH = "embedding_mismatch"
+RERANK_UNAVAILABLE = "rerank_unavailable"
