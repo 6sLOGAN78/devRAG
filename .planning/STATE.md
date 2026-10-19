@@ -25,9 +25,9 @@ See: .planning/PROJECT.md (updated 2026-10-05)
 
 ## Current Position
 
-Phase: 4 (ingestion-pipeline) — EXECUTING
-Plan: 35 of 35
-Status: Ready to execute
+Phase: 5 (retrieval-and-cited-chat-core-value-gate) — NEEDS CONTEXT (run /gsd:discuss-phase 5)
+Plan: 0 of TBD (Phase 4 complete: 35 of 35, verification human_needed, clean-room gate deferred — B-36)
+Status: Phase 4 complete; Phase 5 awaiting discuss-phase
 Last activity: 2026-10-19
 
 Progress: [██████████] 99%

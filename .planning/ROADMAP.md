@@ -18,7 +18,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 1: Reconciliation, Guardrails and Dual-Stack Foundation** - Decision register and CI guardrails committed; infrastructure, shared schema and both API servers healthy behind Nginx (completed 2026-10-06)
 - [x] **Phase 2: Identity, Tenancy and Authorization** - Users register and log in through Go, the same token works on Python, tenants are isolated and roles enforced (28 of 28 plans done 2026-10-08; awaiting phase verification; TEN-01, TEN-05, UI-42 partial, see BLOCKERS B-18, B-22) (completed 2026-10-08)
 - [x] **Phase 3: Models, Knowledge Bases and Upload** - Tenants configure a real model provider, create datasets backed by a real index, and upload documents to object storage (completed 2026-10-10)
-- [ ] **Phase 4: Ingestion Pipeline** - Uploaded documents are parsed, chunked, embedded and indexed by a reliable background worker with live progress
+- [x] **Phase 4: Ingestion Pipeline** - Uploaded documents are parsed, chunked, embedded and indexed by a reliable background worker with live progress (completed 2026-10-19; verification human_needed: clean-room gate deferred, see 04-DEFERRED-CLEAN-ROOM.md)
 - [ ] **Phase 5: Retrieval and Cited Chat (Core Value Gate)** - A question about an uploaded document yields a streamed, cited answer in the UI with no mocked stage
 - [ ] **Phase 6: Deep Parsing and Chunking Breadth** - Layout analysis, OCR, table recognition, every documented file type and chunker, LLM enrichment and RAPTOR
 - [ ] **Phase 7: Agents and Workflows** - Users build, run and debug agent workflows on a canvas, with tools, sandboxed code and webhook triggers
@@ -426,7 +426,7 @@ Plans:
 
 **Wave 21** *(blocked on Wave 20 completion)*
 
-- [ ] 04-35-PLAN.md — Traceability, memory measurement, records, phase exit gate (clean_room x3)
+- [x] 04-35-PLAN.md — Traceability, memory measurement, records, phase exit gate (clean_room x3 DEFERRED by the user, B-36, 04-DEFERRED-CLEAN-ROOM.md)
 
 **UI hint**: yes
 
@@ -456,7 +456,7 @@ Scope notes: this is the PROJECT.md Core Value. No Phase 6, 7 or 8 work starts u
 **Goal**: Users can ingest every documented file type with layout-aware parsing and choose any documented chunking strategy and enrichment, and answers cite the richer content correctly
 **Mode:** mvp
 **Depends on**: Phase 5
-**Requirements**: PARSE-04..08, PARSE-14..26, CHUNK-03..15, CHUNK-22..28, LLM-10..11, LLM-13, LLM-32, STOR-09, DOC-17..19, KB-10..13, KB-17, ING-18, DEPLOY-08, SEC-08
+**Requirements**: PARSE-04..08, PARSE-14..26, CHUNK-03..15, CHUNK-22..28, LLM-10..11, LLM-13, LLM-32, STOR-09, DOC-17..19, KB-10..13, KB-17, ING-18, DEPLOY-08, SEC-08; plus the Phase 6 remainders of CHUNK-17, PARSE-09, PARSE-11, UI-14 (partial in Phase 4, D-27)
 **Success Criteria** (what must be TRUE):
 
   1. A scanned PDF with no text layer is parsed into chunks through OCR; a PDF with tables yields HTML table chunks; page headers and footers are absent from chunk text; chunks follow reading order with positions that highlight the right region in the chunk inspector
