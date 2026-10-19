@@ -54,6 +54,8 @@ NEW_PASSWORD = "leak-sweep-new-pass-0007"
 CHANGED_PASSWORD = "leak-sweep-changed-pass-0008"
 TOKENS = "/api/v1/system/tokens"
 USERS = "/api/v1/tenants/{tenant_id}/users"
+# A distinctive question text: it is sent on every retrieval-test call and must not appear in any log line of the stack (plan 05-04, T-05-04-04).
+SEARCH_QUESTION = "leaksweepquestion" + uuid.uuid4().hex[:12]
 
 
 def implemented_rows(path: Path = ROUTES_FILE) -> list[str]:
@@ -739,6 +741,38 @@ def sweep_chunk_rows(s: Sweep, w: World) -> None:
     s.errors(row, "PATCH", path, "PUT")
 
 
+def sweep_search_rows(s: Sweep, w: World) -> None:
+    """The retrieval test on success and error paths (plan 05-04).
+
+    A's team dataset holds the seeded chunks. The owner, a member and an API token may search it; a member who asks for the owner's private dataset, an
+    outsider, an absent id, a malformed id and bad bodies are refused. The question text is a marker that the log test looks for afterwards.
+    """
+    a, b, member = w.a, w.b, w.normal
+    token = str(w.a_tokens[0]["token"])
+    path = f"{DATASETS}/search"
+    team, private = [str(w.a_team_dataset["id"])], [str(w.a_private_dataset["id"])]
+    scope = {"tenant_id": a.tenant_id}
+    ask = {"question": SEARCH_QUESTION, "similarity_threshold": 0}
+
+    row = f"POST {path}"
+    s.req(row, "success as owner", "POST", path, a.token, {"dataset_ids": team, **ask})
+    s.req(row, "success as a member", "POST", path, member.token, {"dataset_ids": team, **scope, **ask})
+    s.req(row, "success with an API token", "POST", path, token, {"dataset_ids": team, **ask})
+    options = {"doc_ids": [str(w.a_parsed_document["id"])], "top_k": 16, "fusion": "rrf", "size": 2, "page": 1, "vector_similarity_weight": 0.5}
+    s.req(row, "success with every option", "POST", path, a.token, {"dataset_ids": team, **options, **ask})
+    s.req(row, "missing question", "POST", path, a.token, {"dataset_ids": team})
+    s.req(row, "blank question", "POST", path, a.token, {"dataset_ids": team, "question": "   "})
+    s.req(row, "question too long", "POST", path, a.token, {"dataset_ids": team, "question": SEARCH_QUESTION + "w" * 2001})
+    s.req(row, "unknown field", "POST", path, a.token, {"dataset_ids": team, "rerank": True, **ask})
+    s.req(row, "threshold out of range", "POST", path, a.token, {"dataset_ids": team, "question": SEARCH_QUESTION, "similarity_threshold": 7})
+    s.req(row, "absent dataset", "POST", path, a.token, {"dataset_ids": [uuid.uuid4().hex], **ask})
+    s.req(row, "malformed dataset id", "POST", path, a.token, {"dataset_ids": ["not-an-id"], **ask})
+    s.req(row, "private dataset as a member", "POST", path, member.token, {"dataset_ids": private, **scope, **ask})
+    s.req(row, "as an outsider", "POST", path, b.token, {"dataset_ids": team, **scope, **ask})
+    s.req(row, "outsider without naming the workspace", "POST", path, b.token, {"dataset_ids": team, **ask})
+    s.errors(row, "POST", path, "GET")
+
+
 def sweep_ingestion_rows(s: Sweep, w: World) -> None:
     """The ingestion summary, log list, one log entry, the embedding check and task status (plan 04-19).
 
@@ -916,6 +950,7 @@ def sweep(ingress: httpx.Client) -> Iterator[Sweep]:
             sweep_status_rows(s, world)
             sweep_chunk_rows(s, world)
             sweep_ingestion_rows(s, world)
+            sweep_search_rows(s, world)
             sweep_page_rows(s, world)
             collect_database_secrets(s)
             s.secrets.extend(infrastructure_secrets())
@@ -1051,3 +1086,19 @@ def test_scanner_flags_key_shapes_and_envelopes_in_any_row_and_never_prints_them
 def test_scanner_does_not_flag_ordinary_words_that_resemble_a_key_prefix() -> None:
     body = json.dumps({"data": {"used_tokens": 12, "task": "sk-short", "risk": "risk-score", "model": "sk-" + "a" * 19, "version": "v1:", "path": "/api/v1/datasets", "ratio": "v1:2"}})
     assert scan_response("GET /api/v1/models", "benign", {"Content-Type": "application/json"}, body, []) == []
+
+
+@pytest.mark.e2e
+def test_the_retrieval_test_answered_and_no_log_line_holds_the_question_text(sweep: Sweep) -> None:
+    """The retrieval rows really ran (a success and a refusal), and the question text they carried is in no log line of the stack."""
+    row = f"POST {DATASETS}/search"
+    statuses = [resp.status_code for r, _label, resp in sweep.responses if r == row]
+    assert any(code == 200 for code in statuses) and any(code == 404 for code in statuses) and any(code == 400 for code in statuses), statuses
+    for r, _label, resp in sweep.responses:
+        if r == row:
+            assert SEARCH_QUESTION not in resp.text, "an answer echoes the question"
+    proc = compose("logs", "--no-color", "--no-log-prefix", "--since", sweep.started, "app", timeout=170)
+    assert proc.returncode == 0, "docker compose logs failed"
+    text = proc.stdout + proc.stderr
+    assert "/api/v1/datasets/search" in text, "the retrieval requests are in the log window, so an empty result means something"
+    assert text.count(SEARCH_QUESTION) == 0, "the question text appears in the container log"

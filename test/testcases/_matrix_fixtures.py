@@ -311,6 +311,8 @@ def resource_of(row: Row) -> str:
         return "ingestion"
     if row.path.startswith(DATASETS + "/") and "/chunks" in row.path:
         return "chunks"
+    if row.path == DATASETS + "/search":
+        return "chunks"  # a retrieval test reads chunks; a refused one must leave them as they were
     if row.path.startswith(DATASETS + "/") and ("/pages/" in row.path or row.path.endswith("/content")):
         return "documents"
     if row.path.startswith(DATASETS + "/") and "/documents" in row.path:
@@ -985,7 +987,38 @@ def check_datasets_delete(w: World) -> None:
     assert w.snapshot() == before and own_list() == own_state
 
 
+def check_datasets_search(w: World) -> None:
+    """POST /api/v1/datasets/search: dataset ids ride in the body, so no outsider reaches A's chunks by naming them, with or without naming A's workspace."""
+    assert w.fake is not None
+    path = DATASETS + "/search"
+    team, private = str(w.a_team_dataset["id"]), str(w.a_private_dataset["id"])
+    before = w.snapshot_chunks()
+    absent = triple(call(w.client, "POST", path, w.a.token, {}, body={"dataset_ids": [uuid.uuid4().hex], "question": "alpha"}))
+    assert absent == NOT_FOUND
+    w.fake.reset()
+    outsiders = (
+        (w.b.token, "B"), (w.pending.token, "the pending invitee"), (w.spare.token, "a registered spare"), (w.b_api_token, "B's API token"),
+    )  # fmt: skip
+    for token, label in outsiders:
+        for ids in ([team], [private], [team, private]):
+            for extra in ({}, {"tenant_id": w.a.tenant_id}, {"tenant_id": w.b.tenant_id}):
+                resp = call(w.client, "POST", path, token, {}, body={"dataset_ids": ids, "question": "alpha", **extra})
+                assert triple(resp) == NOT_FOUND, f"{label} with {len(ids)} id(s) and {sorted(extra)}: {triple(resp)}"
+                _assert_no_a_data(resp.text, w, f"the refused retrieval test of {label}")
+    a_token = str(w.a_tokens[0]["token"])
+    for body in ({"dataset_ids": [team], "tenant_id": w.b.tenant_id}, {"dataset_ids": [uuid.uuid4().hex]}):
+        assert triple(call(w.client, "POST", path, a_token, {}, body={"question": "alpha", **body})) == NOT_FOUND, "a token is pinned to its own workspace"
+    # A's members: the team dataset is open to them, the owner's private dataset is not (D-27), and a mixed request is refused whole.
+    for member in (w.normal, w.admin, w.victim):
+        for ids in ([private], [team, private]):
+            resp = call(w.client, "POST", path, member.token, {}, body={"dataset_ids": ids, "question": "alpha", **{"tenant_id": w.a.tenant_id}})
+            assert triple(resp) == absent, f"a member of A with {len(ids)} id(s): {triple(resp)}"
+    assert w.fake.requests == [], "a refused retrieval test reached the model provider"
+    assert w.snapshot_chunks() == before, "a retrieval test changed A's chunks"
+
+
 NO_ID_CHECKS: dict[str, NoIdCheck] = {
+    "POST /api/v1/datasets/search": check_datasets_search,
     "DELETE /api/v1/datasets": check_datasets_delete,
     "POST /api/v1/documents/upload": check_documents_upload,
     "GET /api/v1/datasets": check_datasets_list,

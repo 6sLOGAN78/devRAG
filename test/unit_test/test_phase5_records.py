@@ -31,6 +31,7 @@ REQUIRED_TITLES = [
     "Live budget and planted facts",
     "Retrieval settings and synonyms",
     "Condition `must_not` and stage-2 kNN",
+    "Retrieval-test limits and shape",
 ]
 
 

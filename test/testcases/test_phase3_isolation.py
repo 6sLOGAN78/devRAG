@@ -49,7 +49,16 @@ from test.testcases._matrix_fixtures import (
 from test.testcases._routes import ROUTES_FILE
 from test.testcases.conftest import BASE_URL
 
-PHASE3_PREFIXES = ("/api/v1/providers", "/api/v1/models", "/api/v1/datasets", "/api/v1/documents", "/v1/task/status")
+PHASE3_PREFIXES = (
+    "/api/v1/providers",
+    "/api/v1/models",
+    "/api/v1/datasets",
+    "/api/v1/documents",
+    "/v1/task/status",
+    # Phase 5 families (CONTRACTS section 5): they match no registry row until plans 05-08 and 05-11 land, so nothing else changes now.
+    "/api/v1/chats",
+    "/api/v1/chat/",
+)
 FORBIDDEN = (403, 403, "forbidden")
 UNAUTHORIZED = 401
 
@@ -225,6 +234,11 @@ def _inv_document_content(w: World, who: Account | None, token: str, as_tenant: 
     return call(w.client, "GET", _doc_path(w) + "/content", token, {})
 
 
+def _inv_search(w: World, who: Account | None, token: str, as_tenant: str | None) -> httpx.Response:
+    # a well-formed retrieval test over A's team dataset: one embedding call at the loopback provider on success, none when refused
+    return call(w.client, "POST", f"{DATASETS}/search", token, {}, body=_body(as_tenant, dataset_ids=[_team_id(w)], question="alpha", similarity_threshold=0))
+
+
 def _inv_task_status(w: World, who: Account | None, token: str, as_tenant: str | None) -> httpx.Response:
     return call(w.client, "GET", f"/v1/task/status/{w.scratch.get('document_id') or w.a_task_id}", token, {})
 
@@ -237,6 +251,7 @@ INVOKERS: dict[str, Invoker] = {
     "GET /api/v1/datasets/{dataset_id}/ingestions/{log_id}": _inv_ingestion_log,
     "POST /api/v1/datasets/{dataset_id}/embedding/check": _inv_embedding_check,
     "GET /v1/task/status/{task_id}": _inv_task_status,
+    "POST /api/v1/datasets/search": _inv_search,
     "GET /api/v1/providers": _inv_list_providers,
     "PUT /api/v1/providers": _inv_save_provider,
     "DELETE /api/v1/providers/{provider}": _inv_delete_provider,
@@ -302,10 +317,11 @@ ID_ROWS = frozenset(
         "POST /api/v1/datasets/{dataset_id}/embedding/check",
         "GET /api/v1/datasets/{dataset_id}/documents/{doc_id}/pages/{n}/image",
         "GET /api/v1/datasets/{dataset_id}/documents/{doc_id}/content",
+        "POST /api/v1/datasets/search",  # dataset_ids in the body: a stranger reaches nothing even without naming the workspace
     }
 )
 # Rows that call the model provider with the stored key: a refused request must never reach it.
-PROVIDER_CALLING_ROWS = frozenset({"PUT /api/v1/providers", "POST /api/v1/providers/{provider}/instances"})
+PROVIDER_CALLING_ROWS = frozenset({"PUT /api/v1/providers", "POST /api/v1/providers/{provider}/instances", "POST /api/v1/datasets/search"})
 
 
 def invoker_problems(rows: list[dict[str, Any]], invokers: Mapping[str, Invoker] = INVOKERS) -> list[str]:
@@ -736,3 +752,28 @@ def test_a_removed_member_loses_the_workspace_and_its_datasets_at_once(world: Wo
     assert {d["id"] for d in _ok_data(call(w.client, "GET", f"{DATASETS}/{shared['id']}/documents", w.a.token, {}), "owner's list")["items"]} == {kept["id"]}
     # the owner's own routes are unaffected
     assert succeeded(call(w.client, "GET", DATASETS, w.a.token, {}))
+
+
+@pytest.mark.e2e
+def test_a_retrieval_test_over_a_private_dataset_is_the_one_404_for_everyone_but_its_creator(world: World) -> None:
+    """POST /api/v1/datasets/search (plan 05-04): a `me` dataset is searchable by its creator alone, and a refused request never reaches the provider."""
+    w = world
+    assert w.fake is not None
+    path = f"{DATASETS}/search"
+    scope = {"tenant_id": w.a.tenant_id}
+    private, team = str(w.a_private_dataset["id"]), str(w.a_team_dataset["id"])
+    absent = triple(call(w.client, "POST", path, w.a.token, {}, body={"dataset_ids": [uuid.uuid4().hex], "question": "alpha"}))
+    assert absent == NOT_FOUND
+    w.fake.reset()
+    for label, who in (("an admin", w.admin), ("a normal member", w.normal), ("another normal member", w.victim)):
+        for ids in ([private], [team, private], [private, uuid.uuid4().hex]):
+            resp = call(w.client, "POST", path, who.token, {}, body={"dataset_ids": ids, "question": "alpha", **scope})
+            assert triple(resp) == absent == NOT_FOUND, f"{label} with {len(ids)} id(s): {triple(resp)}"
+    assert w.fake.requests == [], "a refused retrieval test reached the model provider"
+    mine = _ok_data(call(w.client, "POST", DATASETS, w.normal.token, {}, body={"name": _unique("iso-me-search"), **scope}), "the normal member creates a `me` dataset")
+    for who in (w.a, w.admin):
+        resp = call(w.client, "POST", path, who.token, {}, body={"dataset_ids": [str(mine["id"])], "question": "alpha", **scope})
+        assert triple(resp) == NOT_FOUND, f"no owner or admin override for a private dataset: {triple(resp)}"
+    assert succeeded(call(w.client, "POST", path, w.normal.token, {}, body={"dataset_ids": [str(mine["id"])], "question": "alpha", **scope})), "its creator may search it"
+    assert succeeded(call(w.client, "POST", path, w.a.token, {}, body={"dataset_ids": [private], "question": "alpha"})), "the owner may search the owner's own private dataset"
+    assert succeeded(call(w.client, "DELETE", DATASETS, w.normal.token, {}, body={"ids": [str(mine["id"])], **scope}))
