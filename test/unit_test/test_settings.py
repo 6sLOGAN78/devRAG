@@ -313,3 +313,45 @@ def test_llm_numeric_bounds(tmp_path, conf, key, value):
 def test_llm_zero_retries_is_allowed(tmp_path, conf):
     path = _with(conf, tmp_path, lambda d: d["llm"].__setitem__("max_retries", 0))
     assert load_settings(path).llm.max_retries == 0
+
+
+def test_retrieval_defaults(conf):
+    r = load_settings(conf).retrieval
+    assert (r.top_k, r.rerank_max_candidates, r.msm_percent, r.msm_retry_percent) == (1024, 64, 30, 10)
+    assert (r.synonym_ttl_seconds, r.rate_max, r.rate_window_seconds) == (86400, 30, 60)
+
+
+@pytest.mark.parametrize(
+    ("key", "value"),
+    [
+        ("top_k", 5),
+        ("top_k", 10001),
+        ("rerank_max_candidates", 7),
+        ("rerank_max_candidates", 1025),
+        ("msm_percent", 0),
+        ("msm_percent", 101),
+        ("msm_retry_percent", 0),
+        ("synonym_ttl_seconds", 59),
+        ("synonym_ttl_seconds", 2592001),
+        ("rate_max", 0),
+        ("rate_max", 10001),
+        ("rate_window_seconds", 0),
+        ("rate_window_seconds", 3601),
+        ("top_k", "abc"),
+    ],
+)
+def test_retrieval_bounds(tmp_path, conf, key, value):
+    path = _with(conf, tmp_path, lambda d: d["retrieval"].__setitem__(key, value))
+    with pytest.raises(ConfigError, match=rf"retrieval\.{key}"):
+        load_settings(path)
+
+
+@pytest.mark.parametrize(("key", "value"), [("top_k", 16), ("top_k", 10000), ("rerank_max_candidates", 8), ("rerank_max_candidates", 1024)])
+def test_retrieval_bounds_are_inclusive(tmp_path, conf, key, value):
+    path = _with(conf, tmp_path, lambda d: d["retrieval"].__setitem__(key, value))
+    assert getattr(load_settings(path).retrieval, key) == value
+
+
+def test_retrieval_section_is_optional(tmp_path, conf):
+    path = _with(conf, tmp_path, lambda d: d.pop("retrieval"))
+    assert load_settings(path).retrieval.top_k == 1024

@@ -29,6 +29,7 @@ REQUIRED_TITLES = [
     "Unavailable datasets",
     "Stopped-turn usage",
     "Live budget and planted facts",
+    "Retrieval settings and synonyms",
 ]
 
 

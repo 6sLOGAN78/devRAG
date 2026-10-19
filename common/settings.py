@@ -227,6 +227,19 @@ class IngestSettings:
 
 
 @dataclass(frozen=True)
+class RetrievalSettings:
+    """Retrieval tunables (plan 05-02, R-203). Every number is bounded in ``_parse_retrieval``."""
+
+    top_k: int = 1024
+    rerank_max_candidates: int = 64  # interim; the final value is set by plan 05-15
+    msm_percent: int = 30
+    msm_retry_percent: int = 10
+    synonym_ttl_seconds: int = 86400
+    rate_max: int = 30
+    rate_window_seconds: int = 60
+
+
+@dataclass(frozen=True)
 class RateLimitSettings:
     """Every rate-limit number (D-29). Defaults are the R-94 production values."""
 
@@ -261,6 +274,7 @@ class Settings:
     storage: StorageSettings = field(default_factory=StorageSettings)
     upload: UploadSettings = field(default_factory=UploadSettings)
     ingest: IngestSettings = field(default_factory=IngestSettings)
+    retrieval: RetrievalSettings = field(default_factory=RetrievalSettings)
 
 
 def _section(data: dict[str, Any], name: str) -> dict[str, Any]:
@@ -467,6 +481,20 @@ def _parse_ingest(data: dict[str, Any]) -> IngestSettings:
     return parsed
 
 
+def _parse_retrieval(data: dict[str, Any]) -> RetrievalSettings:
+    sec = data.get("retrieval") or {}
+    d = RetrievalSettings()
+    return RetrievalSettings(
+        top_k=_bounded(sec, "retrieval", "top_k", d.top_k, 10000, lo=16),
+        rerank_max_candidates=_bounded(sec, "retrieval", "rerank_max_candidates", d.rerank_max_candidates, 1024, lo=8),
+        msm_percent=_bounded(sec, "retrieval", "msm_percent", d.msm_percent, 100, lo=1),
+        msm_retry_percent=_bounded(sec, "retrieval", "msm_retry_percent", d.msm_retry_percent, 100, lo=1),
+        synonym_ttl_seconds=_bounded(sec, "retrieval", "synonym_ttl_seconds", d.synonym_ttl_seconds, 2592000, lo=60),
+        rate_max=_bounded(sec, "retrieval", "rate_max", d.rate_max, 10000, lo=1),
+        rate_window_seconds=_bounded(sec, "retrieval", "rate_window_seconds", d.rate_window_seconds, 3600, lo=1),
+    )
+
+
 def parse_settings(data: dict[str, Any]) -> Settings:
     if not isinstance(data, dict):
         raise ConfigError("configuration file is empty or not a mapping")
@@ -515,6 +543,7 @@ def parse_settings(data: dict[str, Any]) -> Settings:
         storage=_parse_storage(data),
         upload=_parse_upload(data),
         ingest=_parse_ingest(data),
+        retrieval=_parse_retrieval(data),
     )
 
 

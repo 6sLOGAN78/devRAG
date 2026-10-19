@@ -114,3 +114,13 @@ ingest:
   pdf_render_threads: ${PDF_RENDER_THREADS:-2}
   queue_prefix: '${INGEST_QUEUE_PREFIX:-te}'
   consumer_group: '${INGEST_CONSUMER_GROUP:-ragflow_consumer_group}'
+
+# Retrieval (plan 05-02, R-203). rerank_max_candidates is interim until plan 05-15.
+retrieval:
+  top_k: ${RETRIEVAL_TOP_K:-1024}
+  rerank_max_candidates: ${RETRIEVAL_RERANK_MAX_CANDIDATES:-64}
+  msm_percent: ${RETRIEVAL_MSM_PERCENT:-30}
+  msm_retry_percent: ${RETRIEVAL_MSM_RETRY_PERCENT:-10}
+  synonym_ttl_seconds: ${RETRIEVAL_SYNONYM_TTL_SECONDS:-86400}
+  rate_max: ${RETRIEVAL_RATE_MAX:-30}
+  rate_window_seconds: ${RETRIEVAL_RATE_WINDOW_SECONDS:-60}

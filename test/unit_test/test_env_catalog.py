@@ -177,3 +177,26 @@ def test_phase4_variables_are_catalogued_and_passed_to_the_app() -> None:
     text = (ROOT / "docker" / "docker-compose.yml").read_text(encoding="utf-8")
     for name in PHASE4_VARIABLES:
         assert f"  {name}:" in text, f"{name} is not passed to the app service"
+
+
+PHASE5_RETRIEVAL_VARIABLES = {
+    "RETRIEVAL_TOP_K": "1024",
+    "RETRIEVAL_RERANK_MAX_CANDIDATES": "64",
+    "RETRIEVAL_MSM_PERCENT": "30",
+    "RETRIEVAL_MSM_RETRY_PERCENT": "10",
+    "RETRIEVAL_SYNONYM_TTL_SECONDS": "86400",
+    "RETRIEVAL_RATE_MAX": "30",
+    "RETRIEVAL_RATE_WINDOW_SECONDS": "60",
+}
+
+
+def test_retrieval_variables_are_catalogued_with_defaults_and_passed_to_the_app() -> None:
+    values, secrets = parse_env(EXAMPLE)
+    for name, default in PHASE5_RETRIEVAL_VARIABLES.items():
+        assert values.get(name) == default, name
+    assert not (set(PHASE5_RETRIEVAL_VARIABLES) & secrets)
+    compose = (ROOT / "docker" / "docker-compose.yml").read_text(encoding="utf-8")
+    template = (ROOT / "conf" / "service_conf.yaml.template").read_text(encoding="utf-8")
+    for name in PHASE5_RETRIEVAL_VARIABLES:
+        assert f"  {name}:" in compose, f"{name} is not passed to the app service"
+        assert "${" + name + ":-" in template, f"{name} is not read by the template"
