@@ -243,13 +243,15 @@ def test_every_editable_field_changes_and_the_rest_stays(settings, space):
         settings,
         owner,
         dataset,
-        {"description": "d", "permission": "team", "avatar": "data:image/png;base64,AAAA", "language": "German", "parser_id": "book"},
+        {"description": "d", "permission": "team", "avatar": "data:image/png;base64,AAAA", "language": "German"},
     )
-    assert (changed.description, changed.permission, changed.avatar, changed.language, changed.parser_id) == ("d", "team", "data:image/png;base64,AAAA", "German", "book")
+    # parser_id is not in the edit set: only "naive" has a built chunker in Phase 4 (IMPLEMENTED_PARSERS in common/ingest_codes.py, D-27), so there is no other
+    # value to change it to; refusing an unbuilt method is covered by test_an_unbuilt_chunking_method_cannot_be_set_on_a_dataset.
+    assert (changed.description, changed.permission, changed.avatar, changed.language, changed.parser_id) == ("d", "team", "data:image/png;base64,AAAA", "German", dataset.parser_id)
     assert (changed.tenant_id, changed.created_by, changed.embd_id, changed.doc_num, changed.chunk_num, changed.token_num) == (
         dataset.tenant_id, dataset.created_by, dataset.embd_id, 0, 0, 0,
     )  # fmt: skip
-    assert kb_row(dataset.id)[1] == "team" and kb_row(dataset.id)[4] == "book" and kb_row(dataset.id)[6] == "German"
+    assert kb_row(dataset.id)[1] == "team" and kb_row(dataset.id)[4] == dataset.parser_id and kb_row(dataset.id)[6] == "German"
     cleared = update(settings, owner, changed, {"description": None, "avatar": None})
     assert cleared.description == "" and cleared.avatar == "", "null clears the free-text fields"
 
@@ -332,9 +334,10 @@ def test_a_bad_parser_setting_is_typed_with_its_field_and_changes_nothing(settin
 def test_an_unbuilt_chunking_method_cannot_be_set_on_a_dataset(settings, space):
     owner, dataset = space
     before = state_of(owner, dataset)
-    err = refused(lambda: update(settings, owner, dataset, {"parser_id": "qa"}))
-    assert err.kind is Kind.INVALID and err.reason == "chunker_unavailable"
-    assert state_of(owner, dataset) == before
+    for unbuilt in ("qa", "book"):
+        err = refused(lambda: update(settings, owner, dataset, {"parser_id": unbuilt}))
+        assert err.kind is Kind.INVALID and err.reason == "chunker_unavailable", unbuilt
+        assert state_of(owner, dataset) == before
     err = refused(lambda: update(settings, owner, dataset, {"parser_id": "bogus"}))
     assert err.reason == "dataset_invalid"
 

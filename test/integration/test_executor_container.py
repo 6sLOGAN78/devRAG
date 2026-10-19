@@ -91,7 +91,7 @@ def test_valkey_keeps_stream_entries() -> None:
 
 def test_memory_limit_and_unprivileged_process() -> None:
     cid = _only_one()
-    assert _inspect(cid, "{{.HostConfig.Memory}}") == str(768 * 1024 * 1024)
+    assert _inspect(cid, "{{.HostConfig.Memory}}") == str(384 * 1024 * 1024), "dev cap set in 04-35 from the measured peak (R-188)"
     # `docker exec` starts as root; the executor process itself must be the unprivileged one (setpriv in the entrypoint).
     lines = _run([DOCKER, "top", cid]).stdout.splitlines()[1:]
     users = [line.split(None, 7) for line in lines]
