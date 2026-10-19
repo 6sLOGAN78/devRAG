@@ -132,3 +132,33 @@ class TestEsDocStore(DocStoreContract):
 
     def test_get_doc_store_caches_one_instance_per_hosts_string(self, settings):
         assert get_doc_store(settings) is get_doc_store(settings)
+
+    def test_must_not_is_refused_by_update_and_delete_and_validated_by_search(self, store, tenant_index, dataset_ids):
+        from common.doc_store.doc_store_base import InvalidFilter
+        from test.helpers.doc_store_contract import row, search
+
+        ds = dataset_ids[0]
+        store.create_idx(tenant_index, ds, 8)
+        store.insert([row("c1", "d1", "alpha", 0), row("c2", "d2", "alpha", 1)], tenant_index, ds)
+        with pytest.raises(InvalidFilter):
+            store.delete({"doc_id": ["d1"], "must_not": {"doc_id": ["d2"]}}, tenant_index, ds)
+        with pytest.raises(InvalidFilter):
+            store.update({"doc_id": ["d1"], "must_not": {"doc_id": ["d2"]}}, {"available_int": 0}, tenant_index, ds)
+        assert store.get("c1", tenant_index, [ds]) is not None and store.get("c2", tenant_index, [ds]) is not None
+        with pytest.raises(InvalidFilter):
+            search(store, tenant_index, [ds], condition={"must_not": ["d1"]})
+        with pytest.raises(InvalidFilter):
+            search(store, tenant_index, [ds], condition={"must_not": {"bad key": "x"}})
+        with pytest.raises(InvalidFilter):
+            search(store, tenant_index, [ds], condition={"must_not": {"doc_id": {"nested": 1}}})
+        assert search(store, tenant_index, [ds], condition={"must_not": {}}).total == 2
+
+    def test_search_does_not_mutate_the_callers_condition(self, store, tenant_index, dataset_ids):
+        from test.helpers.doc_store_contract import row, search
+
+        ds = dataset_ids[0]
+        store.create_idx(tenant_index, ds, 8)
+        store.insert([row("c1", "d1", "alpha", 0)], tenant_index, ds)
+        condition = {"available_int": 1, "must_not": {"doc_id": ["zzz"]}}
+        search(store, tenant_index, [ds], condition=condition)
+        assert condition == {"available_int": 1, "must_not": {"doc_id": ["zzz"]}}

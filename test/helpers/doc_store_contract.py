@@ -267,7 +267,6 @@ class DocStoreContract:
         got = search(store, tenant_index, [ds], condition={"doc_id": ["d1", "d3"]})
         assert {h["id"] for h in got.hits} == {"c1", "c3"}
 
-    @pytest.mark.xfail(strict=True, reason="plan 05-03 adds must_not")  # plan 05-03 removes this marker when it implements the key
     def test_must_not_excludes_matches(self, store, tenant_index, dataset_ids):
         ds = dataset_ids[0]
         store.create_idx(tenant_index, ds, DIM)

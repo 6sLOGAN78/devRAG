@@ -95,6 +95,26 @@ def _filter_clauses(condition: dict[str, Any], dataset_ids: list[str]) -> list[d
     return clauses
 
 
+def _must_not_clauses(raw: Any) -> list[dict[str, Any]]:
+    """Exclusion clauses from the reserved ``must_not`` condition entry (plan 05-03, R-204); only a search accepts it."""
+    if raw is None:
+        return []
+    if not isinstance(raw, dict):
+        raise InvalidFilter("invalid must_not")
+    validate_condition_keys(raw)
+    clauses: list[dict[str, Any]] = []
+    for key, value in raw.items():
+        if isinstance(value, (list, tuple, set)):
+            if not all(isinstance(v, (str, int, float, bool)) for v in value):
+                raise InvalidFilter("invalid condition value")
+            clauses.append({"terms": {key: list(value)}})
+        elif isinstance(value, (str, int, float, bool)):
+            clauses.append({"term": {key: value}})
+        else:
+            raise InvalidFilter("invalid condition value")
+    return clauses
+
+
 def _weights(fusion: FusionExpr | None) -> tuple[float, float]:
     """Text and dense boosts. Without a fusion expression both sides count equally."""
     if fusion is None:
@@ -130,7 +150,7 @@ def _text_query(expr: MatchTextExpr, boost: float) -> dict[str, Any]:
     return {"simple_query_string": body}
 
 
-def _knn(expr: MatchDenseExpr, boost: float, filters: list[dict[str, Any]]) -> dict[str, Any]:
+def _knn(expr: MatchDenseExpr, boost: float, filters: list[dict[str, Any]], must_not: list[dict[str, Any]]) -> dict[str, Any]:
     if VECTOR_FIELD_RE.fullmatch(expr.vector_column_name) is None:
         raise InvalidFilter("invalid vector field")
     check_vector(expr.vector_column_name, list(expr.embedding_data))
@@ -140,7 +160,7 @@ def _knn(expr: MatchDenseExpr, boost: float, filters: list[dict[str, Any]]) -> d
         "query_vector": [float(v) for v in expr.embedding_data],
         "k": k,
         "num_candidates": min(2 * k, MAX_RESULT_WINDOW),
-        "filter": {"bool": {"filter": filters}},
+        "filter": {"bool": {"filter": filters, **({"must_not": must_not} if must_not else {})}},
         "boost": boost,
     }
     similarity = (expr.extra_options or {}).get("similarity")
@@ -322,7 +342,9 @@ class ESConnection(DocStoreConnection):
     ) -> SearchResult:
         indices = validate_index_names(index_names)
         scope = require_dataset_ids(dataset_ids)
-        filters = _filter_clauses(condition or {}, scope)
+        remaining = dict(condition or {})
+        must_not = _must_not_clauses(remaining.pop("must_not", None))
+        filters = _filter_clauses(remaining, scope)
         if isinstance(offset, bool) or isinstance(limit, bool) or not isinstance(offset, int) or not isinstance(limit, int) or offset < 0 or limit < 0:
             raise InvalidFilter("offset and limit must be non-negative integers")
         if offset >= MAX_RESULT_WINDOW:
@@ -339,12 +361,14 @@ class ESConnection(DocStoreConnection):
             if isinstance(expr, MatchTextExpr):
                 must.append(_text_query(expr, text_boost))
             elif isinstance(expr, MatchDenseExpr):
-                knns.append(_knn(expr, dense_boost, filters))
+                knns.append(_knn(expr, dense_boost, filters, must_not))
             elif isinstance(expr, MatchSparseExpr):
                 raise NotSupported("sparse match is not supported by this document store")
             elif not isinstance(expr, FusionExpr):
                 raise NotSupported("unknown match expression")
         bool_query: dict[str, Any] = {"filter": filters}
+        if must_not:
+            bool_query["must_not"] = must_not
         if must:
             bool_query["must"] = must
         if rank_feature:
