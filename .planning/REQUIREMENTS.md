@@ -71,12 +71,12 @@ Requirements for initial release. Each maps to exactly one roadmap phase.
 - [ ] **KB-11**: User can list and delete tags of a dataset via `GET` / `DELETE /datasets/<dataset_id>/tags`
 - [ ] **KB-12**: User can fetch flattened metadata across datasets via `GET /datasets/metadata/flattened`
 - [ ] **KB-13**: User can read a dataset's auto-metadata configuration via `GET /datasets/<dataset_id>/metadata/config`
-- [ ] **KB-14**: User can view an ingestion summary for a dataset via `GET /datasets/<dataset_id>/ingestions/summary`
-- [ ] **KB-15**: User can list ingestion logs and fetch one log via `GET /datasets/<dataset_id>/ingestions/<log_id>`
-- [ ] **KB-16**: User can check embedding-model compatibility for a dataset via `POST /datasets/<dataset_id>/embedding/check`
+- [x] **KB-14**: User can view an ingestion summary for a dataset via `GET /datasets/<dataset_id>/ingestions/summary`
+- [x] **KB-15**: User can list ingestion logs and fetch one log via `GET /datasets/<dataset_id>/ingestions/<log_id>`
+- [x] **KB-16**: User can check embedding-model compatibility for a dataset via `POST /datasets/<dataset_id>/embedding/check`
 - [ ] **KB-17**: User can delete a derived index of a dataset by type via `DELETE /datasets/<dataset_id>/<index_type>` and trace it via `GET /datasets/<dataset_id>/artifacts/alteration`
 - [ ] **KB-18**: User can run a retrieval test against a dataset with similarity threshold and vector/keyword weight controls
-- [ ] **KB-19**: Dataset document counts and token/chunk totals are maintained
+- [x] **KB-19**: Dataset document counts and token/chunk totals are maintained
 
 ### DOC — Document upload, lifecycle, management
 
@@ -88,21 +88,21 @@ Requirements for initial release. Each maps to exactly one roadmap phase.
 - [x] **DOC-06**: Upload inserts `File`, `Document`, `File2Document` rows in one transaction with `run='0'`, `progress=0.0`
 - [x] **DOC-07**: Upload verifies dataset existence and caller permission before storing
 - [x] **DOC-08**: User can list documents in a dataset with paging and keyword filter via `GET /api/v1/datasets/<dataset_id>/documents`
-- [ ] **DOC-09**: User can start parsing selected documents via `POST /api/v1/datasets/<dataset_id>/documents/parse` (`doc_ids`, `run`); document moves to RUNNING and tasks are queued
-- [ ] **DOC-10**: User can cancel a running parse; document moves to CANCELLED
-- [ ] **DOC-11**: User can re-parse a document; previous chunks are replaced
-- [ ] **DOC-12**: Document exposes lifecycle state (`run`), `progress` float 0.0-1.0 (`-1` on failure), and `progress_msg`
-- [ ] **DOC-13**: User can enable/disable documents for retrieval via `POST /api/v1/datasets/<dataset_id>/documents/batch-update-status`
+- [x] **DOC-09**: User can start parsing selected documents via `POST /api/v1/datasets/<dataset_id>/documents/parse` (`doc_ids`, `run`); document moves to RUNNING and tasks are queued
+- [x] **DOC-10**: User can cancel a running parse; document moves to CANCELLED
+- [x] **DOC-11**: User can re-parse a document; previous chunks are replaced
+- [x] **DOC-12**: Document exposes lifecycle state (`run`), `progress` float 0.0-1.0 (`-1` on failure), and `progress_msg`
+- [x] **DOC-13**: User can enable/disable documents for retrieval via `POST /api/v1/datasets/<dataset_id>/documents/batch-update-status`
 - [x] **DOC-14**: User can delete documents via `DELETE /api/v1/datasets/<dataset_id>/documents`; chunks are pruned from the index
 - [x] **DOC-15**: Deleting a document garbage-collects the blob only when no other `File2Document` row references it
 - [x] **DOC-16**: Documents can carry their own `parser_id` / `parser_config` overriding the dataset default
 - [ ] **DOC-17**: User can batch-update document metadata via `PATCH /datasets/<dataset_id>/documents/metadatas`
 - [ ] **DOC-18**: User can fetch an extracted image via `GET /documents/images/<image_id>`
 - [ ] **DOC-19**: User can fetch a generated artifact via `GET /documents/artifact/<filename>`
-- [ ] **DOC-20**: Documents have thumbnails
-- [ ] **DOC-21**: User can preview a document's raw content
-- [ ] **DOC-22**: User can query task status via `GET /v1/task/status/:task_id`
-- [ ] **DOC-23**: Documents track `token_num`, `chunk_num`, `process_begin_at`, `process_duration`, `size`, `suffix`, `source_type`
+- [x] **DOC-20**: Documents have thumbnails
+- [x] **DOC-21**: User can preview a document's raw content
+- [x] **DOC-22**: User can query task status via `GET /v1/task/status/:task_id`
+- [x] **DOC-23**: Documents track `token_num`, `chunk_num`, `process_begin_at`, `process_duration`, `size`, `suffix`, `source_type`
 - [ ] **DOC-24**: File manager with folder hierarchy (`file.parent_id`)
 
 ### STOR — Object and file storage
@@ -121,19 +121,19 @@ Requirements for initial release. Each maps to exactly one roadmap phase.
 
 ### PARSE — Parsers, OCR, layout, tables (DeepDoc)
 
-- [ ] **PARSE-01**: File-type router dispatches each source file to its parser
-- [ ] **PARSE-02**: PDF: extract native text spans with character bounding boxes
-- [ ] **PARSE-03**: PDF: rasterize pages to images at zoom 3
+- [x] **PARSE-01**: File-type router dispatches each source file to its parser
+- [x] **PARSE-02**: PDF: extract native text spans with character bounding boxes
+- [x] **PARSE-03**: PDF: rasterize pages to images at zoom 3
 - [ ] **PARSE-04**: Layout analysis (DLA) detects regions labelled Text, Title, Figure, Figure caption, Table, Table caption, Header, Footer, Reference, Equation
 - [ ] **PARSE-05**: Text boxes are assigned to layout regions at overlap ratio >= 0.4; duplicates removed by IoU NMS; regions sorted into reading order
 - [ ] **PARSE-06**: OCR fallback (text detection plus recognition) runs when a page's text layer is missing or corrupt
 - [ ] **PARSE-07**: Table structure recognition reconstructs cropped tables into HTML `<table>`
 - [ ] **PARSE-08**: Headers and footers are filtered from chunk content
 - [ ] **PARSE-09**: DOCX parser: paragraphs, headings, embedded images, tables as HTML *(Python implementation in v1; Go mirror deferred to v2)* — *partly delivered in Phase 4 (R-160, D-27): paragraphs, headings and tables as HTML; embedded images are skipped and counted in the log; image handling moves to Phase 6*
-- [ ] **PARSE-10**: XLSX parser: sheets to HTML/Markdown tables with header-row context
+- [x] **PARSE-10**: XLSX parser: sheets to HTML/Markdown tables with header-row context
 - [ ] **PARSE-11**: PPTX parser: slide titles, text frames, shape tables, speaker notes, images — *partly delivered in Phase 4 (R-160, D-27): slide titles, text frames, shape tables and speaker notes; images are skipped and counted in the log; image handling moves to Phase 6*
-- [ ] **PARSE-12**: HTML parser: DOM extraction with script/style stripping
-- [ ] **PARSE-13**: TXT parser with encoding auto-detection
+- [x] **PARSE-12**: HTML parser: DOM extraction with script/style stripping
+- [x] **PARSE-13**: TXT parser with encoding auto-detection
 - [ ] **PARSE-14**: Markdown parser
 - [ ] **PARSE-15**: JSON parser
 - [ ] **PARSE-16**: EPUB parser
@@ -150,8 +150,8 @@ Requirements for initial release. Each maps to exactly one roadmap phase.
 
 ### CHUNK — Chunking strategies and chunk management
 
-- [ ] **CHUNK-01**: `parser_id` resolver dispatches to the matching chunker (`FACTORY[parser_id]`)
-- [ ] **CHUNK-02**: `naive`/`general`: token window with overlap, custom delimiters, max tokens (default 512)
+- [x] **CHUNK-01**: `parser_id` resolver dispatches to the matching chunker (`FACTORY[parser_id]`)
+- [x] **CHUNK-02**: `naive`/`general`: token window with overlap, custom delimiters, max tokens (default 512)
 - [ ] **CHUNK-03**: `paper`: section-aware (Abstract, Introduction, Method, ..., References)
 - [ ] **CHUNK-04**: `book`: chapter/section hierarchy from headings or TOC depth
 - [ ] **CHUNK-05**: `laws`: Chapter / Section / Article / Item hierarchy
@@ -165,12 +165,12 @@ Requirements for initial release. Each maps to exactly one roadmap phase.
 - [ ] **CHUNK-13**: `tag`: extracts tag features and tag weights
 - [ ] **CHUNK-14**: `one`: whole document as a single chunk
 - [ ] **CHUNK-15**: `audio`: ASR transcript segmented into timestamped chunks
-- [ ] **CHUNK-16**: Every chunk carries content, page number, position `[page, x0, top, x1, bottom]`, and image ids
+- [x] **CHUNK-16**: Every chunk carries content, page number, position `[page, x0, top, x1, bottom]`, and image ids
 - [ ] **CHUNK-17**: Text preprocessing: full-to-half-width, traditional-to-simplified Chinese, URL/email stripping, tokenize, fine-grained tokenize, token positions — *partly delivered in Phase 4 (R-160, D-27): full-to-half-width, URL/email stripping, tokenize and token positions through the in-repo stdlib tokenizer; traditional-to-simplified conversion and the dictionary fine-grained tokenizer move to Phase 6*
-- [ ] **CHUNK-18**: User can list a document's chunks with text, bounding boxes, status, paging, keyword filter via `GET .../documents/<doc_id>/chunks`
-- [ ] **CHUNK-19**: User can create a manual chunk via `POST .../documents/<doc_id>/chunks`
-- [ ] **CHUNK-20**: User can edit a chunk's text
-- [ ] **CHUNK-21**: User can enable/disable individual chunks
+- [x] **CHUNK-18**: User can list a document's chunks with text, bounding boxes, status, paging, keyword filter via `GET .../documents/<doc_id>/chunks`
+- [x] **CHUNK-19**: User can create a manual chunk via `POST .../documents/<doc_id>/chunks`
+- [x] **CHUNK-20**: User can edit a chunk's text
+- [x] **CHUNK-21**: User can enable/disable individual chunks
 - [ ] **CHUNK-22**: LLM keyword extraction per chunk populates `important_kwd`
 - [ ] **CHUNK-23**: LLM question proposal per chunk populates `question_tks`
 - [ ] **CHUNK-24**: LLM content tagging against tag sets
@@ -181,22 +181,22 @@ Requirements for initial release. Each maps to exactly one roadmap phase.
 
 ### ING — Background ingestion, queues, workers, Redis
 
-- [ ] **ING-01**: Parsing creates `task` rows; large documents are split into page-range sub-tasks (`MAXIMUM_TASK_PAGE_NUMBER = 12`)
-- [ ] **ING-02**: Tasks are published to Redis Streams (`XADD`) on `te.{priority}.common`
-- [ ] **ING-03**: High-priority queue (`te.1.common`) is drained before normal (`te.0.common`)
-- [ ] **ING-04**: Workers consume through a consumer group (`XREADGROUP`); N workers run concurrently
-- [ ] **ING-05**: Un-acked messages from a crashed worker are reclaimed by the next consumer
-- [ ] **ING-06**: A Redis distributed lock (`SET NX EX`) guards each task
-- [ ] **ING-07**: Worker acknowledges (`XACK`) on completion
-- [ ] **ING-08**: Worker reports progress (0.0-1.0, `-1` on failure) and message to `task`; a lock-guarded `update_progress` daemon rolls task progress up to the document
-- [ ] **ING-09**: Concurrency limiters: `task_limiter`, `chunk_limiter`, `embed_limiter`, `minio_limiter`, `kg_limiter`
-- [ ] **ING-10**: Worker heartbeat to Redis (`WORKER_HEARTBEAT_TIMEOUT`, default 120s)
-- [ ] **ING-11**: Task failure records error trace, sets document to FAILED, tracks `retry_count`
-- [ ] **ING-12**: Worker stops when the user cancels
-- [ ] **ING-13**: Worker pipeline end-to-end: fetch blob, parse, chunk, embed, bulk index, mark done
-- [ ] **ING-14**: Blocking compute (embedding, docstore calls) is offloaded to a thread pool so the asyncio loop is not blocked
-- [ ] **ING-15**: Worker closes DB connections before long model inference
-- [ ] **ING-16**: Task executor runs as a standalone process/container (`entrypoint_task_executor.sh`)
+- [x] **ING-01**: Parsing creates `task` rows; large documents are split into page-range sub-tasks (`MAXIMUM_TASK_PAGE_NUMBER = 12`)
+- [x] **ING-02**: Tasks are published to Redis Streams (`XADD`) on `te.{priority}.common`
+- [x] **ING-03**: High-priority queue (`te.1.common`) is drained before normal (`te.0.common`)
+- [x] **ING-04**: Workers consume through a consumer group (`XREADGROUP`); N workers run concurrently
+- [x] **ING-05**: Un-acked messages from a crashed worker are reclaimed by the next consumer
+- [x] **ING-06**: A Redis distributed lock (`SET NX EX`) guards each task
+- [x] **ING-07**: Worker acknowledges (`XACK`) on completion
+- [x] **ING-08**: Worker reports progress (0.0-1.0, `-1` on failure) and message to `task`; a lock-guarded `update_progress` daemon rolls task progress up to the document
+- [x] **ING-09**: Concurrency limiters: `task_limiter`, `chunk_limiter`, `embed_limiter`, `minio_limiter`, `kg_limiter`
+- [x] **ING-10**: Worker heartbeat to Redis (`WORKER_HEARTBEAT_TIMEOUT`, default 120s)
+- [x] **ING-11**: Task failure records error trace, sets document to FAILED, tracks `retry_count`
+- [x] **ING-12**: Worker stops when the user cancels
+- [x] **ING-13**: Worker pipeline end-to-end: fetch blob, parse, chunk, embed, bulk index, mark done
+- [x] **ING-14**: Blocking compute (embedding, docstore calls) is offloaded to a thread pool so the asyncio loop is not blocked
+- [x] **ING-15**: Worker closes DB connections before long model inference
+- [x] **ING-16**: Task executor runs as a standalone process/container (`entrypoint_task_executor.sh`)
 - [ ] **ING-17**: Background task types beyond parse: `raptor`, `graphrag`, `mindmap`, `memory`, `wiki`, `skill`, `structure_graph`, `structure_mindmap`, `timeline`, `session_graph`, `session_essence`, `structure`
 - [ ] **ING-18**: Dataset-wide fan-out tasks using sentinel document ids
 - [ ] **ING-19**: Go ingestion service and syncer (`--ingestor`, `--syncer` flags) *(Python implementation in v1; Go mirror deferred to v2)*
@@ -205,17 +205,17 @@ Requirements for initial release. Each maps to exactly one roadmap phase.
 
 ### IDX — Embedding and indexing
 
-- [ ] **IDX-01**: Chunks are embedded in batches of 64 using the dataset's embedding model
-- [ ] **IDX-02**: Inputs are truncated to 8192 tokens before embedding; results are re-ordered by index to match inputs
-- [ ] **IDX-03**: Vectors are L2-normalized
+- [x] **IDX-01**: Chunks are embedded in batches of 64 using the dataset's embedding model
+- [x] **IDX-02**: Inputs are truncated to 8192 tokens before embedding; results are re-ordered by index to match inputs
+- [x] **IDX-03**: Vectors are L2-normalized
 - [x] **IDX-04**: Vector field is named `q_{dim}_vec`, allowing multiple embedding dimensions in one index
 - [x] **IDX-05**: Unified `DocStoreConnection` interface (create/drop index, insert, update, delete, search with text + dense + fusion expressions)
 - [x] **IDX-06**: Index schema: `id`, `doc_id`, `kb_id`, `content_ltks`, `title_tks`, `important_kwd`, `question_tks`, `position_int`, `q_{dim}_vec`, `available_int` (plus `title_sm_tks`, `important_tks`, `content_sm_ltks` from query fields)
-- [ ] **IDX-07**: Chunks are bulk-upserted in batches of 64 with deterministic id `doc_id + "_" + order`
+- [x] **IDX-07**: Chunks are bulk-upserted in batches of 64 with deterministic id `doc_id + "_" + order`
 - [x] **IDX-08**: Vector index is HNSW with cosine metric, `m=16`, `ef_construction=200`
 - [x] **IDX-09**: Elasticsearch 8 adapter
 - [ ] **IDX-10**: Infinity adapter
-- [ ] **IDX-14**: Document and dataset deletion remove their chunks from the index
+- [x] **IDX-14**: Document and dataset deletion remove their chunks from the index
 - [ ] **IDX-15**: Go docstore drivers (Elasticsearch, Infinity, OceanBase) *(Python implementation in v1; Go mirror deferred to v2)*
 
 ### RETR — Retrieval, filters, reranking
@@ -518,13 +518,13 @@ Requirements for initial release. Each maps to exactly one roadmap phase.
 - [x] **UI-10**: Datasets gallery with card grid and create-dataset dialog
 - [x] **UI-11**: Dataset workspace: document table with status badges
 - [x] **UI-12**: Upload dialog: drag-and-drop, extension and size validation, progress bars
-- [ ] **UI-13**: Chunking-method dialog (General, Q&A, Paper, Book, Laws, Presentation, Table, Manual)
+- [x] **UI-13**: Chunking-method dialog (General, Q&A, Paper, Book, Laws, Presentation, Table, Manual)
 - [ ] **UI-14**: Parser configurator: chunk token size, delimiter, layout-model toggle, auto-keyword count — *partly delivered in Phase 4 (R-160, D-27): chunk token size and delimiter; the layout-model toggle and the auto-keyword count move to Phase 6*
-- [ ] **UI-15**: Live parsing progress bars, status badges (UNSTART, RUNNING, SUCCESS, FAIL), error log display
-- [ ] **UI-16**: Chunk inspector: original document with highlighted bounding boxes beside chunk text
-- [ ] **UI-17**: Chunk editor: edit text, toggle availability, add chunk
+- [x] **UI-15**: Live parsing progress bars, status badges (UNSTART, RUNNING, SUCCESS, FAIL), error log display
+- [x] **UI-16**: Chunk inspector: original document with highlighted bounding boxes beside chunk text
+- [x] **UI-17**: Chunk editor: edit text, toggle availability, add chunk
 - [ ] **UI-18**: Retrieval-testing page: query input, similarity slider, vector/keyword weight, hit list with scores
-- [ ] **UI-19**: Document viewer page
+- [x] **UI-19**: Document viewer page
 - [ ] **UI-20**: Chat playground: session sidebar, message list, input bar
 - [ ] **UI-21**: Streaming token rendering with stop-generation control
 - [ ] **UI-22**: Markdown rendering: GFM, syntax-highlighted code with copy button, KaTeX math, image popovers
@@ -579,7 +579,7 @@ Requirements for initial release. Each maps to exactly one roadmap phase.
 - [x] **DEPLOY-14**: Container health check on the app health endpoint every 10s
 - [x] **DEPLOY-15**: MySQL initialized from `init.sql` on first boot
 - [x] **DEPLOY-16**: Logs bind-mounted to host
-- [ ] **DEPLOY-17**: Standalone task-executor container for horizontal scaling
+- [x] **DEPLOY-17**: Standalone task-executor container for horizontal scaling
 - [ ] **DEPLOY-18**: TEI (text-embeddings-inference) image for local embedding/rerank
 - [ ] **DEPLOY-19**: Helm chart / Kubernetes deployment
 - [ ] **DEPLOY-20**: Compose variants for macOS and China mirrors
@@ -611,7 +611,7 @@ Requirements for initial release. Each maps to exactly one roadmap phase.
 - [x] **TEST-08**: Vector-engine integration tests against live engines
 - [ ] **TEST-09**: Sandbox RPC integration tests
 - [x] **TEST-10**: Frontend component tests (React Testing Library with Jest or Vitest)
-- [ ] **TEST-11**: Database tests and pipeline tests
+- [x] **TEST-11**: Database tests and pipeline tests
 - [ ] **TEST-12**: Performance benchmarks
 
 ### E2E — Acceptance flows (must each pass against the real stack, no mocks)
@@ -620,8 +620,8 @@ Requirements for initial release. Each maps to exactly one roadmap phase.
 - [x] **E2E-02**: Login returns token, user, tenant, default models — passes against the real stack with no mocks (covers AUTH-05..07; flow: `21-.../login.md`) — *login returns token, user, tenant, role and the default model id fields through the real stack; the model ids are empty until configured (D-22, B-09)*
 - [x] **E2E-03**: Create knowledge base provisions DB row and docstore index — passes against the real stack with no mocks (covers KB-01..03, IDX-05; flow: `21-.../create-knowledge-base.md`)
 - [x] **E2E-04**: Upload document stores blob and creates UNSTART document — passes against the real stack with no mocks (covers DOC-01..07, STOR; flow: `21-.../upload-document.md`)
-- [ ] **E2E-05**: Document processing: parse request, queue, worker, DeepDoc, chunks — passes against the real stack with no mocks (covers DOC-09, ING, PARSE, CHUNK; flow: `21-.../document-processing.md`)
-- [ ] **E2E-06**: Indexing: embed, optional enrichment, bulk insert, document finished — passes against the real stack with no mocks (covers IDX, CHUNK-22..26; flow: `21-.../indexing.md`)
+- [x] **E2E-05**: Document processing: parse request, queue, worker, DeepDoc, chunks — passes against the real stack with no mocks (covers DOC-09, ING, PARSE, CHUNK; flow: `21-.../document-processing.md`)
+- [x] **E2E-06**: Indexing: embed, optional enrichment, bulk insert, document finished — passes against the real stack with no mocks (covers IDX, CHUNK-22..26; flow: `21-.../indexing.md`)
 - [ ] **E2E-07**: Ask question: tokenize, embed query, concurrent BM25 + vector search — passes against the real stack with no mocks (covers RETR-01..08; flow: `21-.../ask-question.md`)
 - [ ] **E2E-08**: RAG answer: rerank, format context with citations, generate, persist — passes against the real stack with no mocks (covers RETR-11, CHAT-16..21; flow: `21-.../rag-answer.md`)
 - [ ] **E2E-09**: Chat streaming over SSE with reference payload and final persistence — passes against the real stack with no mocks (covers CHAT-12, CHAT-13, UI-21, UI-23; flow: `21-.../chat-streaming.md`)
@@ -735,12 +735,12 @@ Which phases cover which requirements. Updated during roadmap creation.
 | KB-11 | Phase 6 | Pending |
 | KB-12 | Phase 6 | Pending |
 | KB-13 | Phase 6 | Pending |
-| KB-14 | Phase 4 | Pending |
-| KB-15 | Phase 4 | Pending |
-| KB-16 | Phase 4 | Pending |
+| KB-14 | Phase 4 | Complete |
+| KB-15 | Phase 4 | Complete |
+| KB-16 | Phase 4 | Complete |
 | KB-17 | Phase 6 | Pending |
 | KB-18 | Phase 5 | Pending |
-| KB-19 | Phase 4 | Pending |
+| KB-19 | Phase 4 | Complete |
 | DOC-01 | Phase 3 | Complete |
 | DOC-02 | Phase 3 | Complete |
 | DOC-03 | Phase 3 | Complete |
@@ -749,21 +749,21 @@ Which phases cover which requirements. Updated during roadmap creation.
 | DOC-06 | Phase 3 | Complete |
 | DOC-07 | Phase 3 | Complete |
 | DOC-08 | Phase 3 | Complete |
-| DOC-09 | Phase 4 | Pending |
-| DOC-10 | Phase 4 | Pending |
-| DOC-11 | Phase 4 | Pending |
-| DOC-12 | Phase 4 | Pending |
-| DOC-13 | Phase 4 | Pending |
+| DOC-09 | Phase 4 | Complete |
+| DOC-10 | Phase 4 | Complete |
+| DOC-11 | Phase 4 | Complete |
+| DOC-12 | Phase 4 | Complete |
+| DOC-13 | Phase 4 | Complete |
 | DOC-14 | Phase 3 | Complete |
 | DOC-15 | Phase 3 | Complete |
 | DOC-16 | Phase 3 | Complete |
 | DOC-17 | Phase 6 | Pending |
 | DOC-18 | Phase 6 | Pending |
 | DOC-19 | Phase 6 | Pending |
-| DOC-20 | Phase 4 | Pending |
-| DOC-21 | Phase 4 | Pending |
-| DOC-22 | Phase 4 | Pending |
-| DOC-23 | Phase 4 | Pending |
+| DOC-20 | Phase 4 | Complete |
+| DOC-21 | Phase 4 | Complete |
+| DOC-22 | Phase 4 | Complete |
+| DOC-23 | Phase 4 | Complete |
 | DOC-24 | Phase 8 | Pending |
 | STOR-01 | Phase 3 | Complete |
 | STOR-02 | Phase 3 | Complete |
@@ -776,19 +776,19 @@ Which phases cover which requirements. Updated during roadmap creation.
 | STOR-09 | Phase 6 | Pending |
 | STOR-10 | Phase 3 | Complete |
 | STOR-11 | Phase 3 | Complete |
-| PARSE-01 | Phase 4 | Pending |
-| PARSE-02 | Phase 4 | Pending |
-| PARSE-03 | Phase 4 | Pending |
+| PARSE-01 | Phase 4 | Complete |
+| PARSE-02 | Phase 4 | Complete |
+| PARSE-03 | Phase 4 | Complete |
 | PARSE-04 | Phase 6 | Pending |
 | PARSE-05 | Phase 6 | Pending |
 | PARSE-06 | Phase 6 | Pending |
 | PARSE-07 | Phase 6 | Pending |
 | PARSE-08 | Phase 6 | Pending |
 | PARSE-09 | Phase 4 | Partial (Phase 4 part; rest in Phase 6, D-27) |
-| PARSE-10 | Phase 4 | Pending |
+| PARSE-10 | Phase 4 | Complete |
 | PARSE-11 | Phase 4 | Partial (Phase 4 part; rest in Phase 6, D-27) |
-| PARSE-12 | Phase 4 | Pending |
-| PARSE-13 | Phase 4 | Pending |
+| PARSE-12 | Phase 4 | Complete |
+| PARSE-13 | Phase 4 | Complete |
 | PARSE-14 | Phase 6 | Pending |
 | PARSE-15 | Phase 6 | Pending |
 | PARSE-16 | Phase 6 | Pending |
@@ -802,8 +802,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | PARSE-24 | Phase 6 | Pending |
 | PARSE-25 | Phase 6 | Pending |
 | PARSE-26 | Phase 6 | Pending |
-| CHUNK-01 | Phase 4 | Pending |
-| CHUNK-02 | Phase 4 | Pending |
+| CHUNK-01 | Phase 4 | Complete |
+| CHUNK-02 | Phase 4 | Complete |
 | CHUNK-03 | Phase 6 | Pending |
 | CHUNK-04 | Phase 6 | Pending |
 | CHUNK-05 | Phase 6 | Pending |
@@ -817,12 +817,12 @@ Which phases cover which requirements. Updated during roadmap creation.
 | CHUNK-13 | Phase 6 | Pending |
 | CHUNK-14 | Phase 6 | Pending |
 | CHUNK-15 | Phase 6 | Pending |
-| CHUNK-16 | Phase 4 | Pending |
+| CHUNK-16 | Phase 4 | Complete |
 | CHUNK-17 | Phase 4 | Partial (Phase 4 part; rest in Phase 6, D-27) |
-| CHUNK-18 | Phase 4 | Pending |
-| CHUNK-19 | Phase 4 | Pending |
-| CHUNK-20 | Phase 4 | Pending |
-| CHUNK-21 | Phase 4 | Pending |
+| CHUNK-18 | Phase 4 | Complete |
+| CHUNK-19 | Phase 4 | Complete |
+| CHUNK-20 | Phase 4 | Complete |
+| CHUNK-21 | Phase 4 | Complete |
 | CHUNK-22 | Phase 6 | Pending |
 | CHUNK-23 | Phase 6 | Pending |
 | CHUNK-24 | Phase 6 | Pending |
@@ -830,38 +830,38 @@ Which phases cover which requirements. Updated during roadmap creation.
 | CHUNK-26 | Phase 6 | Pending |
 | CHUNK-27 | Phase 6 | Pending |
 | CHUNK-28 | Phase 6 | Pending |
-| ING-01 | Phase 4 | Pending |
-| ING-02 | Phase 4 | Pending |
-| ING-03 | Phase 4 | Pending |
-| ING-04 | Phase 4 | Pending |
-| ING-05 | Phase 4 | Pending |
-| ING-06 | Phase 4 | Pending |
-| ING-07 | Phase 4 | Pending |
-| ING-08 | Phase 4 | Pending |
-| ING-09 | Phase 4 | Pending |
-| ING-10 | Phase 4 | Pending |
-| ING-11 | Phase 4 | Pending |
-| ING-12 | Phase 4 | Pending |
-| ING-13 | Phase 4 | Pending |
-| ING-14 | Phase 4 | Pending |
-| ING-15 | Phase 4 | Pending |
-| ING-16 | Phase 4 | Pending |
+| ING-01 | Phase 4 | Complete |
+| ING-02 | Phase 4 | Complete |
+| ING-03 | Phase 4 | Complete |
+| ING-04 | Phase 4 | Complete |
+| ING-05 | Phase 4 | Complete |
+| ING-06 | Phase 4 | Complete |
+| ING-07 | Phase 4 | Complete |
+| ING-08 | Phase 4 | Complete |
+| ING-09 | Phase 4 | Complete |
+| ING-10 | Phase 4 | Complete |
+| ING-11 | Phase 4 | Complete |
+| ING-12 | Phase 4 | Complete |
+| ING-13 | Phase 4 | Complete |
+| ING-14 | Phase 4 | Complete |
+| ING-15 | Phase 4 | Complete |
+| ING-16 | Phase 4 | Complete |
 | ING-17 | Phase 8 | Pending |
 | ING-18 | Phase 6 | Pending |
 | ING-19 | Phase 8 | Pending |
 | ING-20 | Phase 8 | Pending |
 | ING-21 | Phase 5 | Pending |
-| IDX-01 | Phase 4 | Pending |
-| IDX-02 | Phase 4 | Pending |
-| IDX-03 | Phase 4 | Pending |
+| IDX-01 | Phase 4 | Complete |
+| IDX-02 | Phase 4 | Complete |
+| IDX-03 | Phase 4 | Complete |
 | IDX-04 | Phase 3 | Complete |
 | IDX-05 | Phase 3 | Complete |
 | IDX-06 | Phase 3 | Complete |
-| IDX-07 | Phase 4 | Pending |
+| IDX-07 | Phase 4 | Complete |
 | IDX-08 | Phase 3 | Complete |
 | IDX-09 | Phase 3 | Complete |
 | IDX-10 | Phase 8 | Pending |
-| IDX-14 | Phase 4 | Pending |
+| IDX-14 | Phase 4 | Complete |
 | IDX-15 | Phase 8 | Pending |
 | RETR-01 | Phase 5 | Pending |
 | RETR-02 | Phase 5 | Pending |
@@ -1119,13 +1119,13 @@ Which phases cover which requirements. Updated during roadmap creation.
 | UI-10 | Phase 3 | Complete |
 | UI-11 | Phase 3 | Complete |
 | UI-12 | Phase 3 | Complete |
-| UI-13 | Phase 4 | Pending |
+| UI-13 | Phase 4 | Complete |
 | UI-14 | Phase 4 | Partial (Phase 4 part; rest in Phase 6, D-27) |
-| UI-15 | Phase 4 | Pending |
-| UI-16 | Phase 4 | Pending |
-| UI-17 | Phase 4 | Pending |
+| UI-15 | Phase 4 | Complete |
+| UI-16 | Phase 4 | Complete |
+| UI-17 | Phase 4 | Complete |
 | UI-18 | Phase 5 | Pending |
-| UI-19 | Phase 4 | Pending |
+| UI-19 | Phase 4 | Complete |
 | UI-20 | Phase 5 | Pending |
 | UI-21 | Phase 5 | Pending |
 | UI-22 | Phase 5 | Pending |
@@ -1174,7 +1174,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | DEPLOY-14 | Phase 1 | Complete |
 | DEPLOY-15 | Phase 1 | Complete |
 | DEPLOY-16 | Phase 1 | Complete |
-| DEPLOY-17 | Phase 4 | Pending |
+| DEPLOY-17 | Phase 4 | Complete |
 | DEPLOY-18 | Phase 5 | Pending |
 | DEPLOY-19 | Phase 8 | Pending |
 | DEPLOY-20 | Phase 8 | Pending |
@@ -1200,14 +1200,14 @@ Which phases cover which requirements. Updated during roadmap creation.
 | TEST-08 | Phase 3 | Complete |
 | TEST-09 | Phase 7 | Pending |
 | TEST-10 | Phase 1 | Complete |
-| TEST-11 | Phase 4 | Pending |
+| TEST-11 | Phase 4 | Complete |
 | TEST-12 | Phase 8 | Pending |
 | E2E-01 | Phase 2 | Complete |
 | E2E-02 | Phase 2 | Complete (as decided, D-22) |
 | E2E-03 | Phase 3 | Complete |
 | E2E-04 | Phase 3 | Complete |
-| E2E-05 | Phase 4 | Pending |
-| E2E-06 | Phase 4 | Pending |
+| E2E-05 | Phase 4 | Complete |
+| E2E-06 | Phase 4 | Complete |
 | E2E-07 | Phase 5 | Pending |
 | E2E-08 | Phase 5 | Pending |
 | E2E-09 | Phase 5 | Pending |

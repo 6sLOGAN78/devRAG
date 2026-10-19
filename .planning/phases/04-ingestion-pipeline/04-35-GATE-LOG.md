@@ -14,3 +14,10 @@ Append-only record. No secrets, only PASS/FAIL lines and figures.
   `docker compose -p devrag-stack --env-file docker/.env -f docker/docker-compose.yml -f docker/docker-compose.dev.yml --profile cpu --profile elasticsearch --profile mail up -d --force-recreate --no-deps mailpit`.
 - The three clean-room runs have NOT been done. `clean-room: 3 run(s) passed` does not appear in this log.
 - Stack after the refusal: all services healthy (nothing was stopped).
+- 2026-10-19, orchestrator: user approved `docker rm -f devrag-stack-mailpit-1`; done (no volume).
+- GATE ATTEMPT 2: run 1 FAIL integration (2 out-of-date tests; fixed in `d65664e`).
+- GATE ATTEMPT 3: run 1 FAIL integration (roll-up finished a document and closed its log row in two commits; real bug fixed in `2925739` with a regression test).
+- GATE ATTEMPT 4: run 1 FAIL e2e (out-of-date dataset update e2e; fixed in `4d651f6`).
+- Pre-check of every remaining tier against the running stack: all PASS (e2e 662, e2e-serial 13, live_model 17 after `ed9e383`, Go race/integration+e2e/manual/cgo, vitest unit 1703, vitest live 57).
+- GATE ATTEMPT 5: run 1 PASS project-guard, stop, preflight, up, wait_stack, unit (2055), integration (643), e2e (662), e2e-serial (13); FAIL live-model: OpenRouter unreachable from the container (`provider_unreachable`, `ERROR_CONNECTION`). Live tier rerun minutes later: 17 passed.
+- GATE ATTEMPT 6: started, then stopped at the user's request. The gate is DEFERRED; see `04-DEFERRED-CLEAN-ROOM.md`. `clean-room: 3 run(s) passed` still does not appear in this log.

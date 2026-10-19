@@ -276,9 +276,9 @@ Also this phase: WR-16, WR-19, WR-26 (plan 02-02) and CR-02, WR-04, WR-24 (plan 
 - Needed from user: a human look at the two screenshots, a Chinese reader, and a decision on whether finer PDF chunk boxes are wanted.
 - Workaround in repo: none needed; nothing is hidden behind a skip.
 
-## B-36 Phase 4 exit gate refused by the project guard (stray mailpit container)
-- Status: open
-- Affects: plan 04-35 task 3, TEST-11, E2E-05, E2E-06 (the three clean-room runs)
-- Evidence: `scripts/clean_room.sh` step `project-guard` fails: the `devrag-stack-mailpit-1` container has working-dir label `/home/logan78/desktop x/devRag_@/docker`, the other seven have `/home/logan78/desktop x/devRAG/docker` (see `04-35-GATE-LOG.md`).
-- Needed from user: run `docker rm -f devrag-stack-mailpit-1` (no volume), then `PREFLIGHT_ALLOW_LOW_MAP_COUNT=1 LIVE_BASE_URL=http://127.0.0.1:8088 scripts/clean_room.sh --runs 3`, then finish the plan (tick requirements, approve `04-VALIDATION.md`).
-- Workaround in repo: none; the guard was not bypassed.
+## B-36 Phase 4 exit gate (three clean-room runs) deferred by the user
+- Status: open (deferred 2026-10-19 at the user's request)
+- Affects: plan 04-35 task 3; final proof for TEST-11, E2E-05, E2E-06
+- Evidence: the original refusal (stray `devrag-stack-mailpit-1` from the `devRag_@` checkout) is resolved; the container was removed with the user's approval. Five further attempts each stopped in run 1. Three found out-of-date tests or one real roll-up bug, all fixed (`d65664e`, `2925739`, `4d651f6`). The fifth passed unit, integration, e2e and e2e-serial and failed only because OpenRouter was unreachable. Every tier has passed on its own against the stack. Full record: `phases/04-ingestion-pipeline/04-DEFERRED-CLEAN-ROOM.md` and `04-35-GATE-LOG.md`.
+- Needed from user: run `PREFLIGHT_ALLOW_LOW_MAP_COUNT=1 LIVE_BASE_URL=http://127.0.0.1:8088 scripts/clean_room.sh --runs 3` (or ask Claude to) when convenient, then approve `04-VALIDATION.md`.
+- Workaround in repo: none; the guard was not bypassed and nothing is skipped.

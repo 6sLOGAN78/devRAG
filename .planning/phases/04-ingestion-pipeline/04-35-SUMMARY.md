@@ -29,13 +29,13 @@ key-files:
 key-decisions:
   - "R-188: executor limit 768m to 384m from a measured peak of 201 MiB"
 requirements-completed: []
-status: blocked
+status: complete-with-deferred-gate
 completed: 2026-10-19
 ---
 
 # Phase 4 Plan 35: Traceability, memory and exit gate Summary
 
-Tasks 1 and 2 are done and committed; task 3 (three clean-room runs) is blocked: the gate's project guard refused because the `mailpit` container carries another checkout's label, and the guard was not bypassed.
+Tasks 1 and 2 are done and committed. Task 3 (three clean-room runs) is **deferred by the user** on 2026-10-19. The original project-guard refusal was resolved. Later attempts found and fixed two out-of-date tests and one real roll-up atomicity bug (`d65664e`, `2925739`, `4d651f6`), and hardened one live test (`ed9e383`). Every tier has passed on its own, but three full runs have not. See `04-DEFERRED-CLEAN-ROOM.md`.
 
 ## Tasks
 
