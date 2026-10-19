@@ -467,7 +467,7 @@ Plans:
 
 **Wave 5** *(blocked on Wave 4 completion)*
 
-- [ ] 05-05-PLAN.md — Rerank drivers (TEI, OpenRouter), `rerank` model type and TEI provider row, rerank in the retrieval route (fail closed)
+- [x] 05-05-PLAN.md — Rerank drivers (TEI, OpenRouter), `rerank` model type and TEI provider row, rerank in the retrieval route (fail closed)
 
 **Wave 6** *(blocked on Wave 5 completion)*
 
