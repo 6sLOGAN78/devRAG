@@ -25,6 +25,7 @@ from api.apps.permissions_gen import allowed
 from api.db.database import DB
 from api.db.models import Document
 from api.db.services.auth_service import Principal
+from api.db.services.chunk_view import merge_page_sizes, page_sizes_of, positions_of
 from api.db.services.document_service import AREA, MANAGE_DOCUMENT
 from api.db.services.knowledgebase_service import VisibleDataset, embedding_dimensions, load_visible_dataset
 from api.db.services.llm_service import LLMBundle
@@ -55,7 +56,6 @@ WRITE_DEADLINE_SECONDS = 40.0
 _RUNNING = "1"
 _ENABLED = "1"
 _LIST_FIELDS = ["content_with_weight", "position_int", "origin_kwd", "available_int", "page_dims_flt", "order_int"]
-_POSITION_STRIDE = 5
 
 
 def _not_found() -> ServiceError:
@@ -77,38 +77,15 @@ def valid_chunk_id(chunk_id: object) -> bool:
     return isinstance(chunk_id, str) and (CHUNK_ID_PARSED.fullmatch(chunk_id) is not None or CHUNK_ID_MANUAL.fullmatch(chunk_id) is not None)
 
 
-def _positions(raw: object) -> list[dict[str, int]]:
-    """Boxes from ``position_int`` in either stored shape: nested ``[[page, x0, top, x1, bottom], ...]`` or flat with stride five."""
-    if not isinstance(raw, list) or not raw:
-        return []
-    rows: list[list[Any]]
-    if isinstance(raw[0], (list, tuple)):
-        rows = [list(r) for r in raw if isinstance(r, (list, tuple)) and len(r) == _POSITION_STRIDE]
-    else:
-        rows = [raw[i : i + _POSITION_STRIDE] for i in range(0, len(raw) - _POSITION_STRIDE + 1, _POSITION_STRIDE)]
-    return [{"page": int(r[0]), "x0": int(r[1]), "top": int(r[2]), "x1": int(r[3]), "bottom": int(r[4])} for r in rows]
-
-
 def chunk_dto(source: dict[str, Any]) -> dict[str, Any]:
     """The response body for a chunk. Keys are listed here, so a field added to the index never reaches a client unreviewed."""
     return {
         "id": str(source.get("id", "")),
         "text": str(source.get("content_with_weight") or ""),
-        "positions": _positions(source.get("position_int")),
+        "positions": positions_of(source),
         "origin": str(source.get("origin_kwd") or ORIGIN_PARSED),
         "enabled": int(source.get("available_int", 1)) == 1,
     }
-
-
-def _page_sizes(hits: list[dict[str, Any]], dtos: list[dict[str, Any]]) -> dict[str, list[float]]:
-    """``{"<page>": [width, height]}`` for every page a listed chunk references."""
-    wanted = {p["page"] for dto in dtos for p in dto["positions"]}
-    sizes: dict[str, list[float]] = {}
-    for hit in hits:
-        for entry in hit.get("page_dims_flt") or []:
-            if isinstance(entry, (list, tuple)) and len(entry) == 3 and int(entry[0]) in wanted:
-                sizes[str(int(entry[0]))] = [float(entry[1]), float(entry[2])]
-    return dict(sorted(sizes.items(), key=lambda kv: int(kv[0])))
 
 
 # ----------------------------------------------------------------------------- authorisation
@@ -206,7 +183,8 @@ def list_chunks(
         logger.warning("chunk list could not read the index dataset=%s error=%s", visible.dataset.id, type(exc).__name__)
         raise _index_unavailable() from None
     dtos = [chunk_dto(hit) for hit in found.hits]
-    return {"items": dtos, "total": int(found.total), "page_sizes": _page_sizes(found.hits, dtos)}
+    wanted = {p["page"] for dto in dtos for p in dto["positions"]}
+    return {"items": dtos, "total": int(found.total), "page_sizes": merge_page_sizes(page_sizes_of(hit, wanted) for hit in found.hits)}
 
 
 # ----------------------------------------------------------------------------- write helpers

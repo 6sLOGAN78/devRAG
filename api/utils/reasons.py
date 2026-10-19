@@ -58,3 +58,6 @@ CHUNK_TOO_LONG = "chunk_too_long"
 CONFIRM_REQUIRED = "confirm_required"
 NOT_RUNNING = "not_running"
 PREVIEW_UNAVAILABLE = "preview_unavailable"
+# Plan 05-04: retrieval test.
+QUESTION_INVALID = "question_invalid"
+EMBEDDING_MISMATCH = "embedding_mismatch"
