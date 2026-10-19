@@ -31,7 +31,7 @@ from rag.llm import ProviderSpec, UnknownProvider, resolve_provider
 
 logger = logging.getLogger(__name__)
 
-TYPE_BITS = {"chat": 1, "embedding": 2}
+TYPE_BITS = {"chat": 1, "embedding": 2, "rerank": 16}  # bit 16 is reserved for rerank in tenant_llm.model_type (plan 05-05, R-206)
 _BIT_TYPES = {bit: name for name, bit in TYPE_BITS.items()}
 MASK_PREFIX = "********"
 MAX_DIMENSION = 65536
@@ -42,7 +42,7 @@ MAX_EXTRA = 512  # tenant_model_instance.extra is VARCHAR(512)
 _ENVELOPE_PREFIX = "v1:"
 _ACTIVE_LLM = "1"
 _ACTIVE = "active"
-_DEFAULT_FIELDS = {"chat": ("llm_id", "tenant_llm_id"), "embedding": ("embd_id", "tenant_embd_id")}
+_DEFAULT_FIELDS = {"chat": ("llm_id", "tenant_llm_id"), "embedding": ("embd_id", "tenant_embd_id"), "rerank": ("rerank_id", "tenant_rerank_id")}
 
 
 @dataclass(frozen=True)

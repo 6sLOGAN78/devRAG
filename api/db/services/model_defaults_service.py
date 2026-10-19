@@ -36,7 +36,7 @@ def model_dto(info: ModelInfo) -> dict[str, Any]:
 
 def list_model_dtos(tenant_id: str, model_type: str | None) -> list[dict[str, Any]]:
     if model_type is not None and model_type not in MODEL_TYPES:
-        raise ServiceError(Kind.INVALID, reasons.MODELS_INVALID, "type must be chat or embedding")
+        raise ServiceError(Kind.INVALID, reasons.MODELS_INVALID, "type must be chat, embedding or rerank")
     return [model_dto(m) for m in tenant_model_service.list_models(tenant_id, model_type)]
 
 

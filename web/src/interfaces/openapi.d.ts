@@ -20,6 +20,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/datasets/search": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["post_search_datasets"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/datasets/{dataset_id}": {
         parameters: {
             query?: never;
@@ -867,7 +883,7 @@ export interface components {
              * Type
              * @enum {string}
              */
-            type: "chat" | "embedding";
+            type: "chat" | "embedding" | "rerank";
         };
         /** ModelDescription */
         ModelDescription: {
@@ -950,6 +966,25 @@ export interface components {
             name: string;
             /** Slug */
             slug: string;
+        };
+        /** SearchResult */
+        SearchResult: {
+            /** Chunks */
+            chunks: {
+                [key: string]: unknown;
+            }[];
+            /** Doc Aggs */
+            doc_aggs: {
+                [key: string]: unknown;
+            }[];
+            /** Rerank Applied */
+            rerank_applied: boolean;
+            /** Timings */
+            timings: {
+                [key: string]: number | null;
+            };
+            /** Total */
+            total: number;
         };
         /** StartedDocument */
         StartedDocument: {
@@ -1157,6 +1192,80 @@ export interface operations {
                         /** Code */
                         code: number;
                         data: components["schemas"]["DeletedDatasets"];
+                        /** Message */
+                        message: string;
+                    };
+                };
+            };
+        };
+    };
+    post_search_datasets: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": {
+                    /** Dataset Ids */
+                    dataset_ids: string[];
+                    /**
+                     * Doc Ids
+                     * @default null
+                     */
+                    doc_ids?: string[] | null;
+                    /**
+                     * Fusion
+                     * @default weighted_sum
+                     */
+                    fusion?: string;
+                    /**
+                     * Page
+                     * @default 1
+                     */
+                    page?: number;
+                    /** Question */
+                    question: string;
+                    /**
+                     * Similarity Threshold
+                     * @default 0.2
+                     */
+                    similarity_threshold?: number;
+                    /**
+                     * Size
+                     * @default 10
+                     */
+                    size?: number;
+                    /**
+                     * Tenant Id
+                     * @default null
+                     */
+                    tenant_id?: string | null;
+                    /**
+                     * Top K
+                     * @default null
+                     */
+                    top_k?: number | null;
+                    /**
+                     * Vector Similarity Weight
+                     * @default 0.3
+                     */
+                    vector_similarity_weight?: number;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Code */
+                        code: number;
+                        data: components["schemas"]["SearchResult"];
                         /** Message */
                         message: string;
                     };

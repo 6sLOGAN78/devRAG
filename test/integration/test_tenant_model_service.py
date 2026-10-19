@@ -142,6 +142,32 @@ def test_save_creates_the_four_row_kinds(llm, account):
     assert llm_types == {"chat-a": "chat", "embed-a": "embedding"}
 
 
+def test_a_rerank_model_is_stored_as_bit_16_and_listed_by_type(llm, account):
+    rerank = svc.NewModel(name="rerank-a", model_type="rerank", dimension=None, max_tokens=8192)
+    info = save(llm, account, "", provider="TEI", model_list=[rerank], api_base="http://tei:80")
+    assert [m.model_type for m in info.models] == ["rerank"] and info.models[0].dimension is None
+    assert info.instances[0].configured is True, "a keyless provider is configured once it has a model"
+    assert _rows("SELECT m.`model_type` FROM `tenant_model` m JOIN `tenant_model_provider` p ON p.`id` = m.`provider_id` WHERE p.`tenant_id` = %s", (account.tenant_id,)) == [(16,)]
+    assert _rows("SELECT `model_type` FROM `tenant_llm` WHERE `tenant_id` = %s", (account.tenant_id,)) == [("rerank",)]
+    assert [m.model for m in svc.list_models(account.tenant_id, "rerank")] == ["rerank-a"]
+    assert svc.list_models(account.tenant_id, "chat") == []
+
+
+def test_a_rerank_dimension_is_refused(llm, account):
+    bad = svc.NewModel(name="rerank-a", model_type="rerank", dimension=8, max_tokens=8192)
+    with pytest.raises(ServiceError) as err:
+        save(llm, account, "", provider="TEI", model_list=[bad])
+    assert err.value.reason == "models_invalid" and counts(account.tenant_id)["model"] == 0
+
+
+def test_deleting_the_provider_clears_a_rerank_default_that_pointed_at_it(llm, account):
+    save(llm, account, "", provider="TEI", model_list=[svc.NewModel(name="rerank-a", model_type="rerank", dimension=None, max_tokens=8192)])
+    model_id = model_ids(account.tenant_id)["rerank-a"]
+    _execute("UPDATE `tenant` SET `rerank_id` = %s, `tenant_rerank_id` = %s WHERE `id` = %s", ("rerank-a@TEI", model_id, account.tenant_id))
+    assert svc.delete_provider(account.tenant_id, "TEI") is True
+    assert _rows("SELECT `rerank_id`, `tenant_rerank_id` FROM `tenant` WHERE `id` = %s", (account.tenant_id,)) == [("", None)]
+
+
 def test_non_default_instance_uses_the_three_part_composite(llm, account):
     info = save(llm, account, fake_key(), instance="prod")
     assert {m.composite for m in info.models} == {"chat-a@prod@OpenRouter", "embed-a@prod@OpenRouter"}

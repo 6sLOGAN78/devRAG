@@ -34,16 +34,20 @@ from rag.llm.chat_model import LiteLLMBase
 from rag.llm.embedding_model import build_embedder
 from rag.llm.errors import LLMErrorCode, ModelException
 from rag.llm.model_meta import lookup
+from rag.llm.rerank_model import build_rerank
+from rag.llm.sync_loop import PrivateLoop
 
 logger = logging.getLogger(__name__)
 
 MAX_MODELS_PER_SAVE = 2
-MODEL_TYPES = ("chat", "embedding")
+MODEL_TYPES = ("chat", "embedding", "rerank")
 _MODEL_NAME = re.compile(r"^[^\s@]{1,128}$")
 MAX_DIMENSION = 4096
 _TEST_MAX_COMPLETION_TOKENS = 16
 _TEST_PROMPT = "Reply with the single word: ok"
 _TEST_INPUT = "ping"
+_TEST_RERANK_QUERY = "test query"
+_TEST_RERANK_TEXTS = ["a short document", "another document"]
 _LIMIT_KEY = "provider-test:{tenant_id}"
 _REFUSAL_CODES = frozenset(
     {
@@ -94,10 +98,17 @@ def check_model_names(spec: ProviderSpec, instance: str, models: Sequence[ModelR
             raise _invalid(reasons.MODELS_INVALID, "that model name is too long for this provider") from None
 
 
+def _check_types_accepted(spec: ProviderSpec, types: Sequence[str]) -> None:
+    """A model type the provider has no driver for is refused (a rerank model on OpenAI, a chat model on TEI)."""
+    if any(t not in spec.model_types for t in types):
+        raise _invalid(reasons.MODELS_INVALID, "this provider does not offer that kind of model")
+
+
 def _check_model_list(spec: ProviderSpec, instance: str, models: Sequence[ModelRequest]) -> None:
     types = [m.model_type for m in models]
     if not 1 <= len(models) <= MAX_MODELS_PER_SAVE or any(t not in MODEL_TYPES for t in types) or len(set(types)) != len(types):
-        raise _invalid(reasons.MODELS_INVALID, "add one chat model, one embedding model, or both")
+        raise _invalid(reasons.MODELS_INVALID, "add up to two models of different types")
+    _check_types_accepted(spec, types)
     check_model_names(spec, instance, models)
 
 
@@ -196,8 +207,17 @@ def _failure(exc: ModelException, key: str | None) -> ServiceError:
     return ServiceError(Kind.BAD_GATEWAY, reasons.PROVIDER_UNREACHABLE, "the provider could not be reached")
 
 
+def _test_rerank(driver: Any) -> None:
+    """One real rerank call on a private loop (this module runs in a worker thread). The answer is not inspected: reaching the model is the test."""
+    loop = PrivateLoop()
+    try:
+        loop.run(driver.similarity(_TEST_RERANK_QUERY, _TEST_RERANK_TEXTS))
+    finally:
+        loop.close()
+
+
 def _test_model(settings: Settings, spec: ProviderSpec, model: ModelRequest, key: str | None, base_url: str | None, api_version: str | None) -> int | None:
-    """One tiny real call. Chat returns None; embedding returns the length of the vector the provider sent back."""
+    """One tiny real call. Chat and rerank return None; embedding returns the length of the vector the provider sent back."""
     seconds = max(1, settings.llm.key_test_timeout_seconds)
     llm = dataclasses.replace(settings.llm, chat_timeout_seconds=seconds, embedding_timeout_seconds=seconds, max_retries=0)
     common: dict[str, Any] = {
@@ -210,6 +230,9 @@ def _test_model(settings: Settings, spec: ProviderSpec, model: ModelRequest, key
         if model.model_type == "chat":
             driver = LiteLLMBase(spec, model.name, key, base_url, api_version, **common)
             driver.chat("", [{"role": "user", "content": _TEST_PROMPT}], {"max_completion_tokens": _TEST_MAX_COMPLETION_TOKENS, "temperature": 0})
+            return None
+        if model.model_type == "rerank":
+            _test_rerank(build_rerank(spec, model.name, key, base_url, api_version, **common))
             return None
         vectors, _ = build_embedder(spec, model.name, key, base_url, api_version, **common).encode([_TEST_INPUT])
     except ModelException as failed:
@@ -292,6 +315,7 @@ def add_models(
         if not 1 <= len(models) <= MAX_MODELS_PER_SAVE or any(m.model_type not in MODEL_TYPES for m in models) or len({m.name for m in models}) != len(models):
             raise _invalid(reasons.MODELS_INVALID, "add one or two models")
         check_model_names(spec, instance, models)
+        _check_types_accepted(spec, [m.model_type for m in models])
         info = tenant_model_service.get_provider(tenant_id, spec.name)
         stored = _instance_of(info, instance)
         if stored is None:

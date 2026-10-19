@@ -370,3 +370,58 @@ def test_the_eleventh_provider_test_in_a_window_is_429_with_retry_after(ingress:
     retry = int(limited.headers["Retry-After"])
     assert 1 <= retry <= 300
     assert api(ingress, "GET", PROVIDERS, owner.token).status_code == 200, "reading is not limited"
+
+
+# --- rerank models and the TEI provider (plan 05-05; LLM-09, D-01, R-206) -------------------------------------------------
+
+
+def test_a_tei_rerank_model_is_saved_keyless_tested_once_and_listed_by_type(ingress: httpx.Client, registry: AccountRegistry, fake_provider_stack: FakeProvider) -> None:  # noqa: F811
+    fake = fake_provider_stack
+    owner = registry.register(prefix="pftei")
+    body = {"provider": "TEI", "base_url": fake.stack_root, "models": [{"name": "tei-rerank", "type": "rerank"}]}
+    saved = ok(api(ingress, "PUT", PROVIDERS, owner.token, body=body))
+    assert saved["name"] == "TEI" and saved["configured"] is True
+    assert [(m["name"], m["type"], m["dimension"]) for m in saved["models"]] == [("tei-rerank", "rerank", None)]
+    assert [r.path for r in fake.requests] == ["/rerank"], "exactly one real rerank call tested the model"
+    assert "authorization" not in fake.requests[0].headers
+
+    listed = ok(api(ingress, "GET", "/api/v1/models", owner.token, params={"type": "rerank"}))
+    assert [(m["name"], m["provider"], m["type"]) for m in listed] == [("tei-rerank", "TEI", "rerank")]
+    assert ok(api(ingress, "GET", "/api/v1/models", owner.token, params={"type": "chat"})) == []
+    assert next(p for p in ok(api(ingress, "GET", PROVIDERS, owner.token)) if p["name"] == "TEI")["configured"] is True
+    assert [p["name"] for p in ok(api(ingress, "GET", PROVIDERS, owner.token))][-1] == "TEI"
+
+
+def test_a_tei_provider_without_an_address_uses_the_default_one_and_is_not_refused_by_the_address_guard(ingress: httpx.Client, registry: AccountRegistry, fake_provider_stack: FakeProvider) -> None:  # noqa: F811
+    owner = registry.register(prefix="pfteid")
+    resp = api(ingress, "PUT", PROVIDERS, owner.token, body={"provider": "TEI", "models": [{"name": "tei-rerank", "type": "rerank"}]})
+    # No TEI container runs in this stack until plan 05-15, so the test call cannot connect: a typed gateway failure, never base_url_refused.
+    assert resp.status_code == 502 and resp.json()["data"]["reason"] == "provider_unreachable", resp.text
+    assert provider_rows(owner.tenant_id) == 0
+
+
+def test_a_rerank_model_on_a_provider_without_a_rerank_driver_is_refused_before_any_request(ingress: httpx.Client, registry: AccountRegistry, fake_provider_stack: FakeProvider) -> None:  # noqa: F811
+    fake = fake_provider_stack
+    owner = registry.register(prefix="pfrrno")
+    refused = api(ingress, "PUT", PROVIDERS, owner.token, body=save_body(fake, models=[{"name": "r1", "type": "rerank"}]))
+    assert refused.status_code == 400 and refused.json()["data"]["reason"] == "models_invalid", refused.text
+    chat_on_tei = api(ingress, "PUT", PROVIDERS, owner.token, body={"provider": "TEI", "base_url": fake.stack_root, "models": [CHAT]})
+    assert chat_on_tei.status_code == 400 and chat_on_tei.json()["data"]["reason"] == "models_invalid"
+    assert fake.requests == [] and provider_rows(owner.tenant_id) == 0
+
+
+def test_an_openrouter_rerank_model_is_tested_on_the_rerank_path_with_the_workspace_key(ingress: httpx.Client, registry: AccountRegistry, fake_provider_stack: FakeProvider) -> None:  # noqa: F811
+    fake = fake_provider_stack
+    owner = registry.register(prefix="pfopr")
+    body = {"provider": "OpenRouter", "api_key": KEY_ONE, "base_url": f"{fake.stack_root}/api/v1", "models": [{"name": "fake-rerank", "type": "rerank"}]}
+    saved = ok(api(ingress, "PUT", PROVIDERS, owner.token, body=body))
+    assert [m["type"] for m in saved["models"]] == ["rerank"]
+    (call,) = fake.requests
+    assert call.path == "/api/v1/rerank" and call.headers["authorization"] == f"Bearer {KEY_ONE}"
+    assert KEY_ONE not in api(ingress, "GET", PROVIDERS, owner.token).text
+
+    fake.reset()
+    failing = {**body, "models": [{"name": "fake-rerank-500", "type": "rerank"}]}
+    refused = api(ingress, "PUT", PROVIDERS, owner.token, body=failing)
+    assert refused.status_code == 502 and refused.json()["data"]["reason"] == "provider_unreachable", refused.text
+    assert KEY_ONE not in refused.text

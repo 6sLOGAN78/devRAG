@@ -497,3 +497,85 @@ async def test_async_stream_failure_to_open_is_a_service_error(settings, account
             pass
     assert caught.value.reason == reasons.PROVIDER_REFUSED
     assert used(account, "fake-401") == 0
+
+
+# ----------------------------------------------------------------------------- rerank (plan 05-05)
+
+RERANK_TEXTS = ["beta only", "nothing here", "alpha beta together", "alpha alone"]
+RERANK_TOTAL = sum(len(t.split()) for t in RERANK_TEXTS)
+
+
+def seed_rerank(settings: Settings, account: Account, fake: FakeProvider, key: str | None = None, provider: str = "OpenRouter", models=("fake-rerank",)) -> None:
+    base = f"{fake.root}/api/v1" if provider == "OpenRouter" else fake.root
+    structure.save_instance(
+        settings.llm,
+        account.tenant_id,
+        provider,
+        "default",
+        api_key=key or (fake_key() if provider == "OpenRouter" else None),
+        api_base=base,
+        api_version=None,
+        models=[NewModel(name, "rerank", None, 8192) for name in models],
+        replace_key=True,
+    )
+
+
+def rerank_hits(fake: FakeProvider, path: str = "/api/v1/rerank"):
+    return fake.hits(path)
+
+
+def test_rerank_returns_scores_in_input_order_with_the_tenants_key_and_counts_tokens(settings, account, fake):
+    key = fake_key()
+    seed_rerank(settings, account, fake, key)
+    scores = bundle(settings, account, "fake-rerank@OpenRouter", "rerank").rerank("alpha beta", RERANK_TEXTS)
+    assert scores == pytest.approx([0.5, 0.0, 1.0, 0.5])
+    assert [r.headers.get("authorization") for r in rerank_hits(fake)] == [f"Bearer {key}"]
+    assert used(account, "fake-rerank") == RERANK_TOTAL
+
+
+async def test_async_rerank_matches_the_sync_scores(settings, account, fake):
+    seed_rerank(settings, account, fake)
+    llm = bundle(settings, account, "fake-rerank@OpenRouter", "rerank")
+    assert await llm.async_rerank("alpha beta", RERANK_TEXTS) == pytest.approx([0.5, 0.0, 1.0, 0.5])
+    assert llm.last_usage is not None and llm.last_usage.total_tokens == RERANK_TOTAL and llm.last_usage.estimated is False
+
+
+def test_a_keyless_tei_model_reranks_with_no_authorization_header_and_counts_estimated_tokens(settings, account, fake):
+    seed_rerank(settings, account, fake, provider="TEI")
+    llm = bundle(settings, account, "fake-rerank@TEI", "rerank")
+    assert llm.rerank("alpha beta", RERANK_TEXTS) == pytest.approx([0.5, 0.0, 1.0, 0.5])
+    (call,) = rerank_hits(fake, "/rerank")
+    assert "authorization" not in call.headers
+    assert llm.last_usage is not None and llm.last_usage.estimated is True and used(account, "fake-rerank") == llm.last_usage.total_tokens > 0
+
+
+def test_a_rerank_failure_is_a_service_error_and_adds_no_tokens(settings, account, fake):
+    seed_rerank(settings, account, fake, models=("fake-rerank-500",))
+    with pytest.raises(ServiceError) as caught:
+        bundle(settings, account, "fake-rerank-500@OpenRouter", "rerank").rerank("alpha", RERANK_TEXTS)
+    assert (caught.value.kind, caught.value.reason) == (Kind.BAD_GATEWAY, reasons.PROVIDER_UNREACHABLE)
+    assert used(account, "fake-rerank-500") == 0
+
+
+def test_rerank_on_a_chat_bundle_and_chat_on_a_rerank_bundle_are_type_errors(settings, account, fake):
+    seed(settings, account, fake, fake_key())
+    seed_rerank(settings, account, fake)
+    with pytest.raises(TypeError):
+        bundle(settings, account).rerank("q", ["a"])
+    with pytest.raises(TypeError):
+        bundle(settings, account, "fake-rerank@OpenRouter", "rerank").chat("s", HISTORY)
+
+
+def test_a_chat_model_is_not_available_as_a_rerank_bundle(settings, account, fake):
+    seed(settings, account, fake, fake_key())
+    with pytest.raises(ServiceError) as caught:
+        bundle(settings, account, CHAT_ID, "rerank")
+    assert caught.value.reason == reasons.MODEL_UNAVAILABLE
+
+
+def test_another_tenants_rerank_model_is_model_unavailable_and_makes_no_request(settings, registry, fake):
+    owner, stranger = registry.register(prefix="rrown"), registry.register(prefix="rrstr")
+    seed_rerank(settings, owner, fake)
+    with pytest.raises(ServiceError) as caught:
+        bundle(settings, stranger, "fake-rerank@OpenRouter", "rerank")
+    assert caught.value.reason == reasons.MODEL_UNAVAILABLE and fake.requests == []

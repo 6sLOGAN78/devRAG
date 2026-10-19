@@ -1135,7 +1135,8 @@
           "type": {
             "enum": [
               "chat",
-              "embedding"
+              "embedding",
+              "rerank"
             ],
             "title": "Type",
             "type": "string"
@@ -1377,6 +1378,57 @@
           "models"
         ],
         "title": "ProviderView",
+        "type": "object"
+      },
+      "SearchResult": {
+        "properties": {
+          "chunks": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Chunks",
+            "type": "array"
+          },
+          "doc_aggs": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Doc Aggs",
+            "type": "array"
+          },
+          "rerank_applied": {
+            "title": "Rerank Applied",
+            "type": "boolean"
+          },
+          "timings": {
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "title": "Timings",
+            "type": "object"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "total",
+          "chunks",
+          "doc_aggs",
+          "rerank_applied",
+          "timings"
+        ],
+        "title": "SearchResult",
         "type": "object"
       },
       "StartedDocument": {
@@ -1828,6 +1880,137 @@
                     "data"
                   ],
                   "title": "DatasetEnvelope",
+                  "type": "object"
+                }
+              }
+            },
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v1/datasets/search": {
+      "post": {
+        "operationId": "post_search_datasets",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "description": "Only these fields exist. Ranges and id shapes are checked in the service so the reason reaches the client.",
+                "properties": {
+                  "dataset_ids": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "title": "Dataset Ids",
+                    "type": "array"
+                  },
+                  "doc_ids": {
+                    "anyOf": [
+                      {
+                        "items": {
+                          "type": "string"
+                        },
+                        "type": "array"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null,
+                    "title": "Doc Ids"
+                  },
+                  "fusion": {
+                    "default": "weighted_sum",
+                    "title": "Fusion",
+                    "type": "string"
+                  },
+                  "page": {
+                    "default": 1,
+                    "title": "Page",
+                    "type": "integer"
+                  },
+                  "question": {
+                    "title": "Question",
+                    "type": "string"
+                  },
+                  "similarity_threshold": {
+                    "default": 0.2,
+                    "title": "Similarity Threshold",
+                    "type": "number"
+                  },
+                  "size": {
+                    "default": 10,
+                    "title": "Size",
+                    "type": "integer"
+                  },
+                  "tenant_id": {
+                    "anyOf": [
+                      {
+                        "pattern": "^[0-9a-f]{32}$",
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null,
+                    "title": "Tenant Id"
+                  },
+                  "top_k": {
+                    "anyOf": [
+                      {
+                        "type": "integer"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null,
+                    "title": "Top K"
+                  },
+                  "vector_similarity_weight": {
+                    "default": 0.3,
+                    "title": "Vector Similarity Weight",
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "dataset_ids",
+                  "question"
+                ],
+                "title": "SearchBody",
+                "type": "object"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "title": "Code",
+                      "type": "integer"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/SearchResult"
+                    },
+                    "message": {
+                      "title": "Message",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "message",
+                    "data"
+                  ],
+                  "title": "SearchEnvelope",
                   "type": "object"
                 }
               }

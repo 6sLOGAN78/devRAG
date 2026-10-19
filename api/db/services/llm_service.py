@@ -1,8 +1,8 @@
-"""LLMBundle: the one way later features call a workspace's chat or embedding model (LLM-14, LLM-15, LLM-21; plan 03-11).
+"""LLMBundle: the one way later features call a workspace's chat, embedding or rerank model (LLM-09, LLM-14, LLM-15, LLM-21; plans 03-11, 05-05).
 
-``LLMBundle(tenant_id, "model@provider" | "model@instance@provider", "chat" | "embedding")`` resolves the composite id to the
+``LLMBundle(tenant_id, "model@provider" | "model@instance@provider", "chat" | "embedding" | "rerank")`` resolves the composite id to the
 tenant's own credential row, opens the sealed key in memory, builds the driver once and exposes ``chat``, ``chat_streamly``,
-their async twins, ``encode`` and ``encode_queries``. Callers never see a key.
+their async twins, ``encode``, ``encode_queries`` and ``rerank`` / ``async_rerank``. Callers never see a key.
 
 Contracts:
 
@@ -42,12 +42,14 @@ from rag.llm.chat_model import LiteLLMBase
 from rag.llm.embedding_model import Base as EmbeddingBase
 from rag.llm.embedding_model import build_embedder
 from rag.llm.errors import LLMErrorCode, ModelException
+from rag.llm.rerank_model import Base as RerankBase
+from rag.llm.rerank_model import build_rerank
 from rag.llm.stream import Usage
 from rag.llm.sync_loop import PrivateLoop
 
 logger = logging.getLogger(__name__)
 
-MODEL_TYPES = ("chat", "embedding")
+MODEL_TYPES = ("chat", "embedding", "rerank")
 _REFUSAL_CODES = frozenset(
     {
         LLMErrorCode.ERROR_AUTHENTICATION,
@@ -138,7 +140,7 @@ class LLMBundle:
         sleep: Callable[[float], Awaitable[None]] | None = None,
     ) -> None:
         if model_type not in MODEL_TYPES:
-            raise ValueError("model_type must be 'chat' or 'embedding'")
+            raise ValueError("model_type must be 'chat', 'embedding' or 'rerank'")
         try:
             ref = parse_model_ref(model_id)
         except InvalidModelRef:
@@ -156,9 +158,9 @@ class LLMBundle:
         self._spec: ProviderSpec = resolve_provider(credential.provider)
         self.ref = ModelRef(credential.model, credential.instance, self._spec.name)
         self._scrub = _scrubber(credential.api_key)
-        self._driver: LiteLLMBase | EmbeddingBase = self._build(credential.api_key, credential.api_base, credential.api_version)
+        self._driver: LiteLLMBase | EmbeddingBase | RerankBase = self._build(credential.api_key, credential.api_base, credential.api_version)
 
-    def _build(self, api_key: str | None, api_base: str | None, api_version: str | None) -> LiteLLMBase | EmbeddingBase:
+    def _build(self, api_key: str | None, api_base: str | None, api_version: str | None) -> LiteLLMBase | EmbeddingBase | RerankBase:
         llm = self._settings.llm
         common: dict[str, Any] = {
             "llm_settings": llm,
@@ -167,6 +169,8 @@ class LLMBundle:
         }
         if self.model_type == "chat":
             return LiteLLMBase(self._spec, self.ref.model, api_key, api_base, api_version, sleep=self._sleep or asyncio.sleep, **common)
+        if self.model_type == "rerank":
+            return build_rerank(self._spec, self.ref.model, api_key, api_base, api_version, sleep=self._sleep or asyncio.sleep, **common)
         return build_embedder(self._spec, self.ref.model, api_key, api_base, api_version, sleep=self._sync_sleep, **common)
 
     def _sync_sleep(self, delay: float) -> None:
@@ -204,12 +208,17 @@ class LLMBundle:
 
     def _chat_driver(self) -> LiteLLMBase:
         if not isinstance(self._driver, LiteLLMBase):
-            raise TypeError("this bundle was built for embeddings, not chat")
+            raise TypeError("this bundle was not built for chat")
         return self._driver
 
     def _embedder(self) -> EmbeddingBase:
         if not isinstance(self._driver, EmbeddingBase):
-            raise TypeError("this bundle was built for chat, not embeddings")
+            raise TypeError("this bundle was not built for embeddings")
+        return self._driver
+
+    def _reranker(self) -> RerankBase:
+        if not isinstance(self._driver, RerankBase):
+            raise TypeError("this bundle was not built for rerank")
         return self._driver
 
     def _reset_last_usage(self) -> None:
@@ -295,6 +304,34 @@ class LLMBundle:
     def encode_queries(self, text: str) -> tuple[list[float], int]:
         vectors, tokens = self.encode([text])
         return vectors[0], tokens
+
+    # ------------------------------------------------------------------------- rerank
+
+    async def async_rerank(self, query: str, texts: list[str]) -> list[float]:
+        """One score in [0, 1] per text, in the order given. A failure is the typed ``ServiceError`` of ``bundle_error``."""
+        driver = self._reranker()
+        self._reset_last_usage()
+        try:
+            result = await driver.similarity(query, texts)
+        except ModelException as exc:
+            raise self._failure(exc) from None
+        self._report_usage(driver.last_usage)
+        return result.scores
+
+    def rerank(self, query: str, texts: list[str]) -> list[float]:
+        """Sync twin of ``async_rerank`` for worker threads; it runs the call on a private loop and refuses to run inside a running one."""
+        self._reranker()
+        try:
+            asyncio.get_running_loop()
+        except RuntimeError:
+            pass
+        else:
+            raise RuntimeError("synchronous rerank called inside a running event loop; await async_rerank instead")
+        loop = PrivateLoop()
+        try:
+            return loop.run(self.async_rerank(query, texts))
+        finally:
+            loop.close()
 
 
 __all__ = ["LLMBundle", "bundle_error", "merge_usage", "split_usage", "usage_log_fields"]

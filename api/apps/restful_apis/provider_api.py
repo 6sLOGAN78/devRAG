@@ -55,7 +55,7 @@ class ModelBody(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     name: str = Field(pattern=r"^[^\s@]{1,128}$")
-    type: Literal["chat", "embedding"]
+    type: Literal["chat", "embedding", "rerank"]
 
 
 class SaveProviderBody(BaseModel):

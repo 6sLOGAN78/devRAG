@@ -103,6 +103,24 @@ def test_one_chat_and_one_embedding_model_are_accepted() -> None:
     check(models=(CHAT, EMBED))
 
 
+RERANK = ModelRequest("rerank-a", "rerank")
+
+
+@pytest.mark.parametrize("provider", ["OpenAI", "Azure-OpenAI", "Ollama", "OpenAI-API-Compatible"])
+def test_a_rerank_model_is_refused_on_a_provider_without_a_rerank_driver(provider: str) -> None:
+    refused(reasons.MODELS_INVALID, provider, models=(RERANK,), base_url="https://models.example.test", api_version="2024-06-01")
+
+
+def test_openrouter_accepts_rerank_next_to_chat() -> None:
+    check("OpenRouter", models=(CHAT, RERANK))
+
+
+def test_tei_accepts_rerank_without_a_key_or_an_address_and_refuses_anything_else() -> None:
+    check("TEI", api_key=None, base_url=None, models=(RERANK,))
+    refused(reasons.MODELS_INVALID, "TEI", api_key=None, models=(CHAT,))
+    refused(reasons.MODELS_INVALID, "TEI", api_key=None, models=(EMBED,))
+
+
 def test_a_changed_base_url_needs_a_new_key_on_a_keyed_instance() -> None:
     existing = instance(base="https://models.example.test/v1")
     refused(reasons.KEY_REQUIRED_FOR_NEW_ADDRESS, "OpenAI-API-Compatible", existing, api_key=None, base_url="https://other.example.test/v1")

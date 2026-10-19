@@ -484,3 +484,48 @@ def test_delete_provider_removes_everything_once(settings, account, limiter, fak
     assert svc.delete_provider(account.tenant_id, COMPAT) is True
     assert counts(account.tenant_id) == {"provider": 0, "instance": 0, "model": 0, "llm": 0}
     assert svc.delete_provider(account.tenant_id, COMPAT) is False
+
+
+# ----------------------------------------------------------------------------- rerank (plan 05-05)
+
+
+def test_a_tei_rerank_model_is_tested_with_one_rerank_call_and_stored_keyless(settings, account, fake, limiter):
+    saved = svc.save_provider(
+        settings, SaveRequest(tenant_id=account.tenant_id, provider="TEI", models=(ModelRequest("tei-model", "rerank"),), base_url=fake.root), limiter=limiter
+    )
+    assert [m.model_type for m in saved.models] == ["rerank"] and saved.instances[0].configured is True
+    assert [r.path for r in fake.requests] == ["/rerank"]
+    (call,) = fake.requests
+    assert call.body["texts"] and call.body["truncate"] is True
+
+
+def test_a_tei_instance_with_no_address_uses_the_default_one_and_skips_the_guard(account):
+    spec = resolve_provider("TEI")
+    strict = make_settings(allow_private=False)
+    svc._guard_address(strict, spec, None)
+    svc._guard_address(strict, spec, "http://tei:80")
+    with pytest.raises(ServiceError) as caught:
+        svc._guard_address(strict, spec, "http://127.0.0.1:9000")
+    assert caught.value.reason == reasons.BASE_URL_REFUSED
+
+
+def test_an_openrouter_rerank_model_is_tested_against_its_rerank_path(settings, account, fake, limiter):
+    req = SaveRequest(tenant_id=account.tenant_id, provider="OpenRouter", models=(ModelRequest("fake-rerank", "rerank"),), api_key=fake_key(), base_url=f"{fake.root}/api/v1")
+    saved = svc.save_provider(settings, req, limiter=limiter)
+    assert [m.model_type for m in saved.models] == ["rerank"]
+    assert [r.path for r in fake.requests] == ["/api/v1/rerank"] and fake.requests[0].body["model"] == "fake-rerank"
+
+
+def test_a_rerank_model_that_fails_its_test_stores_nothing(settings, account, fake, limiter):
+    req = SaveRequest(tenant_id=account.tenant_id, provider="OpenRouter", models=(ModelRequest("fake-rerank-500", "rerank"),), api_key=fake_key(), base_url=f"{fake.root}/api/v1")
+    with pytest.raises(ServiceError) as caught:
+        svc.save_provider(settings, req, limiter=limiter)
+    assert caught.value.reason == reasons.PROVIDER_UNREACHABLE
+    assert counts(account.tenant_id)["model"] == 0
+
+
+def test_a_rerank_model_on_openai_is_refused_before_any_request(settings, account, fake, limiter):
+    req = SaveRequest(tenant_id=account.tenant_id, provider="OpenAI", models=(ModelRequest("rerank-x", "rerank"),), api_key=fake_key())
+    with pytest.raises(ServiceError) as caught:
+        svc.save_provider(settings, req, limiter=limiter)
+    assert caught.value.reason == reasons.MODELS_INVALID and fake.requests == []
