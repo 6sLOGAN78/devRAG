@@ -463,7 +463,7 @@ Plans:
 
 **Wave 4** *(blocked on Wave 3 completion)*
 
-- [ ] 05-04-PLAN.md — `POST /api/v1/datasets/search`: service, route, registry row, isolation, matrix and leak-sweep coverage
+- [x] 05-04-PLAN.md — `POST /api/v1/datasets/search`: service, route, registry row, isolation, matrix and leak-sweep coverage
 
 **Wave 5** *(blocked on Wave 4 completion)*
 
