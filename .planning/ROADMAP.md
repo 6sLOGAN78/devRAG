@@ -471,7 +471,7 @@ Plans:
 
 **Wave 6** *(blocked on Wave 5 completion)*
 
-- [ ] 05-06-PLAN.md — Calibration probe with real `bge-m3` vectors for the similarity threshold default
+- [x] 05-06-PLAN.md — Calibration probe with real `bge-m3` vectors for the similarity threshold default
 
 **Wave 7** *(blocked on Wave 6 completion)*
 

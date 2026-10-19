@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 05-05-PLAN.md (rerank drivers, model type, optional rerank stage); next plan 05-06
-last_updated: "2026-10-19T22:21:07.459Z"
+stopped_at: Completed 05-06-PLAN.md (retrieval threshold calibration, outcome keep); next plan 05-07
+last_updated: "2026-10-19T22:26:19.875Z"
 last_activity: 2026-10-19
 progress:
   total_phases: 8
   completed_phases: 4
   total_plans: 146
-  completed_plans: 123
+  completed_plans: 124
   percent: 50
 ---
 
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-10-05)
 ## Current Position
 
 Phase: 5 (retrieval-and-cited-chat-core-value-gate) — EXECUTING
-Plan: 6 of 28
+Plan: 7 of 28
 Status: Ready to execute
 Last activity: 2026-10-19
 
-Progress: [████████░░] 84%
+Progress: [█████████░] 85%
 
 ## Performance Metrics
 
@@ -125,6 +125,7 @@ Progress: [████████░░] 84%
 | Phase 05 P03 | 40min | 3 tasks | 8 files |
 | Phase 5 P04 | 1h45m | 3 tasks | 17 files |
 | Phase 5 P05 | ~3h | 3 tasks | 22 files |
+| Phase 5 P6 | ~1h | 2 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -212,6 +213,7 @@ Recent decisions affecting current work:
 - [Phase 05]: R-204: must_not rides inside condition; two-stage search (pool top_k, kNN-only stage 2 to cosine); RETR-09 and RETR-13 Partial
 - [Phase 5]: R-205: retrieval-test body bounds, embedding_mismatch, rate key retrieval:{tenant}:{user}, 45 s handler; rate guard runs before dataset authorisation; RETR-16 Partial
 - [Phase 5]: R-206/R-207: rerank is model type bit 16 with a rerank_id slot; TEI is a keyless rerank-only sixth provider (default http://tei:80 skips the SSRF guard by exact match); OpenRouter rerank exists (D-02); rerank_id on the retrieval route fails closed (502 rerank_unavailable, 409 model_unavailable); LLM-09 Partial
+- [Phase 5]: R-208: similarity threshold 0.2 kept; measured on real bge-m3, relevant 0.2867..0.6381, irrelevant 0.0783..0.1221, planted-fact wording 0.6796..0.7979; probe is manual (scripts/probe), 19 of 24 query embeddings, no chat call
 
 ### Pending Todos
 
@@ -247,6 +249,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-10-19T22:21:07.442Z
-Stopped at: Completed 05-05-PLAN.md (rerank drivers, model type, optional rerank stage); next plan 05-06
+Last session: 2026-10-19T22:26:19.864Z
+Stopped at: Completed 05-06-PLAN.md (retrieval threshold calibration, outcome keep); next plan 05-07
 Resume file: None
