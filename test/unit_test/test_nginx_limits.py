@@ -66,7 +66,8 @@ def test_go_owned_locations_have_small_body_limits_except_the_profile_route(conf
 
 MB = 1024 * 1024
 UPLOAD_PATH = "/api/v1/documents/upload"
-JSON_FAMILIES = ("/api/v1/providers", "/api/v1/providers/", "/api/v1/models", "/api/v1/models/default", "/api/v1/datasets", "/api/v1/datasets/")
+JSON_FAMILIES = ("/api/v1/providers", "/api/v1/providers/", "/api/v1/models", "/api/v1/models/default", "/api/v1/datasets", "/api/v1/datasets/",
+                 "/api/v1/chats", "/api/v1/chats/", "/api/v1/chat/completions")
 CATCH_ALLS = ("/api/", "/v1/")
 
 

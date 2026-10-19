@@ -23,6 +23,8 @@ type policyRow struct {
 
 var policyExact = []policyFamily{
 	{"/api/v1/auth/logout", "go", "jwt"},
+	{"/api/v1/chat/completions", "python", "api"},
+	{"/api/v1/chats", "python", "api"},
 	{"/api/v1/datasets", "python", "api"},
 	{"/api/v1/documents/upload", "python", "api"},
 	{"/api/v1/language", "go", "none"},
@@ -48,6 +50,7 @@ var policyPrefix = []policyFamily{
 	{"/api/v1/providers/", "python", "api"},
 	{"/api/v1/datasets/", "python", "api"},
 	{"/api/v1/tenants/", "go", "jwt"},
+	{"/api/v1/chats/", "python", "api"},
 	{"/api/v1/auth/", "go", "none"},
 	{"/v1/tenant/", "go", "jwt"},
 	{"/v1/user/", "go", "jwt"},
@@ -61,6 +64,11 @@ var policyRows = []policyRow{
 	{"POST", "go", "none", "none", []string{"api", "v1", "auth", "password", "forgot", "otp"}, []string{}},
 	{"POST", "go", "none", "none", []string{"api", "v1", "auth", "password", "forgot", "otp", "verify"}, []string{}},
 	{"POST", "go", "none", "none", []string{"api", "v1", "auth", "password", "reset"}, []string{}},
+	{"GET", "python", "api", "tenant", []string{"api", "v1", "chats"}, []string{"owner", "admin", "normal"}},
+	{"POST", "python", "api", "tenant", []string{"api", "v1", "chats"}, []string{"owner", "admin", "normal"}},
+	{"DELETE", "python", "api", "tenant", []string{"api", "v1", "chats", "{chat_id}"}, []string{"owner", "admin", "normal"}},
+	{"GET", "python", "api", "tenant", []string{"api", "v1", "chats", "{chat_id}"}, []string{"owner", "admin", "normal"}},
+	{"PUT", "python", "api", "tenant", []string{"api", "v1", "chats", "{chat_id}"}, []string{"owner", "admin", "normal"}},
 	{"DELETE", "python", "api", "tenant", []string{"api", "v1", "datasets"}, []string{"owner", "admin", "normal"}},
 	{"GET", "python", "api", "tenant", []string{"api", "v1", "datasets"}, []string{"owner", "admin", "normal"}},
 	{"POST", "python", "api", "tenant", []string{"api", "v1", "datasets"}, []string{"owner", "admin", "normal"}},

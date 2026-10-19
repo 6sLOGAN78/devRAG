@@ -1,6 +1,132 @@
 {
   "components": {
     "schemas": {
+      "AssistantPage": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/AssistantView"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total"
+        ],
+        "title": "AssistantPage",
+        "type": "object"
+      },
+      "AssistantView": {
+        "properties": {
+          "created_by": {
+            "title": "Created By",
+            "type": "string"
+          },
+          "icon": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Icon"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "kb_ids": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Kb Ids",
+            "type": "array"
+          },
+          "llm_id": {
+            "title": "Llm Id",
+            "type": "string"
+          },
+          "llm_setting": {
+            "additionalProperties": true,
+            "title": "Llm Setting",
+            "type": "object"
+          },
+          "members_with_chats": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Members With Chats"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "permission": {
+            "title": "Permission",
+            "type": "string"
+          },
+          "prompt_config": {
+            "$ref": "#/components/schemas/PromptConfigView"
+          },
+          "rerank_id": {
+            "title": "Rerank Id",
+            "type": "string"
+          },
+          "similarity_threshold": {
+            "title": "Similarity Threshold",
+            "type": "number"
+          },
+          "top_n": {
+            "title": "Top N",
+            "type": "integer"
+          },
+          "unavailable_datasets": {
+            "title": "Unavailable Datasets",
+            "type": "integer"
+          },
+          "update_time": {
+            "title": "Update Time",
+            "type": "integer"
+          },
+          "vector_similarity_weight": {
+            "title": "Vector Similarity Weight",
+            "type": "number"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "permission",
+          "created_by",
+          "kb_ids",
+          "unavailable_datasets",
+          "llm_id",
+          "rerank_id",
+          "similarity_threshold",
+          "vector_similarity_weight",
+          "top_n",
+          "prompt_config",
+          "llm_setting",
+          "update_time"
+        ],
+        "title": "AssistantView",
+        "type": "object"
+      },
       "CheckView": {
         "properties": {
           "dimension": {
@@ -285,6 +411,19 @@
           "embedding"
         ],
         "title": "DefaultsView",
+        "type": "object"
+      },
+      "DeletedAssistant": {
+        "properties": {
+          "deleted": {
+            "title": "Deleted",
+            "type": "string"
+          }
+        },
+        "required": [
+          "deleted"
+        ],
+        "title": "DeletedAssistant",
         "type": "object"
       },
       "DeletedCount": {
@@ -1341,6 +1480,29 @@
         "title": "ProbeResult",
         "type": "object"
       },
+      "PromptConfigView": {
+        "properties": {
+          "empty_response": {
+            "title": "Empty Response",
+            "type": "string"
+          },
+          "prologue": {
+            "title": "Prologue",
+            "type": "string"
+          },
+          "system": {
+            "title": "System",
+            "type": "string"
+          }
+        },
+        "required": [
+          "system",
+          "prologue",
+          "empty_response"
+        ],
+        "title": "PromptConfigView",
+        "type": "object"
+      },
       "ProviderView": {
         "properties": {
           "configured": {
@@ -1626,6 +1788,507 @@
   },
   "openapi": "3.1.0",
   "paths": {
+    "/api/v1/chats": {
+      "get": {
+        "operationId": "get_list_chats",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "title": "Code",
+                      "type": "integer"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/AssistantPage"
+                    },
+                    "message": {
+                      "title": "Message",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "message",
+                    "data"
+                  ],
+                  "title": "AssistantPageEnvelope",
+                  "type": "object"
+                }
+              }
+            },
+            "description": ""
+          }
+        }
+      },
+      "post": {
+        "operationId": "post_create_chat",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "description": "Only these fields exist. Their bounds are the service's, so a bad value is a typed ``fields_invalid`` and a missing or unknown model is ``model_unavailable``.",
+                "properties": {
+                  "icon": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null,
+                    "title": "Icon"
+                  },
+                  "kb_ids": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "title": "Kb Ids",
+                    "type": "array"
+                  },
+                  "llm_id": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null,
+                    "title": "Llm Id"
+                  },
+                  "llm_setting": {
+                    "anyOf": [
+                      {
+                        "additionalProperties": true,
+                        "type": "object"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null,
+                    "title": "Llm Setting"
+                  },
+                  "name": {
+                    "title": "Name",
+                    "type": "string"
+                  },
+                  "permission": {
+                    "default": "me",
+                    "title": "Permission",
+                    "type": "string"
+                  },
+                  "prompt_config": {
+                    "anyOf": [
+                      {
+                        "additionalProperties": true,
+                        "type": "object"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null,
+                    "title": "Prompt Config"
+                  },
+                  "rerank_id": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null,
+                    "title": "Rerank Id"
+                  },
+                  "similarity_threshold": {
+                    "anyOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null,
+                    "title": "Similarity Threshold"
+                  },
+                  "tenant_id": {
+                    "anyOf": [
+                      {
+                        "pattern": "^[0-9a-f]{32}$",
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null,
+                    "title": "Tenant Id"
+                  },
+                  "top_n": {
+                    "anyOf": [
+                      {
+                        "type": "integer"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null,
+                    "title": "Top N"
+                  },
+                  "vector_similarity_weight": {
+                    "anyOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null,
+                    "title": "Vector Similarity Weight"
+                  }
+                },
+                "required": [
+                  "name"
+                ],
+                "title": "CreateChatBody",
+                "type": "object"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "title": "Code",
+                      "type": "integer"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/AssistantView"
+                    },
+                    "message": {
+                      "title": "Message",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "message",
+                    "data"
+                  ],
+                  "title": "AssistantEnvelope",
+                  "type": "object"
+                }
+              }
+            },
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v1/chats/{chat_id}": {
+      "delete": {
+        "operationId": "delete_delete_chat",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "chat_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "title": "Code",
+                      "type": "integer"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/DeletedAssistant"
+                    },
+                    "message": {
+                      "title": "Message",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "message",
+                    "data"
+                  ],
+                  "title": "DeletedAssistantEnvelope",
+                  "type": "object"
+                }
+              }
+            },
+            "description": ""
+          }
+        }
+      },
+      "get": {
+        "operationId": "get_get_chat",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "chat_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "title": "Code",
+                      "type": "integer"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/AssistantView"
+                    },
+                    "message": {
+                      "title": "Message",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "message",
+                    "data"
+                  ],
+                  "title": "AssistantEnvelope",
+                  "type": "object"
+                }
+              }
+            },
+            "description": ""
+          }
+        }
+      },
+      "put": {
+        "operationId": "put_update_chat",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "chat_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "description": "The editable fields. A key that is absent is not a change; an explicit null clears ``icon`` and ``rerank_id`` and is refused for the rest.",
+                "properties": {
+                  "icon": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null,
+                    "title": "Icon"
+                  },
+                  "kb_ids": {
+                    "anyOf": [
+                      {
+                        "items": {
+                          "type": "string"
+                        },
+                        "type": "array"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null,
+                    "title": "Kb Ids"
+                  },
+                  "llm_id": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null,
+                    "title": "Llm Id"
+                  },
+                  "llm_setting": {
+                    "anyOf": [
+                      {
+                        "additionalProperties": true,
+                        "type": "object"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null,
+                    "title": "Llm Setting"
+                  },
+                  "name": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null,
+                    "title": "Name"
+                  },
+                  "permission": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null,
+                    "title": "Permission"
+                  },
+                  "prompt_config": {
+                    "anyOf": [
+                      {
+                        "additionalProperties": true,
+                        "type": "object"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null,
+                    "title": "Prompt Config"
+                  },
+                  "rerank_id": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null,
+                    "title": "Rerank Id"
+                  },
+                  "similarity_threshold": {
+                    "anyOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null,
+                    "title": "Similarity Threshold"
+                  },
+                  "top_n": {
+                    "anyOf": [
+                      {
+                        "type": "integer"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null,
+                    "title": "Top N"
+                  },
+                  "vector_similarity_weight": {
+                    "anyOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null,
+                    "title": "Vector Similarity Weight"
+                  }
+                },
+                "title": "UpdateChatBody",
+                "type": "object"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "title": "Code",
+                      "type": "integer"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/AssistantView"
+                    },
+                    "message": {
+                      "title": "Message",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "message",
+                    "data"
+                  ],
+                  "title": "AssistantEnvelope",
+                  "type": "object"
+                }
+              }
+            },
+            "description": ""
+          }
+        }
+      }
+    },
     "/api/v1/datasets": {
       "delete": {
         "operationId": "delete_delete_datasets",
@@ -1935,6 +2598,18 @@
                   "question": {
                     "title": "Question",
                     "type": "string"
+                  },
+                  "rerank_id": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null,
+                    "title": "Rerank Id"
                   },
                   "similarity_threshold": {
                     "default": 0.2,

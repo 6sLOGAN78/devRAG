@@ -78,6 +78,9 @@ routes:
   - {owner: python, match: exact, path: /api/v1/models/default, auth: api, body_limit: 1m}
   - {owner: python, match: exact, path: /api/v1/datasets, auth: api, body_limit: 1m}
   - {owner: python, match: prefix, path: /api/v1/datasets/, auth: api, body_limit: 1m}
+  - {owner: python, match: exact, path: /api/v1/chats, auth: api, body_limit: 1m}
+  - {owner: python, match: prefix, path: /api/v1/chats/, auth: api, body_limit: 1m}
+  - {owner: python, match: exact, path: /api/v1/chat/completions, auth: api, body_limit: 1m}
 
   # --- Python catch-alls (/api/v1/system/tokens, /stats, /api/v1/mcp/servers etc. land here, D-04/D-06/D-07) ---
   - {owner: python, match: prefix, path: /api/, auth: api, catch_all: true}
@@ -200,3 +203,13 @@ endpoints:
      note: "plan 04-20 streams the original file (inline only for PDF, PNG and JPEG, nosniff, CSP sandbox) or, with format=text, a decoded text preview (DOC-21, UI-19)"}
   - {method: POST, path: "/api/v1/datasets/{dataset_id}/documents/parse", owner: python, auth: api, roles: [owner, admin, normal], scope: tenant, implemented: true,
      note: "plan 04-14 starts, cancels and re-parses documents; the uploader, the dataset creator, owner or admin (D-02)"}
+  - {method: POST, path: "/api/v1/chats", owner: python, auth: api, roles: [owner, admin, normal], scope: tenant, implemented: true,
+     note: "plan 05-08 creates an assistant, private to its creator unless shared with the team; the workspace is the caller's or the named tenant_id (CHAT-01, D-08, D-09)"}
+  - {method: GET, path: "/api/v1/chats", owner: python, auth: api, roles: [owner, admin, normal], scope: tenant, implemented: true,
+     note: "plan 05-08 lists the caller's own assistants and every team one, newest first, 20 per page (CHAT-02, D-09)"}
+  - {method: GET, path: "/api/v1/chats/{chat_id}", owner: python, auth: api, roles: [owner, admin, normal], scope: tenant, implemented: true,
+     note: "plan 05-08 reads one assistant; a private one is the one 404 for everyone but its creator (CHAT-02, D-19)"}
+  - {method: PUT, path: "/api/v1/chats/{chat_id}", owner: python, auth: api, roles: [owner, admin, normal], scope: tenant, implemented: true,
+     note: "plan 05-08 changes the fields sent; the creator, or owner or admin for a team assistant (CHAT-03, D-23, D-24)"}
+  - {method: DELETE, path: "/api/v1/chats/{chat_id}", owner: python, auth: api, roles: [owner, admin, normal], scope: tenant, implemented: true,
+     note: "plan 05-08 deletes an assistant and every member's sessions with it; the creator, or owner or admin for a team assistant (CHAT-04, D-26)"}

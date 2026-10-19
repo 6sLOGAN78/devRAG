@@ -47,6 +47,7 @@ def create_app(
     register_middleware(app, settings)
     register_auth_gate(app, settings, principal_resolver or auth_service.make_resolver(settings.security.secret_key))
 
+    from api.apps.restful_apis.chat_api import chat_bp
     from api.apps.restful_apis.chunk_api import chunk_bp
     from api.apps.restful_apis.dataset_api import dataset_bp
     from api.apps.restful_apis.document_api import document_bp
@@ -66,6 +67,7 @@ def create_app(
     app.register_blueprint(parse_bp)
     app.register_blueprint(chunk_bp)
     app.register_blueprint(retrieval_bp)
+    app.register_blueprint(chat_bp)
     app.register_blueprint(ingestion_bp)
     app.register_blueprint(page_bp)
     for blueprint in extra_blueprints:

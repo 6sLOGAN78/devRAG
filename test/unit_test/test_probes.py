@@ -66,13 +66,15 @@ def test_blueprint_urls_match_python_exact_routes():
     # /api/v1/providers is an exact family too, but the provider blueprint (plan 03-12) serves it, not the system blueprint;
     # the same holds for /api/v1/models and /api/v1/models/default (models blueprint, plan 03-13)
     # for /api/v1/datasets (dataset blueprint, plan 03-14)
-    # and for /api/v1/documents/upload (document blueprint, plan 03-16).
+    # for /api/v1/documents/upload (document blueprint, plan 03-16)
+    # and for /api/v1/chats (chat blueprint, plan 05-08).
+    from api.apps.restful_apis.chat_api import CHATS
     from api.apps.restful_apis.dataset_api import DATASETS
     from api.apps.restful_apis.document_api import UPLOAD
     from api.apps.restful_apis.models_api import MODELS, MODELS_DEFAULT
     from api.apps.restful_apis.provider_api import PROVIDERS
 
-    other_blueprints = {PROVIDERS, MODELS, MODELS_DEFAULT, DATASETS, UPLOAD}
+    other_blueprints = {PROVIDERS, MODELS, MODELS_DEFAULT, DATASETS, UPLOAD, CHATS}
     assert set(HEALTH_PATHS) == expected - other_blueprints
     assert other_blueprints <= expected
 

@@ -16,6 +16,8 @@ class RoutePolicy(NamedTuple):
 
 _EXACT: dict[str, tuple[str, str]] = {
     '/api/v1/auth/logout': ('go', 'jwt'),
+    '/api/v1/chat/completions': ('python', 'api'),
+    '/api/v1/chats': ('python', 'api'),
     '/api/v1/datasets': ('python', 'api'),
     '/api/v1/documents/upload': ('python', 'api'),
     '/api/v1/language': ('go', 'none'),
@@ -41,6 +43,7 @@ _PREFIX: tuple[tuple[str, str, str], ...] = (
     ('/api/v1/providers/', 'python', 'api'),
     ('/api/v1/datasets/', 'python', 'api'),
     ('/api/v1/tenants/', 'go', 'jwt'),
+    ('/api/v1/chats/', 'python', 'api'),
     ('/api/v1/auth/', 'go', 'none'),
     ('/v1/tenant/', 'go', 'jwt'),
     ('/v1/user/', 'go', 'jwt'),
@@ -54,6 +57,11 @@ _ROWS: tuple[tuple[str, tuple[str, ...], str, str, str, tuple[str, ...]], ...] =
     ('POST', ('api', 'v1', 'auth', 'password', 'forgot', 'otp'), 'go', 'none', 'none', ()),
     ('POST', ('api', 'v1', 'auth', 'password', 'forgot', 'otp', 'verify'), 'go', 'none', 'none', ()),
     ('POST', ('api', 'v1', 'auth', 'password', 'reset'), 'go', 'none', 'none', ()),
+    ('GET', ('api', 'v1', 'chats'), 'python', 'api', 'tenant', ('owner', 'admin', 'normal')),
+    ('POST', ('api', 'v1', 'chats'), 'python', 'api', 'tenant', ('owner', 'admin', 'normal')),
+    ('DELETE', ('api', 'v1', 'chats', '{chat_id}'), 'python', 'api', 'tenant', ('owner', 'admin', 'normal')),
+    ('GET', ('api', 'v1', 'chats', '{chat_id}'), 'python', 'api', 'tenant', ('owner', 'admin', 'normal')),
+    ('PUT', ('api', 'v1', 'chats', '{chat_id}'), 'python', 'api', 'tenant', ('owner', 'admin', 'normal')),
     ('DELETE', ('api', 'v1', 'datasets'), 'python', 'api', 'tenant', ('owner', 'admin', 'normal')),
     ('GET', ('api', 'v1', 'datasets'), 'python', 'api', 'tenant', ('owner', 'admin', 'normal')),
     ('POST', ('api', 'v1', 'datasets'), 'python', 'api', 'tenant', ('owner', 'admin', 'normal')),

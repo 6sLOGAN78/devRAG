@@ -70,3 +70,21 @@ def test_static_assertions() -> None:
     assert "text/event-stream" not in (NGINX / "nginx.conf").read_text(encoding="utf-8")
     assert "proxy_hide_header" not in (NGINX / "ragflow.conf").read_text(encoding="utf-8")
     assert "proxy_hide_header" not in (NGINX / "proxy.conf").read_text(encoding="utf-8")
+
+
+# Nothing listens on 9380 in this container, so a body that Nginx lets through to Python would be a 502, never a 413.
+OVERSIZE_PROBE = (
+    "nginx; head -c 2097152 /dev/zero | tr '\\0' ' ' | "
+    "curl -s -o /dev/null -w '%{{http_code}}' --retry 20 --retry-delay 0 --retry-max-time 8 --retry-connrefused "
+    "-X POST -H 'Content-Type: application/json' --data-binary @- http://127.0.0.1{path}"
+)
+
+
+@pytest.mark.parametrize("path", ["/api/v1/chats", "/api/v1/chats/0123456789abcdef0123456789abcdef", "/api/v1/chat/completions"])
+def test_chat_families_refuse_a_2_mib_body_with_413_before_the_app(path: str) -> None:
+    """Plan 05-08: the chat families carry the 1m JSON limit, so the 1024m catch-all never sees these bodies."""
+    cmd = ["docker", "run", "--rm", "--name", f"devrag-nginx-413-{uuid.uuid4().hex[:8]}", "-v", f"{NGINX}:/etc/nginx-test:ro",
+           "--entrypoint", "sh", IMAGE, "-c", SETUP.format(conf="ragflow.conf") + OVERSIZE_PROBE.format(path=path)]
+    proc = subprocess.run(cmd, capture_output=True, text=True, check=False, timeout=120)
+    assert proc.returncode == 0, proc.stdout + proc.stderr
+    assert proc.stdout.strip().endswith("413"), proc.stdout + proc.stderr
