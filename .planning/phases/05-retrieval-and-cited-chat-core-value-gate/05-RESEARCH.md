@@ -582,17 +582,23 @@ condition.update({"doc_id": doc_ids} if doc_ids else {})
 | A9 | Not every OpenRouter rerank model returns scores in [0,1] | Pattern 3 | `normalize_rank` covers it |
 | A10 | Dropping a rare-term kNN floor to 0.0 does not hurt recall on corpora under 1024 chunks | Pattern 2 | Large corpora need a two-pass pool |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **Sixth provider `TEI` and `rerank` model type: confirm?**
    - Known: D-01/D-03 need a selectable rerank model; the Phase 3 registry has five providers and chat/embedding only; the SSRF guard blocks `http://tei:80` in production unless it is a spec default.
    - Unclear: whether the user accepts a registry row beyond the docs' five (docs name TEI only as a container; the reference lists "HuggingFace" as a rerank factory).
    - Recommendation: add it (small, recorded). The alternative, a server-config-only reranker with no workspace model row, breaks "rerank model per assistant" and the model selector.
+   - RESOLVED: built as a registry row in plan 05-05 (decision row R-206) and confirmed by the user at the plan 05-14 human checkpoint (how-to-verify item 7), recorded in R-217 and in the R-206 row.
 2. **Provider setup inside the browser journey.** Recommend seeding the provider and models by API with the real key (R-147 accepted-exception policy) and driving registration, dataset, upload, parse, assistant and chat through the UI; a UI-typed key puts the secret through CDP calls.
+   - RESOLVED: provider and models are seeded by API with the real key, everything else is driven through the UI, in plan 05-26 (the criterion-5 journey), policy R-147; recorded in row R-228.
 3. **Package pins and scope (checkpoint).** Approve `eventsource-parser@4.1.2` or choose the hand-written parser; approve `react-markdown@10.1.0` + `remark-gfm@4.0.1`; decide whether UI-22 stays Partial (no math, highlighter, image popover).
+   - RESOLVED: settled by the blocking human checkpoint of plan 05-14 (audit table `05-PACKAGES.md`, pins, the two CLAUDE.md deviations, and the explicit UI-22 Partial decision in how-to-verify item 6), recorded in R-217.
 4. **Stopped-turn usage (amend R-149?).** Recommend recording an estimated usage on stop.
+   - RESOLVED: yes, an estimated usage is recorded on stop (row R-201, built in plan 05-12).
 5. **`TEI_PORT` publication.** Needed only for the timing task from the host; recommend loopback publication on 6381, none in production compose.
+   - RESOLVED: published on loopback port 6381 in the infra compose file for the timing probe and the tests, never in production compose; built in plan 05-15 (rows R-218 and R-219).
 6. **Do dataset flips (team to me) need a warning when team assistants use the dataset?** Not required by D-10; the notice in the final frame covers users; a dataset-settings warning can be a Partial UI nicety.
+   - RESOLVED: not required. D-10 and D-25 handle a flipped dataset at answer time (it is skipped for every reader who cannot open it, with a per-reader notice), and a warning on the dataset settings page would be a new cross-feature UI beyond the phase scope; it stays an optional later nicety, not a Phase 5 requirement.
 
 ## Environment Availability
 

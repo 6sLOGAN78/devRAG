@@ -15,11 +15,18 @@ Planner artifact. Every Phase 5 plan cites this file so names, shapes and ids ca
 | `api/db/services/conversation_service.py`, session and feedback routes (in `chat_session_api.py`) | 05-09 |
 | `rag/prompts/generator.py`, `rag/prompts/citations.py` | 05-10 |
 | `api/db/services/chat_turn_service.py`, `api/apps/restful_apis/completion_api.py` | 05-11 (non-stream), 05-12 (stream) |
-| `web/src/services/{sse,chat-service,retrieval-service}.ts`, hooks, routes | 05-16 |
-| `web/src/components/markdown-content/*` | 05-17 |
-| `web/src/pages/chat/assistant-dialog/*`, `components/ui/range-field.tsx` | 05-18 |
-| `web/src/pages/chat/*` | 05-19, 05-20, 05-21 |
-| `web/src/pages/dataset/testing/*` | 05-22 |
+| `web/src/services/{sse,chat-turn,chat-service,retrieval-service}.ts`, path constants | 05-16 |
+| `web/src/hooks/use-chat-request.ts`, `use-retrieval-request.ts`, `web/src/test/server-areas/{chat,assistants,retrieval}.ts` | 05-17 |
+| `web/src/components/markdown-content/*` | 05-18 |
+| `web/src/pages/chat/assistant-dialog/*`, `components/ui/range-field.tsx` | 05-19 |
+| `web/src/pages/chat/` page shell, rails, routes (`use-chat-params`, `assistant-rail`, `chat-list`, `page-states`) | 05-20 |
+| `web/src/pages/chat/` header, delete dialogs, message list and item | 05-21 |
+| `web/src/pages/chat/` message input, `conversation`, live region, scroll | 05-22 |
+| `web/src/components/source-drawer/*`, sources row, feedback | 05-23 |
+| `web/src/pages/dataset/testing/*` | 05-24 |
+| `test/testcases/test_live_chat.py`, `web/src/pages/chat/chat.live.test.ts` | 05-25 |
+| `test/testcases/test_spa_chat_browser.py` | 05-26 |
+| `test/testcases/test_spa_chat_sharing_browser.py` | 05-27 |
 
 ## 2. Settings keys (`common/settings.py`, template `conf/service_conf.yaml.template`, catalog `docker/.env.example`)
 
@@ -35,7 +42,7 @@ Rule: a missed id, another workspace's id, a private assistant seen by a non-cre
 
 Assistant view: `id, name, icon (detail only), permission ("me"|"team"), created_by, kb_ids (only ids the reader can open), unavailable_datasets (int, per reader), members_with_chats (int, detail only, for callers who can manage: distinct members other than the caller with at least one session), llm_id, rerank_id, similarity_threshold, vector_similarity_weight, top_n, prompt_config {system, prologue, empty_response}, llm_setting, update_time`.
 Session view: `id, chat_id, name, create_time, update_time`; detail adds `messages` (chronological, one page ending before the optional `before=<message_id>`; `limit` default 50) and `has_earlier`.
-Message: `id, role, content, created_at`; assistant adds `reference {chunks: [...]}, finish ("complete"|"stopped"|"failed"), usage {input, output, total, estimated}, latency_ms, empty (bool), feedback ("up"|"down"|null)`.
+Message: `id, role, content, created_at`; assistant adds `reference {chunks: [...], doc_aggs: [{doc_id, doc_name, count}]}` (chunks keep their own `index`; a stopped turn stores only the cited subset, so `chunks` can be sparse and every consumer looks a chunk up by `chunk.index`, never by array position), `finish ("complete"|"stopped"|"failed"), usage {input, output, total, estimated}, latency_ms, empty (bool), feedback ("up"|"down"|null)`.
 Reference chunk: `index` (0-based, equals the `##N$$` marker), `chunk_id, doc_id, doc_name, dataset_id, content, positions [{page,x0,x1,top,bottom}], page_sizes {"<page>": [w,h]}, similarity, term_similarity, vector_similarity, rerank_similarity?`; after read-time redaction `{index, unavailable: true}`.
 Retrieval hit: the reference chunk without `index`. Retrieval response: `total, chunks, doc_aggs, rerank_applied, timings {embed_ms, search_ms, rerank_ms}`. Floats pass `sanitize_floats` (NaN, Infinity become null).
 Completion request: `chat_id, session_id?, message, stream (default true), tenant_id?`. Frame: `data: {"code":0,"message":"","data":{...}}\n\n`. While `final` is false: `answer` (delta), `reference` null, `session_id`, `message_id`, `final`. Final frame: `answer` (canonical full text), `reference`, `usage`, `latency_ms`, `finish`, `empty?`, `notice {unavailable_datasets}`, `final: true`. Then `data: [DONE]\n\n`. After the first byte a failure is a frame with non-zero `code`, `data.reason`, `final: true`, then `[DONE]`. Before the first byte every failure is a normal HTTP status with the envelope.
@@ -64,26 +71,26 @@ Per-route definition of done (Phase 4 missed 7 routes): registry row `implemente
 | 05-13 | R-216 | 8B citation adherence and the model choice (D-05) |
 | 05-14 | R-217 | Phase 5 packages and image outcome |
 | 05-15 | R-218, R-219 | TEI image and volume (R-218); R-52 closed, rerank cap and memory limit (R-219) |
-| 05-16 | R-220 | SPA services and SSE client |
-| 05-17 | R-221 | answer rendering rules |
-| 05-18 | R-222 | assistant dialog rules |
-| 05-19 | R-223 | chat page routes, draft chat, deletion placement |
-| 05-20 | R-224 | turn UI states |
-| 05-21 | R-225 | source drawer and feedback |
-| 05-22 | R-226 | retrieval testing page |
-| 05-23 | R-227 | live tier results |
-| 05-24 | R-228 | criterion-5 journey |
-| 05-25 | R-229 | sharing journeys |
-| 05-26 | R-230, R-231 | Partial hand-offs; gate result |
+| 05-16 | R-220 | SPA services and SSE client (05-17 amends the same row with hooks and test-server areas, no new row) |
+| 05-18 | R-221 | answer rendering rules |
+| 05-19 | R-222 | assistant dialog rules |
+| 05-20 | R-223 | chat page routes, draft chat, deletion placement (05-21 amends the same row, no new row) |
+| 05-22 | R-224 | turn UI states |
+| 05-23 | R-225 | source drawer and feedback |
+| 05-24 | R-226 | retrieval testing page |
+| 05-25 | R-227 | live tier results |
+| 05-26 | R-228 | criterion-5 journey |
+| 05-27 | R-229 | sharing journeys |
+| 05-28 | R-230, R-231 | Partial hand-offs; gate result |
 A plan that finds it needs fewer rows keeps the number and writes a short row; it never reuses another plan's number. Blockers use B-37 onward, assigned in the order found.
 
-## 7. Partial requirements (hand-off recorded in DECISIONS and in the ROADMAP Phase 5 note by 05-26; executors never tick REQUIREMENTS.md)
+## 7. Partial requirements (hand-off recorded in DECISIONS and in the ROADMAP Phase 5 note by 05-28; executors never tick REQUIREMENTS.md)
 
 RETR-03 (term weighting left to BM25 IDF), RETR-04 (small in-repo dictionary, no WordNet), RETR-09 (chunk-field conditions only; document metadata filter is advanced), RETR-13 (formula and `pagerank_fea` read; no tag or pagerank producer until Phase 6), RETR-16 (several datasets of one workspace; not several tenants in one call), CHAT-05 (system, prologue, empty response stored; prompt variables other than `{knowledge}` advanced), LLM-09 (TEI and OpenRouter drivers; Jina, Cohere, NVIDIA, Voyage, LocalAI, DashScope direct drivers not built), ING-21 (synonym cache delivered; LLM cache and session store have no consumer yet), UI-22 (GFM only; no math, highlighting, image popovers), UI-25 (dataset, model, threshold, weight, top N, rerank; temperature, top-p, penalties, max tokens controls not drawn).
 
 ## 8. Live budget (D-06)
 
-At most 15 chat turns reach the model per gate run (planned 9) and about 10 query embeddings; at most 1 OpenRouter rerank smoke call. Probes (calibration about 20 embeddings, adherence 15 chat calls) are one-off and outside the gate budget. The app counts turns from persisted assistant messages with `usage` and not `empty`; the test keeps its own counter; both are asserted.
+At most 15 Phase 5 chat turns reach the model per gate run (planned 9; D-06's 15 applies to Phase 5 turns only, not to Phase 3's `test_live_models.py` calls). Query-side embeddings: 10 planned (nine questions in plan 05-25 plus one in the browser journey) with a hard cap of 14 that leaves room for up to four CHAT-19 fallback embeddings (a refinement of D-06 recorded in R-227). Counting method: `llm usage` log lines for the embedding model, read with `docker logs --since`, query-side from the APP container and ingestion from the TASK-EXECUTOR container, with a before/after diff around the question phase. At most 2 OpenRouter rerank requests (one smoke call, one retry only if the first was refused). Live assistants use `llm_setting.temperature` 0. Probes (calibration about 20 embeddings, adherence 15 chat calls) are one-off and outside the gate budget. The app counts turns from persisted assistant messages with `usage` and not `empty`; the test keeps its own counter; both are asserted.
 
 ## 9. Test commands
 
