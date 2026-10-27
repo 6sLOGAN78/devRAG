@@ -8,6 +8,7 @@ covers ``0..MAXIMUM_TASK_PAGE_NUMBER``. Ranges are 0-based and exclusive at the 
 from __future__ import annotations
 
 import datetime
+import json
 import logging
 from collections.abc import Sequence
 from dataclasses import dataclass
@@ -80,9 +81,13 @@ def task_digest(
     chunk_token_num: int,
     delimiter: str,
     overlapped_percent: int | float,
+    *,
+    parser_config: dict[str, Any] | None = None,
 ) -> str:
     """16 hex characters (xxh64) that change when any input that decides the chunks changes."""
     parts = (doc_id, from_page, to_page, content_hash, parser_id, chunk_token_num, delimiter, overlapped_percent, PIPELINE_VERSION)
+    if parser_config is not None:
+        parts += (json.dumps(parser_config, sort_keys=True, separators=(",", ":"), ensure_ascii=False),)
     return xxhash.xxh64("\x1f".join(str(p) for p in parts).encode("utf-8")).hexdigest()
 
 

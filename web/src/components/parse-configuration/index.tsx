@@ -51,6 +51,15 @@ export function ParseConfiguration({ control, disabled = false, answers = {}, on
   const { t } = useTranslation();
   return (
     <div className="flex flex-col gap-4">
+      <FormField control={control} name="pageRanges" render={({ field }) => (
+        <FormItem>
+          <FormLabel>{t("datasets.chunking.field.pages")}</FormLabel>
+          <FormControl><Input {...field} value={field.value ?? ""} disabled={disabled} maxLength={1024}
+            data-testid="field-page-ranges" onChange={(event) => { onEdit?.("pageRanges"); field.onChange(event); }} /></FormControl>
+          <FormDescription>{t("datasets.chunking.field.pagesHelp")}</FormDescription>
+          <FormMessage /><ServerFieldError text={answers.pageRanges ?? null} />
+        </FormItem>
+      )} />
       <FormField
         control={control}
         name="chunkSize"

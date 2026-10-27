@@ -39,7 +39,7 @@ from test.testcases.test_provider_flow import api, ok
 pytestmark = pytest.mark.e2e
 
 PDF = "application/pdf"
-NO_TEXT_SENTENCE = "This PDF has no readable text; scanned documents are not supported yet."
+NO_TEXT_SENTENCE = "This PDF has no readable text."
 
 
 @pytest.fixture(scope="module")

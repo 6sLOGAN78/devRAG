@@ -15,6 +15,20 @@ function whole(min: number, max: number, message: string) {
  * server's `ParserConfig`. The delimiters are typed escaped and leave the schema as the real characters.
  */
 export const parseConfigSchema = z.object({
+  pageRanges: z.string().optional().default("").transform((value, context): [number, number][] => {
+    if (!value.trim()) return [];
+    const ranges: [number, number][] = [];
+    for (const item of value.split(",")) {
+      const match = /^\s*(\d+)\s*(?:-\s*(\d+))?\s*$/.exec(item);
+      const start = Number(match?.[1]), end = Number(match?.[2] ?? match?.[1]);
+      if (!match || !Number.isSafeInteger(start) || !Number.isSafeInteger(end) || start < 1 || end < start || end > 1000000 || ranges.length >= 128) {
+        context.addIssue({ code: z.ZodIssueCode.custom, message: "errors.chunking.pagesRange" });
+        return z.NEVER;
+      }
+      ranges.push([start, end]);
+    }
+    return ranges;
+  }),
   chunkSize: whole(CHUNK_SIZE_MIN, CHUNK_SIZE_MAX, "errors.chunking.sizeRange"),
   delimiters: z
     .string()

@@ -680,6 +680,11 @@ export interface components {
              * @default null
              */
             overlapped_percent: unknown;
+            /**
+             * Pages
+             * @default null
+             */
+            pages: unknown;
         };
         /** CompletionView */
         CompletionView: {
@@ -815,6 +820,11 @@ export interface components {
             name: string;
             /** Overlapped Percent */
             overlapped_percent: number;
+            /** Pages */
+            pages?: [
+                number,
+                number
+            ][];
             /** Pages Total */
             pages_total: number | null;
             /** Pages Without Text */

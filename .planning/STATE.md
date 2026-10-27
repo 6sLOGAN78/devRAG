@@ -3,9 +3,9 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Phase 6 plan 06-02 real CPU OCR complete; continuing 06-03 remote PDF slice
-last_updated: "2026-10-27T17:40:49.103092+00:00"
-last_activity: 2026-10-27 -- Phase 6 admission complete; implementing 06-02
+stopped_at: Phase 6 plan 06-03 remote PDF and page-selection checkpoint; layout integration remains with 06-04
+last_updated: "2026-10-27T18:05:53.452073+00:00"
+last_activity: 2026-10-27 -- Verified remote scanned PDF worker/Chrome path and publishing checkpoint
 progress:
   total_phases: 8
   completed_phases: 4
@@ -26,9 +26,10 @@ See: .planning/PROJECT.md (updated 2026-10-05)
 ## Current Position
 
 Phase: 6 (deep-parsing-and-chunking-breadth) — EXECUTING
-Plan: 03 of 30; plans01–02 complete; remote PDF slice begins
+Plan: 03 of 30; plans01–02 complete; remote PDF and page selection verified, layout control pending04
 Status: Actual user approval "Approve the exact packet" is bound to the unchanged audited snapshot in06-APPROVAL.json and validates. Plan01 safeguards pass37focused checks; two Phase6 exit checks are deferred. Decision gate232rows, Ruff and CI7/7 pass. Plan02 CPU OCR is complete with2real integration/1E2E pass and offline5repeatguard p950.624s/peak220.4MiB. No paid inference.
 Prior checks: Phase5 UAT5/6 passed (two user answer judgments and delegated screenshot/Chinese/footprint review). Final Phase5 acceptance remains pending; Phase4 B36 remains separately deferred. Prior paid evidence retained.
+Current checkpoint: remote scanned PDF upload, selected source page2, stored52/9100 facts, authenticated preview and actual Chrome save/reopen/highlights pass. Source page-count bug fixed without changing per-task counters. Plan03 stays open for04 layout integration; no R234 or requirement claim yet. See06-03-PROGRESS.md and06-03-GLUE-REVIEW.md. Publication explicitly authorized; prior checkpoint72a7c54 is on origin/master.
 Last activity: 2026-10-27
 
 Progress: 148/176 currently planned execution plans complete (84%); Phase6 2/30 complete.

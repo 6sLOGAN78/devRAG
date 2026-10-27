@@ -257,6 +257,10 @@
           "overlapped_percent": {
             "default": null,
             "title": "Overlapped Percent"
+          },
+          "pages": {
+            "default": null,
+            "title": "Pages"
           }
         },
         "title": "ChunkingValues",
@@ -606,6 +610,23 @@
           "overlapped_percent": {
             "title": "Overlapped Percent",
             "type": "integer"
+          },
+          "pages": {
+            "items": {
+              "maxItems": 2,
+              "minItems": 2,
+              "prefixItems": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "integer"
+                }
+              ],
+              "type": "array"
+            },
+            "title": "Pages",
+            "type": "array"
           },
           "pages_total": {
             "anyOf": [

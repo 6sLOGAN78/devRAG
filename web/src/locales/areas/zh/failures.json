@@ -2,7 +2,7 @@
   "datasets": {
     "details": {
       "reason": {
-        "noText": "此 PDF 没有可读取的文字，暂不支持扫描文档。",
+        "noText": "此 PDF 没有可读取的文字。",
         "unsupported": "暂不支持解析此文件类型。",
         "chunker": "所选的分块方式暂不可用。",
         "damaged": "文件已损坏或不完整，无法打开。",
@@ -20,7 +20,8 @@
         "tooManyChunks": "此文档产生的分块数量超出单个解析任务可存储的上限。",
         "queue": "任务队列当时不可用。",
         "documentGone": "解析过程中该文档已被删除。",
-        "unknown": "解析因意外原因失败。"
+        "unknown": "解析因意外原因失败。",
+        "nativeUnavailable": "原生解析服务暂时不可用，请稍后重试。"
       },
       "step": {
         "queue": "等待处理程序",

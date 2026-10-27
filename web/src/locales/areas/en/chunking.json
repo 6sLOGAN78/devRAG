@@ -60,7 +60,9 @@
         "delimiters": "Delimiters",
         "delimitersHelp": "A chunk ends early at any of these characters. Write \\n for a line break.",
         "overlap": "Overlap (%)",
-        "overlapHelp": "How much of the end of one chunk is repeated at the start of the next."
+        "overlapHelp": "How much of the end of one chunk is repeated at the start of the next.",
+        "pages": "PDF pages",
+        "pagesHelp": "Leave blank for all pages, or enter inclusive ranges such as 2-4, 13-30. Other file types ignore this setting."
       },
       "notYet": {
         "heading": "Not available yet",
@@ -84,7 +86,8 @@
       "sizeRange": "Enter a whole number from 1 to 8192.",
       "delimitersRequired": "Enter at least one delimiter.",
       "delimitersMax": "Use 64 characters or fewer.",
-      "overlapRange": "Enter a whole number from 0 to 50."
+      "overlapRange": "Enter a whole number from 0 to 50.",
+      "pagesRange": "Enter pages from 1 to 1000000, such as 2-4, 13-30."
     }
   }
 }

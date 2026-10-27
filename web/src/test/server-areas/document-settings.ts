@@ -43,6 +43,8 @@ function badField(config: Record<string, unknown>): string | null {
   if ("chunk_token_num" in config && !isWhole(config.chunk_token_num, 1, 8192)) return "chunk_token_num";
   if ("delimiter" in config && !(typeof config.delimiter === "string" && [...config.delimiter].length >= 1 && [...config.delimiter].length <= DELIMITER_MAX)) return "delimiter";
   if ("overlapped_percent" in config && !isWhole(config.overlapped_percent, 0, 50)) return "overlapped_percent";
+  if ("pages" in config && (!Array.isArray(config.pages) || config.pages.length > 128 || config.pages.some((pair: unknown) =>
+    !Array.isArray(pair) || pair.length !== 2 || !isWhole(pair[0], 1, 1_000_000) || !isWhole(pair[1], pair[0], 1_000_000)))) return "pages";
   return null;
 }
 
@@ -77,6 +79,7 @@ function checked(config: InternalAxiosRequestConfig, server: DatasetServer, sent
 function valuesOf(parserConfig: unknown) {
   const source = typeof parserConfig === "object" && parserConfig !== null ? (parserConfig as Record<string, unknown>) : {};
   return {
+    ...(Array.isArray(source.pages) ? { pages: source.pages as [number, number][] } : {}),
     ...(typeof source.chunk_token_num === "number" ? { chunkTokenNum: source.chunk_token_num } : {}),
     ...(typeof source.delimiter === "string" ? { delimiter: source.delimiter } : {}),
     ...(typeof source.overlapped_percent === "number" ? { overlappedPercent: source.overlapped_percent } : {}),

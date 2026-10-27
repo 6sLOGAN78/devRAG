@@ -26,7 +26,7 @@ class ParserConfig(BaseModel):
     chunk_token_num: StrictInt = Field(default=512, ge=1, le=8192)
     delimiter: StrictStr = Field(default="\n", min_length=1, max_length=MAX_DELIMITER)
     overlapped_percent: StrictInt = Field(default=0, ge=0, le=50)
-    pages: list[tuple[StrictInt, StrictInt]] = Field(default_factory=list)
+    pages: list[tuple[StrictInt, StrictInt]] = Field(default_factory=list, max_length=128)
     layout_recognize: StrictBool | StrictStr = True
     auto_keywords: StrictInt = Field(default=0, ge=0, le=32)
     table_context_size: StrictInt = Field(default=0, ge=0)

@@ -28,6 +28,7 @@ from api.db.services.service_errors import Kind, ServiceError
 from api.utils import reasons
 from common.constants import BUCKET_NAME
 from common.settings import Settings
+from rag.parsers.deepdoc_client import DeepDocClient, NativeUnavailable
 from rag.parsers.errors import ParserError
 from rag.parsers.pdf import count_pages, rasterize_page
 from rag.parsers.txt import decode_text
@@ -119,7 +120,9 @@ def page_etag(settings: Settings, visible: VisibleDataset, doc_id: str, n: int, 
     blobs = storage if storage is not None else get_storage(settings)
     try:
         path = (cache or PDF_CACHE).path_for(blobs, doc.location, doc.content_hash or "")
-        total = count_pages(path)
+        total = count_pages(path, settings=settings)
+    except NativeUnavailable:
+        raise ServiceError(Kind.UNAVAILABLE, reasons.PREVIEW_UNAVAILABLE, "the preview service is not available") from None
     except (StorageError, ParserError):
         return None
     return _etag(doc, n) if n <= total else None
@@ -134,13 +137,18 @@ def page_image(settings: Settings, visible: VisibleDataset, doc_id: str, n: int,
         path = None
         try:
             path = files.path_for(blobs, doc.location, doc.content_hash or "")
-            total = count_pages(path)
+            total = count_pages(path, settings=settings)
             if n > total:
                 raise _not_found()
+            if settings.deepdoc.url:
+                data = DeepDocClient(settings.deepdoc).page_image(path, n, ZOOM)
+                return RenderedPage(data, _etag(doc, n))
             image = rasterize_page(path, n - 1, ZOOM).convert("RGB")
             break
         except StorageError as exc:
             raise _storage_error(exc) from None
+        except NativeUnavailable:
+            raise ServiceError(Kind.UNAVAILABLE, reasons.PREVIEW_UNAVAILABLE, "the preview service is not available") from None
         except ParserError:
             if attempt == 1 and path is not None and not path.exists():
                 continue  # evicted by a concurrent request between the lookup and the open

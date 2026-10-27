@@ -47,6 +47,7 @@ function Body({ target, pendingRef, onClose }: { target: ChunkTarget; pendingRef
       overlappedPercent: detail.overlappedPercent > 0 ? detail.overlappedPercent : DEFAULT_OVERLAPPED_PERCENT,
       chunkCount: detail.chunkCount,
       run: detail.run,
+      pages: detail.pages,
     };
   } else if (dataset.data !== undefined && !isDocument) {
     const detail = dataset.data;
@@ -57,6 +58,7 @@ function Body({ target, pendingRef, onClose }: { target: ChunkTarget; pendingRef
       overlappedPercent: detail.parserConfig.overlappedPercent,
       chunkCount: 0,
       run: "0",
+      pages: detail.parserConfig.pages,
     };
   }
   const query = isDocument ? document : dataset;

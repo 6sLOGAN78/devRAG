@@ -11,6 +11,7 @@ const REASON_LEAF: Readonly<Record<string, string>> = {
   unsupported_type: "unsupported",
   chunker_unavailable: "chunker",
   file_damaged: "damaged",
+  native_unavailable: "nativeUnavailable",
   file_too_large: "tooLarge",
   archive_limits_exceeded: "archive",
   provider_timeout: "providerTimeout",

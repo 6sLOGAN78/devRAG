@@ -183,6 +183,7 @@ services:
     networks:
       ragflow:
         aliases: [ragflow-app]
+      deepdoc:
 
   # Parsing worker: same image as app, no port, no name, so `--scale task-executor=N` needs no configuration (ING-04).
   # Each replica registers its own consumer (te_<host>_<pid>_<rand>) in the shared group. Dev-only settings live in the dev file.
@@ -207,6 +208,7 @@ services:
       start_period: 30s
     networks:
       - ragflow
+      - deepdoc
 
 networks:
   deepdoc:

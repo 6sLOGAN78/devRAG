@@ -1,6 +1,6 @@
 import { datasetDocumentPath, datasetDocumentsPath, datasetParsePath, datasetStatusPath, documentUploadPath } from "@/constants/api-paths";
 import { ApiError, expectRecord, request } from "./http";
-import { asRecord, clampWhole, count, text } from "./mapping";
+import { asRecord, clampWhole, count, pageRangesOf, text } from "./mapping";
 
 /**
  * Document APIs (plans 03-16 and 03-17). Every mapper copies an explicit field list, so an unexpected field from the
@@ -221,6 +221,7 @@ export async function setDocumentsEnabled(datasetId: string, ids: string[], enab
 
 /** One document opened on its own: the list row plus its chunking values and the kind of preview it supports. */
 export interface DocumentDetailView extends DocumentView {
+  pages?: [number, number][];
   chunkTokenNum: number;
   delimiter: string;
   overlappedPercent: number;
@@ -239,10 +240,12 @@ export async function getDocument(datasetId: string, docId: string): Promise<Doc
     delimiter: text(dto.delimiter),
     overlappedPercent: count(dto.overlapped_percent),
     preview: dto.preview === "pages" ? "pages" : "none",
+    ...(dto.pages !== undefined ? { pages: pageRangesOf(dto.pages) } : {}),
   };
 }
 
 export interface DocumentSettingsChanges {
+  pages?: [number, number][];
   parserId?: string;
   chunkTokenNum?: number;
   delimiter?: string;
@@ -260,6 +263,7 @@ export async function updateDocumentSettings(datasetId: string, docId: string, c
   if (changes.chunkTokenNum !== undefined) config.chunk_token_num = changes.chunkTokenNum;
   if (changes.delimiter !== undefined) config.delimiter = changes.delimiter;
   if (changes.overlappedPercent !== undefined) config.overlapped_percent = changes.overlappedPercent;
+  if (changes.pages !== undefined) config.pages = changes.pages;
   if (Object.keys(config).length > 0) data.parser_config = config;
   const raw = await request<unknown>({ url: datasetDocumentPath(datasetId, docId), method: "PATCH", data, timeout: MAX_SETTINGS_TIMEOUT_MS }, { silent: true });
   const dto = asRecord(expectRecord<Record<string, unknown>>(raw, "the document settings", ["id"]));
@@ -269,5 +273,6 @@ export async function updateDocumentSettings(datasetId: string, docId: string, c
     delimiter: text(dto.delimiter),
     overlappedPercent: count(dto.overlapped_percent),
     preview: dto.preview === "pages" ? "pages" : "none",
+    ...(dto.pages !== undefined ? { pages: pageRangesOf(dto.pages) } : {}),
   };
 }

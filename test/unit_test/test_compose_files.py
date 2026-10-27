@@ -51,7 +51,9 @@ def test_task_executor_service_shape() -> None:
     assert svc["entrypoint"] == ["tini", "--", "/ragflow/docker/entrypoint_task_executor.sh"]
     assert svc["healthcheck"]["test"] == ["CMD", "/ragflow/docker/healthcheck_task_executor.sh"]
     assert svc["depends_on"]["init"]["condition"] == "service_completed_successfully"
-    assert svc["networks"] == ["ragflow"]
+    assert svc["networks"] == ["ragflow", "deepdoc"]
+    app = _load("docker-compose.yml")["services"]["app"]
+    assert set(app["networks"]) == {"ragflow", "deepdoc"}
     assert "APP_UID" in svc["environment"]
     assert "MYSQL_PASSWORD" in svc["environment"]
 

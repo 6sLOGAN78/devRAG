@@ -38,6 +38,7 @@ RUN pip install --no-cache-dir uv==0.9.18 \
 COPY api ./api
 COPY common ./common
 COPY rag ./rag
+COPY deepdoc ./deepdoc
 COPY conf ./conf
 COPY scripts/render_conf.py ./scripts/render_conf.py
 COPY --from=go-build /out/ragflow_server /ragflow/bin/ragflow_server

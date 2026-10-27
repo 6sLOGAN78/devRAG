@@ -15,8 +15,11 @@ import threading
 from collections import OrderedDict
 from pathlib import Path
 
+from api.db.services.service_errors import Kind, ServiceError
+from api.utils import reasons
 from common.constants import BUCKET_NAME
 from common.settings import Settings
+from rag.parsers.deepdoc_client import NativeUnavailable
 from rag.parsers.errors import ParserError
 from rag.parsers.pdf import count_pages
 from rag.utils.storage_base import Storage, StorageError
@@ -47,7 +50,7 @@ def pdf_page_count(settings: Settings, doc_id: str, location: str, content_hash:
     """The number of pages of a PDF, or ``None`` for another type, a damaged file or an unreadable blob."""
     if (suffix or "").lower() != "pdf" or not location:
         return None
-    key = (doc_id, content_hash or "")
+    key = (doc_id, f"{content_hash or ''}:{settings.deepdoc.url}")
     with _lock:
         hit = _cache.get(key)
         if hit is not None:
@@ -70,7 +73,10 @@ def pdf_page_count(settings: Settings, doc_id: str, location: str, content_hash:
             if close is not None:
                 close()
         try:
-            total = count_pages(path)
+            total = count_pages(path, settings=settings)
+        except NativeUnavailable:
+            # A service outage is never remembered as a damaged document.
+            raise ServiceError(Kind.UNAVAILABLE, reasons.PARSE_UNAVAILABLE, "the native parsing service is not available") from None
         except ParserError:
             _remember(key, _DAMAGED)
             return None

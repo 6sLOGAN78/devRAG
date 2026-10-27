@@ -21,3 +21,13 @@ export function clampWhole(value: number, low: number, high: number): number {
   if (!Number.isFinite(value)) return low;
   return Math.min(high, Math.max(low, Math.floor(value)));
 }
+/** Valid one-based inclusive PDF ranges; malformed wire values never reach the form. */
+export function pageRangesOf(raw: unknown): [number, number][] {
+  if (!Array.isArray(raw) || raw.length > 128) return [];
+  const result: [number, number][] = [];
+  for (const pair of raw) {
+    if (!Array.isArray(pair) || pair.length !== 2 || !pair.every((n) => Number.isSafeInteger(n)) || pair[0] < 1 || pair[1] < pair[0] || pair[1] > 1000000) return [];
+    result.push([pair[0], pair[1]]);
+  }
+  return result;
+}

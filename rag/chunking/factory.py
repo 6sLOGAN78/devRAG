@@ -33,3 +33,17 @@ def get_chunker(parser_id: str) -> Chunker:
     if parser_id not in IMPLEMENTED_PARSERS or parser_id not in _CHUNKERS:
         raise ChunkerUnavailable()
     return _CHUNKERS[parser_id]
+
+
+def get_chunker_config(parser_id: str, raw: dict[str, Any]):
+    """Each built method owns its configuration; unbuilt methods cannot borrow General."""
+    get_chunker(parser_id)
+    if parser_id != "naive":
+        raise ChunkerUnavailable()
+    defaults = naive.NaiveConfig()
+    delimiter = raw.get("delimiter")
+    delimiter = delimiter.replace("\\n", "\n").replace("\\t", "\t") if isinstance(delimiter, str) and delimiter else defaults.delimiter
+    return naive.NaiveConfig(
+        chunk_token_num=int(raw.get("chunk_token_num") or defaults.chunk_token_num), delimiter=delimiter,
+        overlapped_percent=int(raw.get("overlapped_percent") or defaults.overlapped_percent),
+    )

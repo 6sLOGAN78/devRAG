@@ -32,7 +32,7 @@ import json
 import re
 from typing import Any, Literal, Protocol
 
-from pydantic import BaseModel, ConfigDict, model_validator
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 from quart import Blueprint, Response, current_app, g, request
 from quart_schema import document_response, validate_request
 from werkzeug.exceptions import RequestEntityTooLarge
@@ -133,6 +133,7 @@ class DocumentDetailView(DocumentRowView):
     delimiter: str
     overlapped_percent: int
     preview: str
+    pages: list[tuple[int, int]] = Field(default_factory=list)
 
 
 class DocumentDetailEnvelope(BaseModel):
@@ -149,6 +150,7 @@ class ChunkingValues(BaseModel):
     chunk_token_num: Any = None
     delimiter: Any = None
     overlapped_percent: Any = None
+    pages: Any = None
 
 
 class UpdateDocumentBody(BaseModel):

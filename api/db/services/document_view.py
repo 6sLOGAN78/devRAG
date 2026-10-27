@@ -162,12 +162,14 @@ def document_detail(settings: Settings, visible: VisibleDataset, doc_id: str, *,
             raise ServiceError(Kind.NOT_FOUND, reasons.DATASET_NOT_FOUND, "not found")
         body = _rows([doc])[0]
     config = {**DEFAULT_PARSER_CONFIG, **(doc.parser_config if isinstance(doc.parser_config, dict) else {})}
-    if body["pages_total"] is None and (doc.suffix or "").lower() == "pdf":
+    # A parse report counts selected pages; preview navigation needs the entire source.
+    if (doc.suffix or "").lower() == "pdf":
         body["pages_total"] = pdf_page_count(settings, doc.id, doc.location or "", doc.content_hash or "", doc.suffix or "", storage=storage)
     body.update(
         chunk_token_num=config["chunk_token_num"],
         delimiter=config["delimiter"],
         overlapped_percent=int(config.get("overlapped_percent") or 0),
         preview="pages" if (doc.suffix or "").lower() == "pdf" and body["pages_total"] is not None else "none",
+        pages=config.get("pages", []),
     )
     return body

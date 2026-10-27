@@ -60,7 +60,9 @@
         "delimiters": "分隔符",
         "delimitersHelp": "分块会在这些字符处提前结束。换行请写 \\n。",
         "overlap": "重叠（%）",
-        "overlapHelp": "一个分块末尾有多少内容会在下一个分块开头重复。"
+        "overlapHelp": "一个分块末尾有多少内容会在下一个分块开头重复。",
+        "pages": "PDF 页码",
+        "pagesHelp": "留空表示全部页，也可输入包含首尾页的范围，例如 2-4, 13-30。其他文件类型忽略此设置。"
       },
       "notYet": {
         "heading": "暂不可用",
@@ -84,7 +86,8 @@
       "sizeRange": "请输入 1 到 8192 之间的整数。",
       "delimitersRequired": "请至少输入一个分隔符。",
       "delimitersMax": "最多使用 64 个字符。",
-      "overlapRange": "请输入 0 到 50 之间的整数。"
+      "overlapRange": "请输入 0 到 50 之间的整数。",
+      "pagesRange": "请输入 1 到 1000000 之间的页码，例如 2-4, 13-30。"
     }
   }
 }

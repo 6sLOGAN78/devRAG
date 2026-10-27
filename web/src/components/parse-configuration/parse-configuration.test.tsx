@@ -96,6 +96,15 @@ function Probe({ initial = VALID }: { initial?: ChunkFormInput }) {
 }
 
 describe("ParseConfiguration", () => {
+  it("offers one-based PDF page selection and validates ranges", async () => {
+    render(<Probe />);
+    expect(screen.getByLabelText("PDF pages")).toBeInTheDocument();
+    const result = parse({ pageRanges: "2-4, 13-30" });
+    expect(result.success && result.data.pageRanges).toEqual([[2, 4], [13, 30]]);
+    expect(parse({ pageRanges: "0-3" }).success).toBe(false);
+    expect(parse({ pageRanges: "9-3" }).success).toBe(false);
+    expect(parse({ pageRanges: "" }).success).toBe(true);
+  });
   it("renders the three fields with labels, helpers and a Mono delimiter input", () => {
     render(<Probe />);
     expect(screen.getByLabelText("Chunk size (tokens)")).toHaveValue(512);

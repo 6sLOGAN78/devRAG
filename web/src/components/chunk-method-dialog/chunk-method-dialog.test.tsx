@@ -132,6 +132,16 @@ describe("Chunking method dialog, document mode (UI-13, UI-14)", () => {
     expect(sent(detailUrl(1), "PATCH")[0]).toEqual({ parser_config: { delimiter: "\t;\n" } });
   });
 
+  it("saves inclusive PDF ranges and restores them when reopened", async () => {
+    const { dialog, user } = await openFirst();
+    await replace(user, within(dialog).getByTestId("field-page-ranges"), "2-4, 13");
+    await user.click(within(dialog).getByTestId("chunk-method-submit"));
+    await waitFor(() => expect(screen.queryByTestId("chunk-method-dialog")).toBeNull());
+    expect(sent(detailUrl(1), "PATCH")).toEqual([{ parser_config: { pages: [[2, 4], [13, 13]] } }]);
+    const next = await openDialog(1);
+    expect(within(next.dialog).getByTestId("field-page-ranges")).toHaveValue("2-4, 13");
+  });
+
   it("shows a saved delimiter escaped the next time the dialog opens", async () => {
     const { dialog, user } = await openFirst();
     await replace(user, within(dialog).getByTestId("field-delimiters"), "\\n;");

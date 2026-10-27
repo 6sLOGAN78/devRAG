@@ -24,6 +24,7 @@ FAILURE_CODES: tuple[str, ...] = (
     "unsupported_type",
     "chunker_unavailable",
     "file_damaged",
+    "native_unavailable",
     "file_too_large",
     "archive_limits_exceeded",
     "too_many_chunks",
@@ -59,10 +60,11 @@ TERMINAL_CODES: frozenset[str] = frozenset(
 
 # Plain sentences per failure code: what the worker stores and the SPA shows (UI-SPEC "Failure reasons", D-08, D-23).
 PLAIN_MESSAGES: dict[str, str] = {
-    "no_readable_text": "This PDF has no readable text; scanned documents are not supported yet.",
+    "no_readable_text": "This PDF has no readable text.",
     "unsupported_type": "Parsing isn't available yet for this file type.",
     "chunker_unavailable": "The chosen chunking method isn't available yet.",
     "file_damaged": "The file is damaged or incomplete and couldn't be opened.",
+    "native_unavailable": "The native parsing service is not available. Try again shortly.",
     "file_too_large": "The file is too large to parse.",
     "archive_limits_exceeded": "The file unpacks to more data than is allowed, so it wasn't opened.",
     "too_many_chunks": "This document produced more chunks than one parsing task can store.",

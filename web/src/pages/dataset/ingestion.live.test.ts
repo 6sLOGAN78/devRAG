@@ -172,7 +172,7 @@ describe("live Phase 4 journeys on the dataset page", () => {
     await waitUntil(() => rowOf("blank.pdf")?.getAttribute("data-run") === "4", { describe: "the blank PDF to fail", timeout: 60_000, interval: 250 });
     const failed = rowOf("blank.pdf") as HTMLElement;
     expect(statusOf(failed)).toBe("Failed");
-    expect(failed).toHaveTextContent("This PDF has no readable text; scanned documents are not supported yet.");
+    expect(failed).toHaveTextContent("This PDF has no readable text.");
     await user.click(within(failed).getByTestId("document-details"));
     const sheet = await screen.findByTestId("parsing-details", {}, { timeout: 15_000 });
     await waitUntil(() => within(sheet).queryByTestId("details-retry") !== null, { describe: "the details to load", timeout: 15_000 });

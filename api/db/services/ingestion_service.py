@@ -180,7 +180,20 @@ def _check_all(settings: Settings, visible: VisibleDataset, documents: Sequence[
 def _page_ranges(settings: Settings, storage: Storage, doc: Document) -> list[tuple[int, int]]:
     """Page ranges of one document. The count comes from ``pdf_page_count`` (cached); a damaged or unreadable PDF yields the single full range (the worker fails it, D-25)."""
     total = pdf_page_count(settings, doc.id, doc.location or "", doc.content_hash or "", doc.suffix or "", storage=storage)
-    return task_service.split_pages(total, settings.ingest.task_page_size)
+    selected = (doc.parser_config or {}).get("pages") if (doc.suffix or "").lower() == "pdf" else None
+    if not selected or total is None:
+        return task_service.split_pages(total, settings.ingest.task_page_size)
+    ranges = sorted((max(0, start - 1), min(end, total)) for start, end in selected if start <= total)
+    if not ranges:
+        raise ServiceError(Kind.INVALID, reasons.PARSER_CONFIG_INVALID, "the selected pages are outside this document", data={"field": "pages"})
+    merged: list[tuple[int, int]] = []
+    for start, end in ranges:
+        if merged and start <= merged[-1][1]:
+            merged[-1] = (merged[-1][0], max(end, merged[-1][1]))
+        else:
+            merged.append((start, end))
+    return [(start, min(start + settings.ingest.task_page_size, end))
+            for first, end in merged for start in range(first, end, settings.ingest.task_page_size)]
 
 
 @dataclass(frozen=True)
@@ -200,6 +213,7 @@ def _digest_for(doc: Document, start: int, end: int) -> str:
         int(cfg.get("chunk_token_num", _DEFAULT_CHUNK_TOKENS)),
         str(cfg.get("delimiter", _DEFAULT_DELIMITER)),
         cfg.get("overlapped_percent", 0),
+        parser_config=cfg,
     )
 
 

@@ -1,0 +1,57 @@
+{
+  "recorded_at": "2026-10-27T18:09:19.934514+00:00",
+  "plan_status": "in_progress_layout_control_requires_plan04",
+  "paid_calls": 0,
+  "checks": [
+    {
+      "name": "unit",
+      "passed": 2483,
+      "existing_skips": 8,
+      "log": "ragflow-logs/phase6-03-unit-final.log"
+    },
+    {
+      "name": "boundary",
+      "passed": 16,
+      "existing_skips": 0,
+      "log": "ragflow-logs/phase6-03-boundary-green.log"
+    },
+    {
+      "name": "frontend",
+      "passed": 2139,
+      "existing_skips": 0,
+      "log": "ragflow-logs/phase6-03-web-unit-reviewed.log"
+    },
+    {
+      "name": "native_scan_browser_existing_pdf",
+      "passed": 15,
+      "existing_skips": 0,
+      "log": "ragflow-logs/phase6-03-stack-reviewed.log"
+    },
+    {
+      "name": "document_preview_integration",
+      "passed": 36,
+      "existing_skips": 0,
+      "log": "ragflow-logs/phase6-03-regression-integration.log"
+    }
+  ],
+  "ci_gates": "7/7 passed",
+  "native_request_layout_true": "503 layout_unavailable until real plan04 support",
+  "worker_native_imports": [],
+  "screenshots": {
+    "output/playwright/phase6-review/scan-page-selection-saved.png": {
+      "sha256": "1bc5215b1aea8fbe5796926232647f5ad2b55e12c4460a61bea9afe1d733752b",
+      "reviewer": "assistant",
+      "user_approval": false
+    },
+    "output/playwright/phase6-review/scan-page2-highlight.png": {
+      "sha256": "3669e0894528990b32fd3ae705d83b9e6cb749b0b55242d726bbab6610ec9e6e",
+      "reviewer": "assistant",
+      "user_approval": false
+    }
+  },
+  "images": {
+    "devrag-stack-app-1": "sha256:ddecedbaa1138ed1cb61c0c36c75eaafb2225484abb3d1e0559b6cb4baffd38a",
+    "devrag-stack-task-executor-3": "sha256:ddecedbaa1138ed1cb61c0c36c75eaafb2225484abb3d1e0559b6cb4baffd38a",
+    "devrag-stack-deepdoc-1": "sha256:c38575f6cab61c0329fcd20dc91843845e7886fc5c53891736511dfba643a644"
+  }
+}

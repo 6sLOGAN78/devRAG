@@ -24,6 +24,7 @@ export interface FileExtra {
   /** The next replacing parse is refused once more with fresh counts, as when the chunks changed meanwhile. */
   refuseConfirmOnce?: boolean;
   /** The document's own chunking values (the chunking dialog saves them). */
+  pages?: [number, number][];
   chunkTokenNum?: number;
   delimiter?: string;
   overlappedPercent?: number;
@@ -37,6 +38,7 @@ export interface LogRow {
 
 /** A document's chunking values or a dataset's default (R-167: the `document-settings` area writes them). */
 export interface ChunkingValues {
+  pages?: [number, number][];
   chunkTokenNum: number;
   delimiter: string;
   overlappedPercent: number;
@@ -74,6 +76,7 @@ export function setDatasetDefaults(server: DatasetServer, datasetId: string, pat
 export function documentValuesOf(server: DatasetServer, docId: string): ChunkingValues {
   const extra = stateOf(server).extras[docId] ?? {};
   return {
+    ...(extra.pages === undefined ? {} : { pages: extra.pages }),
     chunkTokenNum: extra.chunkTokenNum ?? BUILT_IN_VALUES.chunkTokenNum,
     delimiter: extra.delimiter ?? BUILT_IN_VALUES.delimiter,
     overlappedPercent: extra.overlappedPercent ?? BUILT_IN_VALUES.overlappedPercent,
@@ -157,6 +160,7 @@ export function documentDetailOf(server: DatasetServer, row: DocumentRow) {
   const values = documentValuesOf(server, row.id);
   return {
     ...viewOf(row, stateOf(server)),
+    ...(values.pages === undefined ? {} : { pages: values.pages }),
     chunk_token_num: values.chunkTokenNum,
     delimiter: values.delimiter,
     overlapped_percent: values.overlappedPercent,
@@ -192,6 +196,7 @@ export const handle: AreaHandler = ({ server, config, method, url, params, ok })
       language: "English",
       parser_id: datasetDefaultsOf(server, row.id).parserId,
       parser_config: {
+        ...(datasetDefaultsOf(server, row.id).pages === undefined ? {} : { pages: datasetDefaultsOf(server, row.id).pages }),
         chunk_token_num: datasetDefaultsOf(server, row.id).chunkTokenNum,
         delimiter: datasetDefaultsOf(server, row.id).delimiter,
         overlapped_percent: datasetDefaultsOf(server, row.id).overlappedPercent,

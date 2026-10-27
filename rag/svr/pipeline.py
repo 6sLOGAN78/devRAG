@@ -22,8 +22,7 @@ from common.constants import BUCKET_NAME
 from common.doc_store.doc_store_base import DocStoreConnection, index_name
 from common.ingest_codes import RUN_CANCELLED
 from common.settings import Settings
-from rag.chunking.factory import get_chunker
-from rag.chunking.naive import NaiveConfig
+from rag.chunking.factory import get_chunker, get_chunker_config
 from rag.chunking.types import Chunk
 from rag.parsers.pdf import thumbnail_data_url
 from rag.parsers.router import parser_for_suffix
@@ -72,20 +71,6 @@ def _step(name: str, ctx: TaskContext) -> Iterator[None]:
         raise failure from None
 
 
-def _naive_config(parser_config: dict[str, Any]) -> NaiveConfig:
-    defaults = NaiveConfig()
-    delimiter = parser_config.get("delimiter")
-    if isinstance(delimiter, str) and delimiter:
-        delimiter = delimiter.replace("\\n", "\n").replace("\\t", "\t")
-    else:
-        delimiter = defaults.delimiter
-    return NaiveConfig(
-        chunk_token_num=int(parser_config.get("chunk_token_num") or defaults.chunk_token_num),
-        delimiter=delimiter,
-        overlapped_percent=int(parser_config.get("overlapped_percent") or defaults.overlapped_percent),
-    )
-
-
 def _embedding_dimension(ctx: TaskContext) -> int:
     for model in tenant_model_service.list_models(ctx.tenant_id, "embedding"):
         if model.composite == ctx.embd_id and isinstance(model.dimension, int):
@@ -116,19 +101,20 @@ def _parse_and_chunk(ctx: TaskContext, deps: PipelineDeps, control: TaskControl,
     page_range = (ctx.from_page, ctx.to_page) if spec.name == "pdf" else None
     chunks: list[Chunk] = []
     with deps.limiters.chunk_limiter:
-        blocks = spec.load().parse(source, report, page_range=page_range, limits=limits)
-        for chunk in chunker(blocks, _naive_config(ctx.parser_config)):
+        options = {"settings": deps.settings, "parser_config": ctx.parser_config} if spec.name == "pdf" else {}
+        blocks = spec.load().parse(source, report, page_range=page_range, limits=limits, **options)
+        for chunk in chunker(blocks, get_chunker_config(ctx.parser_id, ctx.parser_config)):
             control.check()
             if chunk.text.strip():
                 chunks.append(chunk)
     return chunks
 
 
-def _store_thumbnail(ctx: TaskContext, path: Path) -> None:
+def _store_thumbnail(ctx: TaskContext, path: Path, settings: Settings | None = None) -> None:
     if ctx.doc_suffix.lower().lstrip(".") != "pdf" or ctx.from_page != 0 or task_service.has_thumbnail(ctx.doc_id):
         return
     try:
-        task_service.store_thumbnail(ctx.doc_id, thumbnail_data_url(path))
+        task_service.store_thumbnail(ctx.doc_id, thumbnail_data_url(path, settings=settings))
     except Exception as exc:  # noqa: BLE001 - a missing thumbnail never fails the task
         logger.info("thumbnail skipped", extra={"task": ctx.task_id, "error_type": type(exc).__name__})
 
@@ -211,7 +197,7 @@ def run_pipeline(ctx: TaskContext, control: TaskControl, deps: PipelineDeps) -> 
         control.check()
         with _step("parse", ctx):
             chunks = _parse_and_chunk(ctx, deps, control, path, report)
-        _store_thumbnail(ctx, path)
+        _store_thumbnail(ctx, path, deps.settings)
     is_pdf = ctx.doc_suffix.lower().lstrip(".") == "pdf"
     if not chunks and not is_pdf:
         raise TaskFailure("chunk", "no_readable_text")

@@ -2,7 +2,7 @@
   "datasets": {
     "details": {
       "reason": {
-        "noText": "This PDF has no readable text; scanned documents are not supported yet.",
+        "noText": "This PDF has no readable text.",
         "unsupported": "Parsing isn't available yet for this file type.",
         "chunker": "The chosen chunking method isn't available yet.",
         "damaged": "The file is damaged or incomplete and couldn't be opened.",
@@ -20,7 +20,8 @@
         "tooManyChunks": "This document produced more chunks than one parsing task can store.",
         "queue": "The task queue wasn't available.",
         "documentGone": "The document was deleted while it was being parsed.",
-        "unknown": "Parsing failed for an unexpected reason."
+        "unknown": "Parsing failed for an unexpected reason.",
+        "nativeUnavailable": "The native parsing service is not available. Try again shortly."
       },
       "step": {
         "queue": "Waiting for a worker",
