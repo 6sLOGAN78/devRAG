@@ -89,6 +89,7 @@ _ROWS: tuple[tuple[str, tuple[str, ...], str, str, str, tuple[str, ...]], ...] =
     ('GET', ('api', 'v1', 'datasets', '{dataset_id}', 'ingestions'), 'python', 'api', 'tenant', ('owner', 'admin', 'normal')),
     ('GET', ('api', 'v1', 'datasets', '{dataset_id}', 'ingestions', 'summary'), 'python', 'api', 'tenant', ('owner', 'admin', 'normal')),
     ('GET', ('api', 'v1', 'datasets', '{dataset_id}', 'ingestions', '{log_id}'), 'python', 'api', 'tenant', ('owner', 'admin', 'normal')),
+    ('GET', ('api', 'v1', 'documents', 'images', '{image_id}'), 'python', 'api', 'tenant', ('owner', 'admin', 'normal')),
     ('POST', ('api', 'v1', 'documents', 'upload'), 'python', 'api', 'tenant', ('owner', 'admin', 'normal')),
     ('GET', ('api', 'v1', 'language'), 'go', 'none', 'none', ()),
     ('GET', ('api', 'v1', 'models'), 'python', 'api', 'tenant', ('owner', 'admin', 'normal')),

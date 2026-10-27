@@ -49,7 +49,7 @@ func TestVerifySchemaPassesOnLiveDatabase(t *testing.T) {
 	rep, err := VerifySchema(context.Background(), db.SchemaProvider(), liveDef(t))
 	require.NoError(t, err)
 	require.NoError(t, rep.Err())
-	assert.Equal(t, 38, rep.Tables)
+	assert.Equal(t, 39, rep.Tables)
 }
 
 func TestVerifySchemaOnScratchCopyPositiveThenNegative(t *testing.T) {
@@ -95,7 +95,7 @@ func TestMigrateBinaryExitsNonZeroOnDriftAndZeroOnLive(t *testing.T) {
 	// live database
 	live, err := run(confPath())
 	require.NoError(t, err, live)
-	assert.Contains(t, live, "schema OK: 38 tables")
+	assert.Contains(t, live, "schema OK: 39 tables")
 
 	// drifted scratch copy
 	doc, err := scratch.Qualified("document")

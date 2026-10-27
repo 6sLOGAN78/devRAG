@@ -10,6 +10,8 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Literal, get_args
 
+from rag.parsers.assets import ParsedAsset
+
 BLOCK_KINDS = frozenset({"text", "heading", "table", "slide", "sheet"})
 LayoutLabel = Literal["_background_", "Text", "Title", "Figure", "Figure caption", "Table", "Table caption", "Header", "Footer", "Reference", "Equation"]
 LAYOUT_LABELS = get_args(LayoutLabel)
@@ -35,6 +37,7 @@ class ParsedBlock:
     page_sizes: dict[int, tuple[float, float]] = field(default_factory=dict)
 
     layout_label: LayoutLabel | None = None
+    assets: tuple[ParsedAsset, ...] = ()
 
     def __post_init__(self) -> None:
         if self.layout_label is not None and self.layout_label not in LAYOUT_LABELS:

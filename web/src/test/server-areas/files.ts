@@ -8,6 +8,7 @@ import type { AreaHandler, DatasetServer, DocumentRow } from "../dataset-server"
  */
 
 export interface FileExtra {
+  assets?: { id: string; kind: string; caption: string; page: number | null; width: number; height: number }[];
   parseable?: boolean;
   enabled?: boolean;
   thumbnail?: string | null;
@@ -169,6 +170,7 @@ export function documentDetailOf(server: DatasetServer, row: DocumentRow) {
     delimiter: values.delimiter,
     overlapped_percent: values.overlappedPercent,
     preview: stateOf(server).extras[row.id]?.preview ?? "none",
+    assets: stateOf(server).extras[row.id]?.assets ?? [],
   };
 }
 

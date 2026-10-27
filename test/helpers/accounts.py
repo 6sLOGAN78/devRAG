@@ -139,6 +139,7 @@ def _delete_dataset_rows(cur: Any, tenant_id: str) -> None:
         "DELETE FROM `task` WHERE `doc_id` IN (SELECT `id` FROM `document` WHERE `kb_id` IN (SELECT `id` FROM `knowledgebase` WHERE `tenant_id` = %s))",
         (tenant_id,),
     )
+    cur.execute("DELETE FROM `document_asset` WHERE `tenant_id` = %s", (tenant_id,))
     cur.execute("DELETE FROM `pipeline_operation_log` WHERE `tenant_id` = %s", (tenant_id,))
     cur.execute(
         "DELETE FROM `file2document` WHERE `document_id` IN "

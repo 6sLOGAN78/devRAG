@@ -232,6 +232,12 @@ def _inv_page_image(w: World, who: Account | None, token: str, as_tenant: str | 
     return call(w.client, "GET", _doc_path(w) + "/pages/1/image", token, {})
 
 
+def _inv_document_image(w: World, who: Account | None, token: str, as_tenant: str | None) -> httpx.Response:
+    from test.helpers.document_assets import owned_image
+
+    return call(w.client, "GET", "/api/v1/documents/images/{image_id}", token, {"image_id": owned_image(w)})
+
+
 def _inv_document_content(w: World, who: Account | None, token: str, as_tenant: str | None) -> httpx.Response:
     return call(w.client, "GET", _doc_path(w) + "/content", token, {})
 
@@ -306,6 +312,7 @@ def _inv_completion(w: World, who: Account | None, token: str, as_tenant: str | 
 
 
 INVOKERS: dict[str, Invoker] = {
+    "GET /api/v1/documents/images/{image_id}": _inv_document_image,
     "POST /api/v1/chat/completions": _inv_completion,
     "POST /api/v1/chats/{chat_id}/sessions": _inv_create_session,
     "GET /api/v1/chats/{chat_id}/sessions": _inv_list_sessions,

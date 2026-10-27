@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Phase 6 plans03/04 verified; continuing05 extracted images and ownership
-last_updated: "2026-10-27T18:37:46.609664+00:00"
-last_activity: 2026-10-28 -- Verified and closing scanned PDF/layout slices; continuing05
+stopped_at: Phase 6 plan05 verified; continuing06 structured tables
+last_updated: "2026-10-27T23:52:33.429888+00:00"
+last_activity: 2026-10-28 -- Owned image slice verified; continuing06
 progress:
   total_phases: 8
   completed_phases: 4
   total_plans: 176
-  completed_plans: 150
-  percent: 85
+  completed_plans: 151
+  percent: 86
 ---
 
 # Project State
@@ -21,18 +21,18 @@ progress:
 See: .planning/PROJECT.md (updated 2026-10-05)
 
 **Core value:** A user can upload a document into a knowledge base and get an accurate, cited answer to a question about it, end-to-end through the real pipeline (parse, chunk, embed, index, hybrid retrieve, rerank, generate), with no mocked stages.
-**Current focus:** Phase 6 execution — 06-05 extracted images and ownership
+**Current focus:** Phase 6 execution — 06-06 structured PDF tables and crops
 
 ## Current Position
 
 Phase: 6 (deep-parsing-and-chunking-breadth) — EXECUTING
-Plan: 05 of 30; plans01–04 complete; extracted images slice next
-Status: Actual acquisition/layout-artifact decisions persist and audit passes. Plans01–04 complete; R234/R235 and summaries recorded. Final21real native/API/Chrome/PDF checks pass,unit2500/8existing skips,web2141 plus36focused preservation. Next05; no paid calls or requirement-checkbox updates.
+Plan: 06 of 30; plans01–05 complete; structured tables next
+Status: Plans01–05 complete; R232..236 and summaries recorded. Final05 rebuilt native/API/Chrome/detail32pass,unit2421/8existing skips,web2143 plus71focused,service121,migration14,matrix5,leaks6; Go/build/CI/admission pass. Zero paid calls. Continue06.
 Prior checks: Phase5 UAT5/6 passed (two user answer judgments and delegated screenshot/Chinese/footprint review). Final Phase5 acceptance remains pending; Phase4 B36 remains separately deferred. Prior paid evidence retained.
-Current checkpoint: plans03/04 complete with original scan fact/page2 geometry and real column-order ONNX/Chrome flow. Final21native/API/browser/legacy checks pass,unit2500/8existing skips,frontend2141 plus preservation36focused, offline5repeatp95/page2.795s/peak561.85MiB. R234/R235 recorded; no requirement-checkbox or human UAT claim. Publication authorization persists; continue05 after verified checkpoint.
-Last activity: 2026-10-27
+Current checkpoint:05 verified: actual normalized owned PDF/Office images, migration0004/39tables, scoped dedup/reparse/delete/lost-owner GC, authenticated source drawer and real route matrix/leak coverage. Continue06 structured PDF tables/crops through the pinned TSR model. Publication authorization persists.
+Last activity: 2026-10-28
 
-Progress: 150/176 currently planned execution plans complete (85%); Phase6 4/30 complete.
+Progress: 151/176 currently planned execution plans complete (86%); Phase6 5/30 complete.
 
 ## Performance Metrics
 

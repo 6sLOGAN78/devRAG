@@ -165,6 +165,9 @@ def document_detail(settings: Settings, visible: VisibleDataset, doc_id: str, *,
     # A parse report counts selected pages; preview navigation needs the entire source.
     if (doc.suffix or "").lower() == "pdf":
         body["pages_total"] = pdf_page_count(settings, doc.id, doc.location or "", doc.content_hash or "", doc.suffix or "", storage=storage)
+    from api.db.services.document_asset_service import list_assets
+
+    body["assets"] = list_assets(visible, doc_id)
     body.update(
         chunk_token_num=config["chunk_token_num"],
         delimiter=config["delimiter"],

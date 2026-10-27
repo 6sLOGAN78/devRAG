@@ -128,7 +128,17 @@ class DocumentRowView(BaseModel):
     error: DocumentErrorView | None
 
 
+class DocumentAssetView(BaseModel):
+    id: str
+    kind: str
+    caption: str
+    page: int | None
+    width: int
+    height: int
+
+
 class DocumentDetailView(DocumentRowView):
+    assets: list[DocumentAssetView] = Field(default_factory=list)
     chunk_token_num: int
     delimiter: str
     overlapped_percent: int

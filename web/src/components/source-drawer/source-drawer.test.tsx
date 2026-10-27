@@ -10,6 +10,7 @@ import { server, useFilesServer } from "@/test/files-harness";
 import { setFileExtra } from "@/test/server-areas/files";
 import { waitUntil } from "@/test/wait-until";
 import { SourceDrawer } from ".";
+import { useUserStore } from "@/stores/user-store";
 import { sourceFromHit, sourceFromReference, type SourceView } from "./source-model";
 
 useFilesServer();
@@ -61,4 +62,44 @@ describe("source drawer", () => {
     render(<MemoryRouter><QueryClientProvider client={client}><Host /></QueryClientProvider></MemoryRouter>); fireEvent.click(screen.getByRole("button", { name: "Open first" })); await waitUntil(() => screen.queryByTestId("source-passage")); fireEvent.click(screen.getByTestId("source-close")); await waitUntil(() => document.activeElement === screen.getByRole("button", { name: "Open first" }));
     await act(async () => fireEvent.click(screen.getByRole("button", { name: "Open second" }))); expect(screen.getByTestId("source-passage")).toHaveTextContent("Second passage"); expect(screen.queryByTestId("source-preview")).toBeNull();
   });
+  it("renders extracted figures from an authenticated blob and keeps hostile captions as text", async () => {
+    const id = "a".repeat(32), url = `/api/v1/documents/images/${id}`;
+    setFileExtra(server, DOC, { assets: [{ id, kind: "image", caption: "<img src=x onerror=alert(1)>", page: 3, width: 1400, height: 400 }] });
+    server.use(({ config, url: called }) => called === url ? { data: new Blob(["PNG bytes"], { type: "image/png" }), status: 200, statusText: "OK", headers: {}, config } : undefined);
+    const view = show();
+    await waitUntil(() => screen.queryByTestId("source-asset-image"));
+    expect(screen.getByTestId("source-asset-image")).toHaveAttribute("src", "blob:source-test");
+    expect(screen.getByTestId("source-asset-caption")).toHaveTextContent("<img src=x onerror=alert(1)>");
+    expect(view.container.querySelector("img[onerror]")).toBeNull();
+    const call = server.callsTo("GET", url)[0]!;
+    expect(call.headers.get("Authorization")).toBe("Bearer tok-session"); expect(call.url).not.toContain("token=");
+    view.unmount(); expect(URL.revokeObjectURL).toHaveBeenCalledWith("blob:source-test");
+  });
+
+  it("keeps passage text when a figure fails and retries the authenticated request", async () => {
+    const id = "b".repeat(32), url = `/api/v1/documents/images/${id}`;
+    setFileExtra(server, DOC, { preview: "none", assets: [{ id, kind: "image", caption: "Figure", page: null, width: 100, height: 40 }] });
+    server.use(({ config, url: called }) => called === url ? { data: new Blob(["pixels"], { type: "image/png" }), status: 200, statusText: "OK", headers: {}, config } : undefined);
+    server.forced[`GET ${url}`] = { status: 503, message: "temporarily unavailable" };
+    show(source({ positions: [] }));
+    await waitUntil(() => screen.queryByText("This figure is unavailable."));
+    expect(screen.getByTestId("source-passage")).toHaveTextContent("A saved passage.");
+    delete server.forced[`GET ${url}`]; fireEvent.click(screen.getByRole("button", { name: "Try again" }));
+    await waitUntil(() => screen.queryByTestId("source-asset-image"));
+    expect(server.callsTo("GET", url)).toHaveLength(2);
+  });
+  it("revokes an old figure when the workspace changes before new detail arrives", async () => {
+    const id = "c".repeat(32), url = `/api/v1/documents/images/${id}`;
+    setFileExtra(server, DOC, { preview: "none", assets: [{ id, kind: "image", caption: "Figure", page: null, width: 100, height: 40 }] });
+    server.use(({ config, url: called }) => called === url ? { data: new Blob(["pixels"], { type: "image/png" }), status: 200, statusText: "OK", headers: {}, config } : undefined);
+    show(source({ positions: [] })); await waitUntil(() => screen.queryByTestId("source-asset-image"));
+    let release!: () => void;
+    server.holds[`GET ${DOC_URL}`] = new Promise<void>((resolve) => { release = resolve; });
+    await act(async () => useUserStore.getState().setUser({ ...useUserStore.getState().user!, tenantId: "t2", tenantName: "Another workspace" }));
+    expect(screen.queryByTestId("source-asset-image")).toBeNull();
+    expect(URL.revokeObjectURL).toHaveBeenCalledWith("blob:source-test");
+    expect(server.callsTo("GET", url)).toHaveLength(1);
+    release();
+  });
+
 });

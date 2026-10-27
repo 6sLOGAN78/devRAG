@@ -35,7 +35,7 @@ def test_generation_is_deterministic(tmp_path: Path) -> None:
 def test_one_file_per_table_plus_registry() -> None:
     tables = json.loads((REPO_ROOT / "conf/schema.json").read_text())["tables"]
     files = sorted(p.name for p in (REPO_ROOT / "internal/entity").glob("*.go"))
-    assert len(tables) == 38
+    assert len(tables) == 39
     assert files == sorted([f"{t['name']}.go" for t in tables] + ["registry.go"])
     for p in (REPO_ROOT / "internal/entity").glob("*.go"):
         assert "DO NOT EDIT" in p.read_text()

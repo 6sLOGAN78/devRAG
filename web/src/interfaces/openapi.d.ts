@@ -340,6 +340,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/documents/images/{image_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["get_image"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/documents/upload": {
         parameters: {
             query?: never;
@@ -800,8 +816,25 @@ export interface components {
             /** Deleted */
             deleted: boolean;
         };
+        /** DocumentAssetView */
+        DocumentAssetView: {
+            /** Caption */
+            caption: string;
+            /** Height */
+            height: number;
+            /** Id */
+            id: string;
+            /** Kind */
+            kind: string;
+            /** Page */
+            page: number | null;
+            /** Width */
+            width: number;
+        };
         /** DocumentDetailView */
         DocumentDetailView: {
+            /** Assets */
+            assets?: components["schemas"]["DocumentAssetView"][];
             /** Chunk Count */
             chunk_count: number;
             /** Chunk Token Num */
@@ -2578,6 +2611,18 @@ export interface operations {
                 };
             };
         };
+    };
+    get_image: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                image_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: never;
     };
     post_upload_documents: {
         parameters: {

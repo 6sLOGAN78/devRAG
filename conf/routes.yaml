@@ -225,3 +225,5 @@ endpoints:
      note: "plan 05-09 rates a completed assistant message in the caller's own session (CHAT-23, D-11)"}
   - {method: POST, path: "/api/v1/chat/completions", owner: python, auth: api, roles: [owner, admin, normal], scope: tenant, implemented: true,
      note: "plan 05-11 answers a question with a persisted cited completion; streaming follows in plan 05-12 (CHAT-14..21, CHAT-31)"}
+  - {method: GET, path: "/api/v1/documents/images/{image_id}", owner: python, auth: api, roles: [owner, admin, normal], scope: tenant, implemented: true,
+     note: "plan 06-05 reads an opaque normalized PNG only through its current original document and dataset visibility; foreign, stale and deleted images are the one 404"}

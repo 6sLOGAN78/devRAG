@@ -6,7 +6,7 @@ from api.db.models.chat import API4Conversation, APIToken, Conversation, Dialog,
 from api.db.models.files import File, File2Document, FileCommit, FileCommitItem
 from api.db.models.identity import InvitationCode, Tenant, User, UserTenant
 from api.db.models.integrations import ChatChannel, Connector, Connector2Kb, Memory, SyncLogs
-from api.db.models.knowledge import Document, Knowledgebase, PipelineOperationLog, Task
+from api.db.models.knowledge import Document, DocumentAsset, Knowledgebase, PipelineOperationLog, Task
 from api.db.models.llm import (
     LLM,
     LLMFactories,
@@ -26,7 +26,7 @@ ALL_MODELS: list[type[BaseModel]] = [
     User, Tenant, UserTenant, InvitationCode,
     LLMFactories, LLM, TenantLLM, TenantLangfuse,
     TenantModelProvider, TenantModelInstance, TenantModel, TenantModelGroup, TenantModelGroupMapping,
-    Knowledgebase, Document, Task, PipelineOperationLog,
+    Knowledgebase, Document, Task, PipelineOperationLog, DocumentAsset,
     File, File2Document, FileCommit, FileCommitItem,
     Dialog, Conversation, APIToken, API4Conversation, Search,
     UserCanvas, CanvasTemplate, UserCanvasVersion, MCPServer, CompilationTemplate, CompilationTemplateGroup,

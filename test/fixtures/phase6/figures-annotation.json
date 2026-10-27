@@ -1,0 +1,16 @@
+{
+  "origin": "Original fixtures composed from the unchanged original OCR bitmap; no third-party artwork",
+  "image_fact": "ORCHARD HARVEST 9100 KILOGRAMS",
+  "duplicate_occurrences": {
+    "docx": 2,
+    "pptx": 2
+  },
+  "unique_office_images": 1,
+  "pdf_pages": 2,
+  "caption_is_plain_text": "<img src=x onerror=alert(1)>",
+  "files": {
+    "figures-duplicate.pptx": "fc1f965f3e1b7d4d5265fb59c0daab5c1fbcd9d100c9975339b5d4e4e5717953",
+    "figures-duplicate.docx": "8c79078375602f0da8d60c84014eb6269915c3a4e487348e5f521a6bd903f729",
+    "figures-mixed.pdf": "0def5cf17d9c0b9fa59c3de724995be1c8063aff85f246709dee0809b03a9ed0"
+  }
+}

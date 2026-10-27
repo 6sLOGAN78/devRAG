@@ -81,3 +81,12 @@ export async function downloadDocument(datasetId: string, docId: string, options
   });
   return response.data;
 }
+
+
+/** Opaque figure id, authenticated header, and a bounded PNG response. */
+export async function fetchDocumentAsset(id: string, signal?: AbortSignal): Promise<Blob> {
+  const response = await http.request<Blob>({ url: `/api/v1/documents/images/${encodeURIComponent(id)}`, method: "GET", responseType: "blob", timeout: PAGE_IMAGE_TIMEOUT_MS, signal, silent: true });
+  const blob = response.data;
+  if (!(blob instanceof Blob) || blob.type !== "image/png" || blob.size > 8 * 1024 * 1024) throw new PreviewTypeError(blob instanceof Blob ? blob.type : "");
+  return blob;
+}

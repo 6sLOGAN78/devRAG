@@ -220,7 +220,21 @@ export async function setDocumentsEnabled(datasetId: string, ids: string[], enab
 }
 
 /** One document opened on its own: the list row plus its chunking values and the kind of preview it supports. */
+export interface DocumentAssetView { id: string; kind: "image" | "table"; caption: string; page: number | null; width: number; height: number }
+
+function assetsOf(raw: unknown): DocumentAssetView[] {
+  if (!Array.isArray(raw)) return [];
+  const seen = new Set<string>();
+  return raw.slice(0, 128).flatMap((value) => {
+    const a = asRecord(value), id = text(a.id);
+    if (!/^[a-f0-9]{32}$/.test(id) || seen.has(id) || (a.kind !== "image" && a.kind !== "table") || count(a.width) < 1 || count(a.height) < 1) return [];
+    seen.add(id);
+    return [{ id, kind: a.kind, caption: text(a.caption).slice(0, 1024), page: optionalCount(a.page), width: count(a.width), height: count(a.height) }];
+  });
+}
+
 export interface DocumentDetailView extends DocumentView {
+  assets?: DocumentAssetView[];
   pages?: [number, number][];
   layoutRecognize?: boolean | string;
   chunkTokenNum: number;
@@ -237,6 +251,7 @@ export async function getDocument(datasetId: string, docId: string): Promise<Doc
   const dto = asRecord(expectRecord<Record<string, unknown>>(raw, "the document", ["id"]));
   return {
     ...toDocument(dto),
+    assets: assetsOf(dto.assets),
     chunkTokenNum: count(dto.chunk_token_num),
     delimiter: text(dto.delimiter),
     overlappedPercent: count(dto.overlapped_percent),
@@ -273,6 +288,7 @@ export async function updateDocumentSettings(datasetId: string, docId: string, c
   const dto = asRecord(expectRecord<Record<string, unknown>>(raw, "the document settings", ["id"]));
   return {
     ...toDocument(dto),
+    assets: assetsOf(dto.assets),
     chunkTokenNum: count(dto.chunk_token_num),
     delimiter: text(dto.delimiter),
     overlappedPercent: count(dto.overlapped_percent),

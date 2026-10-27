@@ -7,6 +7,10 @@
     "passageLabel": "段落文本",
     "gone": "原始文档已不可用，以上段落为保存的文本。",
     "open": "打开文档",
-    "close": "关闭"
+    "close": "关闭",
+    "figure": "提取的图片",
+    "figures": "提取的图片",
+    "figureUnavailable": "此图片暂不可用。",
+    "retry": "重试"
   }
 }

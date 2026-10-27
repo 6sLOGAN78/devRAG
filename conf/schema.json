@@ -2286,6 +2286,250 @@
       ]
     },
     {
+      "name": "document_asset",
+      "columns": [
+        {
+          "name": "caption",
+          "type": "varchar(1024)",
+          "nullable": false,
+          "default": null,
+          "app_default": "",
+          "primary_key": false,
+          "auto_increment": false
+        },
+        {
+          "name": "create_date",
+          "type": "datetime",
+          "nullable": true,
+          "default": null,
+          "app_default": null,
+          "primary_key": false,
+          "auto_increment": false
+        },
+        {
+          "name": "create_time",
+          "type": "bigint",
+          "nullable": true,
+          "default": null,
+          "app_default": null,
+          "primary_key": false,
+          "auto_increment": false
+        },
+        {
+          "name": "doc_id",
+          "type": "varchar(32)",
+          "nullable": true,
+          "default": null,
+          "app_default": null,
+          "primary_key": false,
+          "auto_increment": false
+        },
+        {
+          "name": "generation_id",
+          "type": "varchar(32)",
+          "nullable": false,
+          "default": null,
+          "app_default": null,
+          "primary_key": false,
+          "auto_increment": false
+        },
+        {
+          "name": "height",
+          "type": "int",
+          "nullable": false,
+          "default": null,
+          "app_default": null,
+          "primary_key": false,
+          "auto_increment": false
+        },
+        {
+          "name": "id",
+          "type": "varchar(32)",
+          "nullable": false,
+          "default": null,
+          "app_default": null,
+          "primary_key": true,
+          "auto_increment": false
+        },
+        {
+          "name": "kb_id",
+          "type": "varchar(32)",
+          "nullable": false,
+          "default": null,
+          "app_default": null,
+          "primary_key": false,
+          "auto_increment": false
+        },
+        {
+          "name": "kind",
+          "type": "varchar(16)",
+          "nullable": false,
+          "default": null,
+          "app_default": "image",
+          "primary_key": false,
+          "auto_increment": false
+        },
+        {
+          "name": "mime_type",
+          "type": "varchar(32)",
+          "nullable": false,
+          "default": null,
+          "app_default": "image/png",
+          "primary_key": false,
+          "auto_increment": false
+        },
+        {
+          "name": "object_key",
+          "type": "varchar(255)",
+          "nullable": false,
+          "default": null,
+          "app_default": null,
+          "primary_key": false,
+          "auto_increment": false
+        },
+        {
+          "name": "page",
+          "type": "int",
+          "nullable": true,
+          "default": null,
+          "app_default": null,
+          "primary_key": false,
+          "auto_increment": false
+        },
+        {
+          "name": "sha256",
+          "type": "varchar(64)",
+          "nullable": false,
+          "default": null,
+          "app_default": null,
+          "primary_key": false,
+          "auto_increment": false
+        },
+        {
+          "name": "size",
+          "type": "bigint",
+          "nullable": false,
+          "default": null,
+          "app_default": null,
+          "primary_key": false,
+          "auto_increment": false
+        },
+        {
+          "name": "source_manifest",
+          "type": "longtext",
+          "nullable": false,
+          "default": null,
+          "app_default": null,
+          "primary_key": false,
+          "auto_increment": false
+        },
+        {
+          "name": "tenant_id",
+          "type": "varchar(32)",
+          "nullable": false,
+          "default": null,
+          "app_default": null,
+          "primary_key": false,
+          "auto_increment": false
+        },
+        {
+          "name": "update_date",
+          "type": "datetime",
+          "nullable": true,
+          "default": null,
+          "app_default": null,
+          "primary_key": false,
+          "auto_increment": false
+        },
+        {
+          "name": "update_time",
+          "type": "bigint",
+          "nullable": true,
+          "default": null,
+          "app_default": null,
+          "primary_key": false,
+          "auto_increment": false
+        },
+        {
+          "name": "width",
+          "type": "int",
+          "nullable": false,
+          "default": null,
+          "app_default": null,
+          "primary_key": false,
+          "auto_increment": false
+        }
+      ],
+      "indexes": [
+        {
+          "name": "documentasset_create_date",
+          "columns": [
+            "create_date"
+          ],
+          "unique": false
+        },
+        {
+          "name": "documentasset_create_time",
+          "columns": [
+            "create_time"
+          ],
+          "unique": false
+        },
+        {
+          "name": "documentasset_doc_id",
+          "columns": [
+            "doc_id"
+          ],
+          "unique": false
+        },
+        {
+          "name": "documentasset_generation_id",
+          "columns": [
+            "generation_id"
+          ],
+          "unique": false
+        },
+        {
+          "name": "documentasset_kb_id",
+          "columns": [
+            "kb_id"
+          ],
+          "unique": false
+        },
+        {
+          "name": "documentasset_tenant_id",
+          "columns": [
+            "tenant_id"
+          ],
+          "unique": false
+        },
+        {
+          "name": "documentasset_update_date",
+          "columns": [
+            "update_date"
+          ],
+          "unique": false
+        },
+        {
+          "name": "documentasset_update_time",
+          "columns": [
+            "update_time"
+          ],
+          "unique": false
+        },
+        {
+          "name": "uidx_asset_doc_digest",
+          "columns": [
+            "tenant_id",
+            "doc_id",
+            "kind",
+            "sha256"
+          ],
+          "unique": true
+        }
+      ]
+    },
+    {
       "name": "file",
       "columns": [
         {

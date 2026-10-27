@@ -18,6 +18,7 @@ func All() []any {
 		Conversation{},
 		Dialog{},
 		Document{},
+		DocumentAsset{},
 		File{},
 		File2Document{},
 		FileCommit{},

@@ -4,7 +4,7 @@ from deepdoc.ocr import OCR
 
 
 class NativeRuntime(OCR):
-    capabilities = ["ocr", "pdf", "layout"]
+    capabilities = ["ocr", "pdf", "layout", "images"]
 
     def __init__(self, runtime):
         super().__init__(runtime)
@@ -29,6 +29,12 @@ class NativeRuntime(OCR):
         from deepdoc.layout import Layout
 
         return Layout(self.runtime).detect(image, page_size)
+
+    def normalize_image(self, content):
+        from deepdoc.images import normalize_image
+        from rag.parsers.assets import encode_asset
+
+        return {"schema_version": 1, "image": encode_asset(normalize_image(content))}
 
     def process_pdf(self, operation, content, options):
         from deepdoc.pdf_service import process

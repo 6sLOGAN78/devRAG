@@ -199,3 +199,40 @@ def thumbnail_data_url(path: Path, max_chars: int = 16384) -> str:
         if len(url) <= max_chars:
             return url
     return url
+
+
+def page_assets(page, number: int) -> list[ParsedBlock]:
+    """Extract embedded pixels under the native pixel budget and canonical page geometry."""
+    from dataclasses import replace
+
+    from deepdoc.images import normalize_image
+    from rag.parsers.assets import MAX_ASSETS
+
+    blocks = []
+    produced_bytes = 0
+    for obj in page.get_objects(filter=[pdfium.raw.FPDF_PAGEOBJ_IMAGE], max_depth=15):
+        try:
+            if len(blocks) >= MAX_ASSETS:
+                raise FileTooLarge()
+            metadata = obj.get_metadata()
+            if not 0 < metadata.width * metadata.height <= MAX_PIXELS:
+                raise FileTooLarge()
+            bitmap = obj.get_bitmap(render=False)
+            try:
+                image = bitmap.to_pil()
+                buffer = io.BytesIO()
+                image.save(buffer, "PNG")
+            finally:
+                bitmap.close()
+            asset = replace(normalize_image(buffer.getvalue()), page=number)
+            produced_bytes += len(asset.content)
+            if produced_bytes > 24 * 1024 * 1024:
+                raise FileTooLarge()
+            box = _to_display(obj.get_bounds(), page.get_cropbox(), page.get_rotation() % 360)
+            width, height = page.get_size()
+            box = (max(0, box[0]), max(0, box[1]), min(width, box[2]), min(height, box[3]))
+            if box[0] < box[2] and box[1] < box[3]:
+                blocks.append(ParsedBlock("", boxes=(PageBox(number, *box),), page_sizes={number: (width, height)}, layout_label="Figure", assets=(asset,)))
+        finally:
+            obj.close()
+    return blocks

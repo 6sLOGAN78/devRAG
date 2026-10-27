@@ -83,7 +83,7 @@ def create_app(runtime: OCRRuntime, token: str, *, max_bytes: int = 100 * 1024 *
         if request.mimetype != "multipart/form-data":
             return jsonify(schema_version=1, error="invalid_request"), 400
         files, form = await request.files, await request.form
-        allowed_form = set() if operation in {"ocr", "layout"} else {"options"}
+        allowed_form = set() if operation in {"ocr", "layout", "normalize-image"} else {"options"}
         if (set(files) != {"file"} or len(files.getlist("file")) != 1
                 or set(form) - allowed_form or request.args or len(form.getlist("options")) > 1):
             return jsonify(schema_version=1, error="invalid_request"), 400
@@ -96,8 +96,8 @@ def create_app(runtime: OCRRuntime, token: str, *, max_bytes: int = 100 * 1024 *
             return jsonify(schema_version=1, error="busy"), 503
         if operation == "ocr":
             call, args = runtime.ocr, (content,)
-        elif operation == "layout":
-            call = getattr(runtime, "layout_image", None)
+        elif operation in {"layout", "normalize-image"}:
+            call = getattr(runtime, "layout_image" if operation == "layout" else "normalize_image", None)
             if call is None:
                 return jsonify(schema_version=1, error="capability_unavailable"), 503
             args = (content,)
@@ -149,6 +149,10 @@ def create_app(runtime: OCRRuntime, token: str, *, max_bytes: int = 100 * 1024 *
     @app.post("/v1/layout")
     async def layout():
         return await execute("layout")
+
+    @app.post("/v1/images/normalize")
+    async def normalize_image():
+        return await execute("normalize-image")
 
     @app.post("/v1/document/info")
     async def document_info():

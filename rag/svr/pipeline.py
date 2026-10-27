@@ -12,10 +12,10 @@ import logging
 import tempfile
 from collections.abc import Iterator
 from contextlib import contextmanager
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from pathlib import Path
 
-from api.db.services import task_service, tenant_model_service
+from api.db.services import document_asset_service, task_service, tenant_model_service
 from api.db.services.task_service import TaskContext
 from common.constants import BUCKET_NAME
 from common.doc_store.doc_store_base import DocStoreConnection, index_name
@@ -99,13 +99,27 @@ def _parse_and_chunk(ctx: TaskContext, deps: PipelineDeps, control: TaskControl,
     source = SourceFile(path, ctx.doc_suffix.lower().lstrip("."), path.stat().st_size)
     page_range = (ctx.from_page, ctx.to_page) if spec.name == "pdf" else None
     chunks: list[Chunk] = []
+    assets = []
+    generation = document_asset_service.current_generation(ctx) if deps.settings.deepdoc.url and spec.name in {"pdf", "docx", "pptx"} else None
+
+    def text_blocks(blocks):
+        for block in blocks:
+            control.check()
+            assets.extend(block.assets)
+            if len(assets) > 128 or sum(len(asset.content) for asset in assets) > 24 * 1024 * 1024:
+                from rag.parsers.errors import FileTooLarge
+                raise FileTooLarge()
+            yield replace(block, assets=())
+
     with deps.limiters.chunk_limiter:
-        options = {"settings": deps.settings, "parser_config": ctx.parser_config} if spec.name == "pdf" else {}
+        options = {"settings": deps.settings, "parser_config": ctx.parser_config} if spec.name == "pdf" else ({"settings": deps.settings} if spec.name in {"docx", "pptx"} else {})
         blocks = spec.load().parse(source, report, page_range=page_range, limits=limits, **options)
-        for chunk in chunker(blocks, get_chunker_config(ctx.parser_id, ctx.parser_config)):
+        for chunk in chunker(text_blocks(blocks), get_chunker_config(ctx.parser_id, ctx.parser_config)):
             control.check()
             if chunk.text.strip():
                 chunks.append(chunk)
+    with deps.limiters.minio_limiter:
+        document_asset_service.persist_assets(deps.settings, ctx, generation, assets, control, storage=deps.storage)
     return chunks
 
 

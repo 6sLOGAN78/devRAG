@@ -1,0 +1,104 @@
+{
+  "recorded_at": "2026-10-27T23:52:33.426081+00:00",
+  "plan": "06-05",
+  "paid_calls": 0,
+  "new_packages": 0,
+  "new_models": 0,
+  "schema_version": 4,
+  "table_count": 39,
+  "evidence": {
+    "python_unit": {
+      "log": "ragflow-logs/phase6-05-all-unit-final.log",
+      "passed": 2421,
+      "log_sha256": "e890fbd94440e71497409e5673923e1846670c99b4abba2a9b662626be83c39a"
+    },
+    "frontend_unit": {
+      "log": "ragflow-logs/phase6-05-web-regression.log",
+      "passed": 2143,
+      "log_sha256": "d1433f629e8f4b6605b88c4fbecc9d4477123ef3eb72e1222c0da884416f3fac"
+    },
+    "frontend_focused": {
+      "log": "ragflow-logs/phase6-05-web-focused-final.log",
+      "passed": 71,
+      "log_sha256": "1c82deed3e423cd023cfa7898a2b3308730dcd3707e9ad44660335b0fbe1acd7"
+    },
+    "service_regressions": {
+      "log": "ragflow-logs/phase6-05-service-regressions.log",
+      "passed": 121,
+      "log_sha256": "18d7f55efd9b57358a4499fbb29da00f072cce872f7c8b27a2db3543139db3fd"
+    },
+    "schema_integration": {
+      "log": "ragflow-logs/phase6-05-schema-real.log",
+      "passed": 14,
+      "log_sha256": "a978de75d58565ac1cfa0e71edf70ae6245937b5c8e78528ea59c57cd8cd957c"
+    },
+    "rebuilt_native_api_browser_regressions": {
+      "log": "ragflow-logs/phase6-05-final-verified.log",
+      "passed": 32,
+      "log_sha256": "094743e0bc6624667ed62548bfdd967e0b3f03bdcbee1cbfae72dc2d3dcd7993"
+    },
+    "route_matrix": {
+      "log": "ragflow-logs/phase6-05-real-matrix-final.log",
+      "passed": 5,
+      "log_sha256": "33db57b0e39950eee558470c115ca03ac97b74e5e6796cbbb7970661db6ecca4"
+    },
+    "response_leaks": {
+      "log": "ragflow-logs/phase6-05-real-leaks-final.log",
+      "passed": 6,
+      "log_sha256": "d5ef93f0e438eb35fd4a73e6b3433e8881f26fc3b13ca5080dd39173dee11df6"
+    },
+    "focused_boundary": {
+      "log": "ragflow-logs/phase6-05-focused-reviewed.log",
+      "passed": 77,
+      "log_sha256": "f7f3d5454df8d45ddb2f4b4c8354067f8a908902a5648e910f3e1a3fc5766f52"
+    },
+    "ci": {
+      "log": "ragflow-logs/phase6-05-ci-final.log",
+      "passed": 7,
+      "log_sha256": "2070e79b5d47386e9c64e2da894c9d715a741991fc5dc01a19c8613e2149f194"
+    },
+    "security_async_lint": {
+      "log": "ragflow-logs/phase6-05-security-final.log",
+      "passed": null,
+      "log_sha256": "35ae83fb2d63969e1665d88aa247f8dce682613fa2d31b941cd34d7628ee0b44"
+    },
+    "frontend_build": {
+      "log": "ragflow-logs/phase6-05-web-build-final.log",
+      "passed": null,
+      "log_sha256": "4ba5acce1365505dede295a035e6901641b8c01281cef2d6a878b361927cc858"
+    },
+    "go_internal": {
+      "log": "ragflow-logs/phase6-05-go.log",
+      "passed": null,
+      "log_sha256": "167b791733d1e42a63db426e0f191423eeb31f3566817793693f8104307878e9"
+    },
+    "go_actual_schema": {
+      "log": "ragflow-logs/phase6-05-go-schema-real.log",
+      "passed": null,
+      "log_sha256": "6ffea78f1a81eace0555be1c48c9044ac1de4fd8fb6f1cd21b8d94e8cc8dadb7"
+    },
+    "admission": {
+      "log": "ragflow-logs/phase6-05-admission-final.log",
+      "passed": null,
+      "log_sha256": "920b07e40447627f9d1bae1d17fe957b7152d5d9afe5fb5be2998a4eadad947d"
+    }
+  },
+  "runtime_images": {
+    "app": "sha256:8f3c7d0cc66dfb2e70b074a7270670abecca6866f1e4761c9cfcb026ee2e3283",
+    "deepdoc": "sha256:3137a0a3a7361aad0059d7e97f14ea4997f11d450939f3ff82681332c50ab667"
+  },
+  "screenshot": {
+    "path": "output/playwright/phase6-review/owned-office-figure.png",
+    "sha256": "ad3cce5b0a2b0d26507273592b3056007ce90cbea580a45c91660fd03d8cf0ed",
+    "reviewer": "assistant inline"
+  },
+  "human_uat_approval": false,
+  "phase_gate_complete": false,
+  "closeout_checks": {
+    "passed": 23,
+    "existing_future_gate_skips": 2,
+    "log": "ragflow-logs/phase6-05-closeout-checks.log",
+    "ci": "ragflow-logs/phase6-05-ci-closeout.log",
+    "security_async_lint": "ragflow-logs/phase6-05-security-closeout.log"
+  }
+}

@@ -32,6 +32,7 @@ from rag.queue.queue_base import TaskQueue
 from rag.svr.failure import FailureInfo, parse_failure_line
 from rag.svr.task_lock import TaskLock, open_client
 from rag.utils.es_conn import get_doc_store
+from rag.utils.storage_base import StorageError
 
 logger = logging.getLogger(__name__)
 
@@ -238,6 +239,12 @@ def _finish(settings: Settings, doc: _Doc, summary: _Summary, store: DocStoreCon
     dsl = {"attempts": summary.attempts, **_counts_dsl(summary, chunks)}
     if not _transition(doc, RUN_DONE, 1.0, text, log_status=LOG_DONE, log_text=text, dsl=dsl, store=store):
         return
+    from api.db.services.document_asset_service import prune_obsolete
+
+    try:
+        prune_obsolete(settings, doc.dataset_id, doc.id)
+    except (ServiceError, StorageError):
+        logger.warning("asset cleanup deferred", extra={"document": doc.id})
     stats.finished += 1
 
 

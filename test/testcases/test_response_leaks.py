@@ -1071,6 +1071,18 @@ def sweep_page_rows(s: Sweep, w: World) -> None:
     s.errors(row, "GET", content, "PUT")
 
 
+def sweep_document_image_rows(s: Sweep, w: World) -> None:
+    from test.helpers.document_assets import owned_image
+
+    row = "GET /api/v1/documents/images/{image_id}"
+    image = "/api/v1/documents/images/" + owned_image(w)
+    for label, token in (("owner", w.a.token), ("member", w.normal.token), ("outsider", w.b.token), ("API token", str(w.a_tokens[0]["token"]))):
+        s.req(row, label, "GET", image, token)
+    s.req(row, "absent", "GET", "/api/v1/documents/images/" + uuid.uuid4().hex, w.a.token)
+    s.req(row, "malformed", "GET", "/api/v1/documents/images/bad", w.a.token)
+    s.errors(row, "GET", image, "PUT")
+
+
 def sealed_envelopes(tenant_id: str) -> list[str]:
     """Every sealed provider key stored for one workspace (the ``v1:`` envelopes), read straight from MySQL."""
     conn = root_connection()
@@ -1145,6 +1157,7 @@ def sweep(ingress: httpx.Client) -> Iterator[Sweep]:
             sweep_chat_session_rows(s, world)
             sweep_completion_rows(s, world)
             sweep_page_rows(s, world)
+            sweep_document_image_rows(s, world)
             collect_database_secrets(s)
             s.secrets.extend(infrastructure_secrets())
             yield s

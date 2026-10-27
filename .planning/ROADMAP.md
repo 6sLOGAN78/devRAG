@@ -587,7 +587,7 @@ Scope notes: this is the PROJECT.md Core Value. No Phase 6, 7 or 8 work starts u
 
 **Planning status (2026-10-27):** Research and UI contract complete; structural checks30/30,90 task verifications,58/58 primary requirements plus RETR-13 producer handoff covered. No Phase6 native package/model acquisition or paid inference performed. Automatic entry completed the read-only audit/preparation and stops at the exact-candidate blocking-human approval in06-01 Task2.20 audit-tool tests pass; native acquisition/features have not started. Phase5 human UAT and Phase4 B36 remain pending.
 
-**Execution status (2026-10-28):** 4/30 plans complete. Exact acquisition approval validated; real CPU OCR, remote scanned PDF/page controls and ONNX layout/reading order pass. Final native/API/Chrome/PDF21pass,unit2500/8existing skips,frontend2141 plus preservation36focused; offline layout5repeatp95/page2.795s/peak561.85MiB. No paid requests or requirement checkbox changes. Next05 extracted images/ownership; full phase gate and human validation remain pending.
+**Execution status (2026-10-28):** 5/30 plans complete. Acquisition/CPU OCR/scanned PDF/layout and owned image slices verified. Final05 rebuilt native/API/Chrome/detail32pass,unit2421/8existing skips,web2143 plus71focused,service121,migration14,matrix5,leaks6; Go/build/CI/admission pass. No paid call or requirement-checkbox changes. Next06 structured PDF tables; full phase gate and human validation pending.
 
 **Wave 1** *(admission audit and blocking-human acquisition checkpoint)*
 
@@ -603,7 +603,7 @@ Scope notes: this is the PROJECT.md Core Value. No Phase 6, 7 or 8 work starts u
 - [x] 06-04-PLAN.md — Preserve visual reading order and remove page furniture
 **Wave 5** *(blocked on Wave 4 completion and accepted06-01 snapshot)*
 
-- [ ] 06-05-PLAN.md — Open extracted images and office figures securely
+- [x] 06-05-PLAN.md — Open extracted images and office figures securely
 **Wave 6** *(blocked on Wave 5 completion and accepted06-01 snapshot)*
 
 - [ ] 06-06-PLAN.md — Inspect reconstructed PDF tables and crops
@@ -753,6 +753,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8. Ph
 | 3. Models, Knowledge Bases and Upload | 31/31 | Complete | 2026-10-10 |
 | 4. Ingestion Pipeline | 35/35 | Human verification pending (B-36 deferred) | 2026-10-19 |
 | 5. Retrieval and Cited Chat (Core Value Gate) | 28/28 | Automated gate passed; human review pending | 2026-10-27 |
-| 6. Deep Parsing and Chunking Breadth | 4/30 | Executing; scanned PDF and layout slices passed | - |
+| 6. Deep Parsing and Chunking Breadth | 5/30 | Executing; owned image slice passed | - |
 | 7. Agents and Workflows | 0/TBD | Not started | - |
 | 8. Go Surface, CLI, Integrations, Billing and Production Deployment | 0/TBD | Not started | - |

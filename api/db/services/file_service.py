@@ -167,7 +167,9 @@ def release_files(document_ids: Sequence[str]) -> list[str]:
     PipelineOperationLog.delete().where(PipelineOperationLog.document_id.in_(ids)).execute()  # run history of a document that no longer exists keeps its name
     File2Document.delete().where(File2Document.document_id.in_(ids)).execute()
     Document.delete().where(Document.id.in_(ids)).execute()
-    freed: list[str] = []
+    from api.db.services.document_asset_service import release_rows
+
+    freed = release_rows(ids)
     for file_id in file_ids:
         if file_id not in locations:  # the row is already gone: nothing to free
             continue

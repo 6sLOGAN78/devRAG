@@ -165,6 +165,7 @@ class World:
     a_private_chat: dict[str, Any] = field(default_factory=dict)  # A's assistant with permission me (plan 05-08)
     a_team_session: dict[str, Any] = field(default_factory=dict)  # A's own session on the team assistant (plan 05-09)
     a_team_message_id: str = ""
+    a_image_id: str = ""
     scratch: dict[str, Any] = field(default_factory=dict)  # per-call disposable resources of the isolation table (plan 03-19)
 
     # reads performed as A -----------------------------------------------------------------------------------------
@@ -289,13 +290,21 @@ class World:
             "chats": self.snapshot_chats(),
             "objects": self.snapshot_objects(),
             "documents": self.snapshot_documents(),
+            "assets": self.snapshot_assets(),
             "chunks": self.snapshot_chunks(),
             "ingestion": self.snapshot_ingestion(),
         }
 
+    def snapshot_assets(self) -> Any:
+        from test.helpers.uploads import sql
+
+        return sql("SELECT `id`, `doc_id`, `generation_id`, `sha256`, `object_key` FROM `document_asset` WHERE `tenant_id`=%s ORDER BY `id`", (self.a.tenant_id,))
+
     def a_identifiers(self) -> list[str]:
         """Values that belong to A's side only; none may ever appear in a response to B."""
         out = [self.a.tenant_id, self.a.user_id, self.a.email, self.a.nickname]
+        if self.a_image_id:
+            out.append(self.a_image_id)
         for acc in (self.admin, self.normal, self.victim, self.pending):
             out += [acc.user_id, acc.email, acc.nickname]
         for tok in self.a_tokens:
@@ -350,6 +359,8 @@ def resource_of(row: Row) -> str:
         return "documents"
     if row.path.startswith(DATASETS):
         return "datasets"
+    if row.path.startswith("/api/v1/documents/images/"):
+        return "assets"
     if row.path.startswith(UPLOAD):
         return "objects"
     if row.path.startswith((CHATS, "/api/v1/chat/")):
@@ -423,6 +434,9 @@ def build_world(client: httpx.Client, registry: AccountRegistry, fake: FakeProvi
         sql("UPDATE `conversation` SET `message` = %s WHERE `id` = %s", (json.dumps([seed_message]), world.a_team_session["id"]))
         world.a_parsed_chunks = seed_chunks(world, CHUNK_SEED_COUNT)
         world.a_log_id, world.a_task_id = seed_parse_artifacts(world)
+        from test.helpers.document_assets import owned_image
+
+        owned_image(world)
     return world
 
 
@@ -633,6 +647,12 @@ def _page_image(w: World) -> Target:
     return Target(ids, _sender("GET", DATASETS + "/{dataset_id}/documents/{doc_id}/pages/{n}/image", extra_fields=set()), w.snapshot_documents)
 
 
+def _document_image(w: World) -> Target:
+    from test.helpers.document_assets import owned_image
+
+    return Target({"image_id": owned_image(w)}, _sender("GET", "/api/v1/documents/images/{image_id}", extra_fields=set()), w.snapshot_assets)
+
+
 def _document_content(w: World) -> Target:
     ids = {"dataset_id": str(w.a_team_dataset["id"]), "doc_id": str(w.a_team_documents[0]["id"])}
     return Target(ids, _sender("GET", DATASETS + "/{dataset_id}/documents/{doc_id}/content", extra_fields=set()), w.snapshot_documents)
@@ -680,6 +700,7 @@ def _task_status(w: World) -> Target:
 
 
 BUILDERS: dict[str, Builder] = {
+    "GET /api/v1/documents/images/{image_id}": _document_image,
     "POST /api/v1/chats/{chat_id}/sessions": _create_session,
     "GET /api/v1/chats/{chat_id}/sessions": _list_sessions,
     "GET /api/v1/chats/{chat_id}/sessions/{session_id}": _get_session,

@@ -1,4 +1,4 @@
-"""PPTX parser (PARSE-11): one slide block per slide, images skipped and counted (D-27)."""
+"""PPTX parser (PARSE-11): one slide block per slide, configured remote figures; legacy skips counted (D-27)."""
 
 from __future__ import annotations
 
@@ -10,8 +10,10 @@ from lxml import etree
 from pptx.enum.shapes import MSO_SHAPE_TYPE
 from pptx.exc import PackageNotFoundError
 
+from common.settings import Settings
 from rag.parsers.errors import FileDamaged, NoReadableText
 from rag.parsers.limits import check_ooxml_limits
+from rag.parsers.ooxml_images import OOXMLImages
 from rag.parsers.types import ParsedBlock, ParseLimits, ParseReport, SourceFile
 
 _DAMAGE = (zipfile.BadZipFile, KeyError, ValueError, AttributeError, PackageNotFoundError, etree.XMLSyntaxError, OSError)
@@ -36,28 +38,30 @@ def _shape_lines(shapes, skip_id: int | None, lines: list[str]) -> int:
     return images
 
 
-def _extract(source: SourceFile, report: ParseReport) -> list[ParsedBlock]:
+def _extract(source: SourceFile, report: ParseReport, settings: Settings | None = None) -> list[ParsedBlock]:
     prs = pptx.Presentation(str(source.path))
     blocks: list[ParsedBlock] = []
     images = 0
-    for slide in prs.slides:
-        lines: list[str] = []
-        title = slide.shapes.title
-        skip_id = None
-        if title is not None:
-            skip_id = title.shape_id
-            if title.text_frame.text.strip():
-                lines.append(title.text_frame.text.strip())
-        images += _shape_lines(slide.shapes, skip_id, lines)
-        if slide.has_notes_slide:
-            notes = slide.notes_slide.notes_text_frame
-            if notes is not None and notes.text.strip():
-                lines.append(notes.text.strip())
-        if lines:
-            blocks.append(ParsedBlock("\n".join(lines), "slide"))
-    if images:
-        report.images_skipped += images
-        report.add_note(f"{images} embedded images were skipped")
+    with OOXMLImages(source.path, settings) as collector:
+        for slide in prs.slides:
+            lines: list[str] = []
+            title = slide.shapes.title
+            skip_id = None
+            if title is not None:
+                skip_id = title.shape_id
+                if title.text_frame.text.strip():
+                    lines.append(title.text_frame.text.strip())
+            images += _shape_lines(slide.shapes, skip_id, lines)
+            if slide.has_notes_slide:
+                notes = slide.notes_slide.notes_text_frame
+                if notes is not None and notes.text.strip():
+                    lines.append(notes.text.strip())
+            assets = collector.for_element(slide._element, str(slide.part.partname))
+            if lines or assets:
+                blocks.append(ParsedBlock("\n".join(lines), "slide", assets=assets))
+        if images and not collector.enabled:
+            report.images_skipped += images
+            report.add_note(f"{images} embedded images were skipped")
     return blocks
 
 
@@ -67,11 +71,12 @@ def parse(
     *,
     page_range: tuple[int, int] | None = None,
     limits: ParseLimits | None = None,
+    settings: Settings | None = None,
 ) -> Iterator[ParsedBlock]:
     del page_range, limits
     check_ooxml_limits(source.path)
     try:
-        blocks = _extract(source, report)
+        blocks = _extract(source, report, settings)
     except _DAMAGE:
         raise FileDamaged() from None
     if not blocks:

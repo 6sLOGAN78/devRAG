@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import io
 import json
 import math
 from pathlib import Path
@@ -10,6 +11,7 @@ from typing import Any
 import httpx
 
 from common.settings import DeepDocSettings
+from rag.parsers.assets import InvalidAsset, ParsedAsset, decode_asset
 from rag.parsers.errors import FileDamaged, FileTooLarge, ParserError
 from rag.parsers.types import BLOCK_KINDS, LAYOUT_LABELS, PageBox, ParsedBlock, ParseLimits, ParseReport, SourceFile
 
@@ -23,19 +25,21 @@ class DeepDocClient:
     def __init__(self, settings: DeepDocSettings, *, transport: httpx.BaseTransport | None = None):
         self.settings, self.transport = settings, transport
 
-    def _request(self, endpoint: str, path: Path, options: dict[str, Any], *, binary: bool = False):
+    def _request(self, endpoint: str, path: Path | bytes, options: dict[str, Any] | None, *, binary: bool = False):
         if not self.settings.url or len(self.settings.api_token) < 24:
             raise NativeUnavailable()
         try:
-            if path.stat().st_size > 100 * 1024 * 1024:
+            size = len(path) if isinstance(path, bytes) else path.stat().st_size
+            if size > 100 * 1024 * 1024:
                 raise FileTooLarge()
-            with path.open("rb") as source, httpx.Client(
+            stream = io.BytesIO(path) if isinstance(path, bytes) else path.open("rb")
+            with stream as source, httpx.Client(
                 base_url=self.settings.url, timeout=self.settings.timeout_seconds, transport=self.transport,
                 follow_redirects=False, trust_env=False,
             ) as client:
                 with client.stream("POST", endpoint, headers={"Authorization": f"Bearer {self.settings.api_token}"},
-                                   files={"file": ("source.pdf", source, "application/pdf")},
-                                   data={"options": json.dumps(options)}) as response:
+                                   files={"file": ("source.bin", source, "application/octet-stream")},
+                                   data={} if options is None else {"options": json.dumps(options)}) as response:
                     if response.status_code == 413:
                         raise FileTooLarge()
                     if response.status_code == 400:
@@ -68,6 +72,15 @@ class DeepDocClient:
             if not isinstance(image, str) or len(image) > 16384 or not image.startswith("data:image/jpeg;base64,"):
                 raise NativeUnavailable()
         return data
+
+    def normalize_image(self, content: bytes) -> ParsedAsset:
+        if len(content) > 16 * 1024 * 1024:
+            raise FileTooLarge()
+        data = self._request("/v1/images/normalize", content, None)
+        try:
+            return decode_asset(data["image"])
+        except (KeyError, InvalidAsset):
+            raise NativeUnavailable() from None
 
     def page_image(self, path: Path, page: int, zoom: float = 3) -> bytes:
         return self._request("/v1/page-image", path, {"page": page, "zoom": zoom}, binary=True)
@@ -127,9 +140,13 @@ class DeepDocClient:
                 label = raw.get("layout_label")
                 if label is not None and label not in LAYOUT_LABELS:
                     raise ValueError
-                blocks.append(ParsedBlock(text, kind, tuple(boxes), sizes, layout_label=label))
+                raw_assets = raw.get("assets", [])
+                if not isinstance(raw_assets, list) or len(raw_assets) > 128:
+                    raise ValueError
+                assets = tuple(decode_asset(value) for value in raw_assets)
+                blocks.append(ParsedBlock(text, kind, tuple(boxes), sizes, layout_label=label, assets=assets))
             report.pages_total, report.pages_without_text = total, missing
             report.layout_backend, report.layout_regions = backend, regions
             return blocks
-        except (KeyError, TypeError, ValueError, OverflowError):
+        except (KeyError, TypeError, ValueError, OverflowError, InvalidAsset):
             raise NativeUnavailable() from None

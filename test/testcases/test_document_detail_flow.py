@@ -146,10 +146,18 @@ def test_patch_refuses_a_method_that_is_not_built_and_a_bad_value(ingress: httpx
 def test_patch_refuses_an_extra_field(ingress: httpx.Client, owner: Account) -> None:
     dataset_id = new_dataset(ingress, owner)
     doc = upload_text(ingress, owner, dataset_id, paragraphs(2))
-    for body in ({"run": "1"}, {"created_by": owner.user_id}, {"parser_config": {"pages": [[1, 2]]}}, {"parser_config": {"chunk_token_num": 64, "x": 1}}):
+    for body in ({"run": "1"}, {"created_by": owner.user_id}, {"parser_config": {"unknown_pages": [[1, 2]]}}, {"parser_config": {"chunk_token_num": 64, "x": 1}}):
         resp = patch(ingress, owner, dataset_id, doc["id"], body)
         assert resp.status_code == 400, (body, resp.text)
     assert detail(ingress, owner, dataset_id, doc["id"])["chunk_token_num"] == 512
+
+
+def test_patch_persists_supported_page_and_layout_settings(ingress: httpx.Client, owner: Account) -> None:
+    dataset_id = new_dataset(ingress, owner)
+    doc = upload_text(ingress, owner, dataset_id, paragraphs(2))
+    saved = ok(patch(ingress, owner, dataset_id, doc["id"], {"parser_config": {"pages": [[1, 2]], "layout_recognize": False}}))
+    assert saved["pages"] == [[1, 2]] and saved["layout_recognize"] is False
+    assert saved["run"] == "0"
 
 
 def test_patch_during_a_running_parse_is_409_parse_running(ingress: httpx.Client, owner: Account, fake: FakeProvider) -> None:

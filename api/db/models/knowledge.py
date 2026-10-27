@@ -156,3 +156,30 @@ class PipelineOperationLog(BaseModel):
 
     class Meta:
         table_name = "pipeline_operation_log"
+
+
+class DocumentAsset(BaseModel):
+    """Opaque, generation-bound image/artifact ownership; digests never confer read access."""
+
+    id = peewee.CharField(max_length=32, primary_key=True)
+    tenant_id = peewee.CharField(max_length=32, null=False, index=True)
+    kb_id = peewee.CharField(max_length=32, null=False, index=True)
+    doc_id = peewee.CharField(max_length=32, null=True, index=True)
+    kind = peewee.CharField(max_length=16, null=False, default="image")
+    object_key = peewee.CharField(max_length=255, null=False)
+    mime_type = peewee.CharField(max_length=32, null=False, default="image/png")
+    size = peewee.BigIntegerField(null=False)
+    sha256 = peewee.CharField(max_length=64, null=False)
+    generation_id = peewee.CharField(max_length=32, null=False, index=True)
+    caption = peewee.CharField(max_length=1024, null=False, default="")
+    page = peewee.IntegerField(null=True)
+    width = peewee.IntegerField(null=False)
+    height = peewee.IntegerField(null=False)
+    source_manifest = JSONField(null=False, default=list)
+
+    class Meta:
+        table_name = "document_asset"
+        constraints = [peewee.Check("kind NOT IN ('image', 'table') OR doc_id IS NOT NULL")]
+
+
+DocumentAsset.add_index(DocumentAsset.tenant_id, DocumentAsset.doc_id, DocumentAsset.kind, DocumentAsset.sha256, unique=True, name="uidx_asset_doc_digest")

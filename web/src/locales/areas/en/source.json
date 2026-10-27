@@ -7,6 +7,10 @@
     "passageLabel": "Passage text",
     "gone": "The original document is no longer available. The passage above is the saved text.",
     "open": "Open document",
-    "close": "Close"
+    "close": "Close",
+    "figure": "Extracted figure",
+    "figures": "Extracted figures",
+    "figureUnavailable": "This figure is unavailable.",
+    "retry": "Try again"
   }
 }
