@@ -1,0 +1,68 @@
+{
+  "retrieval": {
+    "score": {
+      "overall": "Overall similarity",
+      "term": "Keyword similarity",
+      "vector": "Vector similarity",
+      "rerank": "Rerank score",
+      "overallLabel": "Overall similarity for result {{n}}",
+      "none": "Not available"
+    },
+    "title": "Retrieval testing",
+    "documentTitle": "Retrieval testing for {{name}} - devRag",
+    "entry": "Test retrieval",
+    "intro": "Ask a question and see which passages of {{dataset}} the search returns, with their scores.",
+    "field": {
+      "question": "Question",
+      "questionPlaceholder": "Type a question about this dataset's documents",
+      "threshold": "Similarity threshold",
+      "thresholdHelp": "Passages scoring below this are left out. Raise it to see fewer, closer matches.",
+      "weight": "Keyword and vector weight",
+      "weightHelp": "Move toward vector to rank by meaning, toward keyword to rank by matching words.",
+      "rerank": "Rerank model",
+      "rerankHelp": "Reorders the closest passages with a dedicated model. Takes longer."
+    },
+    "reset": "Reset settings",
+    "run": "Run test",
+    "stale": "The settings changed after this result. Run the test again to update it.",
+    "results": {
+      "title": "Results",
+      "count_one": "{{count}} passage above the threshold",
+      "count_other": "{{count}} passages above the threshold",
+      "pages": "Result pages",
+      "reranked": "Reranked",
+      "timings": "Embedding {{embed}} ms · Search {{search}} ms",
+      "timingsRerank": "Embedding {{embed}} ms · Search {{search}} ms · Rerank {{rerank}} ms"
+    },
+    "hit": {
+      "rank": "Result {{n}}",
+      "more": "Show more",
+      "less": "Show less",
+      "source": "View source"
+    },
+    "idle": {
+      "heading": "Run a test to see results",
+      "body": "Results show the passages the assistant would draw on, with keyword, vector and overall scores."
+    },
+    "empty": {
+      "heading": "No passages matched",
+      "body": "Lower the similarity threshold, or try other words."
+    },
+    "noChunks": "No document in this dataset has been parsed yet, so there is nothing to search.",
+    "noChunksLink": "Open documents",
+    "error": {
+      "model": "This dataset's embedding model is no longer available in the workspace.",
+      "rerank": "The rerank model isn't available right now. Choose No rerank, or try again in a moment.",
+      "index": "The search index isn't available right now. Try again in a moment.",
+      "limited": "The embedding provider is limiting requests. Wait a moment and try again.",
+      "timeout": "The search took too long. Try again.",
+      "fallback": "The test couldn't run. Try again."
+    }
+  },
+  "errors": {
+    "retrieval": {
+      "questionRequired": "Enter a question.",
+      "questionMax": "Use 2,000 characters or fewer."
+    }
+  }
+}

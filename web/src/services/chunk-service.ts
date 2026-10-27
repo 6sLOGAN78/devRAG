@@ -49,7 +49,7 @@ export const MAX_CHUNK_KEYWORDS_LENGTH = 128;
 /** A text write waits on the embedding model (45 s, UI-SPEC HTTP client rules). */
 export const CHUNK_WRITE_TIMEOUT_MS = 45000;
 
-function toPosition(raw: unknown): ChunkPosition | null {
+export function toPosition(raw: unknown): ChunkPosition | null {
   const dto = asRecord(raw);
   const values = [dto.page, dto.x0, dto.x1, dto.top, dto.bottom];
   if (!values.every((value) => typeof value === "number" && Number.isFinite(value))) return null;

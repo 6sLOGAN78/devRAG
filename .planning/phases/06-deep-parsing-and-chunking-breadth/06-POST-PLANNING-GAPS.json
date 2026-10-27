@@ -1,0 +1,305 @@
+{
+  "global_counts": {
+    "total": 543,
+    "covered": 59,
+    "uncovered": 484
+  },
+  "scope_note": "SDK scans all543 project requirements.484 unrelated unassigned-to-this-phase items are not Phase6 coverage gaps. Scoped coverage is checked independently in06-REQUIREMENT-COVERAGE.json.",
+  "phase6_rows": [
+    {
+      "source": "REQUIREMENTS.md",
+      "item": "CHUNK-03",
+      "status": "Covered"
+    },
+    {
+      "source": "REQUIREMENTS.md",
+      "item": "CHUNK-04",
+      "status": "Covered"
+    },
+    {
+      "source": "REQUIREMENTS.md",
+      "item": "CHUNK-05",
+      "status": "Covered"
+    },
+    {
+      "source": "REQUIREMENTS.md",
+      "item": "CHUNK-06",
+      "status": "Covered"
+    },
+    {
+      "source": "REQUIREMENTS.md",
+      "item": "CHUNK-07",
+      "status": "Covered"
+    },
+    {
+      "source": "REQUIREMENTS.md",
+      "item": "CHUNK-08",
+      "status": "Covered"
+    },
+    {
+      "source": "REQUIREMENTS.md",
+      "item": "CHUNK-09",
+      "status": "Covered"
+    },
+    {
+      "source": "REQUIREMENTS.md",
+      "item": "CHUNK-10",
+      "status": "Covered"
+    },
+    {
+      "source": "REQUIREMENTS.md",
+      "item": "CHUNK-11",
+      "status": "Covered"
+    },
+    {
+      "source": "REQUIREMENTS.md",
+      "item": "CHUNK-12",
+      "status": "Covered"
+    },
+    {
+      "source": "REQUIREMENTS.md",
+      "item": "CHUNK-13",
+      "status": "Covered"
+    },
+    {
+      "source": "REQUIREMENTS.md",
+      "item": "CHUNK-14",
+      "status": "Covered"
+    },
+    {
+      "source": "REQUIREMENTS.md",
+      "item": "CHUNK-15",
+      "status": "Covered"
+    },
+    {
+      "source": "REQUIREMENTS.md",
+      "item": "CHUNK-17",
+      "status": "Covered"
+    },
+    {
+      "source": "REQUIREMENTS.md",
+      "item": "CHUNK-22",
+      "status": "Covered"
+    },
+    {
+      "source": "REQUIREMENTS.md",
+      "item": "CHUNK-23",
+      "status": "Covered"
+    },
+    {
+      "source": "REQUIREMENTS.md",
+      "item": "CHUNK-24",
+      "status": "Covered"
+    },
+    {
+      "source": "REQUIREMENTS.md",
+      "item": "CHUNK-25",
+      "status": "Covered"
+    },
+    {
+      "source": "REQUIREMENTS.md",
+      "item": "CHUNK-26",
+      "status": "Covered"
+    },
+    {
+      "source": "REQUIREMENTS.md",
+      "item": "CHUNK-27",
+      "status": "Covered"
+    },
+    {
+      "source": "REQUIREMENTS.md",
+      "item": "CHUNK-28",
+      "status": "Covered"
+    },
+    {
+      "source": "REQUIREMENTS.md",
+      "item": "DEPLOY-08",
+      "status": "Covered"
+    },
+    {
+      "source": "REQUIREMENTS.md",
+      "item": "DOC-17",
+      "status": "Covered"
+    },
+    {
+      "source": "REQUIREMENTS.md",
+      "item": "DOC-18",
+      "status": "Covered"
+    },
+    {
+      "source": "REQUIREMENTS.md",
+      "item": "DOC-19",
+      "status": "Covered"
+    },
+    {
+      "source": "REQUIREMENTS.md",
+      "item": "ING-18",
+      "status": "Covered"
+    },
+    {
+      "source": "REQUIREMENTS.md",
+      "item": "KB-10",
+      "status": "Covered"
+    },
+    {
+      "source": "REQUIREMENTS.md",
+      "item": "KB-11",
+      "status": "Covered"
+    },
+    {
+      "source": "REQUIREMENTS.md",
+      "item": "KB-12",
+      "status": "Covered"
+    },
+    {
+      "source": "REQUIREMENTS.md",
+      "item": "KB-13",
+      "status": "Covered"
+    },
+    {
+      "source": "REQUIREMENTS.md",
+      "item": "KB-17",
+      "status": "Covered"
+    },
+    {
+      "source": "REQUIREMENTS.md",
+      "item": "LLM-10",
+      "status": "Covered"
+    },
+    {
+      "source": "REQUIREMENTS.md",
+      "item": "LLM-11",
+      "status": "Covered"
+    },
+    {
+      "source": "REQUIREMENTS.md",
+      "item": "LLM-13",
+      "status": "Covered"
+    },
+    {
+      "source": "REQUIREMENTS.md",
+      "item": "LLM-32",
+      "status": "Covered"
+    },
+    {
+      "source": "REQUIREMENTS.md",
+      "item": "PARSE-04",
+      "status": "Covered"
+    },
+    {
+      "source": "REQUIREMENTS.md",
+      "item": "PARSE-05",
+      "status": "Covered"
+    },
+    {
+      "source": "REQUIREMENTS.md",
+      "item": "PARSE-06",
+      "status": "Covered"
+    },
+    {
+      "source": "REQUIREMENTS.md",
+      "item": "PARSE-07",
+      "status": "Covered"
+    },
+    {
+      "source": "REQUIREMENTS.md",
+      "item": "PARSE-08",
+      "status": "Covered"
+    },
+    {
+      "source": "REQUIREMENTS.md",
+      "item": "PARSE-09",
+      "status": "Covered"
+    },
+    {
+      "source": "REQUIREMENTS.md",
+      "item": "PARSE-11",
+      "status": "Covered"
+    },
+    {
+      "source": "REQUIREMENTS.md",
+      "item": "PARSE-14",
+      "status": "Covered"
+    },
+    {
+      "source": "REQUIREMENTS.md",
+      "item": "PARSE-15",
+      "status": "Covered"
+    },
+    {
+      "source": "REQUIREMENTS.md",
+      "item": "PARSE-16",
+      "status": "Covered"
+    },
+    {
+      "source": "REQUIREMENTS.md",
+      "item": "PARSE-17",
+      "status": "Covered"
+    },
+    {
+      "source": "REQUIREMENTS.md",
+      "item": "PARSE-18",
+      "status": "Covered"
+    },
+    {
+      "source": "REQUIREMENTS.md",
+      "item": "PARSE-19",
+      "status": "Covered"
+    },
+    {
+      "source": "REQUIREMENTS.md",
+      "item": "PARSE-20",
+      "status": "Covered"
+    },
+    {
+      "source": "REQUIREMENTS.md",
+      "item": "PARSE-21",
+      "status": "Covered"
+    },
+    {
+      "source": "REQUIREMENTS.md",
+      "item": "PARSE-22",
+      "status": "Covered"
+    },
+    {
+      "source": "REQUIREMENTS.md",
+      "item": "PARSE-23",
+      "status": "Covered"
+    },
+    {
+      "source": "REQUIREMENTS.md",
+      "item": "PARSE-24",
+      "status": "Covered"
+    },
+    {
+      "source": "REQUIREMENTS.md",
+      "item": "PARSE-25",
+      "status": "Covered"
+    },
+    {
+      "source": "REQUIREMENTS.md",
+      "item": "PARSE-26",
+      "status": "Covered"
+    },
+    {
+      "source": "REQUIREMENTS.md",
+      "item": "RETR-13",
+      "status": "Covered"
+    },
+    {
+      "source": "REQUIREMENTS.md",
+      "item": "SEC-08",
+      "status": "Covered"
+    },
+    {
+      "source": "REQUIREMENTS.md",
+      "item": "STOR-09",
+      "status": "Covered"
+    },
+    {
+      "source": "REQUIREMENTS.md",
+      "item": "UI-14",
+      "status": "Covered"
+    }
+  ]
+}

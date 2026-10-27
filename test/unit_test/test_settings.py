@@ -317,7 +317,7 @@ def test_llm_zero_retries_is_allowed(tmp_path, conf):
 
 def test_retrieval_defaults(conf):
     r = load_settings(conf).retrieval
-    assert (r.top_k, r.rerank_max_candidates, r.msm_percent, r.msm_retry_percent) == (1024, 64, 30, 10)
+    assert (r.top_k, r.rerank_max_candidates, r.msm_percent, r.msm_retry_percent) == (1024, 16, 30, 10)
     assert (r.synonym_ttl_seconds, r.rate_max, r.rate_window_seconds) == (86400, 30, 60)
 
 
@@ -355,3 +355,35 @@ def test_retrieval_bounds_are_inclusive(tmp_path, conf, key, value):
 def test_retrieval_section_is_optional(tmp_path, conf):
     path = _with(conf, tmp_path, lambda d: d.pop("retrieval"))
     assert load_settings(path).retrieval.top_k == 1024
+
+
+def test_chat_defaults(conf):
+    c = load_settings(conf).chat
+    assert (c.stream_deadline_seconds, c.max_question_chars, c.max_session_messages) == (300, 8000, 400)
+    assert (c.rate_max, c.rate_window_seconds, c.message_page_size) == (30, 60, 50)
+
+
+@pytest.mark.parametrize(
+    ("key", "lo", "hi"),
+    [
+        ("stream_deadline_seconds", 30, 3600),
+        ("max_question_chars", 100, 100000),
+        ("max_session_messages", 2, 10000),
+        ("rate_max", 1, 10000),
+        ("rate_window_seconds", 1, 3600),
+        ("message_page_size", 10, 200),
+    ],
+)
+def test_chat_bounds(tmp_path, conf, key, lo, hi):
+    for value in (lo, hi):
+        path = _with(conf, tmp_path, lambda d: d.setdefault("chat", {}).__setitem__(key, value))
+        assert getattr(load_settings(path).chat, key) == value
+    for value in (lo - 1, hi + 1, "invalid"):
+        path = _with(conf, tmp_path, lambda d: d.setdefault("chat", {}).__setitem__(key, value))
+        with pytest.raises(ConfigError, match=rf"chat\.{key}"):
+            load_settings(path)
+
+
+def test_chat_section_is_optional(tmp_path, conf):
+    path = _with(conf, tmp_path, lambda d: d.pop("chat", None))
+    assert load_settings(path).chat.message_page_size == 50

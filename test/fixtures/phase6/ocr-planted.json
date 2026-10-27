@@ -1,0 +1,19 @@
+{
+  "fixture": "ocr-planted.png",
+  "size": [
+    1400,
+    400
+  ],
+  "required_facts": [
+    "LIGHTHOUSE",
+    "52",
+    "ORCHARD",
+    "9100"
+  ],
+  "text_lines": [
+    "LIGHTHOUSE HEIGHT 52 METERS",
+    "ORCHARD HARVEST 9100 KILOGRAMS"
+  ],
+  "sha256": "9d43fa3a2f874051e53a665657e1bfffda85bb1716e2f3681437f6b52569bca8",
+  "provenance": "Original locally generated fixture; DejaVu Sans font already installed; frozen before native weights acquisition."
+}

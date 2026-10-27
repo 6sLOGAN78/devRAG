@@ -21,6 +21,7 @@ import { useUserStore } from "@/stores/user-store";
 import { useWorkspaceStore } from "@/stores/workspace-store";
 import { setAuthorization } from "@/utils/authorization";
 import { advanceParse } from "@/test/server-areas/files";
+import { waitUntil } from "@/test/wait-until";
 import DatasetPage from ".";
 
 // Drives the real page, table, dialogs, hooks, services and HTTP client against an in-memory server shaped like the
@@ -106,6 +107,12 @@ afterEach(() => {
 });
 
 describe("Dataset workspace structure (UI-11)", () => {
+  it("offers retrieval testing before Upload files for a member", async () => {
+    const member = user({ id: "u4", tenantId: "t4", tenantName: "Member workspace" });
+    signIn(member, [membershipRow("t1", "Ada's workspace", "normal")]); renderPage();
+    const entry = await screen.findByTestId("dataset-test-retrieval"), upload = await screen.findByTestId("dataset-upload");
+    expect(entry).toHaveAttribute("href", `/dataset/testing?id=${DATASET_ID}`); expect(entry.compareDocumentPosition(upload) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
   it("shows a back link, the name as the first heading, the meta line, the description and the title", async () => {
     renderPage();
     const page = await screen.findByTestId("dataset-page");
@@ -178,6 +185,7 @@ describe("Dataset workspace structure (UI-11)", () => {
     server.documents[DATASET_ID] = [];
     renderPage();
     expect(await screen.findByRole("heading", { level: 2, name: "No documents yet" })).toBeInTheDocument();
+    await waitUntil(() => screen.queryAllByRole("button", { name: "Upload files" }).length === 1);
     expect(screen.getAllByRole("button", { name: "Upload files" })).toHaveLength(1);
     await userEvent.click(screen.getByRole("button", { name: "Upload files" }));
     expect(await screen.findByTestId("upload-dialog")).toBeInTheDocument();

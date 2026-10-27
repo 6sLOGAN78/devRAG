@@ -143,3 +143,11 @@ export function embeddingCheckPath(datasetId: string): string {
 export function taskStatusPath(taskId: string): string {
   return resolveUnder("python", "/v1/", `task/status/${enc(taskId)}`);
 }
+
+export const chatsPath = resolve("python", "/api/v1/chats");
+export const chatCompletionsPath = resolve("python", "/api/v1/chat/completions");
+export const datasetSearchPath = resolveUnder("python", "/api/v1/datasets/", "search");
+export const chatPath = (id: string): string => resolveUnder("python", "/api/v1/chats/", enc(id));
+export const chatSessionsPath = (id: string): string => `${chatPath(id)}/sessions`;
+export const chatSessionPath = (chatId: string, sessionId: string): string => `${chatSessionsPath(chatId)}/${enc(sessionId)}`;
+export const messageFeedbackPath = (chatId: string, sessionId: string, messageId: string): string => `${chatSessionPath(chatId, sessionId)}/messages/${enc(messageId)}/feedback`;

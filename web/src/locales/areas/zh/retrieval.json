@@ -1,0 +1,68 @@
+{
+  "retrieval": {
+    "score": {
+      "overall": "总体相似度",
+      "term": "关键词相似度",
+      "vector": "向量相似度",
+      "rerank": "重排得分",
+      "overallLabel": "结果 {{n}} 的总体相似度",
+      "none": "不可用"
+    },
+    "title": "检索测试",
+    "documentTitle": "{{name}}的检索测试 - devRag",
+    "entry": "测试检索",
+    "intro": "针对 {{dataset}} 提问，查看检索返回的段落及得分。",
+    "field": {
+      "question": "问题",
+      "questionPlaceholder": "输入有关此知识库文档的问题",
+      "threshold": "相似度阈值",
+      "thresholdHelp": "低于此分数的段落将被排除，提高阈值可获取更相关的匹配。",
+      "weight": "关键词和向量权重",
+      "weightHelp": "向向量方向移动可按含义排序，向关键词方向移动可按词语匹配排序。",
+      "rerank": "重排模型",
+      "rerankHelp": "使用专用模型重新排列最相关的段落，需要更多时间。"
+    },
+    "reset": "重置设置",
+    "run": "运行测试",
+    "stale": "结果生成后设置已更改，请重新运行测试以更新结果。",
+    "results": {
+      "title": "检索结果",
+      "count_one": "{{count}} 个段落高于阈值",
+      "count_other": "{{count}} 个段落高于阈值",
+      "pages": "结果分页",
+      "reranked": "已重排",
+      "timings": "嵌入 {{embed}} 毫秒 · 搜索 {{search}} 毫秒",
+      "timingsRerank": "嵌入 {{embed}} 毫秒 · 搜索 {{search}} 毫秒 · 重排 {{rerank}} 毫秒"
+    },
+    "hit": {
+      "rank": "结果 {{n}}",
+      "more": "显示更多",
+      "less": "收起",
+      "source": "查看来源"
+    },
+    "idle": {
+      "heading": "运行测试以查看结果",
+      "body": "结果会显示助手可引用的段落及其关键词、向量和总体得分。"
+    },
+    "empty": {
+      "heading": "没有匹配的段落",
+      "body": "降低相似度阈值，或尝试其他词语。"
+    },
+    "noChunks": "此知识库中还没有解析过的文档，暂时无法搜索。",
+    "noChunksLink": "打开文档列表",
+    "error": {
+      "model": "此知识库的嵌入模型在工作区中已不可用。",
+      "rerank": "重排模型暂时不可用，请选择不重排，或稍后重试。",
+      "index": "搜索索引暂时不可用，请稍后重试。",
+      "limited": "嵌入服务提供方正在限制请求，请稍后重试。",
+      "timeout": "搜索耗时过长，请重试。",
+      "fallback": "测试未能运行，请重试。"
+    }
+  },
+  "errors": {
+    "retrieval": {
+      "questionRequired": "请输入问题。",
+      "questionMax": "请使用不超过 2,000 个字符。"
+    }
+  }
+}

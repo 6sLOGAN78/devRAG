@@ -22,6 +22,12 @@ afterEach(() => {
 
 const success = (data: unknown) => ({ code: 0, message: "", data });
 
+it("filters the model list to rerank models", async () => {
+  body = success([{ id: "r@TEI", name: "r", type: "rerank", provider: "TEI" }]);
+  expect((await listModels("t", "rerank"))[0]?.type).toBe("rerank");
+  expect(seen[0]?.params).toEqual({ tenant_id: "t", type: "rerank" });
+});
+
 const providerDto = {
   name: "OpenRouter",
   slug: "openrouter",

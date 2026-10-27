@@ -59,7 +59,6 @@ class _Doc:
     id: str
     dataset_id: str
     tenant_id: str
-    enabled: bool
     began: datetime.datetime | None
 
 
@@ -77,12 +76,12 @@ class _Summary:
 
 def _running_documents(doc_ids: Sequence[str] | None) -> list[_Doc]:
     with DB.connection_context():
-        query = Document.select(Document.id, Document.kb_id, Document.status, Document.process_begin_at, Knowledgebase.tenant_id).join(
+        query = Document.select(Document.id, Document.kb_id, Document.process_begin_at, Knowledgebase.tenant_id).join(
             Knowledgebase, on=(Document.kb_id == Knowledgebase.id)
         ).where(Document.run == RUN_RUNNING)
         if doc_ids is not None:
             query = query.where(Document.id.in_(list(doc_ids)))
-        return [_Doc(r.id, r.kb_id, r.knowledgebase.tenant_id, (r.status or "1") == "1", r.process_begin_at) for r in query]
+        return [_Doc(r.id, r.kb_id, r.knowledgebase.tenant_id, r.process_begin_at) for r in query]
 
 
 def _last_match(pattern: re.Pattern[str], text: str) -> re.Match[str] | None:
@@ -155,16 +154,19 @@ def _update_log(doc_id: str, *, dsl: dict[str, Any] | None = None, status: str |
     PipelineOperationLog.update(**values, **_stamp()).where(PipelineOperationLog.id == row.id).execute()
 
 
-def _transition(doc: _Doc, run: str, progress: float, text: str, *, log_status: str, log_text: str, dsl: dict[str, Any]) -> bool:
+def _transition(doc: _Doc, run: str, progress: float, text: str, *, log_status: str, log_text: str, dsl: dict[str, Any], store: DocStoreConnection) -> bool:
     """Set the final state and close the log row in one transaction under a row lock.
 
     False when the document is no longer running (a cancel won). Both writes commit together, so a reader never sees a
     finished document whose log row still says running, and a failed log write leaves the document running for the next cycle.
     """
     with DB.connection_context(), transaction():
-        row = Document.select(Document.run).where(Document.id == doc.id).for_update().first()
+        row = Document.select(Document.run, Document.status).where(Document.id == doc.id).for_update().first()
         if row is None or row.run != RUN_RUNNING:
             return False
+        # Serialize with document switching and acknowledge the index update before publishing completion.
+        if not store.update({"doc_id": [doc.id]}, {"doc_enabled_int": 1 if (row.status or "1") == "1" else 0}, index_name(doc.tenant_id), doc.dataset_id):
+            raise DocStoreError("document switch synchronization failed")
         duration = _duration(doc)
         Document.update(run=run, progress=progress, progress_msg=text, process_duration=duration, **_stamp()).where(Document.id == doc.id).execute()
         _update_log(doc.id, status=log_status, progress=progress, progress_msg=log_text, process_duration=duration, dsl=dsl)
@@ -182,13 +184,6 @@ def _settle(settings: Settings, doc: _Doc, store: DocStoreConnection) -> int | N
     except ServiceError:
         logger.warning("roll-up could not settle totals", extra={"document": doc.id})
         return None
-
-
-def _reapply_switch(doc: _Doc, store: DocStoreConnection) -> None:
-    try:
-        store.update({"doc_id": [doc.id]}, {"doc_enabled_int": 1 if doc.enabled else 0}, index_name(doc.tenant_id), doc.dataset_id)
-    except DocStoreError as exc:
-        logger.warning("roll-up could not reapply the document switch", extra={"document": doc.id, "error_type": type(exc).__name__})
 
 
 def _error_dsl(info: FailureInfo, attempts: int, max_attempts: int) -> dict[str, Any]:
@@ -215,9 +210,8 @@ def _finish(settings: Settings, doc: _Doc, summary: _Summary, store: DocStoreCon
         info = _failure_error(failed)
         chunks = _settle(settings, doc, store)
         dsl = {**_error_dsl(info, int(failed.retry_count or 0), max_attempts), **_counts_dsl(summary, chunks or 0)}
-        if not _transition(doc, RUN_FAILED, -1.0, text, log_status=LOG_FAILED, log_text=text, dsl=dsl):
+        if not _transition(doc, RUN_FAILED, -1.0, text, log_status=LOG_FAILED, log_text=text, dsl=dsl, store=store):
             return
-        _reapply_switch(doc, store)
         stats.failed += 1
         return
     chunks = _settle(settings, doc, store)
@@ -227,14 +221,13 @@ def _finish(settings: Settings, doc: _Doc, summary: _Summary, store: DocStoreCon
         info = FailureInfo("parse", "no_readable_text", PLAIN_MESSAGES["no_readable_text"])
         line = f"[failed] step={info.step} code={info.code} message={info.message}"
         dsl = {**_error_dsl(info, summary.attempts, max_attempts), **_counts_dsl(summary, 0)}
-        if not _transition(doc, RUN_FAILED, -1.0, f"{text}\n{line}" if text else line, log_status=LOG_FAILED, log_text=text, dsl=dsl):
+        if not _transition(doc, RUN_FAILED, -1.0, f"{text}\n{line}" if text else line, log_status=LOG_FAILED, log_text=text, dsl=dsl, store=store):
             return
         stats.failed += 1
         return
     dsl = {"attempts": summary.attempts, **_counts_dsl(summary, chunks)}
-    if not _transition(doc, RUN_DONE, 1.0, text, log_status=LOG_DONE, log_text=text, dsl=dsl):
+    if not _transition(doc, RUN_DONE, 1.0, text, log_status=LOG_DONE, log_text=text, dsl=dsl, store=store):
         return
-    _reapply_switch(doc, store)
     stats.finished += 1
 
 

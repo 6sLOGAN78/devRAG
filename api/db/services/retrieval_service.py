@@ -26,6 +26,7 @@ from api.db.database import DB
 from api.db.models import Document
 from api.db.services.auth_service import Principal
 from api.db.services.chunk_view import chunk_view_fields
+from api.db.services.dialog_records import AssistantRecord
 from api.db.services.knowledgebase_service import VisibleDataset, embedding_dimensions, load_visible_dataset
 from api.db.services.llm_service import LLMBundle
 from api.db.services.service_errors import Kind, ServiceError
@@ -35,7 +36,7 @@ from common.doc_store.doc_store_base import DocStoreConnection, DocStoreError
 from common.ratelimit import FixedWindowLimiter, RateLimited, RateLimitUnavailable
 from common.settings import Settings
 from rag.nlp.fusion import sanitize_floats
-from rag.nlp.search import FUSIONS, Hit, RetrievalRequest, Retriever
+from rag.nlp.search import FUSIONS, Hit, RetrievalRequest, RetrievalResult, Retriever
 from rag.nlp.synonym import SynonymSource
 from rag.svr.chunk_doc import l2_normalize
 from rag.svr.failure import TaskFailure
@@ -264,13 +265,73 @@ def search(
     """``{"total", "chunks", "doc_aggs", "rerank_applied", "timings"}`` for one question over one or more datasets of the acting workspace."""
     params = parse_body(body, settings)
     opened = _authorize(principal, scope, params["dataset_ids"])
-    model_id = _one_model(opened)
-    rerank = _build_reranker(settings, scope.tenant_id, params["rerank_id"], reranker)  # before the embedding: a bad model id costs nothing
+    result = _run_retrieval(settings, scope.tenant_id, params, _one_model(opened), doc_store=doc_store, embedder=embedder, reranker=reranker)
+    logger.info("retrieval done tenant=%s datasets=%s hits=%d", scope.tenant_id, ",".join(params["dataset_ids"]), len(result.hits))
+    return sanitize_floats(
+        {
+            "total": int(result.total),
+            "chunks": [chunk_hit_view(h) for h in result.hits],
+            "doc_aggs": _doc_aggs(result.hits),
+            "rerank_applied": result.rerank_applied,
+            "timings": result.timings,
+        }
+    )
+
+
+def retrieve_for_chat(
+    settings: Settings,
+    assistant: AssistantRecord,
+    tenant_id: str,
+    dataset_ids: list[str] | tuple[str, ...],
+    question: str,
+    *,
+    doc_store: DocStoreConnection | None = None,
+    embedder: Embedder | None = None,
+) -> RetrievalResult:
+    """Run the same search pipeline for an already authorised chat binding."""
+    if not dataset_ids:
+        raise _invalid("chat retrieval needs a dataset")
+    with DB.connection_context():
+        from api.db.models import Knowledgebase
+
+        rows = list(Knowledgebase.select(Knowledgebase.id, Knowledgebase.embd_id).where((Knowledgebase.id.in_(dataset_ids)) & (Knowledgebase.tenant_id == tenant_id)))
+    if len(rows) != len(dataset_ids):
+        raise _not_found()
+    models = {row.embd_id for row in rows}
+    if len(models) != 1:
+        raise _invalid("the datasets use different embedding models", reasons.EMBEDDING_MISMATCH)
+    params = {
+        "dataset_ids": list(dataset_ids),
+        "question": question,
+        "doc_ids": None,
+        "similarity_threshold": assistant.similarity_threshold,
+        "vector_similarity_weight": assistant.vector_similarity_weight,
+        "top_k": settings.retrieval.top_k,
+        "rerank_id": assistant.rerank_id or None,
+        "fusion": "weighted_sum",
+        "page": 1,
+        "size": assistant.top_n,
+    }
+    return _run_retrieval(settings, tenant_id, params, models.pop(), doc_store=doc_store, embedder=embedder)
+
+
+def _run_retrieval(
+    settings: Settings,
+    tenant_id: str,
+    params: Mapping[str, Any],
+    model_id: str,
+    *,
+    doc_store: DocStoreConnection | None = None,
+    embedder: Embedder | None = None,
+    reranker: Reranker | None = None,
+) -> RetrievalResult:
+    """Shared embed, search, prune and optional rerank pipeline."""
+    rerank = _build_reranker(settings, tenant_id, params["rerank_id"], reranker)  # a bad model id costs no embedding call
     started = time.monotonic()
-    vector = _embed_question(settings, scope.tenant_id, model_id, params["question"], embedder)
+    vector = _embed_question(settings, tenant_id, model_id, params["question"], embedder)
     embed_ms = (time.monotonic() - started) * 1000.0
     request = RetrievalRequest(
-        tenant_id=scope.tenant_id,
+        tenant_id=tenant_id,
         dataset_ids=params["dataset_ids"],
         question=params["question"],
         query_vector=vector,
@@ -291,14 +352,9 @@ def search(
     except DocStoreError as exc:
         logger.warning("retrieval could not read the index datasets=%s error=%s", ",".join(params["dataset_ids"]), type(exc).__name__)
         raise ServiceError(Kind.UNAVAILABLE, reasons.INDEX_UNAVAILABLE, "the search index is not available, try again shortly") from None
-    timings = {"embed_ms": embed_ms, "search_ms": result.timings.get("search_ms", 0.0), "rerank_ms": result.timings.get("rerank_ms", 0.0)}
-    logger.info("retrieval done tenant=%s datasets=%s hits=%d", scope.tenant_id, ",".join(params["dataset_ids"]), len(result.hits))
-    return sanitize_floats(
-        {
-            "total": int(result.total),
-            "chunks": [chunk_hit_view(h) for h in result.hits],
-            "doc_aggs": _doc_aggs(result.hits),
-            "rerank_applied": result.rerank_applied,
-            "timings": timings,
-        }
+    return RetrievalResult(
+        result.total,
+        result.hits,
+        result.rerank_applied,
+        {"embed_ms": embed_ms, "search_ms": result.timings.get("search_ms", 0.0), "rerank_ms": result.timings.get("rerank_ms", 0.0)},
     )

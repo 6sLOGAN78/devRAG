@@ -96,6 +96,29 @@ services:
       retries: 40
       start_period: 30s
 
+  tei:
+    # Original approved model retained: replacement quality failed (B-37).
+    profiles: [tei-cpu]
+    image: ${TEI_IMAGE:-ghcr.io/huggingface/text-embeddings-inference:cpu-1.9.4}
+    restart: unless-stopped
+    command: ["--model-id", "${TEI_RERANK_MODEL:-BAAI/bge-reranker-base}", "--auto-truncate"]
+    environment:
+      HF_TOKEN: ${HF_TOKEN:-}
+      REVISION: ${TEI_RERANK_REVISION:-2cfc18c9415c912f9d8155881c133215df768a70}
+    ports:
+      - ${BIND_HOST:-127.0.0.1}:${TEI_PORT:-6381}:80
+    volumes:
+      - tei_data:/data
+    networks:
+      ragflow:
+        aliases: [tei]
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:80/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 40
+      start_period: 300s
+
   infinity:
     # Parse-only in Phase 1: the image is never pulled (DEPLOY-04).
     profiles: [infinity]
@@ -115,6 +138,7 @@ volumes:
   minio_data:
   esdata01:
   infinity_data:
+  tei_data:
 
 networks:
   ragflow:

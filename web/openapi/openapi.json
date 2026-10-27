@@ -262,6 +262,69 @@
         "title": "ChunkingValues",
         "type": "object"
       },
+      "CompletionView": {
+        "properties": {
+          "answer": {
+            "title": "Answer",
+            "type": "string"
+          },
+          "empty": {
+            "title": "Empty",
+            "type": "boolean"
+          },
+          "final": {
+            "title": "Final",
+            "type": "boolean"
+          },
+          "finish": {
+            "title": "Finish",
+            "type": "string"
+          },
+          "latency_ms": {
+            "title": "Latency Ms",
+            "type": "integer"
+          },
+          "message_id": {
+            "title": "Message Id",
+            "type": "string"
+          },
+          "notice": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Notice",
+            "type": "object"
+          },
+          "reference": {
+            "additionalProperties": true,
+            "title": "Reference",
+            "type": "object"
+          },
+          "session_id": {
+            "title": "Session Id",
+            "type": "string"
+          },
+          "usage": {
+            "additionalProperties": true,
+            "title": "Usage",
+            "type": "object"
+          }
+        },
+        "required": [
+          "answer",
+          "reference",
+          "session_id",
+          "message_id",
+          "usage",
+          "latency_ms",
+          "finish",
+          "empty",
+          "notice",
+          "final"
+        ],
+        "title": "CompletionView",
+        "type": "object"
+      },
       "DatasetPage": {
         "properties": {
           "items": {
@@ -453,6 +516,19 @@
           "deleted"
         ],
         "title": "DeletedDatasets",
+        "type": "object"
+      },
+      "DeletedSession": {
+        "properties": {
+          "deleted": {
+            "title": "Deleted",
+            "type": "string"
+          }
+        },
+        "required": [
+          "deleted"
+        ],
+        "title": "DeletedSession",
         "type": "object"
       },
       "DeletedView": {
@@ -949,6 +1025,35 @@
           "message"
         ],
         "title": "ErrorView",
+        "type": "object"
+      },
+      "FeedbackView": {
+        "properties": {
+          "feedback": {
+            "anyOf": [
+              {
+                "enum": [
+                  "up",
+                  "down"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Feedback"
+          },
+          "message_id": {
+            "title": "Message Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "message_id",
+          "feedback"
+        ],
+        "title": "FeedbackView",
         "type": "object"
       },
       "HealthData": {
@@ -1593,6 +1698,107 @@
         "title": "SearchResult",
         "type": "object"
       },
+      "SessionDetail": {
+        "properties": {
+          "chat_id": {
+            "title": "Chat Id",
+            "type": "string"
+          },
+          "create_time": {
+            "title": "Create Time",
+            "type": "integer"
+          },
+          "has_earlier": {
+            "title": "Has Earlier",
+            "type": "boolean"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "messages": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Messages",
+            "type": "array"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "update_time": {
+            "title": "Update Time",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "chat_id",
+          "name",
+          "create_time",
+          "update_time",
+          "messages",
+          "has_earlier"
+        ],
+        "title": "SessionDetail",
+        "type": "object"
+      },
+      "SessionPage": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/SessionView"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total"
+        ],
+        "title": "SessionPage",
+        "type": "object"
+      },
+      "SessionView": {
+        "properties": {
+          "chat_id": {
+            "title": "Chat Id",
+            "type": "string"
+          },
+          "create_time": {
+            "title": "Create Time",
+            "type": "integer"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "update_time": {
+            "title": "Update Time",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "chat_id",
+          "name",
+          "create_time",
+          "update_time"
+        ],
+        "title": "SessionView",
+        "type": "object"
+      },
       "StartedDocument": {
         "properties": {
           "id": {
@@ -1788,6 +1994,100 @@
   },
   "openapi": "3.1.0",
   "paths": {
+    "/api/v1/chat/completions": {
+      "post": {
+        "operationId": "post_complete",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "chat_id": {
+                    "pattern": "^[0-9a-f]{32}$",
+                    "title": "Chat Id",
+                    "type": "string"
+                  },
+                  "message": {
+                    "title": "Message",
+                    "type": "string"
+                  },
+                  "session_id": {
+                    "anyOf": [
+                      {
+                        "pattern": "^[0-9a-f]{32}$",
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null,
+                    "title": "Session Id"
+                  },
+                  "stream": {
+                    "default": true,
+                    "title": "Stream",
+                    "type": "boolean"
+                  },
+                  "tenant_id": {
+                    "anyOf": [
+                      {
+                        "pattern": "^[0-9a-f]{32}$",
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null,
+                    "title": "Tenant Id"
+                  }
+                },
+                "required": [
+                  "chat_id",
+                  "message"
+                ],
+                "title": "CompletionBody",
+                "type": "object"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "title": "Code",
+                      "type": "integer"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/CompletionView"
+                    },
+                    "message": {
+                      "title": "Message",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "message",
+                    "data"
+                  ],
+                  "title": "CompletionEnvelope",
+                  "type": "object"
+                }
+              }
+            },
+            "description": ""
+          }
+        }
+      }
+    },
     "/api/v1/chats": {
       "get": {
         "operationId": "get_list_chats",
@@ -2280,6 +2580,332 @@
                     "data"
                   ],
                   "title": "AssistantEnvelope",
+                  "type": "object"
+                }
+              }
+            },
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v1/chats/{chat_id}/sessions": {
+      "get": {
+        "operationId": "get_list_sessions",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "chat_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "title": "Code",
+                      "type": "integer"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/SessionPage"
+                    },
+                    "message": {
+                      "title": "Message",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "message",
+                    "data"
+                  ],
+                  "title": "SessionPageEnvelope",
+                  "type": "object"
+                }
+              }
+            },
+            "description": ""
+          }
+        }
+      },
+      "post": {
+        "operationId": "post_create_session",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "chat_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "name": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null,
+                    "title": "Name"
+                  }
+                },
+                "title": "CreateSessionBody",
+                "type": "object"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "title": "Code",
+                      "type": "integer"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/SessionDetail"
+                    },
+                    "message": {
+                      "title": "Message",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "message",
+                    "data"
+                  ],
+                  "title": "SessionEnvelope",
+                  "type": "object"
+                }
+              }
+            },
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v1/chats/{chat_id}/sessions/{session_id}": {
+      "delete": {
+        "operationId": "delete_delete_session",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "chat_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "session_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "title": "Code",
+                      "type": "integer"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/DeletedSession"
+                    },
+                    "message": {
+                      "title": "Message",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "message",
+                    "data"
+                  ],
+                  "title": "DeletedSessionEnvelope",
+                  "type": "object"
+                }
+              }
+            },
+            "description": ""
+          }
+        }
+      },
+      "get": {
+        "operationId": "get_get_session",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "chat_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "session_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "title": "Code",
+                      "type": "integer"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/SessionDetail"
+                    },
+                    "message": {
+                      "title": "Message",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "message",
+                    "data"
+                  ],
+                  "title": "SessionEnvelope",
+                  "type": "object"
+                }
+              }
+            },
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v1/chats/{chat_id}/sessions/{session_id}/messages/{message_id}/feedback": {
+      "post": {
+        "operationId": "post_set_feedback",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "chat_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "session_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "message_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "comment": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null,
+                    "title": "Comment"
+                  },
+                  "thumb": {
+                    "anyOf": [
+                      {
+                        "enum": [
+                          "up",
+                          "down"
+                        ],
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "title": "Thumb"
+                  }
+                },
+                "required": [
+                  "thumb"
+                ],
+                "title": "FeedbackBody",
+                "type": "object"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "title": "Code",
+                      "type": "integer"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/FeedbackView"
+                    },
+                    "message": {
+                      "title": "Message",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "message",
+                    "data"
+                  ],
+                  "title": "FeedbackEnvelope",
                   "type": "object"
                 }
               }

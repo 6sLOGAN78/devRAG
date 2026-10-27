@@ -1,4 +1,4 @@
-import { ChevronLeft, Lock, Upload, Users } from "lucide-react";
+import { ChevronLeft, Lock, SearchCheck, Upload, Users } from "lucide-react";
 import { useCallback, useEffect, useRef, useState, type DragEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, useSearchParams } from "react-router";
@@ -12,7 +12,7 @@ import { carriesFiles, readDropped } from "@/components/file-upload-dialog/dropz
 import { PageHeader } from "@/components/page-header";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { DATASETS_PATH } from "@/constants/app-paths";
+import { DATASETS_PATH, retrievalTestPath } from "@/constants/app-paths";
 import { useCanManageDataset } from "@/hooks/use-dataset-permissions";
 import type { DatasetDetailView } from "@/services/dataset-service";
 import { MAX_DOCUMENT_KEYWORDS_LENGTH } from "@/services/document-service";
@@ -206,6 +206,7 @@ export function DatasetWorkspace({ dataset, ready, onDeleted, onDeleteDialogChan
           onDelete={() => dialogOpenChange("delete", true)}
         />
       ) : null}
+      <Button variant="outline" asChild><Link data-testid="dataset-test-retrieval" to={retrievalTestPath(dataset.id)}><SearchCheck aria-hidden="true" />{t("retrieval.entry")}</Link></Button>
       {uploadButton}
     </>
   );

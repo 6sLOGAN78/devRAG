@@ -1,7 +1,7 @@
-import { Activity, Cpu, Database, House, KeyRound, UserRound, Users, type LucideIcon } from "lucide-react";
+import { Activity, Cpu, Database, House, KeyRound, MessagesSquare, UserRound, Users, type LucideIcon } from "lucide-react";
 import type { ComponentType } from "react";
 import { HOME_PATH } from "@/utils/safe-next";
-import { CHUNK_ROUTE, DATASET_LOGS_ROUTE, DOCUMENT_VIEWER_ROUTE } from "./app-paths";
+import { CHATS_ROUTE, CHUNK_ROUTE, DATASET_LOGS_ROUTE, DATASET_TESTING_ROUTE, DOCUMENT_VIEWER_ROUTE } from "./app-paths";
 
 /**
  * The single typed route registry (UI-01, D-19, 01-UI-SPEC.md).
@@ -92,6 +92,12 @@ export const routes: readonly RouteEntry[] = [
     component: () => import("@/pages/dataset/logs"),
   },
   {
+    path: DATASET_TESTING_ROUTE,
+    layout: "standard",
+    auth: "required",
+    component: () => import("@/pages/dataset/testing"),
+  },
+  {
     // The chunk inspector of one document: no navigation entry; Datasets stays highlighted (nested-path match).
     path: CHUNK_ROUTE,
     layout: "standard",
@@ -106,11 +112,24 @@ export const routes: readonly RouteEntry[] = [
     component: () => import("@/pages/document-viewer"),
   },
   {
+    path: CHATS_ROUTE,
+    layout: "standard",
+    auth: "required",
+    component: () => import("@/pages/chat"),
+    nav: { labelKey: "nav.chat", icon: MessagesSquare, order: 3, group: "platform" },
+  },
+  {
+    path: "/chat",
+    layout: "bare",
+    auth: "required",
+    redirect: () => CHATS_ROUTE,
+  },
+  {
     path: "/system-status",
     layout: "standard",
     auth: "required",
     component: () => import("@/pages/system-status"),
-    nav: { labelKey: "nav.systemStatus", icon: Activity, order: 3, group: "platform" },
+    nav: { labelKey: "nav.systemStatus", icon: Activity, order: 4, group: "platform" },
   },
   {
     path: "/user-setting/profile",

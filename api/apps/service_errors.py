@@ -39,6 +39,15 @@ def _retry_after_seconds(seconds: float) -> str:
     return str(max(1, math.ceil(seconds)))
 
 
+def error_code_for(exc: ServiceError) -> int:
+    """The same envelope code used for a regular HTTP error and an SSE error frame."""
+    if exc.kind is Kind.NOT_FOUND:
+        return int(RetCode.NOT_FOUND)
+    if exc.kind is Kind.FORBIDDEN:
+        return int(RetCode.FORBIDDEN)
+    return int(_TABLE.get(exc.kind, (RetCode.SERVER_ERROR, 500))[0])
+
+
 def service_error_response(exc: ServiceError) -> Response:
     if exc.kind is Kind.NOT_FOUND:
         return not_found_response()

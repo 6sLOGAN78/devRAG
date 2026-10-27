@@ -1,0 +1,130 @@
+{
+  "assistant": {
+    "dialog": {
+      "titleCreate": "Create assistant",
+      "titleSettings": "Assistant settings",
+      "submitCreate": "Create assistant",
+      "submitSave": "Save assistant",
+      "blocked": {
+        "heading": "Add a chat model first",
+        "body": "An assistant needs a chat model to write its answers, and this workspace has none yet.",
+        "bodyMember": "Ask the workspace owner or an admin to add one.",
+        "action": "Open model settings"
+      },
+      "modelsError": "Couldn't load models"
+    },
+    "group": {
+      "basics": "Basics",
+      "knowledge": "Knowledge",
+      "model": "Model and wording",
+      "retrieval": "Retrieval"
+    },
+    "field": {
+      "name": "Name",
+      "picture": "Picture (optional)",
+      "pictureHelp": "PNG or JPEG, up to 1 MB. It is shrunk to fit.",
+      "visibility": "Who can use it",
+      "datasets": "Datasets",
+      "datasetsHelp": "The assistant answers from these. Choose none to chat without sources.",
+      "model": "Chat model",
+      "modelHelp": "Writes the answers.",
+      "system": "Instructions",
+      "systemHelp": "How the assistant should behave. The retrieved passages and the citation rules are added automatically.",
+      "prologue": "Opening message",
+      "prologueHelp": "Shown at the top of every new chat.",
+      "empty": "When nothing is found",
+      "emptyHelp": "Sent instead of an answer when no passage is relevant enough. The chat model isn't called.",
+      "threshold": "Similarity threshold",
+      "thresholdHelp": "Passages scoring below this are ignored. Higher means stricter.",
+      "thresholdLow": "Looser",
+      "thresholdHigh": "Stricter",
+      "weight": "Keyword and vector weight",
+      "weightHelp": "How much a passage's score comes from matching words and how much from meaning.",
+      "weightValue": "Keyword {{keyword}}% · Vector {{vector}}%",
+      "weightLow": "More keyword",
+      "weightHigh": "More vector",
+      "topN": "Passages used",
+      "topNHelp": "How many passages are given to the chat model.",
+      "rerank": "Rerank model",
+      "rerankHelp": "Reorders the passages with a dedicated model. Slower, usually more accurate.",
+      "rerankNone": "No rerank"
+    },
+    "picture": {
+      "choose": "Choose image",
+      "remove": "Remove image",
+      "type": "Choose a PNG or JPEG image.",
+      "size": "The image is larger than 1 MB.",
+      "read": "The image couldn't be read."
+    },
+    "visibility": {
+      "meTitle": "Only me",
+      "meBody": "Only you can see and use this assistant.",
+      "teamTitle": "Whole team",
+      "teamBody": "Everyone in {{workspace}} can use it. Each person's chats stay private. Only the person who made it, the owner and admins can change or delete it.",
+      "needsShared": "Needs shared datasets",
+      "reason": "Remove the datasets that only you can see, or share them first.",
+      "narrowingInfo": "It can go back to \"Only me\" only when no teammate has chats with it.",
+      "narrowingCreator": "After the switch, only the person who made it can see it, and it leaves your list.",
+      "me": "Only me",
+      "team": "Team"
+    },
+    "datasets": {
+      "none": "No datasets yet.",
+      "link": "Datasets page",
+      "privateReason": "Only you can see this dataset, so a shared assistant can't use it.",
+      "skipped_one": "{{count}} dataset used by this assistant isn't available to you. It stays linked.",
+      "skipped_other": "{{count}} datasets used by this assistant aren't available to you. They stay linked."
+    },
+    "default": {
+      "system": "You are a helpful assistant. Answer using only the knowledge you are given. If it does not contain the answer, say that you could not find it.",
+      "prologue": "Hello. Ask me a question about your documents.",
+      "empty": "I couldn't find anything about that in the selected datasets."
+    },
+    "saved": {
+      "created": "Assistant created",
+      "updated": "Assistant saved",
+      "narrowed": "Assistant saved. Only the person who made it can see it now."
+    },
+    "error": {
+      "duplicate": "An assistant named \"{{name}}\" already exists in this workspace. Choose another name.",
+      "notShared": "This assistant can't be shared while it uses datasets that aren't shared with the team.",
+      "narrowing_one": "This assistant can't be made private while {{count}} teammate has chats with it. Ask them to delete those chats, then try again.",
+      "narrowing_other": "This assistant can't be made private while {{count}} teammates have chats with it. Ask them to delete those chats, then try again.",
+      "dataset": "A dataset you chose is no longer available. Choose again.",
+      "model": "That model is no longer available in this workspace. Choose another one.",
+      "gone": "This assistant no longer exists.",
+      "fallback": "The assistant wasn't saved. Try again."
+    },
+    "deleteChat": {
+      "title": "Delete this chat?",
+      "body": "\"{{name}}\" and its answers will be deleted. This can't be undone.",
+      "keep": "Keep chat",
+      "confirm": "Delete chat",
+      "done": "Chat deleted",
+      "failed": "The chat wasn't deleted. Try again."
+    },
+    "delete": {
+      "title": "Delete this assistant?",
+      "body": "\"{{name}}\" will be deleted together with all of its chats. Datasets aren't affected.",
+      "bodyTeam_one": "\"{{name}}\" will be deleted together with all of its chats, including the chats of {{count}} other member. Datasets aren't affected.",
+      "bodyTeam_other": "\"{{name}}\" will be deleted together with all of its chats, including the chats of {{count}} other members. Datasets aren't affected.",
+      "keep": "Keep assistant",
+      "confirm": "Delete assistant",
+      "done": "Assistant deleted",
+      "failed": "The assistant wasn't deleted. Try again."
+    }
+  },
+  "errors": {
+    "assistant": {
+      "nameRequired": "Enter a name.",
+      "nameMax": "Use 128 characters or fewer.",
+      "systemMax": "Use 8,000 characters or fewer.",
+      "prologueMax": "Use 500 characters or fewer.",
+      "emptyRequired": "Enter the message to send when nothing is found.",
+      "emptyMax": "Use 500 characters or fewer.",
+      "topNRange": "Enter a whole number from 1 to 30.",
+      "modelRequired": "Choose a chat model.",
+      "scoreRange": "Choose a value from 0 to 1 in steps of 0.05."
+    }
+  }
+}

@@ -249,9 +249,12 @@ def _retrying(attempt: Any, describe: str) -> Any:
     return wait_until(attempt, timeout=RETRY_DEADLINE_SECONDS, interval=RETRY_INTERVAL_SECONDS, describe=lambda: describe)
 
 
-def _save_provider(http: Any, token: str, key: str, embed_model: str) -> None:
-    """Save the provider with the embedding model only (the save test makes one embedding call and no chat call)."""
-    body = {"provider": PROVIDER, "api_key": key, "models": [{"name": embed_model, "type": "embedding"}]}
+def _save_provider(http: Any, token: str, key: str, embed_model: str, chat_model: str | None = None) -> None:
+    """Save embedding and, for the adherence probe, an optional chat model."""
+    models = [{"name": embed_model, "type": "embedding"}]
+    if chat_model is not None:
+        models.append({"name": chat_model, "type": "chat"})
+    body = {"provider": PROVIDER, "api_key": key, "models": models}
 
     def attempt() -> dict[str, bool] | None:
         http.cookies.clear()
@@ -287,7 +290,8 @@ def supplementary_questions() -> tuple[Question, ...]:
 
     facts = [*FACTS[:3], PDF_FACTS[1], PDF_FACTS[2]]
     questions = tuple(Question(f"planted-fact wording: {f.token}", f.question, f.token) for f in facts)
-    assert len(questions) == SUPPLEMENTARY_COUNT
+    if len(questions) != SUPPLEMENTARY_COUNT:
+        raise ValueError("supplementary question count differs from the probe budget")
     return questions
 
 

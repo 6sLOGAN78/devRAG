@@ -1,0 +1,86 @@
+跳到主要内容
+devRag
+工作区:
+nick-ca514994887b's Kingdom
+N
+
+平台
+
+首页
+数据集
+对话
+系统状态
+
+账户
+
+个人资料
+模型
+API 令牌
+团队
+助手
+新建助手
+搜索助手
+T
+turn-4d8fd30f2f94
+仅自己
+对话
+新建对话
+How tall is the Brantwell-6130 lighthouse?
+2026年10月27日
+T
+turn-4d8fd30f2f94
+
+How tall is the Brantwell-6130 lighthouse?
+
+仅自己
+助手设置
+
+Hi! I'm your assistant. What can I do for you?
+
+How tall is the Brantwell-6130 lighthouse?
+T
+
+Answer text 1 more.
+
+来源
+
+1
+language-review.pdf
+第 1 页
+
+0.1 秒 · 词元：16
+
+消息
+发送
+
+按 Enter 发送，Shift + Enter 换行。
+
+回答已完成
+来源 1
+
+language-review.pdf
+
+页码
+1, 2, 3
+总体相似度
+0.75
+关键词相似度
+0.75
+向量相似度
+1.00
+段落
+The Brantwell-6130 lighthouse stands 52 meters
+above Corvane Bay.
+The Oskarine-8847 orchard harvested 9100
+kilograms of quinces.
+The Tyrmoth-2275 archive stores 730
+handwritten maps of Dunmere.
+第 1 页，共 3 页
+100%
+适应宽度
+
+分块 1：第 1 页
+
+关闭
+打开文档
+关闭

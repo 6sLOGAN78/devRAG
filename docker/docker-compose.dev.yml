@@ -1,5 +1,23 @@
 # Dev memory caps for a 15 GB shared host (D-29, R-56, R-72). Documented values stay in the base file.
 services:
+  deepdoc:
+    image: ${DEEPDOC_IMAGE:-devrag-deepdoc:local}
+    profiles: [deepdoc]
+    mem_limit: 3g
+    cpus: 2
+    ports:
+      - 127.0.0.1:${DEEPDOC_PORT:-9390}:9390
+  tei:
+    # R-219: full timing + startup guard peak 2267.136 MiB; 25% headroom rounded to 256 MiB gives 3 GiB.
+    mem_limit: 3g
+    cpus: 4
+    # Optional host-specific physical cores; empty means no affinity constraint.
+    cpuset: ${TEI_CPUSET:-}
+    # First startup restarted in the Candle CPU path; retry with the planned AVX2 cap.
+    environment:
+      MKL_ENABLE_INSTRUCTIONS: AVX2
+      # Smaller warmup and a four-thread pool kept the measured BGE working set below 3 GiB.
+      MAX_BATCH_TOKENS: "1024"
   es01:
     mem_limit: 2g
     environment:
@@ -67,3 +85,9 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+
+# Docker suppresses host-port publication on an internal-only bridge. Dev probes need
+# loopback 9390; the production topology stays internal and publishes no port.
+networks:
+  deepdoc:
+    internal: false

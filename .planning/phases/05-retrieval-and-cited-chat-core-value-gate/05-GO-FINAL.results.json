@@ -1,0 +1,28 @@
+[
+  {
+    "tier": "race",
+    "command": [
+      "go",
+      "test",
+      "-p",
+      "1",
+      "-race",
+      "./internal/..."
+    ],
+    "exit_code": 0,
+    "seconds": 1.422
+  },
+  {
+    "tier": "integration-e2e",
+    "command": [
+      "go",
+      "test",
+      "-p",
+      "1",
+      "-tags=integration,e2e",
+      "./..."
+    ],
+    "exit_code": 0,
+    "seconds": 28.781
+  }
+]

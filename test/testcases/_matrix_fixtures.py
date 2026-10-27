@@ -13,6 +13,7 @@ must therefore extend this file in the same change.
 """
 from __future__ import annotations
 
+import hashlib
 import json
 import re
 import secrets
@@ -38,6 +39,7 @@ MODELS = "/api/v1/models"
 MODELS_DEFAULT = "/api/v1/models/default"
 DATASETS = "/api/v1/datasets"
 UPLOAD = "/api/v1/documents/upload"
+CHATS = "/api/v1/chats"
 PROVIDER_SLUG = "openai-compatible"
 COMPAT = "OpenAI-API-Compatible"
 NOT_FOUND = (404, 404, "not found")
@@ -51,6 +53,8 @@ A_EMBED_MODEL = "matrix-a-embed-" + uuid.uuid4().hex[:8]
 # Dataset names that belong to A's side only.
 A_TEAM_DATASET = "matrix-a-team-" + uuid.uuid4().hex[:8]
 A_PRIVATE_DATASET = "matrix-a-private-" + uuid.uuid4().hex[:8]
+A_TEAM_CHAT = "matrix-a-team-chat-" + uuid.uuid4().hex[:8]
+A_PRIVATE_CHAT = "matrix-a-private-chat-" + uuid.uuid4().hex[:8]
 # A private dataset that a normal member of A's workspace created in A's workspace (plan 03-19): its creator is not the owner.
 A_NORMAL_PRIVATE_DATASET = "matrix-a-member-private-" + uuid.uuid4().hex[:8]
 
@@ -157,6 +161,10 @@ class World:
     a_log_id: str = ""  # a parsing-log entry seeded for the second team document (plan 04-19)
     a_task_id: str = ""  # a finished task seeded for the same document (plan 04-19)
     a_normal_private_dataset: dict[str, Any] = field(default_factory=dict)  # a `me` dataset the normal member created in A's workspace (plan 03-19)
+    a_team_chat: dict[str, Any] = field(default_factory=dict)  # A's assistant shared with the team, bound to the team dataset (plan 05-08)
+    a_private_chat: dict[str, Any] = field(default_factory=dict)  # A's assistant with permission me (plan 05-08)
+    a_team_session: dict[str, Any] = field(default_factory=dict)  # A's own session on the team assistant (plan 05-09)
+    a_team_message_id: str = ""
     scratch: dict[str, Any] = field(default_factory=dict)  # per-call disposable resources of the isolation table (plan 03-19)
 
     # reads performed as A -----------------------------------------------------------------------------------------
@@ -195,6 +203,20 @@ class World:
         resp = call(self.client, "GET", DATASETS, self.a.token, {}, query={"page_size": "100"})
         assert resp.status_code == 200, resp.text
         return resp.json()["data"]
+
+    def snapshot_chats(self) -> Any:
+        """A's assistants and their session rows; a refused session write must leave both unchanged."""
+        resp = call(self.client, "GET", CHATS, self.a.token, {}, query={"page_size": "100"})
+        assert resp.status_code == 200, resp.text
+        return [
+            (
+                c["id"], c["name"], c["permission"], tuple(c["kb_ids"]), c["llm_id"], c["top_n"], c["similarity_threshold"], c["update_time"],
+                tuple((sid, uid, hashlib.sha256(str(msg).encode()).hexdigest()) for sid, uid, msg in sql(
+                    "SELECT `id`, `user_id`, `message` FROM `conversation` WHERE `dialog_id` = %s ORDER BY `id`", (c["id"],)
+                )),
+            )
+            for c in resp.json()["data"]["items"]
+        ]
 
     def snapshot_objects(self) -> list[str]:
         """Every object A's workspace holds in MinIO (by exact tenant prefix): an upload that crosses the boundary would add one."""
@@ -264,6 +286,7 @@ class World:
             "models": self.snapshot_models(),
             "defaults": self.snapshot_defaults(),
             "datasets": self.snapshot_datasets(),
+            "chats": self.snapshot_chats(),
             "objects": self.snapshot_objects(),
             "documents": self.snapshot_documents(),
             "chunks": self.snapshot_chunks(),
@@ -283,6 +306,9 @@ class World:
             out += [str(dataset.get("id", "")), str(dataset.get("name", ""))]
         for doc in (*self.a_team_documents, *self.a_private_documents):
             out += [str(doc.get("id", "")), str(doc.get("name", ""))]
+        for chat in (self.a_team_chat, self.a_private_chat):
+            out += [str(chat.get("id", "")), str(chat.get("name", ""))]
+        out += [str(self.a_team_session.get("id", "")), self.a_team_message_id]
         out += [str(self.a_text_document.get("id", "")), str(self.a_text_document.get("name", ""))]
         out += self.a_parsed_chunks
         out += [self.a_log_id, self.a_task_id]
@@ -292,6 +318,11 @@ class World:
 def a_embed_id() -> str:
     """The composite id of A's embedding model."""
     return f"{A_EMBED_MODEL}@{COMPAT}"
+
+
+def a_chat_id() -> str:
+    """The composite id of A's chat model."""
+    return f"{A_CHAT_MODEL}@{COMPAT}"
 
 
 def _ok(resp: httpx.Response, what: str) -> dict[str, Any]:
@@ -321,6 +352,8 @@ def resource_of(row: Row) -> str:
         return "datasets"
     if row.path.startswith(UPLOAD):
         return "objects"
+    if row.path.startswith((CHATS, "/api/v1/chat/")):
+        return "chats"
     return "members"
 
 
@@ -378,6 +411,16 @@ def build_world(client: httpx.Client, registry: AccountRegistry, fake: FakeProvi
             ),
             "A uploads a text file",
         )["data"][0]
+        # Assistants through the real route: one shared with the team and bound to the team dataset, one private to the owner.
+        chat = {"llm_id": a_chat_id()}
+        world.a_team_chat = _ok(
+            call(client, "POST", CHATS, a.token, {}, body={"name": A_TEAM_CHAT, "permission": "team", "kb_ids": [str(world.a_team_dataset["id"])], **chat}), "A creates a team assistant"
+        )["data"]
+        world.a_private_chat = _ok(call(client, "POST", CHATS, a.token, {}, body={"name": A_PRIVATE_CHAT, **chat}), "A creates a private assistant")["data"]
+        world.a_team_session = _ok(call(client, "POST", f"{CHATS}/{world.a_team_chat['id']}/sessions", a.token, {}, body={"name": "matrix session"}), "A creates a team chat session")["data"]
+        world.a_team_message_id = uuid.uuid4().hex
+        seed_message = {"id": world.a_team_message_id, "role": "assistant", "content": "matrix answer", "finish": "complete", "created_at": "2026-10-24T00:00:00Z"}
+        sql("UPDATE `conversation` SET `message` = %s WHERE `id` = %s", (json.dumps([seed_message]), world.a_team_session["id"]))
         world.a_parsed_chunks = seed_chunks(world, CHUNK_SEED_COUNT)
         world.a_log_id, world.a_task_id = seed_parse_artifacts(world)
     return world
@@ -595,11 +638,56 @@ def _document_content(w: World) -> Target:
     return Target(ids, _sender("GET", DATASETS + "/{dataset_id}/documents/{doc_id}/content", extra_fields=set()), w.snapshot_documents)
 
 
+def _chat_detail(w: World) -> Target:
+    return Target({"chat_id": str(w.a_team_chat["id"])}, _sender("GET", CHATS + "/{chat_id}", extra_fields=set()), w.snapshot_chats)
+
+
+def _update_chat(w: World) -> Target:
+    """PUT on A's team assistant: only its visibility keeps an outsider from it. The model takes only its own fields, so nothing else is smuggled in."""
+    return Target({"chat_id": str(w.a_team_chat["id"])}, _sender("PUT", CHATS + "/{chat_id}", {"top_n": 3}, extra_fields=set()), w.snapshot_chats)
+
+
+def _delete_chat(w: World) -> Target:
+    return Target({"chat_id": str(w.a_team_chat["id"])}, _sender("DELETE", CHATS + "/{chat_id}", extra_fields=set()), w.snapshot_chats)
+
+
+def _session_ids(w: World) -> dict[str, str]:
+    return {"chat_id": str(w.a_team_chat["id"]), "session_id": str(w.a_team_session["id"]), "message_id": w.a_team_message_id}
+
+
+def _create_session(w: World) -> Target:
+    return Target({"chat_id": str(w.a_team_chat["id"])}, _sender("POST", CHATS + "/{chat_id}/sessions", {"name": "matrix new session"}, extra_fields=set()), w.snapshot_chats)
+
+
+def _list_sessions(w: World) -> Target:
+    return Target({"chat_id": str(w.a_team_chat["id"])}, _sender("GET", CHATS + "/{chat_id}/sessions", extra_fields=set()), w.snapshot_chats)
+
+
+def _get_session(w: World) -> Target:
+    return Target(_session_ids(w), _sender("GET", CHATS + "/{chat_id}/sessions/{session_id}", extra_fields=set()), w.snapshot_chats)
+
+
+def _delete_session(w: World) -> Target:
+    return Target(_session_ids(w), _sender("DELETE", CHATS + "/{chat_id}/sessions/{session_id}", extra_fields=set()), w.snapshot_chats)
+
+
+def _feedback(w: World) -> Target:
+    return Target(_session_ids(w), _sender("POST", CHATS + "/{chat_id}/sessions/{session_id}/messages/{message_id}/feedback", {"thumb": "up"}, extra_fields=set()), w.snapshot_chats)
+
+
 def _task_status(w: World) -> Target:
     return Target({"task_id": w.a_task_id}, _sender("GET", "/v1/task/status/{task_id}", extra_fields=set()), w.snapshot_ingestion)
 
 
 BUILDERS: dict[str, Builder] = {
+    "POST /api/v1/chats/{chat_id}/sessions": _create_session,
+    "GET /api/v1/chats/{chat_id}/sessions": _list_sessions,
+    "GET /api/v1/chats/{chat_id}/sessions/{session_id}": _get_session,
+    "DELETE /api/v1/chats/{chat_id}/sessions/{session_id}": _delete_session,
+    "POST /api/v1/chats/{chat_id}/sessions/{session_id}/messages/{message_id}/feedback": _feedback,
+    "GET /api/v1/chats/{chat_id}": _chat_detail,
+    "PUT /api/v1/chats/{chat_id}": _update_chat,
+    "DELETE /api/v1/chats/{chat_id}": _delete_chat,
     "GET /api/v1/datasets/{dataset_id}/documents/{doc_id}/pages/{n}/image": _page_image,
     "GET /api/v1/datasets/{dataset_id}/documents/{doc_id}/content": _document_content,
     "GET /api/v1/datasets/{dataset_id}/ingestions/summary": _ingestion_summary,
@@ -1017,7 +1105,84 @@ def check_datasets_search(w: World) -> None:
     assert w.snapshot_chunks() == before, "a retrieval test changed A's chunks"
 
 
+def check_chats_list(w: World) -> None:
+    """GET /api/v1/chats: the list is the acting workspace's; a private assistant is its creator's alone, for A's owner-level members too."""
+    before = w.snapshot_chats()
+    smuggle = {"tenant_id": w.a.tenant_id, "user_id": w.a.user_id, "created_by": w.a.user_id}
+    own_b = call(w.client, "GET", CHATS, w.b.token, {})
+    assert own_b.status_code == 200 and own_b.json()["data"] == {"items": [], "total": 0}, own_b.text
+    for who, label in ((w.b, "B"), (w.pending, "the pending invitee"), (w.spare, "a registered spare")):
+        resp = call(w.client, "GET", CHATS, who.token, {}, query=smuggle)
+        assert triple(resp) == NOT_FOUND, f"{label} naming tenant A's workspace must get the one not-found answer: {triple(resp)}"
+        _assert_no_a_data(resp.text, w, f"the assistant list {label} asked for in A's name")
+    assert call(w.client, "GET", CHATS, w.b.token, {}).text == own_b.text, "B's own list is unchanged by the smuggled requests"
+    # A's members see the team assistant and never the owner's private one: there is no override for anyone.
+    for member in (w.normal, w.admin, w.victim):
+        resp = call(w.client, "GET", CHATS, member.token, {}, query={"tenant_id": w.a.tenant_id, "page_size": "100"})
+        assert resp.status_code == 200, resp.text
+        assert A_TEAM_CHAT in resp.text, "a member of A sees A's team assistant"
+        assert A_PRIVATE_CHAT not in resp.text and str(w.a_private_chat["id"]) not in resp.text, "nobody but its creator sees a private assistant"
+    token = str(w.a_tokens[0]["token"])
+    as_token = call(w.client, "GET", CHATS, token, {})
+    assert as_token.status_code == 200 and A_TEAM_CHAT in as_token.text, as_token.text
+    assert triple(call(w.client, "GET", CHATS, token, {}, query={"tenant_id": w.b.tenant_id})) == NOT_FOUND, "a token is pinned to its own workspace"
+    assert triple(call(w.client, "GET", CHATS, w.b_api_token, {}, query={"tenant_id": w.a.tenant_id})) == NOT_FOUND
+    # A member cannot open the owner's private assistant by its real id either: the one 404 of an absent id.
+    absent = triple(call(w.client, "GET", CHATS + "/{chat_id}", w.normal.token, {"chat_id": uuid.uuid4().hex}))
+    assert absent == NOT_FOUND
+    for who in (w.normal, w.admin):
+        assert triple(call(w.client, "GET", CHATS + "/{chat_id}", who.token, {"chat_id": str(w.a_private_chat["id"])})) == absent
+    assert w.snapshot_chats() == before
+
+
+def check_chats_create(w: World) -> None:
+    """POST /api/v1/chats: B creates nowhere near A, cannot adopt A's chat model or datasets, and nothing mass-assigns; A's assistants do not change."""
+    before, snapshot = w.snapshot_chats(), w.snapshot()
+    base = {"name": "matrix-intruder", "llm_id": a_chat_id()}
+    for who, label in ((w.b, "B"), (w.pending, "the pending invitee"), (w.spare, "a registered spare")):
+        resp = call(w.client, "POST", CHATS, who.token, {}, body={**base, "tenant_id": w.a.tenant_id})
+        assert triple(resp) == NOT_FOUND, f"{label}: {triple(resp)}"
+        _assert_no_a_data(resp.text, w, f"the refused creation of {label}")
+    resp = call(w.client, "POST", CHATS, w.b.token, {}, body=base)
+    _refused_as_unavailable(resp, "B uses A's chat model")
+    _assert_no_a_data(resp.text, w, "the refusal of B's attempt to use A's chat model")
+    adopt = call(w.client, "POST", CHATS, w.b.token, {}, body={**base, "kb_ids": [str(w.a_team_dataset["id"])]})
+    assert adopt.status_code in (400, 404), f"B binds A's dataset: HTTP {adopt.status_code}"
+    _assert_no_a_data(adopt.text, w, "the refusal of B's attempt to bind A's dataset")
+    for field_name in ("created_by", "tenant_llm_id", "id", "dialog_id", "status", "source"):
+        mass = call(w.client, "POST", CHATS, w.b.token, {}, body={**base, field_name: w.a.user_id})
+        assert mass.status_code == 400, f"{field_name} cannot be assigned: HTTP {mass.status_code}"
+    resp = call(w.client, "POST", CHATS, w.b_api_token, {}, body={**base, "tenant_id": w.a.tenant_id})
+    assert triple(resp) == NOT_FOUND, f"B's API token is pinned to B's workspace: {triple(resp)}"
+    # A's members cannot bind the owner's private dataset: the same not-found answer as an absent dataset.
+    for member in (w.normal, w.admin):
+        for ids in ([str(w.a_private_dataset["id"])], [uuid.uuid4().hex]):
+            resp = call(w.client, "POST", CHATS, member.token, {}, body={**base, "kb_ids": ids, "tenant_id": w.a.tenant_id})
+            assert resp.status_code == 404 and resp.json()["data"] == {"reason": "dataset_not_found"}, f"a member binding {len(ids)} unopenable dataset: {triple(resp)}"
+    assert call(w.client, "GET", CHATS, w.b.token, {}).json()["data"] == {"items": [], "total": 0}, "none of B's refused requests stored an assistant"
+    assert w.snapshot_chats() == before
+    assert w.snapshot() == snapshot
+
+
+def check_chat_completion(w: World) -> None:
+    """The chat id lives in the JSON body, so swap it there and check that a refused turn stores nothing."""
+    row = "POST /api/v1/chat/completions"
+    body = {"chat_id": str(w.a_team_chat["id"]), "message": "hello", "stream": False}
+    before = w.snapshot_chats()
+    for who in (w.b, w.pending, w.spare):
+        response = call(w.client, "POST", "/api/v1/chat/completions", who.token, {}, body=body)
+        assert triple(response) == NOT_FOUND, f"{row}: {who.email} reached A's chat"
+    absent = call(w.client, "POST", "/api/v1/chat/completions", w.a.token, {}, body={**body, "chat_id": uuid.uuid4().hex})
+    assert triple(absent) == NOT_FOUND
+    mismatch = call(w.client, "POST", "/api/v1/chat/completions", w.a.token, {}, body={**body, "tenant_id": w.b.tenant_id})
+    assert triple(mismatch) == NOT_FOUND
+    assert w.snapshot_chats() == before
+
+
 NO_ID_CHECKS: dict[str, NoIdCheck] = {
+    "POST /api/v1/chat/completions": check_chat_completion,
+    "GET /api/v1/chats": check_chats_list,
+    "POST /api/v1/chats": check_chats_create,
     "POST /api/v1/datasets/search": check_datasets_search,
     "DELETE /api/v1/datasets": check_datasets_delete,
     "POST /api/v1/documents/upload": check_documents_upload,

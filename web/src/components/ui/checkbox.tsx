@@ -9,12 +9,13 @@ export interface CheckboxProps {
   disabled?: boolean;
   id?: string;
   "aria-label"?: string;
+  "aria-describedby"?: string;
   "data-testid"?: string;
   className?: string;
 }
 
 /** Native checkbox, a 16 px box inside a 40 px hit area. The tick and border use the foreground colour. */
-export function Checkbox({ checked, onChange, indeterminate = false, disabled = false, id, className, "aria-label": ariaLabel, "data-testid": testId }: CheckboxProps) {
+export function Checkbox({ checked, onChange, indeterminate = false, disabled = false, id, className, "aria-label": ariaLabel, "aria-describedby": describedBy, "data-testid": testId }: CheckboxProps) {
   const ref = React.useRef<HTMLInputElement>(null);
   React.useEffect(() => {
     if (ref.current) ref.current.indeterminate = indeterminate;
@@ -26,6 +27,7 @@ export function Checkbox({ checked, onChange, indeterminate = false, disabled = 
         id={id}
         type="checkbox"
         aria-label={ariaLabel}
+        aria-describedby={describedBy}
         data-testid={testId}
         checked={checked}
         disabled={disabled}

@@ -1,0 +1,31 @@
+{
+  "status": 200,
+  "result": {
+    "schema_version": 1,
+    "width": 1400,
+    "height": 400,
+    "spans": [
+      {
+        "text": "LIGHTHOUSEHEIGHT52METERS",
+        "confidence": 0.9957298388083776,
+        "box": [
+          65.5169906616211,
+          86.06884002685547,
+          754.06640625,
+          122.26448822021484
+        ]
+      },
+      {
+        "text": "ORCHARDHARVEST910OKILOGRAMS",
+        "confidence": 0.9610342250929939,
+        "box": [
+          67.08333587646484,
+          227.77777099609375,
+          851.6666870117188,
+          261.1111145019531
+        ]
+      }
+    ]
+  },
+  "quality": "FAIL:910O differs from fixed 9100; no assertion weakened"
+}

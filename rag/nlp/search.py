@@ -60,7 +60,7 @@ class RetrievalRequest:
     vector_similarity_weight: float = 0.3
     top_k: int = 1024
     fusion: str = "weighted_sum"
-    rerank_cap: int = 64
+    rerank_cap: int = 16
     page: int = 1
     size: int = 10
 

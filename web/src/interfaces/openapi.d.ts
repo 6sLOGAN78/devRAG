@@ -4,6 +4,102 @@
  */
 
 export interface paths {
+    "/api/v1/chat/completions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["post_complete"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/chats": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["get_list_chats"];
+        put?: never;
+        post: operations["post_create_chat"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/chats/{chat_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["get_get_chat"];
+        put: operations["put_update_chat"];
+        post?: never;
+        delete: operations["delete_delete_chat"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/chats/{chat_id}/sessions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["get_list_sessions"];
+        put?: never;
+        post: operations["post_create_session"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/chats/{chat_id}/sessions/{session_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["get_get_session"];
+        put?: never;
+        post?: never;
+        delete: operations["delete_delete_session"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/chats/{chat_id}/sessions/{session_id}/messages/{message_id}/feedback": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["post_set_feedback"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/datasets": {
         parameters: {
             query?: never;
@@ -475,6 +571,55 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** AssistantPage */
+        AssistantPage: {
+            /** Items */
+            items: components["schemas"]["AssistantView"][];
+            /** Total */
+            total: number;
+        };
+        /** AssistantView */
+        AssistantView: {
+            /** Created By */
+            created_by: string;
+            /**
+             * Icon
+             * @default null
+             */
+            icon: string | null;
+            /** Id */
+            id: string;
+            /** Kb Ids */
+            kb_ids: string[];
+            /** Llm Id */
+            llm_id: string;
+            /** Llm Setting */
+            llm_setting: {
+                [key: string]: unknown;
+            };
+            /**
+             * Members With Chats
+             * @default null
+             */
+            members_with_chats: number | null;
+            /** Name */
+            name: string;
+            /** Permission */
+            permission: string;
+            prompt_config: components["schemas"]["PromptConfigView"];
+            /** Rerank Id */
+            rerank_id: string;
+            /** Similarity Threshold */
+            similarity_threshold: number;
+            /** Top N */
+            top_n: number;
+            /** Unavailable Datasets */
+            unavailable_datasets: number;
+            /** Update Time */
+            update_time: number;
+            /** Vector Similarity Weight */
+            vector_similarity_weight: number;
+        };
         /** CheckView */
         CheckView: {
             /** Dimension */
@@ -536,6 +681,35 @@ export interface components {
              */
             overlapped_percent: unknown;
         };
+        /** CompletionView */
+        CompletionView: {
+            /** Answer */
+            answer: string;
+            /** Empty */
+            empty: boolean;
+            /** Final */
+            final: boolean;
+            /** Finish */
+            finish: string;
+            /** Latency Ms */
+            latency_ms: number;
+            /** Message Id */
+            message_id: string;
+            /** Notice */
+            notice: {
+                [key: string]: number;
+            };
+            /** Reference */
+            reference: {
+                [key: string]: unknown;
+            };
+            /** Session Id */
+            session_id: string;
+            /** Usage */
+            usage: {
+                [key: string]: unknown;
+            };
+        };
         /** DatasetPage */
         DatasetPage: {
             /** Items */
@@ -591,6 +765,11 @@ export interface components {
             /** Embedding */
             embedding: string;
         };
+        /** DeletedAssistant */
+        DeletedAssistant: {
+            /** Deleted */
+            deleted: string;
+        };
         /** DeletedCount */
         DeletedCount: {
             /** Deleted */
@@ -600,6 +779,11 @@ export interface components {
         DeletedDatasets: {
             /** Deleted */
             deleted: string[];
+        };
+        /** DeletedSession */
+        DeletedSession: {
+            /** Deleted */
+            deleted: string;
         };
         /** DeletedView */
         DeletedView: {
@@ -772,6 +956,13 @@ export interface components {
             message: string;
             /** Step */
             step: string;
+        };
+        /** FeedbackView */
+        FeedbackView: {
+            /** Feedback */
+            feedback: ("up" | "down") | null;
+            /** Message Id */
+            message_id: string;
         };
         /** HealthData */
         HealthData: {
@@ -954,6 +1145,15 @@ export interface components {
             /** Status */
             status: string;
         };
+        /** PromptConfigView */
+        PromptConfigView: {
+            /** Empty Response */
+            empty_response: string;
+            /** Prologue */
+            prologue: string;
+            /** System */
+            system: string;
+        };
         /** ProviderView */
         ProviderView: {
             /** Configured */
@@ -985,6 +1185,45 @@ export interface components {
             };
             /** Total */
             total: number;
+        };
+        /** SessionDetail */
+        SessionDetail: {
+            /** Chat Id */
+            chat_id: string;
+            /** Create Time */
+            create_time: number;
+            /** Has Earlier */
+            has_earlier: boolean;
+            /** Id */
+            id: string;
+            /** Messages */
+            messages: {
+                [key: string]: unknown;
+            }[];
+            /** Name */
+            name: string;
+            /** Update Time */
+            update_time: number;
+        };
+        /** SessionPage */
+        SessionPage: {
+            /** Items */
+            items: components["schemas"]["SessionView"][];
+            /** Total */
+            total: number;
+        };
+        /** SessionView */
+        SessionView: {
+            /** Chat Id */
+            chat_id: string;
+            /** Create Time */
+            create_time: number;
+            /** Id */
+            id: string;
+            /** Name */
+            name: string;
+            /** Update Time */
+            update_time: number;
         };
         /** StartedDocument */
         StartedDocument: {
@@ -1063,6 +1302,474 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    post_complete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": {
+                    /** Chat Id */
+                    chat_id: string;
+                    /** Message */
+                    message: string;
+                    /**
+                     * Session Id
+                     * @default null
+                     */
+                    session_id?: string | null;
+                    /**
+                     * Stream
+                     * @default true
+                     */
+                    stream?: boolean;
+                    /**
+                     * Tenant Id
+                     * @default null
+                     */
+                    tenant_id?: string | null;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Code */
+                        code: number;
+                        data: components["schemas"]["CompletionView"];
+                        /** Message */
+                        message: string;
+                    };
+                };
+            };
+        };
+    };
+    get_list_chats: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Code */
+                        code: number;
+                        data: components["schemas"]["AssistantPage"];
+                        /** Message */
+                        message: string;
+                    };
+                };
+            };
+        };
+    };
+    post_create_chat: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": {
+                    /**
+                     * Icon
+                     * @default null
+                     */
+                    icon?: string | null;
+                    /** Kb Ids */
+                    kb_ids?: string[];
+                    /**
+                     * Llm Id
+                     * @default null
+                     */
+                    llm_id?: string | null;
+                    /**
+                     * Llm Setting
+                     * @default null
+                     */
+                    llm_setting?: {
+                        [key: string]: unknown;
+                    } | null;
+                    /** Name */
+                    name: string;
+                    /**
+                     * Permission
+                     * @default me
+                     */
+                    permission?: string;
+                    /**
+                     * Prompt Config
+                     * @default null
+                     */
+                    prompt_config?: {
+                        [key: string]: unknown;
+                    } | null;
+                    /**
+                     * Rerank Id
+                     * @default null
+                     */
+                    rerank_id?: string | null;
+                    /**
+                     * Similarity Threshold
+                     * @default null
+                     */
+                    similarity_threshold?: number | null;
+                    /**
+                     * Tenant Id
+                     * @default null
+                     */
+                    tenant_id?: string | null;
+                    /**
+                     * Top N
+                     * @default null
+                     */
+                    top_n?: number | null;
+                    /**
+                     * Vector Similarity Weight
+                     * @default null
+                     */
+                    vector_similarity_weight?: number | null;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Code */
+                        code: number;
+                        data: components["schemas"]["AssistantView"];
+                        /** Message */
+                        message: string;
+                    };
+                };
+            };
+        };
+    };
+    get_get_chat: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                chat_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Code */
+                        code: number;
+                        data: components["schemas"]["AssistantView"];
+                        /** Message */
+                        message: string;
+                    };
+                };
+            };
+        };
+    };
+    put_update_chat: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                chat_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": {
+                    /**
+                     * Icon
+                     * @default null
+                     */
+                    icon?: string | null;
+                    /**
+                     * Kb Ids
+                     * @default null
+                     */
+                    kb_ids?: string[] | null;
+                    /**
+                     * Llm Id
+                     * @default null
+                     */
+                    llm_id?: string | null;
+                    /**
+                     * Llm Setting
+                     * @default null
+                     */
+                    llm_setting?: {
+                        [key: string]: unknown;
+                    } | null;
+                    /**
+                     * Name
+                     * @default null
+                     */
+                    name?: string | null;
+                    /**
+                     * Permission
+                     * @default null
+                     */
+                    permission?: string | null;
+                    /**
+                     * Prompt Config
+                     * @default null
+                     */
+                    prompt_config?: {
+                        [key: string]: unknown;
+                    } | null;
+                    /**
+                     * Rerank Id
+                     * @default null
+                     */
+                    rerank_id?: string | null;
+                    /**
+                     * Similarity Threshold
+                     * @default null
+                     */
+                    similarity_threshold?: number | null;
+                    /**
+                     * Top N
+                     * @default null
+                     */
+                    top_n?: number | null;
+                    /**
+                     * Vector Similarity Weight
+                     * @default null
+                     */
+                    vector_similarity_weight?: number | null;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Code */
+                        code: number;
+                        data: components["schemas"]["AssistantView"];
+                        /** Message */
+                        message: string;
+                    };
+                };
+            };
+        };
+    };
+    delete_delete_chat: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                chat_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Code */
+                        code: number;
+                        data: components["schemas"]["DeletedAssistant"];
+                        /** Message */
+                        message: string;
+                    };
+                };
+            };
+        };
+    };
+    get_list_sessions: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                chat_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Code */
+                        code: number;
+                        data: components["schemas"]["SessionPage"];
+                        /** Message */
+                        message: string;
+                    };
+                };
+            };
+        };
+    };
+    post_create_session: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                chat_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": {
+                    /**
+                     * Name
+                     * @default null
+                     */
+                    name?: string | null;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Code */
+                        code: number;
+                        data: components["schemas"]["SessionDetail"];
+                        /** Message */
+                        message: string;
+                    };
+                };
+            };
+        };
+    };
+    get_get_session: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                chat_id: string;
+                session_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Code */
+                        code: number;
+                        data: components["schemas"]["SessionDetail"];
+                        /** Message */
+                        message: string;
+                    };
+                };
+            };
+        };
+    };
+    delete_delete_session: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                chat_id: string;
+                session_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Code */
+                        code: number;
+                        data: components["schemas"]["DeletedSession"];
+                        /** Message */
+                        message: string;
+                    };
+                };
+            };
+        };
+    };
+    post_set_feedback: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                chat_id: string;
+                session_id: string;
+                message_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": {
+                    /**
+                     * Comment
+                     * @default null
+                     */
+                    comment?: string | null;
+                    /** Thumb */
+                    thumb: ("up" | "down") | null;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Code */
+                        code: number;
+                        data: components["schemas"]["FeedbackView"];
+                        /** Message */
+                        message: string;
+                    };
+                };
+            };
+        };
+    };
     get_list_datasets: {
         parameters: {
             query?: never;
@@ -1228,6 +1935,11 @@ export interface operations {
                     page?: number;
                     /** Question */
                     question: string;
+                    /**
+                     * Rerank Id
+                     * @default null
+                     */
+                    rerank_id?: string | null;
                     /**
                      * Similarity Threshold
                      * @default 0.2

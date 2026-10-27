@@ -1,0 +1,21 @@
+{
+  "reviewed_at": "2026-10-27T17:12:35.851779+00:00",
+  "browser": "installed Google Chrome via repository CDP harness",
+  "provider": "local recording fake; no paid inference",
+  "screens": [
+    "output/playwright/phase5-review/zh-sharing.png",
+    "output/playwright/phase5-review/zh-citation.png",
+    "output/playwright/phase5-review/zh-stopped.png",
+    "output/playwright/phase5-review/zh-refusal.png",
+    "output/playwright/phase5-review/zh-retrieval.png"
+  ],
+  "steps": [
+    "zh-sharing",
+    "zh-citation",
+    "zh-stopped",
+    "zh-refusal",
+    "zh-retrieval"
+  ],
+  "local_provider_request_count": 9,
+  "cleanup": "exact fixture account registry; no user data touched"
+}

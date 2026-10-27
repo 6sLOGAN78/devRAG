@@ -213,3 +213,15 @@ endpoints:
      note: "plan 05-08 changes the fields sent; the creator, or owner or admin for a team assistant (CHAT-03, D-23, D-24)"}
   - {method: DELETE, path: "/api/v1/chats/{chat_id}", owner: python, auth: api, roles: [owner, admin, normal], scope: tenant, implemented: true,
      note: "plan 05-08 deletes an assistant and every member's sessions with it; the creator, or owner or admin for a team assistant (CHAT-04, D-26)"}
+  - {method: POST, path: "/api/v1/chats/{chat_id}/sessions", owner: python, auth: api, roles: [owner, admin, normal], scope: tenant, implemented: true,
+     note: "plan 05-09 creates the caller's private session after locking the assistant row (CHAT-08, D-11, D-23)"}
+  - {method: GET, path: "/api/v1/chats/{chat_id}/sessions", owner: python, auth: api, roles: [owner, admin, normal], scope: tenant, implemented: true,
+     note: "plan 05-09 lists only the caller's sessions of a visible assistant (CHAT-09, D-11)"}
+  - {method: GET, path: "/api/v1/chats/{chat_id}/sessions/{session_id}", owner: python, auth: api, roles: [owner, admin, normal], scope: tenant, implemented: true,
+     note: "plan 05-09 reads one own session with a message cursor and read-time reference redaction (CHAT-10, D-10, D-19)"}
+  - {method: DELETE, path: "/api/v1/chats/{chat_id}/sessions/{session_id}", owner: python, auth: api, roles: [owner, admin, normal], scope: tenant, implemented: true,
+     note: "plan 05-09 deletes only the caller's own session (CHAT-11, D-11)"}
+  - {method: POST, path: "/api/v1/chats/{chat_id}/sessions/{session_id}/messages/{message_id}/feedback", owner: python, auth: api, roles: [owner, admin, normal], scope: tenant, implemented: true,
+     note: "plan 05-09 rates a completed assistant message in the caller's own session (CHAT-23, D-11)"}
+  - {method: POST, path: "/api/v1/chat/completions", owner: python, auth: api, roles: [owner, admin, normal], scope: tenant, implemented: true,
+     note: "plan 05-11 answers a question with a persisted cited completion; streaming follows in plan 05-12 (CHAT-14..21, CHAT-31)"}

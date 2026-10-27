@@ -1,0 +1,72 @@
+[
+  {
+    "package": "onnxruntime",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "jieba",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "opencv-python-headless",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "shapely",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "scikit-learn",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "umap-learn",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "faster-whisper",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "numpy",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "opencc-python-reimplemented",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "pyclipper",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  }
+]

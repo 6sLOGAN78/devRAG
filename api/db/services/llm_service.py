@@ -35,6 +35,7 @@ from peewee import PeeweeException
 from api.db.services import tenant_llm_service
 from api.db.services.service_errors import Kind, ServiceError
 from api.utils import reasons
+from api.utils.blocking import DB_EXECUTOR, run_blocking
 from common.model_ref import InvalidModelRef, ModelRef, parse_model_ref
 from common.settings import Settings, get_settings
 from rag.llm import ProviderSpec, resolve_provider
@@ -274,7 +275,10 @@ class LLMBundle:
             text, _ = await driver.async_chat(system, history, gen_conf)
         except ModelException as exc:
             raise self._failure(exc) from None
-        self._report_usage(driver.last_usage)
+        try:
+            await run_blocking(DB_EXECUTOR, self._report_usage, driver.last_usage, timeout=10)
+        except Exception as exc:  # noqa: BLE001 - a paid provider answer survives counter storage failure
+            logger.error("llm usage not recorded tenant=%s provider=%s model=%s error=%s", self.tenant_id, self._spec.name, self.ref.model, type(exc).__name__)
         return text
 
     async def async_chat_streamly(self, system: str, history: list[dict[str, Any]], gen_conf: Mapping[str, Any] | None = None) -> AsyncIterator[str]:
@@ -286,7 +290,10 @@ class LLMBundle:
                     yield piece
         except ModelException as exc:
             raise self._failure(exc) from None
-        self._report_usage(driver.last_usage)
+        try:
+            await run_blocking(DB_EXECUTOR, self._report_usage, driver.last_usage, timeout=10)
+        except Exception as exc:  # noqa: BLE001 - a paid provider answer survives counter storage failure
+            logger.error("llm usage not recorded tenant=%s provider=%s model=%s error=%s", self.tenant_id, self._spec.name, self.ref.model, type(exc).__name__)
 
     # ------------------------------------------------------------------------- embeddings
 
@@ -315,7 +322,10 @@ class LLMBundle:
             result = await driver.similarity(query, texts)
         except ModelException as exc:
             raise self._failure(exc) from None
-        self._report_usage(driver.last_usage)
+        try:
+            await run_blocking(DB_EXECUTOR, self._report_usage, driver.last_usage, timeout=10)
+        except Exception as exc:  # noqa: BLE001 - a paid provider answer survives counter storage failure
+            logger.error("llm usage not recorded tenant=%s provider=%s model=%s error=%s", self.tenant_id, self._spec.name, self.ref.model, type(exc).__name__)
         return result.scores
 
     def rerank(self, query: str, texts: list[str]) -> list[float]:

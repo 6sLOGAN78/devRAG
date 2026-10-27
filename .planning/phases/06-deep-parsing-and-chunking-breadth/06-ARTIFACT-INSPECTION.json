@@ -1,0 +1,12 @@
+{
+  "inspected_at": "2026-10-27T17:32:33.909575+00:00",
+  "layout_decision": {
+    "source": "user",
+    "response": "Retain pinned layout; document discrepancy",
+    "model_revision": "9c7aa2c730d7a242d7f04cf6109a6a239aefc717",
+    "artifact_sha256": "de401c03ee30b1c120416dc06f0705237f0c36d3cdb692c9bfefe8a8f98a4b70",
+    "embedded_license": "AGPL-3.0 License (https://github.com/infiniflow/ragflow/blob/main/LICENSE)",
+    "repository_card_license": "apache-2.0",
+    "boundary": "Artifact labels retained without legal determination; actual quality and resource tests still required."
+  }
+}

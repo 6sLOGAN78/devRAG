@@ -49,7 +49,7 @@ export interface DefaultsView {
   embedding: string;
 }
 
-export type ModelType = "chat" | "embedding";
+export type ModelType = "chat" | "embedding" | "rerank";
 
 interface ModelDto {
   id: string;

@@ -1,0 +1,103 @@
+{
+  "chat": {
+    "sources": {
+      "chip": "Source {{n}}: {{name}}",
+      "unavailable": "Source {{n}} is no longer available to you",
+      "heading": "Sources",
+      "page": "Page {{page}}"
+    },
+    "code": {
+      "copy": "Copy code",
+      "copied": "Code copied",
+      "copyFailed": "The code wasn't copied."
+    },
+    "documentTitle": "Chat - devRag",
+    "rail": {
+      "assistants": "Assistants",
+      "search": "Search assistants",
+      "newAssistant": "New assistant",
+      "assistantPages": "Assistant pages",
+      "chats": "Chats",
+      "newChat": "New chat",
+      "chatPages": "Chat pages",
+      "open": "Assistants and chats",
+      "noMatch": "No assistants match.",
+      "noChats": "No chats yet. Send a message to start one.",
+      "untitled": "New chat",
+      "assistantsError": "Couldn't load assistants.",
+      "chatsError": "Couldn't load chats."
+    },
+    "empty": {
+      "heading": "No assistants yet",
+      "body": "Create an assistant, choose the datasets it can use, and ask it questions about your documents.",
+      "action": "Create assistant"
+    },
+    "draft": {
+      "hint": "Ask a question. Answers use this assistant's datasets and say where they came from."
+    },
+    "error": {
+      "pageHeading": "Couldn't load this assistant",
+      "listHeading": "Couldn't load this chat.",
+      "turnBusy": "Another message in this chat is still being answered. Wait for it to finish.",
+      "full": "This chat is full. Start a new chat to continue.",
+      "rateLimited": "You're sending messages too quickly. Wait a moment and try again.",
+      "model": "This assistant's chat model is no longer available in the workspace.",
+      "rerank": "The rerank model isn't available right now. Nothing was sent. Try again in a moment.",
+      "index": "The search index isn't available right now. Try again in a moment.",
+      "timeout": "The chat model didn't answer in time. Try again.",
+      "refused": "The chat model refused the request.",
+      "providerRateLimited": "The chat model provider is limiting requests. Wait a moment and try again.",
+      "send": "The message wasn't sent. Try again."
+    },
+    "gone": {
+      "assistant": "That assistant no longer exists.",
+      "chat": "That chat no longer exists."
+    },
+    "header": {
+      "settings": "Assistant settings",
+      "more": "More actions for {{name}}",
+      "deleteChat": "Delete chat",
+      "deleteAssistant": "Delete assistant"
+    },
+    "notice": {
+      "skipped_one": "{{count}} dataset used by this assistant isn't available to you and is skipped.",
+      "skipped_other": "{{count}} datasets used by this assistant aren't available to you and are skipped.",
+      "noneAvailable": "None of this assistant's datasets are available to you, so it can't answer. Ask the person who made it to update its datasets."
+    },
+    "message": {
+      "list": "Conversation",
+      "you": "You",
+      "loadEarlier": "Load earlier messages",
+      "stopped": "Stopped",
+      "stoppedNote": "This answer was stopped before it finished.",
+      "failed": "The answer couldn't be completed. Ask the question again.",
+      "noSources": "No sources found",
+      "latency": "{{seconds}} s",
+      "tokens": "Tokens: {{count}}",
+      "tokensApprox": "Tokens: about {{count}}",
+      "jump": "Jump to latest",
+      "generating": "Looking through your documents",
+      "thinking": "Thinking",
+      "feedbackUp": "Good answer",
+      "feedbackDown": "Bad answer",
+      "feedbackFailed": "The feedback wasn't saved. Try again."
+    },
+    "input": {
+      "label": "Message",
+      "placeholder": "Ask a question",
+      "hint": "Enter to send, Shift and Enter for a new line.",
+      "counter": "{{used}}/{{max}}",
+      "tooLong": "Use 8,000 characters or fewer.",
+      "send": "Send",
+      "stop": "Stop",
+      "sendLabel": "Send message",
+      "stopLabel": "Stop answer"
+    },
+    "live": {
+      "started": "Answer started",
+      "finished": "Answer finished",
+      "stopped": "Answer stopped",
+      "failed": "The answer couldn't be completed"
+    }
+  }
+}

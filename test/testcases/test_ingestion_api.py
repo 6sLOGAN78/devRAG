@@ -172,7 +172,7 @@ def test_a_damaged_document_fails_after_its_attempts_with_a_plain_error_and_no_i
     assert entry["document_id"] == journey.bad and entry["document_name"] == "damaged.docx"
     assert entry["error"] == {"step": "parse", "code": "file_damaged", "message": PLAIN_MESSAGES["file_damaged"]}
     assert len(entry["log"]) >= 1 and len(entry["log"]) <= 3000
-    for banned in ("Traceback", "/ragflow", "/tmp", "127.0.0.1", "host.docker.internal", 'File "'):
+    for banned in ("Traceback", "/ragflow", "/tmp", "127.0.0.1", "host.docker.internal", 'File "'):  # noqa: S108 - forbidden leak text, not a filesystem path used by this test
         assert banned not in resp.text, banned
     assert KEY_SHAPE.search(resp.text) is None
 

@@ -7,7 +7,7 @@ COMPOSE_FILES = -f docker/docker-compose.yml -f docker/docker-compose.dev.yml
 ENV_FILE = docker/.env
 COMPOSE = docker compose -p $(COMPOSE_PROJECT) --env-file $(ENV_FILE)
 
-.PHONY: ci test-unit test-live init-env preflight up infra-up down clean-room gen
+.PHONY: ci test-unit test-live init-env preflight up infra-up deepdoc-up down clean-room gen
 
 ci:
 	cd "$(CURDIR)" && uv run python scripts/ci/run_all.py
@@ -25,17 +25,25 @@ init-env:
 	cd "$(CURDIR)" && scripts/init_env.sh
 
 preflight:
-	cd "$(CURDIR)" && scripts/preflight.sh
+	cd "$(CURDIR)" && scripts/preflight.sh --tei-cpu
 
 up: preflight
-	cd "$(CURDIR)" && $(COMPOSE) $(COMPOSE_FILES) --profile cpu --profile elasticsearch --profile mail up -d --build
-	cd "$(CURDIR)" && scripts/wait_stack.sh
+	cd "$(CURDIR)" && $(COMPOSE) $(COMPOSE_FILES) --profile cpu --profile elasticsearch --profile mail --profile tei-cpu up -d --build
+	cd "$(CURDIR)" && WAIT_STACK_TIMEOUT=900 scripts/wait_stack.sh
 
 INFRA_FILES = -f docker/docker-compose-base.yml -f docker/docker-compose.dev.yml
 
+# Explicit native profile entry; the provisioner enforces the exact acquisition decision.
+deepdoc-up:
+	cd "$(CURDIR)" && scripts/preflight.sh --deepdoc
+	cd "$(CURDIR)" && uv run --no-sync python -m scripts.provision_deepdoc
+	cd "$(CURDIR)" && $(COMPOSE) $(COMPOSE_FILES) --profile deepdoc up -d --build --no-deps deepdoc
+	cd "$(CURDIR)" && WAIT_STACK_TIMEOUT=120 scripts/wait_stack.sh
+
 infra-up:
-	cd "$(CURDIR)" && $(COMPOSE) $(INFRA_FILES) --profile elasticsearch --profile mail up -d
-	cd "$(CURDIR)" && scripts/wait_stack.sh --infra-only
+	cd "$(CURDIR)" && scripts/preflight.sh --tei-cpu
+	cd "$(CURDIR)" && $(COMPOSE) $(INFRA_FILES) --profile elasticsearch --profile mail --profile tei-cpu up -d
+	cd "$(CURDIR)" && WAIT_STACK_TIMEOUT=900 scripts/wait_stack.sh --infra-only
 
 # Stop only; volumes are never removed here (the guarded removal lives in scripts/clean_room.sh).
 down:

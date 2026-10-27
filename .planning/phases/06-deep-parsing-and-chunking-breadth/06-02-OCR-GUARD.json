@@ -1,0 +1,178 @@
+{
+  "model_load_seconds": 0.3878961120008171,
+  "samples": [
+    {
+      "repetition": 1,
+      "seconds": 0.62396395199994,
+      "peak_rss_kib": 188192,
+      "result": {
+        "schema_version": 1,
+        "width": 1400,
+        "height": 400,
+        "spans": [
+          {
+            "text": "LIGHTHOUSE HEIGHT 52 METERS",
+            "confidence": 0.9968210657437643,
+            "box": [
+              65.5169906616211,
+              86.06884002685547,
+              754.06640625,
+              122.26448822021484
+            ]
+          },
+          {
+            "text": "ORCHARD HARVEST 9100 KILOGRAMS",
+            "confidence": 0.994026694032881,
+            "box": [
+              67.08333587646484,
+              227.77777099609375,
+              851.6666870117188,
+              261.1111145019531
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "repetition": 2,
+      "seconds": 0.2955831429999307,
+      "peak_rss_kib": 225696,
+      "result": {
+        "schema_version": 1,
+        "width": 1400,
+        "height": 400,
+        "spans": [
+          {
+            "text": "LIGHTHOUSE HEIGHT 52 METERS",
+            "confidence": 0.9968210657437643,
+            "box": [
+              65.5169906616211,
+              86.06884002685547,
+              754.06640625,
+              122.26448822021484
+            ]
+          },
+          {
+            "text": "ORCHARD HARVEST 9100 KILOGRAMS",
+            "confidence": 0.994026694032881,
+            "box": [
+              67.08333587646484,
+              227.77777099609375,
+              851.6666870117188,
+              261.1111145019531
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "repetition": 3,
+      "seconds": 0.27912996699978976,
+      "peak_rss_kib": 225696,
+      "result": {
+        "schema_version": 1,
+        "width": 1400,
+        "height": 400,
+        "spans": [
+          {
+            "text": "LIGHTHOUSE HEIGHT 52 METERS",
+            "confidence": 0.9968210657437643,
+            "box": [
+              65.5169906616211,
+              86.06884002685547,
+              754.06640625,
+              122.26448822021484
+            ]
+          },
+          {
+            "text": "ORCHARD HARVEST 9100 KILOGRAMS",
+            "confidence": 0.994026694032881,
+            "box": [
+              67.08333587646484,
+              227.77777099609375,
+              851.6666870117188,
+              261.1111145019531
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "repetition": 4,
+      "seconds": 0.27645714699974633,
+      "peak_rss_kib": 225696,
+      "result": {
+        "schema_version": 1,
+        "width": 1400,
+        "height": 400,
+        "spans": [
+          {
+            "text": "LIGHTHOUSE HEIGHT 52 METERS",
+            "confidence": 0.9968210657437643,
+            "box": [
+              65.5169906616211,
+              86.06884002685547,
+              754.06640625,
+              122.26448822021484
+            ]
+          },
+          {
+            "text": "ORCHARD HARVEST 9100 KILOGRAMS",
+            "confidence": 0.994026694032881,
+            "box": [
+              67.08333587646484,
+              227.77777099609375,
+              851.6666870117188,
+              261.1111145019531
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "repetition": 5,
+      "seconds": 0.2391772460005086,
+      "peak_rss_kib": 225696,
+      "result": {
+        "schema_version": 1,
+        "width": 1400,
+        "height": 400,
+        "spans": [
+          {
+            "text": "LIGHTHOUSE HEIGHT 52 METERS",
+            "confidence": 0.9968210657437643,
+            "box": [
+              65.5169906616211,
+              86.06884002685547,
+              754.06640625,
+              122.26448822021484
+            ]
+          },
+          {
+            "text": "ORCHARD HARVEST 9100 KILOGRAMS",
+            "confidence": 0.994026694032881,
+            "box": [
+              67.08333587646484,
+              227.77777099609375,
+              851.6666870117188,
+              261.1111145019531
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "network": "none",
+  "container_wall_seconds": 2.5693918580000172,
+  "checked_at": "2026-10-27T17:38:39.629445+00:00",
+  "fixture_sha256": "9d43fa3a2f874051e53a665657e1bfffda85bb1716e2f3681437f6b52569bca8",
+  "p95_seconds": 0.62396395199994,
+  "peak_rss_mib": 220.40625,
+  "measured_limit_mib": 512,
+  "image": {
+    "id": "sha256:48a42c2cce34dd66502fc3dbd99d121cc3b7994e7f80b18848a6662f5f061c41",
+    "bytes": 1129212613,
+    "user": "10001:10001"
+  },
+  "model_bytes": 103568065
+}

@@ -196,7 +196,7 @@ def test_a_pdf_without_any_text_fails_at_once_with_the_plain_sentence(ingress: h
     assert len(tasks) == 1 and tasks[0]["retry"] == 1, "one attempt: a missing text layer is not retried"
     log = ok(api(ingress, "GET", f"/api/v1/datasets/{dataset_id}/ingestions/{row['last_log_id']}", owner.token))
     assert log["error"]["code"] == "no_readable_text" and log["retried"] is False and log["attempts"] == 1, log
-    for banned in ("Traceback", "/tmp", "/ragflow", 'File "'):
+    for banned in ("Traceback", "/tmp", "/ragflow", 'File "'):  # noqa: S108 - forbidden leak text, not a filesystem path used by this test
         assert banned not in str(row) + str(log), banned
     assert index_count(settings, owner.tenant_id, dataset_id, doc["id"]) == 0
     wait_until(lambda: pending_for(settings, {tasks[0]["id"]}) == [], timeout=30, interval=1.0, describe=lambda: "the failed task is still pending in the stream")
@@ -212,7 +212,7 @@ def test_a_damaged_pdf_fails_with_file_damaged_after_three_attempts(ingress: htt
     assert row["error"]["code"] == "file_damaged" and row["error"]["message"] == PLAIN_MESSAGES["file_damaged"], row["error"]
     log = ok(api(ingress, "GET", f"/api/v1/datasets/{dataset_id}/ingestions/{row['last_log_id']}", owner.token))
     assert (log["attempts"], log["max_attempts"], log["retried"]) == (3, 3, True), log
-    for banned in ("Traceback", "/tmp", "/ragflow", 'File "'):
+    for banned in ("Traceback", "/tmp", "/ragflow", 'File "'):  # noqa: S108 - forbidden leak text, not a filesystem path used by this test
         assert banned not in str(row) + str(log), banned
     ids = {t["id"] for t in task_table(doc["id"])}
     wait_until(lambda: pending_for(settings, ids) == [], timeout=30, interval=1.0, describe=lambda: "the failed task is still pending in the stream")

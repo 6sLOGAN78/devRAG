@@ -25,6 +25,9 @@ export interface FakeProvider {
   delayMs: number;
   /** `refuse` answers every embedding call with a 400, the way a provider rejects an input (plan 04-34). */
   mode: "ok" | "refuse";
+  chatMode: "plain" | "gated" | "marker";
+  chatRequests: Record<string, unknown>[];
+  releaseChat: () => void;
   close: () => Promise<void>;
 }
 
@@ -58,7 +61,10 @@ function inputs(body: Record<string, unknown>): string[] {
 
 export async function startFakeProvider(): Promise<FakeProvider> {
   const paths: string[] = [];
-  const state = { delayMs: 0, mode: "ok" as "ok" | "refuse" };
+  const state = { delayMs: 0, mode: "ok" as "ok" | "refuse", chatMode: "plain" as "plain" | "gated" | "marker" };
+  const chatRequests: Record<string, unknown>[] = [];
+  const gates = new Set<() => void>();
+  const releaseChat = () => { for (const release of gates) release(); gates.clear(); };
   const server: Server = createServer((request, response) => {
     void (async () => {
       const path = (request.url ?? "").split("?")[0];
@@ -79,12 +85,31 @@ export async function startFakeProvider(): Promise<FakeProvider> {
         return send(response, 200, { object: "list", data, model, usage: { prompt_tokens: tokens, total_tokens: tokens } });
       }
       if (request.method === "POST" && path === "/v1/chat/completions") {
+        chatRequests.push(body);
+        const content = state.chatMode === "marker" ? "Answer ##0$$ done." : CHAT_TEXT;
+        if (body.stream === true) {
+          response.writeHead(200, { "Content-Type": "text/event-stream", "Cache-Control": "no-cache" });
+          const piece = (text: string, finish: string | null = null) => response.write(`data: ${JSON.stringify({ id: "chatcmpl-fake", object: "chat.completion.chunk", created: 1, model, choices: [{ index: 0, delta: { content: text }, finish_reason: finish }] })}\n\n`);
+          piece(content.slice(0, 6));
+          if (state.chatMode === "gated") {
+            await new Promise<void>((resolve) => {
+              const release = () => { gates.delete(release); response.off("close", release); resolve(); };
+              gates.add(release);
+              response.once("close", release);
+            });
+          }
+          if (response.destroyed) return;
+          piece(content.slice(6));
+          piece("", "stop");
+          response.end("data: [DONE]\n\n");
+          return;
+        }
         return send(response, 200, {
           id: "chatcmpl-fake",
           object: "chat.completion",
           created: 1,
           model,
-          choices: [{ index: 0, message: { role: "assistant", content: CHAT_TEXT }, finish_reason: "stop" }],
+          choices: [{ index: 0, message: { role: "assistant", content }, finish_reason: "stop" }],
           usage: { prompt_tokens: 11, completion_tokens: 5, total_tokens: 16 },
         });
       }
@@ -99,6 +124,10 @@ export async function startFakeProvider(): Promise<FakeProvider> {
   return {
     stackBaseUrl: `http://${STACK_HOST}:${port}/v1`,
     paths,
+    chatRequests,
+    releaseChat,
+    get chatMode() { return state.chatMode; },
+    set chatMode(value) { state.chatMode = value; },
     get delayMs() {
       return state.delayMs;
     },
@@ -113,6 +142,7 @@ export async function startFakeProvider(): Promise<FakeProvider> {
     },
     close: () =>
       new Promise<void>((resolve) => {
+        releaseChat();
         server.closeAllConnections();
         server.close(() => resolve());
       }),

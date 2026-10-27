@@ -53,7 +53,13 @@ if [ -z "${MYSQL_ROOT_PASSWORD:-}" ]; then
 fi
 export MYSQL_ROOT_PASSWORD
 # The mail profile (dev file only) gives the password-reset e2e and live tests a real SMTP sink.
-COMPOSE=(docker compose -p "$PROJECT" --env-file docker/.env -f docker/docker-compose.yml -f docker/docker-compose.dev.yml --profile cpu --profile elasticsearch --profile mail)
+export COMPOSE_PROFILES=cpu,elasticsearch,mail,tei-cpu
+COMPOSE=(docker compose -p "$PROJECT" --env-file docker/.env -f docker/docker-compose.yml -f docker/docker-compose.dev.yml --profile cpu --profile elasticsearch --profile mail --profile tei-cpu)
+# Explicit opt-in keeps historical gates unchanged; Phase 6 selects the native profile.
+if [ "${CLEAN_ROOM_DEEPDOC:-0}" = "1" ]; then
+  export COMPOSE_PROFILES="${COMPOSE_PROFILES},deepdoc"
+  COMPOSE+=(--profile deepdoc)
+fi
 
 step() { # step NAME CMD...
   local name="$1"
@@ -79,7 +85,7 @@ for run in $(seq 1 "$RUNS"); do
   step preflight env PREFLIGHT_REQUIRE_LIVE_KEY=1 scripts/preflight.sh
   "${COMPOSE[@]}" down -v
   step up "${COMPOSE[@]}" up -d --build
-  step wait_stack scripts/wait_stack.sh --timeout 600
+  step wait_stack scripts/wait_stack.sh --timeout 900
   echo "time-to-healthy: $(( $(date +%s) - start ))s"
   step unit uv run python run_tests.py -m unit
   step integration uv run python run_tests.py -m integration

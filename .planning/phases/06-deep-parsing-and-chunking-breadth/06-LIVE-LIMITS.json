@@ -1,0 +1,9 @@
+{
+  "chat_class": 20,
+  "vision": 6,
+  "cloud_ocr": 6,
+  "local_asr_live": 3,
+  "external_parser_submissions": 8,
+  "query_embeddings": 12,
+  "embedded_chunks": 200
+}

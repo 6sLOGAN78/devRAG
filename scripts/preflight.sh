@@ -19,6 +19,11 @@ env_value() { # env_value KEY DEFAULT
 MIN_DISK_GB="${PREFLIGHT_MIN_DISK_GB:-3}"
 MIN_MAP_COUNT="${PREFLIGHT_MIN_MAP_COUNT:-262144}"
 MIN_RAM_MB="${PREFLIGHT_MIN_RAM_MB:-4096}"
+TEI_REQUESTED=0
+DEEPDOC_REQUESTED=0
+NATIVE_ONLY=0
+case ",${COMPOSE_PROFILES:-}," in *,tei-cpu,*) TEI_REQUESTED=1 ;; esac
+case ",${COMPOSE_PROFILES:-}," in *,deepdoc,*) DEEPDOC_REQUESTED=1 ;; esac
 # shellcheck source=lib/compose_project.sh
 . "$ROOT/scripts/lib/compose_project.sh"
 PROJECT="$(resolve_compose_project "$ROOT")"
@@ -67,6 +72,8 @@ check_project() {
 
 case "${1:-}" in
   "") ;;
+  --tei-cpu) TEI_REQUESTED=1 ;;
+  --deepdoc) DEEPDOC_REQUESTED=1; NATIVE_ONLY=1 ;;
   --project-only)
     check_project
     if [ "$FAILED" -ne 0 ]; then
@@ -76,8 +83,14 @@ case "${1:-}" in
     echo "preflight project check passed"
     exit 0
     ;;
-  *) echo "usage: $0 [--project-only]" >&2; exit 2 ;;
+  *) echo "usage: $0 [--project-only|--tei-cpu|--deepdoc]" >&2; exit 2 ;;
 esac
+
+if [ "$NATIVE_ONLY" -eq 1 ]; then
+  # Starting DeepDoc alone neither starts Elasticsearch nor reserves the app's ports.
+  MIN_RAM_MB="${PREFLIGHT_MIN_RAM_MB:-3072}"
+  PORTS="${PREFLIGHT_PORTS-}"
+fi
 
 # Docker compose availability
 if docker compose version >/dev/null 2>&1; then
@@ -97,6 +110,10 @@ for path in "$ROOT" "${DOCKER_ROOT:-/}"; do
 done
 if [ -n "$MIN_FREE_KB" ]; then
   FREE_GB="$(awk -v k="$MIN_FREE_KB" 'BEGIN {printf "%.1f", k/1048576}')"
+  # A hard floor for the first image/model download; the general low-disk override cannot bypass it.
+  if [ "$TEI_REQUESTED" -eq 1 ] && [ "$MIN_FREE_KB" -lt 6291456 ]; then
+    fail "TEI disk" "TEI requires at least 6 GB free; measured ${FREE_GB} GB" "free disk space before pulling the TEI image and model"
+  fi
   if awk -v f="$FREE_GB" -v t="$MIN_DISK_GB" 'BEGIN {exit !(f+0 >= t+0)}'; then
     echo "OK disk: ${FREE_GB} GB free (need ${MIN_DISK_GB} GB)"
   elif [ "${PREFLIGHT_ALLOW_LOW_DISK:-0}" = "1" ]; then
@@ -109,7 +126,9 @@ fi
 
 # vm.max_map_count
 MAP_COUNT="$(cat /proc/sys/vm/max_map_count 2>/dev/null || echo 0)"
-if [ "$MAP_COUNT" -ge "$MIN_MAP_COUNT" ]; then
+if [ "$NATIVE_ONLY" -eq 1 ]; then
+  echo "INFO vm.max_map_count: not required for native-only profile"
+elif [ "$MAP_COUNT" -ge "$MIN_MAP_COUNT" ]; then
   echo "OK vm.max_map_count: $MAP_COUNT"
 elif [ "${PREFLIGHT_ALLOW_LOW_MAP_COUNT:-0}" = "1" ]; then
   echo "WARNING vm.max_map_count: $MAP_COUNT is below $MIN_MAP_COUNT"
@@ -146,6 +165,16 @@ elif [ "${PREFLIGHT_REQUIRE_LIVE_KEY:-0}" = "1" ]; then
   fail "openrouter key" "missing" "add OPENROUTER_API_KEY to docker/.env (see docker/.env.example)"
 else
   echo "INFO openrouter key: missing (the live_model tier and the Phase 3 gate need OPENROUTER_API_KEY in docker/.env)"
+fi
+
+if [ "$DEEPDOC_REQUESTED" -eq 1 ]; then
+  native_token="${DEEPDOC_API_TOKEN:-$(env_value DEEPDOC_API_TOKEN '')}"
+  if [ "${#native_token}" -ge 24 ]; then
+    echo "OK deepdoc operator token: present"
+  else
+    fail "deepdoc operator token" "missing or too short" "set DEEPDOC_API_TOKEN (at least 24 characters); its value is never printed"
+  fi
+  unset native_token
 fi
 
 check_project

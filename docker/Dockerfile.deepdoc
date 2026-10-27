@@ -1,0 +1,22 @@
+# syntax=docker/dockerfile:1
+# Reuse the already-built project Python runtime; acquire no separate upstream parser image.
+ARG DEVRAG_BASE_IMAGE=devrag-app:local
+FROM ${DEVRAG_BASE_IMAGE} AS native-dependencies
+COPY deepdoc/requirements.lock /tmp/deepdoc-requirements.lock
+RUN /usr/local/bin/python -m pip install --no-cache-dir --require-hashes --only-binary=:all: \
+    --no-deps --target=/opt/deepdoc/vendor -r /tmp/deepdoc-requirements.lock
+
+FROM ${DEVRAG_BASE_IMAGE} AS native-runtime
+ENV PYTHONPATH=/opt/deepdoc/vendor:/ragflow \
+    DEEPDOC_MODEL_DIR=/models \
+    HF_HUB_OFFLINE=1 \
+    TRANSFORMERS_OFFLINE=1 \
+    OMP_NUM_THREADS=2 \
+    OPENBLAS_NUM_THREADS=2
+WORKDIR /ragflow
+COPY --from=native-dependencies /opt/deepdoc/vendor /opt/deepdoc/vendor
+COPY deepdoc ./deepdoc
+LABEL org.opencontainers.image.source="https://github.com/6sLOGAN78/devrag-mvp"
+USER 10001:10001
+EXPOSE 9390
+ENTRYPOINT ["tini", "--", "/ragflow/.venv/bin/python", "-m", "deepdoc.server"]

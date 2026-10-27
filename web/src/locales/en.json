@@ -14,7 +14,8 @@
     "models": "Models",
     "apiTokens": "API tokens",
     "team": "Team",
-    "datasets": "Datasets"
+    "datasets": "Datasets",
+    "chat": "Chat"
   },
   "header": {
     "accountMenu": "Account menu",

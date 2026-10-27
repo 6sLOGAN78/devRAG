@@ -187,6 +187,57 @@ def test_the_document_switch_is_reapplied_to_every_chunk_on_completion(world):
     assert {h["doc_enabled_int"] for h in indexed(world, doc_id=[doc])} == {0}
 
 
+def test_a_switch_changed_during_rollup_wins_over_the_initial_snapshot(world, monkeypatch):
+    from rag.svr import progress
+
+    doc, (task,) = running_doc(world)
+    set_task(task, 1.0, "10:00:01  done")
+    put_chunks(world, doc, 3, enabled=True)
+    settle = progress.settle_totals
+
+    def switched(*args, **kwargs):
+        sql("UPDATE `document` SET `status` = '0' WHERE `id` = %s", (doc,))
+        return settle(*args, **kwargs)
+
+    monkeypatch.setattr(progress, "settle_totals", switched)
+    assert roll(world, doc).finished == 1
+    assert {hit["doc_enabled_int"] for hit in indexed(world, doc_id=[doc])} == {0}
+
+
+def test_chunks_are_synchronized_before_the_finished_state_is_visible(world):
+    from rag.utils.es_conn import get_doc_store
+
+    doc, (task,) = running_doc(world)
+    set_task(task, 1.0, "10:00:01  done")
+    put_chunks(world, doc, 3)
+    store, seen = get_doc_store(world.settings), []
+
+    class ObservedStore:
+        def __getattr__(self, name):
+            return getattr(store, name)
+
+        def update(self, *args, **kwargs):
+            seen.append(doc_state(doc)["run"])
+            return store.update(*args, **kwargs)
+
+    assert rollup_once(world.settings, doc_ids=[doc], doc_store=ObservedStore()).finished == 1
+    assert seen == ["1"]
+    assert doc_state(doc)["run"] == "3"
+
+
+def test_a_refused_chunk_switch_update_keeps_the_document_running(world, monkeypatch):
+    from rag.utils.es_conn import get_doc_store
+
+    doc, (task,) = running_doc(world)
+    set_task(task, 1.0, "10:00:01  done")
+    put_chunks(world, doc, 3)
+    store = get_doc_store(world.settings)
+    monkeypatch.setattr(store, "update", lambda *args, **kwargs: False)
+    assert rollup_once(world.settings, doc_ids=[doc], doc_store=store).finished == 0
+    assert doc_state(doc)["run"] == "1"
+    assert log_state(doc)["status"] == "running"
+
+
 def test_every_task_done_with_no_chunk_fails_with_no_readable_text(world):
     doc, (a,) = running_doc(world)
     set_task(a, 1.0, "10:00:01  done", retry_count=1)

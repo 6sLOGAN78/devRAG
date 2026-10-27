@@ -1,0 +1,12 @@
+{
+  "source": {
+    "title": "Source {{n}}",
+    "titleHit": "Result {{n}}",
+    "pages": "Pages",
+    "passage": "Passage",
+    "passageLabel": "Passage text",
+    "gone": "The original document is no longer available. The passage above is the saved text.",
+    "open": "Open document",
+    "close": "Close"
+  }
+}

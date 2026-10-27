@@ -395,9 +395,11 @@ def test_a_tei_rerank_model_is_saved_keyless_tested_once_and_listed_by_type(ingr
 def test_a_tei_provider_without_an_address_uses_the_default_one_and_is_not_refused_by_the_address_guard(ingress: httpx.Client, registry: AccountRegistry, fake_provider_stack: FakeProvider) -> None:  # noqa: F811
     owner = registry.register(prefix="pfteid")
     resp = api(ingress, "PUT", PROVIDERS, owner.token, body={"provider": "TEI", "models": [{"name": "tei-rerank", "type": "rerank"}]})
-    # No TEI container runs in this stack until plan 05-15, so the test call cannot connect: a typed gateway failure, never base_url_refused.
-    assert resp.status_code == 502 and resp.json()["data"]["reason"] == "provider_unreachable", resp.text
-    assert provider_rows(owner.tenant_id) == 0
+    # Plan 05-15 supplies the real TEI service; its exact default address must reach that server successfully.
+    saved = ok(resp)
+    assert saved["name"] == "TEI" and saved["configured"] is True
+    assert [(model["name"], model["type"]) for model in saved["models"]] == [("tei-rerank", "rerank")]
+    assert provider_rows(owner.tenant_id) == 1
 
 
 def test_a_rerank_model_on_a_provider_without_a_rerank_driver_is_refused_before_any_request(ingress: httpx.Client, registry: AccountRegistry, fake_provider_stack: FakeProvider) -> None:  # noqa: F811

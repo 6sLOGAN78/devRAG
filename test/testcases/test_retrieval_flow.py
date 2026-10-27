@@ -7,7 +7,9 @@ third party's end of the embedding wire. It answers near-identical vectors, so t
 """
 from __future__ import annotations
 
+import subprocess
 from collections.abc import Iterator
+from datetime import datetime, timezone
 from types import SimpleNamespace
 from typing import Any
 
@@ -18,7 +20,7 @@ from test.helpers.accounts import Account, AccountRegistry
 from test.helpers.fake_provider import FakeProvider, running_stack_fake_provider
 from test.helpers.ingest import start_parse, upload_text, wait_run
 from test.helpers.planted import FACTS, planted_txt
-from test.testcases.conftest import BASE_URL
+from test.testcases.conftest import BASE_URL, PROJECT
 from test.testcases.test_dataset_flow import create, workspace
 from test.testcases.test_provider_flow import KEY_ONE, NOT_FOUND, _bearer, api, join, ok
 
@@ -204,7 +206,7 @@ def test_the_route_needs_a_credential(ingress: httpx.Client, planted: SimpleName
 
 RERANK_PATH = "/api/v1/rerank"
 RERANK_ID = "fake-rerank@OpenRouter"
-CANDIDATE_CAP = 64  # the interim retrieval.rerank_max_candidates (R-203); the planted dataset holds far fewer chunks
+CANDIDATE_CAP = 16  # measured retrieval.rerank_max_candidates (R-219)
 
 
 STRANGER_RERANK_ID = "stranger-rerank@OpenRouter"
@@ -283,3 +285,27 @@ def test_a_malformed_rerank_id_is_a_400(ingress: httpx.Client, ranker: Account, 
     for bad in (5, "", ["a"]):
         resp = search(ingress, ranker, [ranked.dataset_id], FIRST.token, rerank_id=bad)
         assert resp.status_code in (400, 422) and resp.json()["code"] != 0, (bad, resp.text)
+
+
+def test_real_tei_rerank_through_the_stack(ingress: httpx.Client, registry: AccountRegistry, fake: FakeProvider) -> None:
+    who = workspace(ingress, registry, fake, "realtei")
+    model = "BAAI/bge-reranker-base"
+    ok(api(ingress, "PUT", "/api/v1/providers", who.token, body={"provider": "TEI", "models": [{"name": model, "type": "rerank"}]}))
+    dataset = ok(create(ingress, who, parser_config={"chunk_token_num": 24}))["id"]
+    text = (
+        "capital capital France France France is a country in western Europe known for wine and cheese\n\n"
+        "Paris is the seat of government of the French republic"
+    )
+    document = upload_text(ingress, who, dataset, text.encode(), "geography.txt")
+    ok(start_parse(ingress, who, dataset, [document["id"]]))
+    row = wait_run(ingress, who, dataset, document["id"], "3", timeout=180)
+    assert row["chunk_count"] == 2
+    since = datetime.now(timezone.utc).isoformat()
+    view = ok(search(ingress, who, [dataset], "What is the capital of France?", similarity_threshold=0, vector_similarity_weight=0.8, rerank_id=f"{model}@TEI"))
+    assert view["rerank_applied"] is True
+    assert len(view["chunks"]) == 2
+    assert all("rerank_similarity" in hit for hit in view["chunks"])
+    assert "Paris" in view["chunks"][0]["content"]
+    assert view["chunks"][0]["rerank_similarity"] > view["chunks"][1]["rerank_similarity"]
+    result = subprocess.run(["docker", "logs", "--since", since, f"{PROJECT}-tei-1"], capture_output=True, text=True, check=True, timeout=30)
+    assert "rerank" in (result.stdout + result.stderr).lower(), "real TEI logs must show this rerank request"

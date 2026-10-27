@@ -1,0 +1,79 @@
+{
+  "audit_digest": "79befdcdcb44c1418f5c74fba4bce8dd3314151e4e2948569d9caae3dfb02db5",
+  "file_hashes": {
+    "06-SOURCE-EVIDENCE.json": "394d608d5f78b0e9cbc89d5d5a86704665ef117cebcbb71a73b57c38f70cf181",
+    "06-TRANSITIVE-EVIDENCE.json": "6b19548396e95abe9981aacf1c783583d5d8854f4d9b2a61a7ee03d2b983c1f1",
+    "06-CANDIDATE-WHEELS.txt": "ae4c503cc11798687b648743646efc6bf4463645f89b9c6b5206e44585d52fb1",
+    "06-PACKAGE-SCAN.json": "52025211203c2d86fdbccf472c3c28db29c15fe4dbd5bcce44994d3298ff489c",
+    "06-TRANSITIVE-SCAN.json": "72fd9db476e240aa37d6adc30a708789e63c0493e1c03f449d6f06b1b674dafc",
+    "06-LIVE-LIMITS.json": "fb2093d7ec99c81701080f48b4ff10c87064ed9c72e3848fb300f481928c3d9e",
+    "06-PACKAGES.md": "8f5982ff24a98fa1386f64f2176662cea27839fa8aa6fdfb8171a0100a1a1843",
+    "06-LIVE-MATRIX.md": "121c3e0e46693effae8af5b74003458e94dd2cc3a4e3b4bdcbcad986a38c3e17"
+  },
+  "direct_candidates": 10,
+  "resolved_wheel_packages": 40,
+  "packages": {
+    "anyio": "4.15.1",
+    "av": "19.0.2",
+    "click": "8.5.0",
+    "cloudpickle": "3.1.2",
+    "coloredlogs": "15.0.1",
+    "ctranslate2": "4.8.4",
+    "faster-whisper": "1.2.1",
+    "filelock": "4.2.4",
+    "flatbuffers": "25.12.19",
+    "fsspec": "2026.9.0",
+    "h11": "0.16.0",
+    "hf-xet": "1.7.0",
+    "httpcore2": "2.16.0",
+    "httpx2": "2.16.0",
+    "huggingface-hub": "2.3.0",
+    "humanfriendly": "10.0",
+    "idna": "3.20",
+    "jieba": "0.42.1",
+    "joblib": "1.6.0",
+    "llvmlite": "0.50.0",
+    "mpmath": "1.3.0",
+    "numba": "0.68.0",
+    "numpy": "2.2.6",
+    "onnxruntime": "1.23.2",
+    "opencc-python-reimplemented": "0.1.7",
+    "opencv-python-headless": "4.12.0.88",
+    "packaging": "26.3",
+    "protobuf": "7.36.2",
+    "pyclipper": "1.4.0",
+    "pynndescent": "0.6.0",
+    "pyyaml": "6.0.3",
+    "scikit-learn": "1.7.2",
+    "scipy": "1.18.1",
+    "shapely": "2.1.2",
+    "sympy": "1.14.0",
+    "threadpoolctl": "3.7.0",
+    "tokenizers": "0.23.3",
+    "tqdm": "4.70.1",
+    "truststore": "0.10.5",
+    "typing-extensions": "4.16.0",
+    "umap-learn": "0.5.9.post2"
+  },
+  "models": {
+    "deepdoc": "9c7aa2c730d7a242d7f04cf6109a6a239aefc717",
+    "asr": "d90ca5fe260221311c53c58e660288d3deb8d356"
+  },
+  "model_metadata_bytes": {
+    "deepdoc": 103568065,
+    "asr": 78207087
+  },
+  "scan_counts": {
+    "SUS": 3,
+    "OK": 37
+  },
+  "limits": {
+    "chat_class": 20,
+    "vision": 6,
+    "cloud_ocr": 6,
+    "local_asr_live": 3,
+    "external_parser_submissions": 8,
+    "query_embeddings": 12,
+    "embedded_chunks": 200
+  }
+}

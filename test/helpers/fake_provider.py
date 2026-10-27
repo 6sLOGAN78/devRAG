@@ -48,7 +48,7 @@ GATED_FIRST_PIECE = "Start ##2$$ "
 GATED_LAST_PIECE = "end."
 ERROR_MIDSTREAM_PIECES = ("Par", "tial ")
 TEI_MAX_BATCH = 32
-CHAT_MODES = ("plain", "marker", "split_marker", "gated", "error_midstream")
+CHAT_MODES = ("plain", "marker", "split_marker", "gated", "gated_before_first", "error_midstream", "long")
 STACK_HOST = "host.docker.internal"  # how the dev app container reaches the host (extra_hosts in docker-compose.dev.yml)
 
 
@@ -70,6 +70,7 @@ class FakeProvider:
     shuffle_embeddings: bool = False
     delay_ms: int = 0  # embedding endpoints answer after this many milliseconds (plan 04-11: slows a call so a cancel can land mid-request)
     chat_mode: str = "plain"  # plan 05-01: one of CHAT_MODES, selects the text streamed by /v1/chat/completions
+    chat_pieces: tuple[str, ...] | None = None  # browser hostile-text scene: explicit provider output, never product stubbing
     embed_mode: str = "ok"  # plan 04-18: "ok", "refuse" (400), "timeout" (no answer until teardown) or "ratelimit" (429) on the embedding endpoints
     rerank_mode: str = "ok"  # plan 05-05: "fail" makes both rerank endpoints answer 500, so a test can save a model and then break it
     _counters: dict[str, int] = field(default_factory=dict)
@@ -138,6 +139,12 @@ class FakeProvider:
         if self._loop is not None and self._chat_gate is not None:
             self._loop.call_soon_threadsafe(self._chat_gate.set)
 
+    def hold_chat(self) -> None:
+        """Reset the gated stream for another test in a shared provider fixture."""
+        if self._loop is not None and self._chat_gate is not None:
+            self._loop.call_soon_threadsafe(self._chat_gate.clear)
+            wait_until(lambda: not self._chat_gate.is_set(), timeout=5, interval=0.01)
+
     def chat_requests(self) -> list[Any]:
         """The parsed bodies of every ``POST /v1/chat/completions`` so far, in arrival order (all listeners)."""
         return [r.body for r in self.requests if r.method == "POST" and r.path == "/v1/chat/completions"]
@@ -196,7 +203,8 @@ def _chat_completion(model: str) -> dict[str, Any]:
 
 
 def _chat_pieces(mode: str) -> tuple[str, ...]:
-    return {"marker": MARKER_PIECES, "split_marker": SPLIT_MARKER_PIECES, "error_midstream": ERROR_MIDSTREAM_PIECES}.get(mode, CHAT_PIECES)
+    return {"marker": MARKER_PIECES, "split_marker": SPLIT_MARKER_PIECES, "error_midstream": ERROR_MIDSTREAM_PIECES,
+            "long": ("0123456789abcdef" * 64,) * 12}.get(mode, CHAT_PIECES)
 
 
 def _sse(state: FakeProvider, model: str, wants_usage: bool) -> AsyncIterator[bytes]:
@@ -212,13 +220,18 @@ def _sse(state: FakeProvider, model: str, wants_usage: bool) -> AsyncIterator[by
         def content(piece: str) -> bytes:
             return frame({**base, "choices": [{"index": 0, "delta": {"content": piece}, "finish_reason": None}]})
 
-        if mode == "gated":
+        if mode == "gated_before_first":
+            assert state._chat_gate is not None
+            await state._chat_gate.wait()
+            yield content(GATED_FIRST_PIECE)
+            yield content(GATED_LAST_PIECE)
+        elif mode == "gated":
             assert state._chat_gate is not None
             yield content(GATED_FIRST_PIECE)
             await state._chat_gate.wait()
             yield content(GATED_LAST_PIECE)
         else:
-            for piece in _chat_pieces(mode):
+            for piece in state.chat_pieces or _chat_pieces(mode):
                 yield content(piece)
             if mode == "error_midstream":
                 raise ConnectionAbortedError("fake provider closes the stream without [DONE]")

@@ -220,7 +220,7 @@ describe("the root entry redirect (UI-02)", () => {
     const status = routes.find((r) => r.path === "/system-status");
     expect(status?.auth).toBe("required");
     expect(status?.layout).toBe("standard");
-    expect(status?.nav).toMatchObject({ labelKey: "nav.systemStatus", order: 3, group: "platform" });
+    expect(status?.nav).toMatchObject({ labelKey: "nav.systemStatus", order: 4, group: "platform" });
     expect(status?.nav?.icon).toBe(Activity);
     const models = routes.find((r) => r.path === "/user-setting/model");
     expect(models?.auth).toBe("required");
@@ -310,12 +310,15 @@ describe("route table", () => {
     expect(await screen.findByTestId("layout-standard")).toBeInTheDocument();
   });
 
-  it.each(["/chat"])("renders the honest Not Found page for unbuilt %s", async (path) => {
-    renderAt(path);
-    expect(await screen.findByRole("heading", { name: "Page not found" })).toBeInTheDocument();
-    expect(screen.getByText("404")).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Go to home" })).toHaveAttribute("href", "/home");
-    expect(screen.queryByText(/coming soon/i)).toBeNull();
+  it("registers the signed-in chat page and its legacy redirect", async () => {
+    const chat = routes.find((route) => route.path === "/chats");
+    expect(chat).toMatchObject({ auth: "required", layout: "standard", nav: { labelKey: "nav.chat", order: 3, group: "platform" } });
+    expect((await chat?.component?.())?.default).toBeTypeOf("function");
+    expect(routes.find((route) => route.path === "/chat")?.redirect?.({ signedIn: true })).toBe("/chats");
+  });
+  it("registers retrieval testing as a signed-in dataset subpage without navigation", async () => {
+    const entry = routes.find((route) => route.path === "/dataset/testing");
+    expect(entry).toMatchObject({ auth: "required", layout: "standard" }); expect(entry?.nav).toBeUndefined(); expect((await entry?.component?.())?.default).toBeTypeOf("function");
   });
 
   it("renders a test-only fullBleed route inside layout-fullbleed", async () => {

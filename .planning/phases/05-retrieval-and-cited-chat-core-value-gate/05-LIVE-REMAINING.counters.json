@@ -1,0 +1,26 @@
+{
+  "started_at": "2026-10-27T13:53:34.547249+00:00",
+  "finished_at": "2026-10-27T13:54:51.239402+00:00",
+  "pytest_exit_code": 0,
+  "phase3": {
+    "chat": 4,
+    "embedding": 2
+  },
+  "phase4_embedded_chunks": 57,
+  "container_usage_lines": [
+    {
+      "service": "app",
+      "tenant": "d283d327e49f246035d5af4565e49ab4",
+      "provider": "OpenRouter",
+      "model": "baai/bge-m3",
+      "successful_usage_lines": 2
+    },
+    {
+      "service": "task-executor",
+      "tenant": "d283d327e49f246035d5af4565e49ab4",
+      "provider": "OpenRouter",
+      "model": "baai/bge-m3",
+      "successful_usage_lines": 8
+    }
+  ]
+}

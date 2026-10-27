@@ -1,0 +1,12 @@
+{
+  "plans": 30,
+  "tasks": 90,
+  "non_gate_requirement_coverage": 58,
+  "expected_requirements": 58,
+  "acyclic_dependencies": true,
+  "validation_rows": 90,
+  "command_drift": 0,
+  "structural_issues": [],
+  "pending_human_checkpoint": "06-01 Task2; blocking-human",
+  "package_installs_or_model_inference_during_planning": 0
+}

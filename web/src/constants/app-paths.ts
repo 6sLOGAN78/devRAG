@@ -22,6 +22,14 @@ export function chunkPath(datasetId: string, docId: string): string {
   return `${CHUNK_ROUTE}?id=${encodeURIComponent(datasetId)}&doc=${encodeURIComponent(docId)}`;
 }
 /** The viewer of one document. */
-export function documentViewerPath(datasetId: string, docId: string): string {
-  return `${DOCUMENT_VIEWER_ROUTE}?id=${encodeURIComponent(datasetId)}&doc=${encodeURIComponent(docId)}`;
+export function documentViewerPath(datasetId: string, docId: string, page?: number): string {
+  const suffix = page !== undefined && Number.isSafeInteger(page) && page > 0 ? `&page=${page}` : "";
+  return `${DOCUMENT_VIEWER_ROUTE}?id=${encodeURIComponent(datasetId)}&doc=${encodeURIComponent(docId)}${suffix}`;
 }
+
+export const CHATS_ROUTE = "/chats";
+export const DATASET_TESTING_ROUTE = "/dataset/testing";
+export function chatPath(chatId: string, sessionId?: string): string {
+  return `${CHATS_ROUTE}?chat=${encodeURIComponent(chatId)}${sessionId ? `&session=${encodeURIComponent(sessionId)}` : ""}`;
+}
+export const retrievalTestPath = (datasetId: string): string => `${DATASET_TESTING_ROUTE}?id=${encodeURIComponent(datasetId)}`;

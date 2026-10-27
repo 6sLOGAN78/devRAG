@@ -9,6 +9,7 @@ from dataclasses import dataclass, field
 from functools import lru_cache
 from pathlib import Path
 from typing import Any
+from urllib.parse import urlsplit
 
 import yaml
 
@@ -231,12 +232,24 @@ class RetrievalSettings:
     """Retrieval tunables (plan 05-02, R-203). Every number is bounded in ``_parse_retrieval``."""
 
     top_k: int = 1024
-    rerank_max_candidates: int = 64  # interim; the final value is set by plan 05-15
+    rerank_max_candidates: int = 16  # measured BGE CPU window; R-219, plan 05-15
     msm_percent: int = 30
     msm_retry_percent: int = 10
     synonym_ttl_seconds: int = 86400
     rate_max: int = 30
     rate_window_seconds: int = 60
+
+
+@dataclass(frozen=True)
+class ChatSettings:
+    """Chat turn, session and message limits (plan 05-09)."""
+
+    stream_deadline_seconds: int = 300
+    max_question_chars: int = 8000
+    max_session_messages: int = 400
+    rate_max: int = 30
+    rate_window_seconds: int = 60
+    message_page_size: int = 50
 
 
 @dataclass(frozen=True)
@@ -254,6 +267,13 @@ class RateLimitSettings:
     otp_window_seconds: int = 3600
     provider_test_per_tenant: int = 10
     provider_test_window_seconds: int = 300
+
+
+@dataclass(frozen=True)
+class DeepDocSettings:
+    url: str = ""
+    api_token: str = field(default="", repr=False)
+    timeout_seconds: int = 60
 
 
 @dataclass(frozen=True)
@@ -275,6 +295,8 @@ class Settings:
     upload: UploadSettings = field(default_factory=UploadSettings)
     ingest: IngestSettings = field(default_factory=IngestSettings)
     retrieval: RetrievalSettings = field(default_factory=RetrievalSettings)
+    chat: ChatSettings = field(default_factory=ChatSettings)
+    deepdoc: DeepDocSettings = field(default_factory=DeepDocSettings)
 
 
 def _section(data: dict[str, Any], name: str) -> dict[str, Any]:
@@ -495,6 +517,40 @@ def _parse_retrieval(data: dict[str, Any]) -> RetrievalSettings:
     )
 
 
+def _parse_chat(data: dict[str, Any]) -> ChatSettings:
+    sec = data.get("chat") or {}
+    d = ChatSettings()
+    return ChatSettings(
+        stream_deadline_seconds=_bounded(sec, "chat", "stream_deadline_seconds", d.stream_deadline_seconds, 3600, lo=30),
+        max_question_chars=_bounded(sec, "chat", "max_question_chars", d.max_question_chars, 100000, lo=100),
+        max_session_messages=_bounded(sec, "chat", "max_session_messages", d.max_session_messages, 10000, lo=2),
+        rate_max=_bounded(sec, "chat", "rate_max", d.rate_max, 10000, lo=1),
+        rate_window_seconds=_bounded(sec, "chat", "rate_window_seconds", d.rate_window_seconds, 3600, lo=1),
+        message_page_size=_bounded(sec, "chat", "message_page_size", d.message_page_size, 200, lo=10),
+    )
+
+
+def _parse_deepdoc(data: dict[str, Any]) -> DeepDocSettings:
+    sec = data.get("deepdoc") or {}
+    if not isinstance(sec, dict):
+        raise ConfigError("invalid config section: deepdoc")
+    url = (_optional(sec, "url") or _optional(sec, "legacy_url")).rstrip("/")
+    token = _optional(sec, "api_token")
+    if url:
+        try:
+            parsed = urlsplit(url)
+            valid = (parsed.scheme in {"http", "https"} and parsed.hostname and parsed.port != 0
+                     and not parsed.username and not parsed.password and not parsed.query and not parsed.fragment
+                     and parsed.path in {"", "/"})
+        except ValueError:
+            valid = False
+        if not valid:
+            raise ConfigError("invalid value for config key: deepdoc.url")
+        if len(token) < 24:
+            raise ConfigError("invalid value for config key: deepdoc.api_token")
+    return DeepDocSettings(url, token, _bounded(sec, "deepdoc", "timeout_seconds", 60, 60))
+
+
 def parse_settings(data: dict[str, Any]) -> Settings:
     if not isinstance(data, dict):
         raise ConfigError("configuration file is empty or not a mapping")
@@ -544,6 +600,8 @@ def parse_settings(data: dict[str, Any]) -> Settings:
         upload=_parse_upload(data),
         ingest=_parse_ingest(data),
         retrieval=_parse_retrieval(data),
+        chat=_parse_chat(data),
+        deepdoc=_parse_deepdoc(data),
     )
 
 

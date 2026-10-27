@@ -1,0 +1,103 @@
+{
+  "chat": {
+    "sources": {
+      "chip": "来源 {{n}}：{{name}}",
+      "unavailable": "您已无法访问来源 {{n}}",
+      "heading": "来源",
+      "page": "第 {{page}} 页"
+    },
+    "code": {
+      "copy": "复制代码",
+      "copied": "代码已复制",
+      "copyFailed": "未能复制代码。"
+    },
+    "documentTitle": "对话 - devRag",
+    "rail": {
+      "assistants": "助手",
+      "search": "搜索助手",
+      "newAssistant": "新建助手",
+      "assistantPages": "助手分页",
+      "chats": "对话",
+      "newChat": "新建对话",
+      "chatPages": "对话分页",
+      "open": "助手和对话",
+      "noMatch": "没有匹配的助手。",
+      "noChats": "还没有对话，发送消息即可开始。",
+      "untitled": "新建对话",
+      "assistantsError": "无法加载助手。",
+      "chatsError": "无法加载对话。"
+    },
+    "empty": {
+      "heading": "还没有助手",
+      "body": "创建助手，选择它可以使用的知识库，即可询问文档相关问题。",
+      "action": "创建助手"
+    },
+    "draft": {
+      "hint": "提个问题吧。回答将依据助手的知识库并注明出处。"
+    },
+    "error": {
+      "pageHeading": "无法加载此助手",
+      "listHeading": "无法加载此对话。",
+      "turnBusy": "此对话的上一条消息仍在回答中，请稍候。",
+      "full": "此对话已满，请新建对话继续。",
+      "rateLimited": "发送消息过快，请稍候重试。",
+      "model": "此助手的对话模型在工作区中已不可用。",
+      "rerank": "重排模型暂时不可用，未发送消息，请稍后重试。",
+      "index": "搜索索引暂时不可用，请稍后重试。",
+      "timeout": "对话模型未及时响应，请重试。",
+      "refused": "对话模型拒绝了请求。",
+      "providerRateLimited": "模型提供方正在限制请求，请稍后重试。",
+      "send": "消息未能发送，请重试。"
+    },
+    "gone": {
+      "assistant": "该助手已不存在。",
+      "chat": "该对话已不存在。"
+    },
+    "header": {
+      "settings": "助手设置",
+      "more": "{{name}}的更多操作",
+      "deleteChat": "删除对话",
+      "deleteAssistant": "删除助手"
+    },
+    "notice": {
+      "skipped_one": "助手使用的 {{count}} 个知识库对你不可用，已跳过。",
+      "skipped_other": "助手使用的 {{count}} 个知识库对你不可用，已跳过。",
+      "noneAvailable": "该助手的所有知识库对你均不可用，因此无法回答。请创建者更新它的知识库。"
+    },
+    "message": {
+      "list": "对话内容",
+      "you": "你",
+      "loadEarlier": "加载更早的消息",
+      "stopped": "已停止",
+      "stoppedNote": "此回答在完成前已停止。",
+      "failed": "无法完成回答，请重新提问。",
+      "noSources": "未找到来源",
+      "latency": "{{seconds}} 秒",
+      "tokens": "词元：{{count}}",
+      "tokensApprox": "词元：约 {{count}}",
+      "jump": "跳到最新消息",
+      "generating": "正在检索文档",
+      "thinking": "正在思考",
+      "feedbackUp": "回答有帮助",
+      "feedbackDown": "回答无帮助",
+      "feedbackFailed": "未能保存反馈，请重试。"
+    },
+    "input": {
+      "label": "消息",
+      "placeholder": "提个问题",
+      "hint": "按 Enter 发送，Shift + Enter 换行。",
+      "counter": "{{used}}/{{max}}",
+      "tooLong": "请使用不超过 8,000 个字符。",
+      "send": "发送",
+      "stop": "停止",
+      "sendLabel": "发送消息",
+      "stopLabel": "停止回答"
+    },
+    "live": {
+      "started": "回答已开始",
+      "finished": "回答已完成",
+      "stopped": "回答已停止",
+      "failed": "无法完成回答"
+    }
+  }
+}

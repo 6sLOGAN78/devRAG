@@ -1,0 +1,300 @@
+[
+  {
+    "package": "httpx2",
+    "ecosystem": "pypi",
+    "status": "SUS",
+    "flags": [
+      {
+        "signal": "TYPOSQUAT_RISK",
+        "severity": "warning",
+        "message": "Suspiciously close to 'httpx'. Could be a typosquat."
+      }
+    ],
+    "suggestion": "httpx"
+  },
+  {
+    "package": "numba",
+    "ecosystem": "pypi",
+    "status": "SUS",
+    "flags": [
+      {
+        "signal": "TYPOSQUAT_RISK",
+        "severity": "warning",
+        "message": "Suspiciously close to 'numpy'. Could be a typosquat."
+      }
+    ],
+    "suggestion": "numpy"
+  },
+  {
+    "package": "sympy",
+    "ecosystem": "pypi",
+    "status": "SUS",
+    "flags": [
+      {
+        "signal": "TYPOSQUAT_RISK",
+        "severity": "warning",
+        "message": "Suspiciously close to 'numpy'. Could be a typosquat."
+      }
+    ],
+    "suggestion": "numpy"
+  },
+  {
+    "package": "cloudpickle",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "flatbuffers",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "coloredlogs",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "av",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "click",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "faster-whisper",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "anyio",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "fsspec",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "ctranslate2",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "filelock",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "h11",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "httpcore2",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "joblib",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "humanfriendly",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "huggingface-hub",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "llvmlite",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "idna",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "hf-xet",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "mpmath",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "onnxruntime",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "packaging",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "opencv-python-headless",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "opencc-python-reimplemented",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "pynndescent",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "protobuf",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "pyyaml",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "pyclipper",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "threadpoolctl",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "scikit-learn",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "scipy",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "shapely",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "tqdm",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "tokenizers",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "numpy",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "truststore",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "umap-learn",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "typing-extensions",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  }
+]

@@ -1,0 +1,1801 @@
+[
+  {
+    "plan": "06-01-PLAN.md",
+    "frontmatter": {
+      "valid": true,
+      "missing": [],
+      "present": [
+        "phase",
+        "plan",
+        "type",
+        "wave",
+        "depends_on",
+        "files_modified",
+        "autonomous",
+        "must_haves"
+      ],
+      "schema": "plan"
+    },
+    "structure": {
+      "valid": true,
+      "errors": [],
+      "warnings": [],
+      "task_count": 3,
+      "tasks": [
+        {
+          "name": "Task 1: Complete and mechanically check the review packet",
+          "hasFiles": true,
+          "hasAction": true,
+          "hasVerify": true,
+          "hasDone": true
+        },
+        {
+          "name": "Task 2: Human reviews exact package/model acquisition and paid limits",
+          "hasFiles": true,
+          "hasAction": true,
+          "hasVerify": true,
+          "hasDone": true
+        },
+        {
+          "name": "Task 3: Preserve prior records and admit the accepted feature plans",
+          "hasFiles": true,
+          "hasAction": true,
+          "hasVerify": true,
+          "hasDone": true
+        }
+      ],
+      "frontmatter_fields": [
+        "phase",
+        "plan",
+        "type",
+        "wave",
+        "depends_on",
+        "files_modified",
+        "autonomous",
+        "mode",
+        "requirements",
+        "must_haves"
+      ]
+    }
+  },
+  {
+    "plan": "06-02-PLAN.md",
+    "frontmatter": {
+      "valid": true,
+      "missing": [],
+      "present": [
+        "phase",
+        "plan",
+        "type",
+        "wave",
+        "depends_on",
+        "files_modified",
+        "autonomous",
+        "must_haves"
+      ],
+      "schema": "plan"
+    },
+    "structure": {
+      "valid": true,
+      "errors": [],
+      "warnings": [],
+      "task_count": 3,
+      "tasks": [
+        {
+          "name": "Task 1: Freeze the start the approved cpu ocr service behavior with failing fixtures",
+          "hasFiles": true,
+          "hasAction": true,
+          "hasVerify": true,
+          "hasDone": true
+        },
+        {
+          "name": "Task 2: Deliver the real start the approved cpu ocr service slice",
+          "hasFiles": true,
+          "hasAction": true,
+          "hasVerify": true,
+          "hasDone": true
+        },
+        {
+          "name": "Task 3: Preserve failure semantics and finish this slice\u2019s user controls",
+          "hasFiles": true,
+          "hasAction": true,
+          "hasVerify": true,
+          "hasDone": true
+        }
+      ],
+      "frontmatter_fields": [
+        "phase",
+        "plan",
+        "type",
+        "wave",
+        "depends_on",
+        "files_modified",
+        "autonomous",
+        "mode",
+        "user_setup",
+        "requirements",
+        "must_haves"
+      ]
+    }
+  },
+  {
+    "plan": "06-03-PLAN.md",
+    "frontmatter": {
+      "valid": true,
+      "missing": [],
+      "present": [
+        "phase",
+        "plan",
+        "type",
+        "wave",
+        "depends_on",
+        "files_modified",
+        "autonomous",
+        "must_haves"
+      ],
+      "schema": "plan"
+    },
+    "structure": {
+      "valid": true,
+      "errors": [],
+      "warnings": [],
+      "task_count": 3,
+      "tasks": [
+        {
+          "name": "Task 1: Freeze the read scanned pdfs through the existing document ui behavior with failing fixtures",
+          "hasFiles": true,
+          "hasAction": true,
+          "hasVerify": true,
+          "hasDone": true
+        },
+        {
+          "name": "Task 2: Deliver the real read scanned pdfs through the existing document ui slice",
+          "hasFiles": true,
+          "hasAction": true,
+          "hasVerify": true,
+          "hasDone": true
+        },
+        {
+          "name": "Task 3: Preserve failure semantics and finish this slice\u2019s user controls",
+          "hasFiles": true,
+          "hasAction": true,
+          "hasVerify": true,
+          "hasDone": true
+        }
+      ],
+      "frontmatter_fields": [
+        "phase",
+        "plan",
+        "type",
+        "wave",
+        "depends_on",
+        "files_modified",
+        "autonomous",
+        "mode",
+        "user_setup",
+        "requirements",
+        "must_haves"
+      ]
+    }
+  },
+  {
+    "plan": "06-04-PLAN.md",
+    "frontmatter": {
+      "valid": true,
+      "missing": [],
+      "present": [
+        "phase",
+        "plan",
+        "type",
+        "wave",
+        "depends_on",
+        "files_modified",
+        "autonomous",
+        "must_haves"
+      ],
+      "schema": "plan"
+    },
+    "structure": {
+      "valid": true,
+      "errors": [],
+      "warnings": [],
+      "task_count": 3,
+      "tasks": [
+        {
+          "name": "Task 1: Freeze the preserve visual reading order and remove page furniture behavior with failing fixtures",
+          "hasFiles": true,
+          "hasAction": true,
+          "hasVerify": true,
+          "hasDone": true
+        },
+        {
+          "name": "Task 2: Deliver the real preserve visual reading order and remove page furniture slice",
+          "hasFiles": true,
+          "hasAction": true,
+          "hasVerify": true,
+          "hasDone": true
+        },
+        {
+          "name": "Task 3: Preserve failure semantics and finish this slice\u2019s user controls",
+          "hasFiles": true,
+          "hasAction": true,
+          "hasVerify": true,
+          "hasDone": true
+        }
+      ],
+      "frontmatter_fields": [
+        "phase",
+        "plan",
+        "type",
+        "wave",
+        "depends_on",
+        "files_modified",
+        "autonomous",
+        "mode",
+        "user_setup",
+        "requirements",
+        "must_haves"
+      ]
+    }
+  },
+  {
+    "plan": "06-05-PLAN.md",
+    "frontmatter": {
+      "valid": true,
+      "missing": [],
+      "present": [
+        "phase",
+        "plan",
+        "type",
+        "wave",
+        "depends_on",
+        "files_modified",
+        "autonomous",
+        "must_haves"
+      ],
+      "schema": "plan"
+    },
+    "structure": {
+      "valid": true,
+      "errors": [],
+      "warnings": [],
+      "task_count": 3,
+      "tasks": [
+        {
+          "name": "Task 1: Freeze the open extracted images and office figures securely behavior with failing fixtures",
+          "hasFiles": true,
+          "hasAction": true,
+          "hasVerify": true,
+          "hasDone": true
+        },
+        {
+          "name": "Task 2: Deliver the real open extracted images and office figures securely slice",
+          "hasFiles": true,
+          "hasAction": true,
+          "hasVerify": true,
+          "hasDone": true
+        },
+        {
+          "name": "Task 3: Preserve failure semantics and finish this slice\u2019s user controls",
+          "hasFiles": true,
+          "hasAction": true,
+          "hasVerify": true,
+          "hasDone": true
+        }
+      ],
+      "frontmatter_fields": [
+        "phase",
+        "plan",
+        "type",
+        "wave",
+        "depends_on",
+        "files_modified",
+        "autonomous",
+        "mode",
+        "user_setup",
+        "requirements",
+        "must_haves"
+      ]
+    }
+  },
+  {
+    "plan": "06-06-PLAN.md",
+    "frontmatter": {
+      "valid": true,
+      "missing": [],
+      "present": [
+        "phase",
+        "plan",
+        "type",
+        "wave",
+        "depends_on",
+        "files_modified",
+        "autonomous",
+        "must_haves"
+      ],
+      "schema": "plan"
+    },
+    "structure": {
+      "valid": true,
+      "errors": [],
+      "warnings": [],
+      "task_count": 3,
+      "tasks": [
+        {
+          "name": "Task 1: Freeze the inspect reconstructed pdf tables and crops behavior with failing fixtures",
+          "hasFiles": true,
+          "hasAction": true,
+          "hasVerify": true,
+          "hasDone": true
+        },
+        {
+          "name": "Task 2: Deliver the real inspect reconstructed pdf tables and crops slice",
+          "hasFiles": true,
+          "hasAction": true,
+          "hasVerify": true,
+          "hasDone": true
+        },
+        {
+          "name": "Task 3: Preserve failure semantics and finish this slice\u2019s user controls",
+          "hasFiles": true,
+          "hasAction": true,
+          "hasVerify": true,
+          "hasDone": true
+        }
+      ],
+      "frontmatter_fields": [
+        "phase",
+        "plan",
+        "type",
+        "wave",
+        "depends_on",
+        "files_modified",
+        "autonomous",
+        "mode",
+        "user_setup",
+        "requirements",
+        "must_haves"
+      ]
+    }
+  },
+  {
+    "plan": "06-07-PLAN.md",
+    "frontmatter": {
+      "valid": true,
+      "missing": [],
+      "present": [
+        "phase",
+        "plan",
+        "type",
+        "wave",
+        "depends_on",
+        "files_modified",
+        "autonomous",
+        "must_haves"
+      ],
+      "schema": "plan"
+    },
+    "structure": {
+      "valid": true,
+      "errors": [],
+      "warnings": [],
+      "task_count": 3,
+      "tasks": [
+        {
+          "name": "Task 1: Freeze the choose whole-document chunks and inspect public pipeline templates behavior with failing fixtures",
+          "hasFiles": true,
+          "hasAction": true,
+          "hasVerify": true,
+          "hasDone": true
+        },
+        {
+          "name": "Task 2: Deliver the real choose whole-document chunks and inspect public pipeline templates slice",
+          "hasFiles": true,
+          "hasAction": true,
+          "hasVerify": true,
+          "hasDone": true
+        },
+        {
+          "name": "Task 3: Preserve failure semantics and finish this slice\u2019s user controls",
+          "hasFiles": true,
+          "hasAction": true,
+          "hasVerify": true,
+          "hasDone": true
+        }
+      ],
+      "frontmatter_fields": [
+        "phase",
+        "plan",
+        "type",
+        "wave",
+        "depends_on",
+        "files_modified",
+        "autonomous",
+        "mode",
+        "user_setup",
+        "requirements",
+        "must_haves"
+      ]
+    }
+  },
+  {
+    "plan": "06-08-PLAN.md",
+    "frontmatter": {
+      "valid": true,
+      "missing": [],
+      "present": [
+        "phase",
+        "plan",
+        "type",
+        "wave",
+        "depends_on",
+        "files_modified",
+        "autonomous",
+        "must_haves"
+      ],
+      "schema": "plan"
+    },
+    "structure": {
+      "valid": true,
+      "errors": [],
+      "warnings": [],
+      "task_count": 3,
+      "tasks": [
+        {
+          "name": "Task 1: Freeze the ingest markdown and technical manuals behavior with failing fixtures",
+          "hasFiles": true,
+          "hasAction": true,
+          "hasVerify": true,
+          "hasDone": true
+        },
+        {
+          "name": "Task 2: Deliver the real ingest markdown and technical manuals slice",
+          "hasFiles": true,
+          "hasAction": true,
+          "hasVerify": true,
+          "hasDone": true
+        },
+        {
+          "name": "Task 3: Preserve failure semantics and finish this slice\u2019s user controls",
+          "hasFiles": true,
+          "hasAction": true,
+          "hasVerify": true,
+          "hasDone": true
+        }
+      ],
+      "frontmatter_fields": [
+        "phase",
+        "plan",
+        "type",
+        "wave",
+        "depends_on",
+        "files_modified",
+        "autonomous",
+        "mode",
+        "user_setup",
+        "requirements",
+        "must_haves"
+      ]
+    }
+  },
+  {
+    "plan": "06-09-PLAN.md",
+    "frontmatter": {
+      "valid": true,
+      "missing": [],
+      "present": [
+        "phase",
+        "plan",
+        "type",
+        "wave",
+        "depends_on",
+        "files_modified",
+        "autonomous",
+        "must_haves"
+      ],
+      "schema": "plan"
+    },
+    "structure": {
+      "valid": true,
+      "errors": [],
+      "warnings": [],
+      "task_count": 3,
+      "tasks": [
+        {
+          "name": "Task 1: Freeze the ingest structured json, csv and q&a pairs behavior with failing fixtures",
+          "hasFiles": true,
+          "hasAction": true,
+          "hasVerify": true,
+          "hasDone": true
+        },
+        {
+          "name": "Task 2: Deliver the real ingest structured json, csv and q&a pairs slice",
+          "hasFiles": true,
+          "hasAction": true,
+          "hasVerify": true,
+          "hasDone": true
+        },
+        {
+          "name": "Task 3: Preserve failure semantics and finish this slice\u2019s user controls",
+          "hasFiles": true,
+          "hasAction": true,
+          "hasVerify": true,
+          "hasDone": true
+        }
+      ],
+      "frontmatter_fields": [
+        "phase",
+        "plan",
+        "type",
+        "wave",
+        "depends_on",
+        "files_modified",
+        "autonomous",
+        "mode",
+        "user_setup",
+        "requirements",
+        "must_haves"
+      ]
+    }
+  },
+  {
+    "plan": "06-10-PLAN.md",
+    "frontmatter": {
+      "valid": true,
+      "missing": [],
+      "present": [
+        "phase",
+        "plan",
+        "type",
+        "wave",
+        "depends_on",
+        "files_modified",
+        "autonomous",
+        "must_haves"
+      ],
+      "schema": "plan"
+    },
+    "structure": {
+      "valid": true,
+      "errors": [],
+      "warnings": [],
+      "task_count": 3,
+      "tasks": [
+        {
+          "name": "Task 1: Freeze the read epub books in chapter order behavior with failing fixtures",
+          "hasFiles": true,
+          "hasAction": true,
+          "hasVerify": true,
+          "hasDone": true
+        },
+        {
+          "name": "Task 2: Deliver the real read epub books in chapter order slice",
+          "hasFiles": true,
+          "hasAction": true,
+          "hasVerify": true,
+          "hasDone": true
+        },
+        {
+          "name": "Task 3: Preserve failure semantics and finish this slice\u2019s user controls",
+          "hasFiles": true,
+          "hasAction": true,
+          "hasVerify": true,
+          "hasDone": true
+        }
+      ],
+      "frontmatter_fields": [
+        "phase",
+        "plan",
+        "type",
+        "wave",
+        "depends_on",
+        "files_modified",
+        "autonomous",
+        "mode",
+        "user_setup",
+        "requirements",
+        "must_haves"
+      ]
+    }
+  },
+  {
+    "plan": "06-11-PLAN.md",
+    "frontmatter": {
+      "valid": true,
+      "missing": [],
+      "present": [
+        "phase",
+        "plan",
+        "type",
+        "wave",
+        "depends_on",
+        "files_modified",
+        "autonomous",
+        "must_haves"
+      ],
+      "schema": "plan"
+    },
+    "structure": {
+      "valid": true,
+      "errors": [],
+      "warnings": [],
+      "task_count": 3,
+      "tasks": [
+        {
+          "name": "Task 1: Freeze the read academic papers by section behavior with failing fixtures",
+          "hasFiles": true,
+          "hasAction": true,
+          "hasVerify": true,
+          "hasDone": true
+        },
+        {
+          "name": "Task 2: Deliver the real read academic papers by section slice",
+          "hasFiles": true,
+          "hasAction": true,
+          "hasVerify": true,
+          "hasDone": true
+        },
+        {
+          "name": "Task 3: Preserve failure semantics and finish this slice\u2019s user controls",
+          "hasFiles": true,
+          "hasAction": true,
+          "hasVerify": true,
+          "hasDone": true
+        }
+      ],
+      "frontmatter_fields": [
+        "phase",
+        "plan",
+        "type",
+        "wave",
+        "depends_on",
+        "files_modified",
+        "autonomous",
+        "mode",
+        "user_setup",
+        "requirements",
+        "must_haves"
+      ]
+    }
+  },
+  {
+    "plan": "06-12-PLAN.md",
+    "frontmatter": {
+      "valid": true,
+      "missing": [],
+      "present": [
+        "phase",
+        "plan",
+        "type",
+        "wave",
+        "depends_on",
+        "files_modified",
+        "autonomous",
+        "must_haves"
+      ],
+      "schema": "plan"
+    },
+    "structure": {
+      "valid": true,
+      "errors": [],
+      "warnings": [],
+      "task_count": 3,
+      "tasks": [
+        {
+          "name": "Task 1: Freeze the read legal structure and normalize chinese text behavior with failing fixtures",
+          "hasFiles": true,
+          "hasAction": true,
+          "hasVerify": true,
+          "hasDone": true
+        },
+        {
+          "name": "Task 2: Deliver the real read legal structure and normalize chinese text slice",
+          "hasFiles": true,
+          "hasAction": true,
+          "hasVerify": true,
+          "hasDone": true
+        },
+        {
+          "name": "Task 3: Preserve failure semantics and finish this slice\u2019s user controls",
+          "hasFiles": true,
+          "hasAction": true,
+          "hasVerify": true,
+          "hasDone": true
+        }
+      ],
+      "frontmatter_fields": [
+        "phase",
+        "plan",
+        "type",
+        "wave",
+        "depends_on",
+        "files_modified",
+        "autonomous",
+        "mode",
+        "user_setup",
+        "requirements",
+        "must_haves"
+      ]
+    }
+  },
+  {
+    "plan": "06-13-PLAN.md",
+    "frontmatter": {
+      "valid": true,
+      "missing": [],
+      "present": [
+        "phase",
+        "plan",
+        "type",
+        "wave",
+        "depends_on",
+        "files_modified",
+        "autonomous",
+        "must_haves"
+      ],
+      "schema": "plan"
+    },
+    "structure": {
+      "valid": true,
+      "errors": [],
+      "warnings": [],
+      "task_count": 3,
+      "tasks": [
+        {
+          "name": "Task 1: Freeze the inspect presentation chunks per slide behavior with failing fixtures",
+          "hasFiles": true,
+          "hasAction": true,
+          "hasVerify": true,
+          "hasDone": true
+        },
+        {
+          "name": "Task 2: Deliver the real inspect presentation chunks per slide slice",
+          "hasFiles": true,
+          "hasAction": true,
+          "hasVerify": true,
+          "hasDone": true
+        },
+        {
+          "name": "Task 3: Preserve failure semantics and finish this slice\u2019s user controls",
+          "hasFiles": true,
+          "hasAction": true,
+          "hasVerify": true,
+          "hasDone": true
+        }
+      ],
+      "frontmatter_fields": [
+        "phase",
+        "plan",
+        "type",
+        "wave",
+        "depends_on",
+        "files_modified",
+        "autonomous",
+        "mode",
+        "user_setup",
+        "requirements",
+        "must_haves"
+      ]
+    }
+  },
+  {
+    "plan": "06-14-PLAN.md",
+    "frontmatter": {
+      "valid": true,
+      "missing": [],
+      "present": [
+        "phase",
+        "plan",
+        "type",
+        "wave",
+        "depends_on",
+        "files_modified",
+        "autonomous",
+        "must_haves"
+      ],
+      "schema": "plan"
+    },
+    "structure": {
+      "valid": true,
+      "errors": [],
+      "warnings": [],
+      "task_count": 3,
+      "tasks": [
+        {
+          "name": "Task 1: Freeze the retrieve table rows with their headers behavior with failing fixtures",
+          "hasFiles": true,
+          "hasAction": true,
+          "hasVerify": true,
+          "hasDone": true
+        },
+        {
+          "name": "Task 2: Deliver the real retrieve table rows with their headers slice",
+          "hasFiles": true,
+          "hasAction": true,
+          "hasVerify": true,
+          "hasDone": true
+        },
+        {
+          "name": "Task 3: Preserve failure semantics and finish this slice\u2019s user controls",
+          "hasFiles": true,
+          "hasAction": true,
+          "hasVerify": true,
+          "hasDone": true
+        }
+      ],
+      "frontmatter_fields": [
+        "phase",
+        "plan",
+        "type",
+        "wave",
+        "depends_on",
+        "files_modified",
+        "autonomous",
+        "mode",
+        "user_setup",
+        "requirements",
+        "must_haves"
+      ]
+    }
+  },
+  {
+    "plan": "06-15-PLAN.md",
+    "frontmatter": {
+      "valid": true,
+      "missing": [],
+      "present": [
+        "phase",
+        "plan",
+        "type",
+        "wave",
+        "depends_on",
+        "files_modified",
+        "autonomous",
+        "must_haves"
+      ],
+      "schema": "plan"
+    },
+    "structure": {
+      "valid": true,
+      "errors": [],
+      "warnings": [],
+      "task_count": 3,
+      "tasks": [
+        {
+          "name": "Task 1: Freeze the caption pictures with a configured vision model behavior with failing fixtures",
+          "hasFiles": true,
+          "hasAction": true,
+          "hasVerify": true,
+          "hasDone": true
+        },
+        {
+          "name": "Task 2: Deliver the real caption pictures with a configured vision model slice",
+          "hasFiles": true,
+          "hasAction": true,
+          "hasVerify": true,
+          "hasDone": true
+        },
+        {
+          "name": "Task 3: Preserve failure semantics and finish this slice\u2019s user controls",
+          "hasFiles": true,
+          "hasAction": true,
+          "hasVerify": true,
+          "hasDone": true
+        }
+      ],
+      "frontmatter_fields": [
+        "phase",
+        "plan",
+        "type",
+        "wave",
+        "depends_on",
+        "files_modified",
+        "autonomous",
+        "mode",
+        "user_setup",
+        "requirements",
+        "must_haves"
+      ]
+    }
+  },
+  {
+    "plan": "06-16-PLAN.md",
+    "frontmatter": {
+      "valid": true,
+      "missing": [],
+      "present": [
+        "phase",
+        "plan",
+        "type",
+        "wave",
+        "depends_on",
+        "files_modified",
+        "autonomous",
+        "must_haves"
+      ],
+      "schema": "plan"
+    },
+    "structure": {
+      "valid": true,
+      "errors": [],
+      "warnings": [],
+      "task_count": 3,
+      "tasks": [
+        {
+          "name": "Task 1: Freeze the transcribe audio into timestamped chunks behavior with failing fixtures",
+          "hasFiles": true,
+          "hasAction": true,
+          "hasVerify": true,
+          "hasDone": true
+        },
+        {
+          "name": "Task 2: Deliver the real transcribe audio into timestamped chunks slice",
+          "hasFiles": true,
+          "hasAction": true,
+          "hasVerify": true,
+          "hasDone": true
+        },
+        {
+          "name": "Task 3: Preserve failure semantics and finish this slice\u2019s user controls",
+          "hasFiles": true,
+          "hasAction": true,
+          "hasVerify": true,
+          "hasDone": true
+        }
+      ],
+      "frontmatter_fields": [
+        "phase",
+        "plan",
+        "type",
+        "wave",
+        "depends_on",
+        "files_modified",
+        "autonomous",
+        "mode",
+        "user_setup",
+        "requirements",
+        "must_haves"
+      ]
+    }
+  },
+  {
+    "plan": "06-17-PLAN.md",
+    "frontmatter": {
+      "valid": true,
+      "missing": [],
+      "present": [
+        "phase",
+        "plan",
+        "type",
+        "wave",
+        "depends_on",
+        "files_modified",
+        "autonomous",
+        "must_haves"
+      ],
+      "schema": "plan"
+    },
+    "structure": {
+      "valid": true,
+      "errors": [],
+      "warnings": [],
+      "task_count": 3,
+      "tasks": [
+        {
+          "name": "Task 1: Freeze the read email envelopes and message bodies behavior with failing fixtures",
+          "hasFiles": true,
+          "hasAction": true,
+          "hasVerify": true,
+          "hasDone": true
+        },
+        {
+          "name": "Task 2: Deliver the real read email envelopes and message bodies slice",
+          "hasFiles": true,
+          "hasAction": true,
+          "hasVerify": true,
+          "hasDone": true
+        },
+        {
+          "name": "Task 3: Preserve failure semantics and finish this slice\u2019s user controls",
+          "hasFiles": true,
+          "hasAction": true,
+          "hasVerify": true,
+          "hasDone": true
+        }
+      ],
+      "frontmatter_fields": [
+        "phase",
+        "plan",
+        "type",
+        "wave",
+        "depends_on",
+        "files_modified",
+        "autonomous",
+        "mode",
+        "user_setup",
+        "requirements",
+        "must_haves"
+      ]
+    }
+  },
+  {
+    "plan": "06-18-PLAN.md",
+    "frontmatter": {
+      "valid": true,
+      "missing": [],
+      "present": [
+        "phase",
+        "plan",
+        "type",
+        "wave",
+        "depends_on",
+        "files_modified",
+        "autonomous",
+        "must_haves"
+      ],
+      "schema": "plan"
+    },
+    "structure": {
+      "valid": true,
+      "errors": [],
+      "warnings": [],
+      "task_count": 3,
+      "tasks": [
+        {
+          "name": "Task 1: Freeze the read structured r\u00e9sum\u00e9 sections behavior with failing fixtures",
+          "hasFiles": true,
+          "hasAction": true,
+          "hasVerify": true,
+          "hasDone": true
+        },
+        {
+          "name": "Task 2: Deliver the real read structured r\u00e9sum\u00e9 sections slice",
+          "hasFiles": true,
+          "hasAction": true,
+          "hasVerify": true,
+          "hasDone": true
+        },
+        {
+          "name": "Task 3: Preserve failure semantics and finish this slice\u2019s user controls",
+          "hasFiles": true,
+          "hasAction": true,
+          "hasVerify": true,
+          "hasDone": true
+        }
+      ],
+      "frontmatter_fields": [
+        "phase",
+        "plan",
+        "type",
+        "wave",
+        "depends_on",
+        "files_modified",
+        "autonomous",
+        "mode",
+        "user_setup",
+        "requirements",
+        "must_haves"
+      ]
+    }
+  },
+  {
+    "plan": "06-19-PLAN.md",
+    "frontmatter": {
+      "valid": true,
+      "missing": [],
+      "present": [
+        "phase",
+        "plan",
+        "type",
+        "wave",
+        "depends_on",
+        "files_modified",
+        "autonomous",
+        "must_haves"
+      ],
+      "schema": "plan"
+    },
+    "structure": {
+      "valid": true,
+      "errors": [],
+      "warnings": [],
+      "task_count": 3,
+      "tasks": [
+        {
+          "name": "Task 1: Freeze the manage tags and produce retrieval rank features behavior with failing fixtures",
+          "hasFiles": true,
+          "hasAction": true,
+          "hasVerify": true,
+          "hasDone": true
+        },
+        {
+          "name": "Task 2: Deliver the real manage tags and produce retrieval rank features slice",
+          "hasFiles": true,
+          "hasAction": true,
+          "hasVerify": true,
+          "hasDone": true
+        },
+        {
+          "name": "Task 3: Preserve failure semantics and finish this slice\u2019s user controls",
+          "hasFiles": true,
+          "hasAction": true,
+          "hasVerify": true,
+          "hasDone": true
+        }
+      ],
+      "frontmatter_fields": [
+        "phase",
+        "plan",
+        "type",
+        "wave",
+        "depends_on",
+        "files_modified",
+        "autonomous",
+        "mode",
+        "user_setup",
+        "requirements",
+        "must_haves"
+      ]
+    }
+  },
+  {
+    "plan": "06-20-PLAN.md",
+    "frontmatter": {
+      "valid": true,
+      "missing": [],
+      "present": [
+        "phase",
+        "plan",
+        "type",
+        "wave",
+        "depends_on",
+        "files_modified",
+        "autonomous",
+        "must_haves"
+      ],
+      "schema": "plan"
+    },
+    "structure": {
+      "valid": true,
+      "errors": [],
+      "warnings": [],
+      "task_count": 3,
+      "tasks": [
+        {
+          "name": "Task 1: Freeze the edit and inspect bounded document metadata behavior with failing fixtures",
+          "hasFiles": true,
+          "hasAction": true,
+          "hasVerify": true,
+          "hasDone": true
+        },
+        {
+          "name": "Task 2: Deliver the real edit and inspect bounded document metadata slice",
+          "hasFiles": true,
+          "hasAction": true,
+          "hasVerify": true,
+          "hasDone": true
+        },
+        {
+          "name": "Task 3: Preserve failure semantics and finish this slice\u2019s user controls",
+          "hasFiles": true,
+          "hasAction": true,
+          "hasVerify": true,
+          "hasDone": true
+        }
+      ],
+      "frontmatter_fields": [
+        "phase",
+        "plan",
+        "type",
+        "wave",
+        "depends_on",
+        "files_modified",
+        "autonomous",
+        "mode",
+        "user_setup",
+        "requirements",
+        "must_haves"
+      ]
+    }
+  },
+  {
+    "plan": "06-21-PLAN.md",
+    "frontmatter": {
+      "valid": true,
+      "missing": [],
+      "present": [
+        "phase",
+        "plan",
+        "type",
+        "wave",
+        "depends_on",
+        "files_modified",
+        "autonomous",
+        "must_haves"
+      ],
+      "schema": "plan"
+    },
+    "structure": {
+      "valid": true,
+      "errors": [],
+      "warnings": [],
+      "task_count": 3,
+      "tasks": [
+        {
+          "name": "Task 1: Freeze the generate keywords and questions when requested behavior with failing fixtures",
+          "hasFiles": true,
+          "hasAction": true,
+          "hasVerify": true,
+          "hasDone": true
+        },
+        {
+          "name": "Task 2: Deliver the real generate keywords and questions when requested slice",
+          "hasFiles": true,
+          "hasAction": true,
+          "hasVerify": true,
+          "hasDone": true
+        },
+        {
+          "name": "Task 3: Preserve failure semantics and finish this slice\u2019s user controls",
+          "hasFiles": true,
+          "hasAction": true,
+          "hasVerify": true,
+          "hasDone": true
+        }
+      ],
+      "frontmatter_fields": [
+        "phase",
+        "plan",
+        "type",
+        "wave",
+        "depends_on",
+        "files_modified",
+        "autonomous",
+        "mode",
+        "user_setup",
+        "requirements",
+        "must_haves"
+      ]
+    }
+  },
+  {
+    "plan": "06-22-PLAN.md",
+    "frontmatter": {
+      "valid": true,
+      "missing": [],
+      "present": [
+        "phase",
+        "plan",
+        "type",
+        "wave",
+        "depends_on",
+        "files_modified",
+        "autonomous",
+        "must_haves"
+      ],
+      "schema": "plan"
+    },
+    "structure": {
+      "valid": true,
+      "errors": [],
+      "warnings": [],
+      "task_count": 3,
+      "tasks": [
+        {
+          "name": "Task 1: Freeze the apply controlled tags and auto metadata behavior with failing fixtures",
+          "hasFiles": true,
+          "hasAction": true,
+          "hasVerify": true,
+          "hasDone": true
+        },
+        {
+          "name": "Task 2: Deliver the real apply controlled tags and auto metadata slice",
+          "hasFiles": true,
+          "hasAction": true,
+          "hasVerify": true,
+          "hasDone": true
+        },
+        {
+          "name": "Task 3: Preserve failure semantics and finish this slice\u2019s user controls",
+          "hasFiles": true,
+          "hasAction": true,
+          "hasVerify": true,
+          "hasDone": true
+        }
+      ],
+      "frontmatter_fields": [
+        "phase",
+        "plan",
+        "type",
+        "wave",
+        "depends_on",
+        "files_modified",
+        "autonomous",
+        "mode",
+        "user_setup",
+        "requirements",
+        "must_haves"
+      ]
+    }
+  },
+  {
+    "plan": "06-23-PLAN.md",
+    "frontmatter": {
+      "valid": true,
+      "missing": [],
+      "present": [
+        "phase",
+        "plan",
+        "type",
+        "wave",
+        "depends_on",
+        "files_modified",
+        "autonomous",
+        "must_haves"
+      ],
+      "schema": "plan"
+    },
+    "structure": {
+      "valid": true,
+      "errors": [],
+      "warnings": [],
+      "task_count": 3,
+      "tasks": [
+        {
+          "name": "Task 1: Freeze the run dataset-wide enrichment jobs safely behavior with failing fixtures",
+          "hasFiles": true,
+          "hasAction": true,
+          "hasVerify": true,
+          "hasDone": true
+        },
+        {
+          "name": "Task 2: Deliver the real run dataset-wide enrichment jobs safely slice",
+          "hasFiles": true,
+          "hasAction": true,
+          "hasVerify": true,
+          "hasDone": true
+        },
+        {
+          "name": "Task 3: Preserve failure semantics and finish this slice\u2019s user controls",
+          "hasFiles": true,
+          "hasAction": true,
+          "hasVerify": true,
+          "hasDone": true
+        }
+      ],
+      "frontmatter_fields": [
+        "phase",
+        "plan",
+        "type",
+        "wave",
+        "depends_on",
+        "files_modified",
+        "autonomous",
+        "mode",
+        "user_setup",
+        "requirements",
+        "must_haves"
+      ]
+    }
+  },
+  {
+    "plan": "06-24-PLAN.md",
+    "frontmatter": {
+      "valid": true,
+      "missing": [],
+      "present": [
+        "phase",
+        "plan",
+        "type",
+        "wave",
+        "depends_on",
+        "files_modified",
+        "autonomous",
+        "must_haves"
+      ],
+      "schema": "plan"
+    },
+    "structure": {
+      "valid": true,
+      "errors": [],
+      "warnings": [],
+      "task_count": 3,
+      "tasks": [
+        {
+          "name": "Task 1: Freeze the retrieve raptor summaries with real source citations behavior with failing fixtures",
+          "hasFiles": true,
+          "hasAction": true,
+          "hasVerify": true,
+          "hasDone": true
+        },
+        {
+          "name": "Task 2: Deliver the real retrieve raptor summaries with real source citations slice",
+          "hasFiles": true,
+          "hasAction": true,
+          "hasVerify": true,
+          "hasDone": true
+        },
+        {
+          "name": "Task 3: Preserve failure semantics and finish this slice\u2019s user controls",
+          "hasFiles": true,
+          "hasAction": true,
+          "hasVerify": true,
+          "hasDone": true
+        }
+      ],
+      "frontmatter_fields": [
+        "phase",
+        "plan",
+        "type",
+        "wave",
+        "depends_on",
+        "files_modified",
+        "autonomous",
+        "mode",
+        "user_setup",
+        "requirements",
+        "must_haves"
+      ]
+    }
+  },
+  {
+    "plan": "06-25-PLAN.md",
+    "frontmatter": {
+      "valid": true,
+      "missing": [],
+      "present": [
+        "phase",
+        "plan",
+        "type",
+        "wave",
+        "depends_on",
+        "files_modified",
+        "autonomous",
+        "must_haves"
+      ],
+      "schema": "plan"
+    },
+    "structure": {
+      "valid": true,
+      "errors": [],
+      "warnings": [],
+      "task_count": 3,
+      "tasks": [
+        {
+          "name": "Task 1: Freeze the delete derived results and download authorized artifacts behavior with failing fixtures",
+          "hasFiles": true,
+          "hasAction": true,
+          "hasVerify": true,
+          "hasDone": true
+        },
+        {
+          "name": "Task 2: Deliver the real delete derived results and download authorized artifacts slice",
+          "hasFiles": true,
+          "hasAction": true,
+          "hasVerify": true,
+          "hasDone": true
+        },
+        {
+          "name": "Task 3: Preserve failure semantics and finish this slice\u2019s user controls",
+          "hasFiles": true,
+          "hasAction": true,
+          "hasVerify": true,
+          "hasDone": true
+        }
+      ],
+      "frontmatter_fields": [
+        "phase",
+        "plan",
+        "type",
+        "wave",
+        "depends_on",
+        "files_modified",
+        "autonomous",
+        "mode",
+        "user_setup",
+        "requirements",
+        "must_haves"
+      ]
+    }
+  },
+  {
+    "plan": "06-26-PLAN.md",
+    "frontmatter": {
+      "valid": true,
+      "missing": [],
+      "present": [
+        "phase",
+        "plan",
+        "type",
+        "wave",
+        "depends_on",
+        "files_modified",
+        "autonomous",
+        "must_haves"
+      ],
+      "schema": "plan"
+    },
+    "structure": {
+      "valid": true,
+      "errors": [],
+      "warnings": [],
+      "task_count": 3,
+      "tasks": [
+        {
+          "name": "Task 1: Freeze the select docling or mineru parsing behavior with failing fixtures",
+          "hasFiles": true,
+          "hasAction": true,
+          "hasVerify": true,
+          "hasDone": true
+        },
+        {
+          "name": "Task 2: Deliver the real select docling or mineru parsing slice",
+          "hasFiles": true,
+          "hasAction": true,
+          "hasVerify": true,
+          "hasDone": true
+        },
+        {
+          "name": "Task 3: Preserve failure semantics and finish this slice\u2019s user controls",
+          "hasFiles": true,
+          "hasAction": true,
+          "hasVerify": true,
+          "hasDone": true
+        }
+      ],
+      "frontmatter_fields": [
+        "phase",
+        "plan",
+        "type",
+        "wave",
+        "depends_on",
+        "files_modified",
+        "autonomous",
+        "mode",
+        "user_setup",
+        "requirements",
+        "must_haves"
+      ]
+    }
+  },
+  {
+    "plan": "06-27-PLAN.md",
+    "frontmatter": {
+      "valid": true,
+      "missing": [],
+      "present": [
+        "phase",
+        "plan",
+        "type",
+        "wave",
+        "depends_on",
+        "files_modified",
+        "autonomous",
+        "must_haves"
+      ],
+      "schema": "plan"
+    },
+    "structure": {
+      "valid": true,
+      "errors": [],
+      "warnings": [],
+      "task_count": 3,
+      "tasks": [
+        {
+          "name": "Task 1: Freeze the select paddleocr or mistral ocr models behavior with failing fixtures",
+          "hasFiles": true,
+          "hasAction": true,
+          "hasVerify": true,
+          "hasDone": true
+        },
+        {
+          "name": "Task 2: Deliver the real select paddleocr or mistral ocr models slice",
+          "hasFiles": true,
+          "hasAction": true,
+          "hasVerify": true,
+          "hasDone": true
+        },
+        {
+          "name": "Task 3: Preserve failure semantics and finish this slice\u2019s user controls",
+          "hasFiles": true,
+          "hasAction": true,
+          "hasVerify": true,
+          "hasDone": true
+        }
+      ],
+      "frontmatter_fields": [
+        "phase",
+        "plan",
+        "type",
+        "wave",
+        "depends_on",
+        "files_modified",
+        "autonomous",
+        "mode",
+        "user_setup",
+        "requirements",
+        "must_haves"
+      ]
+    }
+  },
+  {
+    "plan": "06-28-PLAN.md",
+    "frontmatter": {
+      "valid": true,
+      "missing": [],
+      "present": [
+        "phase",
+        "plan",
+        "type",
+        "wave",
+        "depends_on",
+        "files_modified",
+        "autonomous",
+        "must_haves"
+      ],
+      "schema": "plan"
+    },
+    "structure": {
+      "valid": true,
+      "errors": [],
+      "warnings": [],
+      "task_count": 3,
+      "tasks": [
+        {
+          "name": "Task 1: Freeze the select tencent adp or somark parsing behavior with failing fixtures",
+          "hasFiles": true,
+          "hasAction": true,
+          "hasVerify": true,
+          "hasDone": true
+        },
+        {
+          "name": "Task 2: Deliver the real select tencent adp or somark parsing slice",
+          "hasFiles": true,
+          "hasAction": true,
+          "hasVerify": true,
+          "hasDone": true
+        },
+        {
+          "name": "Task 3: Preserve failure semantics and finish this slice\u2019s user controls",
+          "hasFiles": true,
+          "hasAction": true,
+          "hasVerify": true,
+          "hasDone": true
+        }
+      ],
+      "frontmatter_fields": [
+        "phase",
+        "plan",
+        "type",
+        "wave",
+        "depends_on",
+        "files_modified",
+        "autonomous",
+        "mode",
+        "user_setup",
+        "requirements",
+        "must_haves"
+      ]
+    }
+  },
+  {
+    "plan": "06-29-PLAN.md",
+    "frontmatter": {
+      "valid": true,
+      "missing": [],
+      "present": [
+        "phase",
+        "plan",
+        "type",
+        "wave",
+        "depends_on",
+        "files_modified",
+        "autonomous",
+        "must_haves"
+      ],
+      "schema": "plan"
+    },
+    "structure": {
+      "valid": true,
+      "errors": [],
+      "warnings": [],
+      "task_count": 3,
+      "tasks": [
+        {
+          "name": "Task 1: Freeze the select opendataloader and figure-focused parsing behavior with failing fixtures",
+          "hasFiles": true,
+          "hasAction": true,
+          "hasVerify": true,
+          "hasDone": true
+        },
+        {
+          "name": "Task 2: Deliver the real select opendataloader and figure-focused parsing slice",
+          "hasFiles": true,
+          "hasAction": true,
+          "hasVerify": true,
+          "hasDone": true
+        },
+        {
+          "name": "Task 3: Preserve failure semantics and finish this slice\u2019s user controls",
+          "hasFiles": true,
+          "hasAction": true,
+          "hasVerify": true,
+          "hasDone": true
+        }
+      ],
+      "frontmatter_fields": [
+        "phase",
+        "plan",
+        "type",
+        "wave",
+        "depends_on",
+        "files_modified",
+        "autonomous",
+        "mode",
+        "user_setup",
+        "requirements",
+        "must_haves"
+      ]
+    }
+  },
+  {
+    "plan": "06-30-PLAN.md",
+    "frontmatter": {
+      "valid": true,
+      "missing": [],
+      "present": [
+        "phase",
+        "plan",
+        "type",
+        "wave",
+        "depends_on",
+        "files_modified",
+        "autonomous",
+        "must_haves"
+      ],
+      "schema": "plan"
+    },
+    "structure": {
+      "valid": true,
+      "errors": [],
+      "warnings": [],
+      "task_count": 3,
+      "tasks": [
+        {
+          "name": "Task 1: Freeze the prove the complete rich-document path and close the gate behavior with failing fixtures",
+          "hasFiles": true,
+          "hasAction": true,
+          "hasVerify": true,
+          "hasDone": true
+        },
+        {
+          "name": "Task 2: Deliver the real prove the complete rich-document path and close the gate slice",
+          "hasFiles": true,
+          "hasAction": true,
+          "hasVerify": true,
+          "hasDone": true
+        },
+        {
+          "name": "Task 3: Preserve failure semantics and finish this slice\u2019s user controls",
+          "hasFiles": true,
+          "hasAction": true,
+          "hasVerify": true,
+          "hasDone": true
+        }
+      ],
+      "frontmatter_fields": [
+        "phase",
+        "plan",
+        "type",
+        "wave",
+        "depends_on",
+        "files_modified",
+        "autonomous",
+        "mode",
+        "user_setup",
+        "requirements",
+        "must_haves"
+      ]
+    }
+  }
+]

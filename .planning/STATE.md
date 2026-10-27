@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 05-07-PLAN.md (assistant model and service layer); next plan 05-08
-last_updated: "2026-10-19T22:51:08.248Z"
-last_activity: 2026-10-19
+stopped_at: Phase 6 plan 06-02 real CPU OCR complete; continuing 06-03 remote PDF slice
+last_updated: "2026-10-27T17:40:49.103092+00:00"
+last_activity: 2026-10-27 -- Phase 6 admission complete; implementing 06-02
 progress:
   total_phases: 8
   completed_phases: 4
-  total_plans: 146
-  completed_plans: 125
-  percent: 50
+  total_plans: 176
+  completed_plans: 148
+  percent: 84
 ---
 
 # Project State
@@ -21,16 +21,17 @@ progress:
 See: .planning/PROJECT.md (updated 2026-10-05)
 
 **Core value:** A user can upload a document into a knowledge base and get an accurate, cited answer to a question about it, end-to-end through the real pipeline (parse, chunk, embed, index, hybrid retrieve, rerank, generate), with no mocked stages.
-**Current focus:** Phase 5 — retrieval-and-cited-chat-core-value-gate
+**Current focus:** Phase 6 execution — 06-03 remote PDF parsing and previews
 
 ## Current Position
 
-Phase: 5 (retrieval-and-cited-chat-core-value-gate) — EXECUTING
-Plan: 8 of 28
-Status: Ready to execute
-Last activity: 2026-10-19
+Phase: 6 (deep-parsing-and-chunking-breadth) — EXECUTING
+Plan: 03 of 30; plans01–02 complete; remote PDF slice begins
+Status: Actual user approval "Approve the exact packet" is bound to the unchanged audited snapshot in06-APPROVAL.json and validates. Plan01 safeguards pass37focused checks; two Phase6 exit checks are deferred. Decision gate232rows, Ruff and CI7/7 pass. Plan02 CPU OCR is complete with2real integration/1E2E pass and offline5repeatguard p950.624s/peak220.4MiB. No paid inference.
+Prior checks: Phase5 UAT5/6 passed (two user answer judgments and delegated screenshot/Chinese/footprint review). Final Phase5 acceptance remains pending; Phase4 B36 remains separately deferred. Prior paid evidence retained.
+Last activity: 2026-10-27
 
-Progress: [█████████░] 86%
+Progress: 148/176 currently planned execution plans complete (84%); Phase6 2/30 complete.
 
 ## Performance Metrics
 
@@ -217,12 +218,17 @@ Recent decisions affecting current work:
 - [Phase 5]: R-208: similarity threshold 0.2 kept; measured on real bge-m3, relevant 0.2867..0.6381, irrelevant 0.0783..0.1221, planted-fact wording 0.6796..0.7979; probe is manual (scripts/probe), 19 of 24 query embeddings, no chat call
 - [Phase 05]: R-209: assistant rules as built (D-10 binding, per-reader chat-time set, keep-hidden save, D-23 count, D-24 manage matrix, D-26 cascade); deleted dataset ids are dropped by the next save that sends kb_ids
 - [Phase 05]: R-210: assistant view keys explicit; icon is a PNG or JPEG data URL up to 400,000 chars, detail only; plan 05-08 must carry data.reason dataset_not_found on its 404
+- [Phase 05]: R-214: chat turn preparation precedes provider work; empty retrieval skips the chat model; completion persistence and async usage writes run through named executors.
+- [Phase 05]: R-215: SSE deltas and final frame run through Nginx; a stopped turn stores the canonical partial answer, cited subset and estimated usage, and the provider read deadline settles a held stream before Quart cuts it.
+- [Phase 05]: R-216: the live 8B chat model cited the planted chunk in all 15 probe turns with no raw no-marker answers, so the D-05 switch rule kept the configured default.
 
 ### Pending Todos
 
 None yet.
 
 ### Blockers/Concerns
+
+Current session (2026-10-27): final timing is complete and B-37/B-39/B-40 are resolved. Core review found and fixed owner lease renewal, nonstream finalization timeout and ingestion roll-up switch races, with failing regressions first. The full current unit suite passes 2411 tests (six existing skips), and the full current integration suite passes 905 tests. The rebuilt app/worker use cap 16 and the fixes. Ordinary E2E is rerunning alone in 05-E2E-FINAL.log after an earlier 867-pass run exposed a stale absent-TEI test, the roll-up race and a concurrent-fixture cleanup deadlock. Serial E2E will run alone afterward, then only the 17 outstanding live-model and live-ingestion checks. Paid Phase 5 API/browser result 14/14 is retained and must not be repeated. The final R-231, summaries 15/28 and validation sign-off remain pending gate completion. No commits or requirement checkbox changes; Phase 4 B-36 stays deferred.
 
 Host blockers (measured 2026-10-05). Items marked USER ACTION cannot be fixed by agents.
 
@@ -252,6 +258,20 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-10-19T22:51:08.236Z
-Stopped at: Completed 05-07-PLAN.md (assistant model and service layer); next plan 05-08
-Resume file: None
+Last session: 2026-10-27
+Stopped at: Phase6 execution requested; exact package/model/live-limit snapshot explicitly approved. Plans06-01/02 complete, continuing06-03 remote PDF slice. Preserve Phase5 final-acceptance pending and B36. No commits.
+Resume file: .planning/phases/06-deep-parsing-and-chunking-breadth/.continue-here.md
+
+2026-10-27 full-access resume: B-39/B-40 conditions no longer reproduce. Project guard confirms existing containers belong to this checkout; all devrag services are healthy. Approved BGE model/revision, AVX2, 3 GiB and cpuset 0,2,4,6 verified. Final row runs in durable 05-RERANK-RECOVERY.log with 05-RERANK-BGE-RECOVERY.samples.json per repetition. Full unit suite runs separately on cores 8–15 in 05-UNIT-RECOVERY.log. No paid inference repeated.
+
+2026-10-27 active continuation: first ordinary E2E completed 867 passed, two failed, one cleanup deadlock (1090.48 s). Corrected the stale absent-TEI test (focused rerun green). Fixed chat lease stage renewal and bounded nonstream finalization after failing regressions; 59 affected integrations green. Fixed the roll-up switch race (current status under row lock, checked index update before completion); all 51 affected integrations green. Updated R-163/R-212/R-215. App and worker rebuilt with these fixes. Full integration tier now running sequentially in 05-INTEGRATION-FINAL.log; unit tier running in 05-UNIT-FINAL.log. Final BGE row has four durable repetitions; fifth running, then script measures cached restart and merges provenance. Next: finish report/cap/memory and 05-15 summary, ordinary E2E full rerun after integration ends, serial E2E alone, outstanding 17 live checks once, final records/review/validation and 05-28 summary. Do not repeat successful paid Phase 5 14 checks. Do not commit or claim Phase 4 B-36.
+
+Timing completion: 05-RERANK-TIMING.md and merged samples now contain all 12 rows / 60 raw repetitions with source hashes and final-row recovery provenance. Peak sizing 2267.136 MiB -> 3072m (3g), cap 16, cached restart 9.954 s. Review report 05-REVIEW.md records three resolved correctness findings and one resolved stale test. Final full unit result 2411 passed / 6 existing skips (104.50 s); 05-INTEGRATION-FINAL.log currently running 905 selected integration tests. Next run full ordinary E2E alone after integration, then serial E2E alone, then only test_live_models.py + test_live_ingestion.py (17 live checks). Preserve already-passed Phase 5 paid checks, no commits, no B-36 claim.
+
+Latest continuation: full fresh integration completed 905 passed / 3381 deselected in 877.07 s, including real BGE and all new regressions. Full ordinary E2E rerun is active (05-E2E-FINAL.log), then serial E2E and only the remaining Phase 3/4 live files. Timing is complete. No paid Phase 5 rerun or commit.
+
+2026-10-27 final continuation: plans 05-15/05-28 summarized, all automated gate tiers green and R-231 pinned. See 05-GATE-LOG.md, 05-VERIFICATION.md and 05-HUMAN-UAT.md. Paid Phase 5 checks were preserved; only outstanding Phase 3/4 live checks ran once. Final phase status human_needed; no automatic Phase 6 transition.
+
+2026-10-27 Phase6 planning/admission handoff: user invoked plan-phase6 --auto, then resume. No Phase5 UAT answer was recorded. Phase6 research/UI/source/validation contracts and30 plans pass inline checks; auto entry completed audit preparation only. Pending blocking-human package/model/budget acceptance is in06-APPROVAL.json; no response is inferred from resume. Continue at06-CHECKPOINT.md Task2. No commit/staging/requirements edits.
+
+2026-10-27 user authorization update: "push t github too" authorizes staging, committing and pushing reviewed completed work to the configured GitHub remote (6sLOGAN78/devRAG,master). Earlier no-commit/no-staging notes are historical and superseded for this work. Preserve local credentials/model caches and scratch; no force push or requirement-checkbox changes. Continue Phase6plan03 after publishing completed01/02 and Phase5work.

@@ -12,6 +12,30 @@ pytestmark = pytest.mark.unit
 DOCKER = Path(__file__).resolve().parents[2] / "docker"
 
 
+def test_deepdoc_profile_has_isolated_production_boundary_and_bounded_dev_probe():
+    document = _load("docker-compose.yml")
+    service = document["services"]["deepdoc"]
+    assert service["profiles"] == ["deepdoc"]
+    assert service["user"] == "10001:10001" and service["read_only"] is True
+    assert service["cap_drop"] == ["ALL"]
+    assert service["security_opt"] == ["no-new-privileges:true"]
+    assert service["networks"] == ["deepdoc"]
+    assert document["networks"]["deepdoc"]["internal"] is True
+    assert "ports" not in service and "MYSQL_PASSWORD" not in service["environment"]
+    assert "DEEPDOC_API_TOKEN" in service["environment"]
+    dev = _load("docker-compose.dev.yml")["services"]["deepdoc"]
+    assert dev["mem_limit"] == "3g" and dev["cpus"] == 2
+    assert dev["ports"] == ["127.0.0.1:${DEEPDOC_PORT:-9390}:9390"]
+
+
+def test_operator_native_entry_and_full_gate_enable_deepdoc_explicitly():
+    root = DOCKER.parent
+    assert "deepdoc-up:" in (root / "Makefile").read_text()
+    assert "--profile deepdoc" in (root / "Makefile").read_text()
+    assert "CLEAN_ROOM_DEEPDOC" in (root / "scripts/clean_room.sh").read_text()
+    assert "DEEPDOC_API_TOKEN" in (root / "scripts/preflight.sh").read_text()
+
+
 def _load(name: str) -> dict[str, Any]:
     return yaml.safe_load((DOCKER / name).read_text(encoding="utf-8"))
 
@@ -68,3 +92,29 @@ def test_valkey_keeps_stream_entries() -> None:
     assert text.count("volatile-lru") == 1
     assert "allkeys-lru" not in text
     assert "allkeys-lru" not in (DOCKER / "docker-compose.dev.yml").read_text(encoding="utf-8")
+
+
+def test_tei_service_uses_the_approved_image_and_persistent_model_cache() -> None:
+    base = _load("docker-compose-base.yml")
+    svc = base["services"]["tei"]
+    assert svc["profiles"] == ["tei-cpu"]
+    assert svc["image"] == "${TEI_IMAGE:-ghcr.io/huggingface/text-embeddings-inference:cpu-1.9.4}"
+    assert svc["command"] == ["--model-id", "${TEI_RERANK_MODEL:-BAAI/bge-reranker-base}", "--auto-truncate"]
+    assert svc["ports"] == ["${BIND_HOST:-127.0.0.1}:${TEI_PORT:-6381}:80"]
+    assert svc["environment"]["REVISION"] == "${TEI_RERANK_REVISION:-2cfc18c9415c912f9d8155881c133215df768a70}"
+    assert svc["volumes"] == ["tei_data:/data"]
+    assert svc["networks"]["ragflow"]["aliases"] == ["tei"]
+    assert svc["healthcheck"]["test"] == ["CMD", "curl", "-fsS", "http://localhost:80/health"]
+    assert svc["healthcheck"]["start_period"] == "300s"
+    assert "tei_data" in base["volumes"]
+    assert "mem_limit" not in svc
+    assert "mem_limit" not in _load("docker-compose.yml")["services"].get("tei", {})
+    assert "mem_limit" in _load("docker-compose.dev.yml")["services"]["tei"]
+
+
+def test_tei_is_wired_into_stack_entry_points() -> None:
+    root = DOCKER.parent
+    for name in ("Makefile", "scripts/clean_room.sh"):
+        assert "--profile tei-cpu" in (root / name).read_text()
+    assert "WAIT_STACK_TIMEOUT=900" in (root / "Makefile").read_text()
+    assert "TEI requires at least 6 GB free" in (root / "scripts/preflight.sh").read_text()

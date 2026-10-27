@@ -15,6 +15,17 @@ BASE = ROOT / "docker" / "docker-compose-base.yml"
 DOC = ROOT / "docs" / "18-deployment" / "environment-variables.md"
 
 
+def test_deepdoc_config_has_all_operator_variables_and_no_secret_default():
+    values, secrets = parse_env(EXAMPLE)
+    assert {"DEEPDOC_IMAGE", "DEEPDOC_MODEL_DIR", "DEEPDOC_PORT", "DEEPDOC_URL",
+            "TENSORRT_DLA_SVR", "DEEPDOC_API_TOKEN"} <= set(values)
+    assert "DEEPDOC_API_TOKEN" in secrets and values["DEEPDOC_API_TOKEN"] == ""
+    template = (ROOT / "conf/service_conf.yaml.template").read_text()
+    compose = (ROOT / "docker/docker-compose.yml").read_text()
+    for name in ("DEEPDOC_URL", "TENSORRT_DLA_SVR", "DEEPDOC_API_TOKEN"):
+        assert name in template and name in compose
+
+
 def parse_env(path: Path) -> tuple[dict[str, str], set[str]]:
     values: dict[str, str] = {}
     secrets: set[str] = set()
@@ -181,7 +192,7 @@ def test_phase4_variables_are_catalogued_and_passed_to_the_app() -> None:
 
 PHASE5_RETRIEVAL_VARIABLES = {
     "RETRIEVAL_TOP_K": "1024",
-    "RETRIEVAL_RERANK_MAX_CANDIDATES": "64",
+    "RETRIEVAL_RERANK_MAX_CANDIDATES": "16",
     "RETRIEVAL_MSM_PERCENT": "30",
     "RETRIEVAL_MSM_RETRY_PERCENT": "10",
     "RETRIEVAL_SYNONYM_TTL_SECONDS": "86400",
@@ -200,3 +211,36 @@ def test_retrieval_variables_are_catalogued_with_defaults_and_passed_to_the_app(
     for name in PHASE5_RETRIEVAL_VARIABLES:
         assert f"  {name}:" in compose, f"{name} is not passed to the app service"
         assert "${" + name + ":-" in template, f"{name} is not read by the template"
+
+
+PHASE5_CHAT_VARIABLES = {
+    "CHAT_STREAM_DEADLINE_SECONDS": "300",
+    "CHAT_MAX_QUESTION_CHARS": "8000",
+    "CHAT_MAX_SESSION_MESSAGES": "400",
+    "CHAT_RATE_MAX": "30",
+    "CHAT_RATE_WINDOW_SECONDS": "60",
+    "CHAT_MESSAGE_PAGE_SIZE": "50",
+}
+
+
+def test_chat_variables_are_catalogued_with_defaults_and_passed_to_the_app() -> None:
+    values, secrets = parse_env(EXAMPLE)
+    compose = (ROOT / "docker" / "docker-compose.yml").read_text(encoding="utf-8")
+    template = (ROOT / "conf" / "service_conf.yaml.template").read_text(encoding="utf-8")
+    for name, default in PHASE5_CHAT_VARIABLES.items():
+        assert values.get(name) == default
+        assert name not in secrets
+        assert f"  {name}:" in compose
+        assert "${" + name + ":-" in template
+
+
+def test_tei_variables_are_catalogued_and_hf_token_is_empty() -> None:
+    values, secrets = parse_env(EXAMPLE)
+    assert values["TEI_IMAGE"] == "ghcr.io/huggingface/text-embeddings-inference:cpu-1.9.4"
+    assert values["TEI_RERANK_MODEL"] == "BAAI/bge-reranker-base"
+    assert values["TEI_RERANK_REVISION"] == "2cfc18c9415c912f9d8155881c133215df768a70"
+    assert values["TEI_PORT"] == "6381"
+    assert values["TEI_CPUSET"] == ""
+    assert values["HF_TOKEN"] == ""
+    assert "HF_TOKEN" in secrets
+    assert "HF_TOKEN" not in (ROOT / "docker/docker-compose.yml").read_text()

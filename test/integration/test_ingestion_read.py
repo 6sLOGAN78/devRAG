@@ -233,7 +233,7 @@ def test_the_log_text_is_capped_redacted_and_free_of_traces_and_paths(world):
     detail = ir.get_log(visible_of(world), log_id)
     assert len(detail["log"]) <= 3000
     text = "\n".join(detail["log"])
-    for banned in ("Traceback", "/ragflow", "/tmp", "127.0.0.1", KEY_SHAPE, 'File "'):
+    for banned in ("Traceback", "/ragflow", "/tmp", "127.0.0.1", KEY_SHAPE, 'File "'):  # noqa: S108 - forbidden leak text, not a filesystem path used by this test
         assert banned not in text, banned
     assert detail["log"][0].endswith("line 500") or len(detail["log"]) == 3000
 

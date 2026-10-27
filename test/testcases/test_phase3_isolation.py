@@ -32,6 +32,7 @@ from test.testcases._matrix_fixtures import (
     A_EMBED_MODEL,
     A_PROVIDER_KEY,
     A_TEAM_DATASET,
+    CHATS,
     COMPAT,
     DATASETS,
     MODELS,
@@ -40,6 +41,7 @@ from test.testcases._matrix_fixtures import (
     PROVIDER_SLUG,
     PROVIDERS,
     World,
+    a_chat_id,
     a_embed_id,
     build_world,
     call,
@@ -55,7 +57,7 @@ PHASE3_PREFIXES = (
     "/api/v1/datasets",
     "/api/v1/documents",
     "/v1/task/status",
-    # Phase 5 families (CONTRACTS section 5): they match no registry row until plans 05-08 and 05-11 land, so nothing else changes now.
+    # Phase 5 families (CONTRACTS section 5): the assistant rows landed in plan 05-08; the completions row lands in plan 05-11.
     "/api/v1/chats",
     "/api/v1/chat/",
 )
@@ -243,7 +245,78 @@ def _inv_task_status(w: World, who: Account | None, token: str, as_tenant: str |
     return call(w.client, "GET", f"/v1/task/status/{w.scratch.get('document_id') or w.a_task_id}", token, {})
 
 
+def _chat_id(w: World) -> str:
+    return str(w.scratch.get("chat_id") or w.a_team_chat["id"])
+
+
+def _inv_create_chat(w: World, who: Account | None, token: str, as_tenant: str | None) -> httpx.Response:
+    return call(w.client, "POST", CHATS, token, {}, body=_body(as_tenant, name=_unique("iso-chat"), llm_id=a_chat_id()))
+
+
+def _inv_list_chats(w: World, who: Account | None, token: str, as_tenant: str | None) -> httpx.Response:
+    return call(w.client, "GET", CHATS, token, {}, query=_query(as_tenant))
+
+
+def _inv_chat(w: World, who: Account | None, token: str, as_tenant: str | None) -> httpx.Response:
+    return call(w.client, "GET", f"{CHATS}/{_chat_id(w)}", token, {})
+
+
+def _inv_update_chat(w: World, who: Account | None, token: str, as_tenant: str | None) -> httpx.Response:
+    return call(w.client, "PUT", f"{CHATS}/{_chat_id(w)}", token, {}, body={"top_n": 4})
+
+
+def _inv_delete_chat(w: World, who: Account | None, token: str, as_tenant: str | None) -> httpx.Response:
+    return call(w.client, "DELETE", f"{CHATS}/{_chat_id(w)}", token, {})
+
+
+def _session_id(w: World) -> str:
+    return str(w.scratch.get("session_id") or w.a_team_session["id"])
+
+
+def _message_id(w: World) -> str:
+    return str(w.scratch.get("message_id") or w.a_team_message_id)
+
+
+def _sessions_path(w: World) -> str:
+    return f"{CHATS}/{_chat_id(w)}/sessions"
+
+
+def _inv_create_session(w: World, who: Account | None, token: str, as_tenant: str | None) -> httpx.Response:
+    return call(w.client, "POST", _sessions_path(w), token, {}, body={"name": _unique("iso-session")})
+
+
+def _inv_list_sessions(w: World, who: Account | None, token: str, as_tenant: str | None) -> httpx.Response:
+    return call(w.client, "GET", _sessions_path(w), token, {})
+
+
+def _inv_session(w: World, who: Account | None, token: str, as_tenant: str | None) -> httpx.Response:
+    return call(w.client, "GET", f"{_sessions_path(w)}/{_session_id(w)}", token, {})
+
+
+def _inv_delete_session(w: World, who: Account | None, token: str, as_tenant: str | None) -> httpx.Response:
+    return call(w.client, "DELETE", f"{_sessions_path(w)}/{_session_id(w)}", token, {})
+
+
+def _inv_feedback(w: World, who: Account | None, token: str, as_tenant: str | None) -> httpx.Response:
+    return call(w.client, "POST", f"{_sessions_path(w)}/{_session_id(w)}/messages/{_message_id(w)}/feedback", token, {}, body={"thumb": "up"})
+
+
+def _inv_completion(w: World, who: Account | None, token: str, as_tenant: str | None) -> httpx.Response:
+    return call(w.client, "POST", "/api/v1/chat/completions", token, {}, body=_body(as_tenant, chat_id=_chat_id(w), message="hello", stream=False))
+
+
 INVOKERS: dict[str, Invoker] = {
+    "POST /api/v1/chat/completions": _inv_completion,
+    "POST /api/v1/chats/{chat_id}/sessions": _inv_create_session,
+    "GET /api/v1/chats/{chat_id}/sessions": _inv_list_sessions,
+    "GET /api/v1/chats/{chat_id}/sessions/{session_id}": _inv_session,
+    "DELETE /api/v1/chats/{chat_id}/sessions/{session_id}": _inv_delete_session,
+    "POST /api/v1/chats/{chat_id}/sessions/{session_id}/messages/{message_id}/feedback": _inv_feedback,
+    "POST /api/v1/chats": _inv_create_chat,
+    "GET /api/v1/chats": _inv_list_chats,
+    "GET /api/v1/chats/{chat_id}": _inv_chat,
+    "PUT /api/v1/chats/{chat_id}": _inv_update_chat,
+    "DELETE /api/v1/chats/{chat_id}": _inv_delete_chat,
     "GET /api/v1/datasets/{dataset_id}/documents/{doc_id}/pages/{n}/image": _inv_page_image,
     "GET /api/v1/datasets/{dataset_id}/documents/{doc_id}/content": _inv_document_content,
     "GET /api/v1/datasets/{dataset_id}/ingestions/summary": _inv_ingestion_summary,
@@ -292,8 +365,16 @@ NORMAL_IS_REFUSED_ON_A_RESOURCE = frozenset(
         "POST /api/v1/datasets/{dataset_id}/documents/{doc_id}/chunks",
         "PATCH /api/v1/datasets/{dataset_id}/documents/{doc_id}/chunks/{chunk_id}",
         "POST /api/v1/datasets/{dataset_id}/embedding/check",  # the dataset manage rule: creator, owner or admin (KB-16)
+        # A's team assistant: only its creator, an owner or an admin may change or delete it (D-24)
+        "PUT /api/v1/chats/{chat_id}",
+        "DELETE /api/v1/chats/{chat_id}",
     }
 )
+PRIVATE_SESSION_ROWS = frozenset({
+    "GET /api/v1/chats/{chat_id}/sessions/{session_id}",
+    "DELETE /api/v1/chats/{chat_id}/sessions/{session_id}",
+    "POST /api/v1/chats/{chat_id}/sessions/{session_id}/messages/{message_id}/feedback",
+})
 # Rows whose resource is addressed by a dataset id: a stranger reaches nothing even without naming the workspace.
 ID_ROWS = frozenset(
     {
@@ -318,10 +399,17 @@ ID_ROWS = frozenset(
         "GET /api/v1/datasets/{dataset_id}/documents/{doc_id}/pages/{n}/image",
         "GET /api/v1/datasets/{dataset_id}/documents/{doc_id}/content",
         "POST /api/v1/datasets/search",  # dataset_ids in the body: a stranger reaches nothing even without naming the workspace
+        "POST /api/v1/chat/completions",  # chat_id in the body
+        "GET /api/v1/chats/{chat_id}",
+        "PUT /api/v1/chats/{chat_id}",
+        "DELETE /api/v1/chats/{chat_id}",
+        "POST /api/v1/chats/{chat_id}/sessions",
+        "GET /api/v1/chats/{chat_id}/sessions",
+        *PRIVATE_SESSION_ROWS,
     }
 )
 # Rows that call the model provider with the stored key: a refused request must never reach it.
-PROVIDER_CALLING_ROWS = frozenset({"PUT /api/v1/providers", "POST /api/v1/providers/{provider}/instances", "POST /api/v1/datasets/search"})
+PROVIDER_CALLING_ROWS = frozenset({"PUT /api/v1/providers", "POST /api/v1/providers/{provider}/instances", "POST /api/v1/datasets/search", "POST /api/v1/chat/completions"})
 
 
 def invoker_problems(rows: list[dict[str, Any]], invokers: Mapping[str, Invoker] = INVOKERS) -> list[str]:
@@ -360,7 +448,20 @@ def _prepare_document(w: World) -> None:
     w.scratch["document_id"] = str(_ok_data(upload_file(w, w.a.token, str(w.a_team_dataset["id"]), name=_unique("iso") + ".pdf"), "A uploads a disposable document")[0]["id"])
 
 
+def _prepare_chat(w: World) -> None:
+    """A disposable team assistant of A's for the delete row."""
+    made = _ok_data(call(w.client, "POST", CHATS, w.a.token, {}, body={"name": _unique("iso-disposable-chat"), "permission": "team", "llm_id": a_chat_id()}), "A creates a disposable assistant")
+    w.scratch["chat_id"] = str(made["id"])
+
+
+def _prepare_session(w: World) -> None:
+    made = _ok_data(call(w.client, "POST", f"{CHATS}/{w.a_team_chat['id']}/sessions", w.a.token, {}, body={"name": _unique("iso-disposable-session")}), "A creates a disposable session")
+    w.scratch["session_id"] = str(made["id"])
+
+
 PREPARE: dict[str, Callable[[World], None]] = {
+    "DELETE /api/v1/chats/{chat_id}/sessions/{session_id}": _prepare_session,
+    "DELETE /api/v1/chats/{chat_id}": _prepare_chat,
     "DELETE /api/v1/providers/{provider}": _prepare_provider,
     "DELETE /api/v1/datasets": _prepare_dataset,
     "DELETE /api/v1/datasets/{dataset_id}/documents": _prepare_document,
@@ -374,6 +475,9 @@ def run(w: World, key: str, who: Account | None, token: str, as_tenant: str | No
     if random_id:
         w.scratch["dataset_id"] = uuid.uuid4().hex
         w.scratch["document_id"] = uuid.uuid4().hex
+        w.scratch["chat_id"] = uuid.uuid4().hex
+        w.scratch["session_id"] = uuid.uuid4().hex
+        w.scratch["message_id"] = uuid.uuid4().hex
     before = w.snapshot()
     if w.fake is not None:
         w.fake.reset()
@@ -451,6 +555,10 @@ def test_owner_admin_and_normal_get_the_status_the_row_promises(world: World, ro
     for role, who, as_tenant in _role_callers(world):
         allowed = role in roles and not (role == "normal" and key in NORMAL_IS_REFUSED_ON_A_RESOURCE)
         resp, before = run(world, key, who, who.token, as_tenant)
+        if key in PRIVATE_SESSION_ROWS and role != "owner":
+            assert triple(resp) == NOT_FOUND, f"{key} as {role}: a teammate's session is private"
+            assert world.snapshot() == before
+            continue
         if allowed:
             assert succeeded(resp), f"{key} as {role}: HTTP {resp.status_code}, expected success"
             continue

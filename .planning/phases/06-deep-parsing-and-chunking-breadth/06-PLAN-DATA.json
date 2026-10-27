@@ -1,0 +1,833 @@
+[
+  {
+    "n": 2,
+    "title": "Start the approved CPU OCR service",
+    "req": [
+      "DEPLOY-08",
+      "SEC-08",
+      "PARSE-06",
+      "PARSE-24"
+    ],
+    "goal": "An operator can start the deepdoc profile and submit an image to obtain real OCR text and bounded boxes with no runtime download.",
+    "a": [
+      "deepdoc/server.py",
+      "deepdoc/ocr.py",
+      "deepdoc/model_runtime.py",
+      "docker/Dockerfile.deepdoc"
+    ],
+    "b": [
+      "docker/docker-compose-base.yml",
+      "docker/docker-compose.dev.yml",
+      "scripts/provision_deepdoc.py",
+      "common/settings.py"
+    ],
+    "act": "After the blocking 06-01 approval, install only the approved candidate lock subset into the DeepDoc image, retaining notices. Implement CPU InferenceSession loading of pinned det.onnx/rec.onnx and CTC dictionary, DBNet-style detection/crop/recognition/CTC decoding, image/pixel limits and finite typed outputs. Expose Quart GET /health and authenticated multipart POST /v1/ocr on 9390, with schema version1, fixed errors and no arbitrary paths/URLs. A self-generated fixture containing two planted numbers must return those numbers and boxes inside its image; a cold process loads only local hash-verified assets. Read the actual approved ONNX input/output signatures rather than guessing names. No full upstream package or runtime installer is imported.",
+    "hard": "Provision the four unique ONNX files plus ocr.res from the immutable manifest through a staging directory and atomic publish; reject wrong hash/size and partial files before readiness. Add the deepdoc profile/internal alias, non-root/read-only execution, dropped capabilities, operator authentication, bounded tmpfs and dev-only trial CPU/memory guards from 06-RESEARCH.md. Production has no published9390 port. Config uses DEEPDOC_URL and TENSORRT_DLA_SVR precedence and secret-safe reprs. Prove missing weights fail health, bad auth fails without inference, corrupt/oversize inputs have typed refusals and an isolated network cannot trigger a download. Record image/cache footprint and five-repeat OCR CPU/RSS guard before claiming capacity. If incompatible tensors, quality or resource guards fail, preserve evidence and block instead of replacing OCR with supplied text.",
+    "checks": "Exact OCR planted facts; bounded boxes; missing/corrupt artifact refusal; no runtime network; explicit authenticated health/protocol tests.",
+    "unit": "test/unit_test/test_phase6_02.py",
+    "e2e": "test/testcases/test_phase6_02_flow.py"
+  },
+  {
+    "n": 3,
+    "title": "Read scanned PDFs through the existing document UI",
+    "req": [
+      "PARSE-06",
+      "PARSE-24",
+      "PARSE-25",
+      "PARSE-26",
+      "UI-14",
+      "SEC-08"
+    ],
+    "goal": "A member uploads a scanned PDF, selects its page range/layout option, parses it and sees OCR chunks with correct source-page highlights.",
+    "a": [
+      "rag/parsers/pdf.py",
+      "rag/parsers/deepdoc_client.py",
+      "deepdoc/pdf.py",
+      "rag/svr/pipeline.py"
+    ],
+    "b": [
+      "api/db/services/document_view.py",
+      "api/db/services/parser_config.py",
+      "web/src/components/parse-configuration/index.tsx",
+      "web/src/components/parse-configuration/schema.ts"
+    ],
+    "act": "Write the failing upload/parse/chunk-inspector journey, then stream source bytes and validated options to DeepDoc POST /v1/parse. Move native PDF raster/text extraction into deepdoc/pdf.py and use OCR on missing or corrupt text layers; keep native text for valid pages. Preserve current ParsedBlock/PageBox and one-based top-left page-unit geometry, converting zoom3 pixels once after crop/rotation. Extend the typed response/client with schema version, page dimensions and report counters; the worker imports no PDFium/ONNX/OpenCV when remote mode is selected. Build chunker config from parser_id instead of unconditionally constructing NaiveConfig. Existing native-text PDF facts and Phase5 reference contracts remain green.",
+    "hard": "Move page-count/task partitioning and thumbnail/page-preview rendering to the same remote boundary through document-info/page-image endpoints; inspect actual task_service/document-view helpers before editing, and include any changed helper in the manifest. Activate persisted layout and one-based inclusive page-range controls in the existing form, preserving unknown settings/overrides. Add focused browser form coverage before changing copy. Extend make/clean-room/preflight/wait stack invocations with --profile deepdoc and bounded model-aware readiness, not extra sleeps. Test rotation/crop, selected pages outside range,13-page partition boundaries, service outage/cancel, malformed response and no local fallback. Any extra glue exceeding the four-file task budget is split into an additional reviewed plan, not hidden in a broad change.",
+    "checks": "Scanned fixture fact reaches stored chunks; selected pages only; rotated/cropped geometry round trip; native imports absent in remote worker; persisted layout setting.",
+    "unit": "test/unit_test/test_phase6_03.py",
+    "e2e": "test/testcases/test_phase6_03_flow.py"
+  },
+  {
+    "n": 4,
+    "title": "Preserve visual reading order and remove page furniture",
+    "req": [
+      "PARSE-04",
+      "PARSE-05",
+      "PARSE-08",
+      "UI-14"
+    ],
+    "goal": "A member parses a two-column PDF and reads sections in order without repeated headers or footers.",
+    "a": [
+      "deepdoc/layout.py",
+      "deepdoc/geometry.py",
+      "deepdoc/pdf.py",
+      "rag/parsers/types.py"
+    ],
+    "b": [
+      "web/src/components/parse-configuration/index.tsx",
+      "common/ingest_codes.py",
+      "deepdoc/server.py",
+      "rag/parsers/deepdoc_client.py"
+    ],
+    "act": "Run the approved layout.onnx with the documented eleven semantic labels and explicit score/IoU thresholds. Match text/OCR boxes to regions using intersection/text-box area>=0.4, deterministic IoU NMS and column-aware stable reading order. Carry heading/figure/table semantics through ParsedBlock, preserve unknown labels as a typed refusal rather than silently calling them text, and discard Header/Footer before chunking. A fixed two-column fixture must yield the annotated paragraph sequence and omit both planted furniture strings; retain Reference content unless an explicit documented option says otherwise.",
+    "hard": "Connect the saved layout toggle/backend selection to the real parse request and existing inspector. Layout off preserves text-only ordering; on uses model output and reports its backend in non-secret operation metadata. Test overlap0.3999 versus0.4, ties, duplicate detections, empty pages, bounded coordinates, corrupt text and mixed native/OCR pages. Record fixed corpus quality and five-repeat latency/RSS without retuning the fixture to the selected weights.",
+    "checks": "All documented label IDs; threshold boundary; fixed reading order and absent header/footer; no clipped/negative/NaN boxes.",
+    "unit": "test/unit_test/test_phase6_04.py",
+    "e2e": "test/testcases/test_phase6_04_flow.py"
+  },
+  {
+    "n": 5,
+    "title": "Open extracted images and office figures securely",
+    "req": [
+      "PARSE-09",
+      "PARSE-11",
+      "PARSE-19",
+      "STOR-09",
+      "DOC-18"
+    ],
+    "goal": "A member opens figures extracted from PDF, DOCX and PPTX, while foreign or deleted assets cannot be fetched.",
+    "a": [
+      "rag/parsers/docx.py",
+      "rag/parsers/pptx.py",
+      "api/db/services/document_asset_service.py",
+      "api/apps/restful_apis/document_asset_api.py"
+    ],
+    "b": [
+      "api/db/models/knowledge.py",
+      "rag/svr/pipeline.py",
+      "rag/utils/storage_base.py",
+      "web/src/components/source-drawer/index.tsx"
+    ],
+    "act": "Extract embedded OOXML images via safe relationships plus PDF figure/table descriptors, normalize image bytes inside DeepDoc and compute deterministic image2id digests. Store at tenant/doc/img.png or tenant/doc/tables/id.png with bounded ownership metadata; add a Peewee-owned DocumentAsset relation with opaque id,tenant_id,kb_id,doc_id,kind,object_key,mime_type,size,sha256 and generation_id, plus unique tenant/doc/kind/digest ownership, using the next sequential migration. Authorization resolves the current original Document and dataset visibility before any object read; filenames never confer access. GET /api/v1/documents/images/{image_id} resolves ownership through an openable original document and streams exact content with safe MIME/length/cache policy. No global digest oracle or caller-supplied path.",
+    "hard": "Apply schema migration on real MySQL, regenerate schema/Go entities, and wire all new registry/auth/matrix/leak invokers and generated schemas through the execution contract. Update existing inspector/source drawer for authenticated assets, dedup within tenant/document, retry/empty state and stale workspace fencing. Reparse/delete cleanup must retain assets referenced elsewhere by an authorized record and remove orphaned artifacts. Test guessed/foreign/deleted identifiers, duplicate figures, DOCX/PPTX relationship traversal and captions containing HTML; no native image decode occurs in API/worker remote mode. Native image handler additions belong in06-02's typed protocol module and are included in the file inventory before editing.",
+    "checks": "Actual extracted bytes and deterministic digest; tenant/doc ownership; same duplicate dedup; delete/reparse garbage collection; authenticated image rendering.",
+    "unit": "test/unit_test/test_phase6_05.py",
+    "e2e": "test/testcases/test_phase6_05_flow.py"
+  },
+  {
+    "n": 6,
+    "title": "Inspect reconstructed PDF tables and crops",
+    "req": [
+      "PARSE-07",
+      "STOR-09",
+      "DOC-18"
+    ],
+    "goal": "A member opens a parsed PDF table as structured cell content with its actual source crop.",
+    "a": [
+      "deepdoc/tables.py",
+      "deepdoc/pdf.py",
+      "rag/parsers/types.py",
+      "rag/svr/chunk_doc.py"
+    ],
+    "b": [
+      "rag/parsers/deepdoc_client.py",
+      "rag/chunking/naive.py",
+      "deepdoc/server.py",
+      "web/src/components/source-drawer/index.tsx"
+    ],
+    "act": "Implement tsr.onnx preprocessing/postprocessing against the pinned model and annotated cells: rows, columns, header/projected-header and spanning cells, text-to-cell association and escaped HTML table output. Preserve title/caption, page-unit boxes and deterministic table asset descriptors. The fixture includes one merged header and one empty cell; assert exact row/column spans and planted numeric cells, not just '<table>' existence. Extend Chunk/build_row with backward-compatible table/asset metadata while all old call sites retain defaults.",
+    "hard": "Carry bounded table crop bytes/descriptors through the DeepDoc response and store them only through the tenant/doc asset ownership path introduced in06-05; that prerequisite is already complete and the same plan now proves the final product endpoint. In this flow, source drawer loads only authenticated assets and renders table content through the safe existing Markdown/table path. Test malicious cell HTML, page-spanning tables, bad crop dimensions and missing asset cleanup. The final gate requires06-05 before claiming STOR-09/DOC-18 complete.",
+    "checks": "Exact spanned table HTML and numbers; matching crop; safe escaping; final image endpoint ownership requires06-05.",
+    "unit": "test/unit_test/test_phase6_06.py",
+    "e2e": "test/testcases/test_phase6_06_flow.py"
+  },
+  {
+    "n": 7,
+    "title": "Choose whole-document chunks and inspect public pipeline templates",
+    "req": [
+      "CHUNK-14",
+      "CHUNK-27",
+      "CHUNK-28"
+    ],
+    "goal": "A member chooses One chunk, while anyone can read the documented static built-in pipeline catalog without exposing workspace data.",
+    "a": [
+      "rag/chunking/one.py",
+      "rag/chunking/factory.py",
+      "common/ingest_codes.py",
+      "internal/handler/pipeline.go"
+    ],
+    "b": [
+      "internal/router/router.go",
+      "conf/routes.yaml",
+      "web/src/constants/chunk-methods.ts",
+      "internal/pipeline/builtin.go"
+    ],
+    "act": "Implement one.chunk with exactly one output preserving all source positions and image IDs; explicit oversize/context errors never silently split it. Register the real method and existing dialog choice. Implement the two docs/04-api/workflow-api.md public GETs in Go Gin: /api/v1/pipelines?type=builtin and /api/v1/pipelines/:id, serving a finite embedded static template catalog. Templates contain IDs/config shape/descriptions only, no tenant/credential/runtime state. No Python controller or canvas engine replaces the Go catalog.",
+    "hard": "Generate route policy/schema artifacts, add public-read/static-data tests and verify unknown IDs/types have fixed responses. Extend Python implementation/Go static catalog parity assertions and method-dialog saved-state tests. Catalog availability honestly tracks built methods while retaining documented templates; final gate requires every fourteen method implementations. Retain the pre-existing decision that PARSE-26/CHUNK-28 Go runtime mirrors are deferred; this plan implements the Python one mirror behavior and the separate required Go static API only.",
+    "checks": "One document means one chunk; unchanged positions; public catalog identical with/without credentials and no tenant data; route policy owner=go.",
+    "unit": "test/unit_test/test_phase6_07.py",
+    "e2e": "test/testcases/test_phase6_07_flow.py"
+  },
+  {
+    "n": 8,
+    "title": "Ingest Markdown and technical manuals",
+    "req": [
+      "PARSE-14",
+      "CHUNK-11"
+    ],
+    "goal": "A member uploads a Markdown manual and sees headings, code fences, parameter tables and related diagrams kept together.",
+    "a": [
+      "rag/parsers/markdown.py",
+      "rag/parsers/router.py",
+      "rag/chunking/manual.py",
+      "rag/chunking/factory.py"
+    ],
+    "b": [
+      "common/ingest_codes.py",
+      "web/src/constants/chunk-methods.ts",
+      "rag/svr/pipeline.py",
+      "rag/parsers/types.py"
+    ],
+    "act": "Replace Markdown-as-TXT routing with a bounded structural parser for ATX/setext headings, paragraphs, fenced code, lists and pipe tables using existing dependencies or stdlib only. Implement manual boundaries grouping code/parameter tables/diagram descriptors with their subsection heading and ordered positions. A fixture with backticks in code and a following heading must preserve complete fences and not merge unrelated sections. Do not execute code or fetch linked images.",
+    "hard": "Wire parser-specific config and the saved Manual choice through upload/parse/inspector. Preserve source text and safe rendered code/table structure through indexing and source references. Test unclosed fences, HTML injection, huge lines, delimiter literals, no remote requests and unsupported asset references. Add focused method-form and original Markdown source-drawer tests without introducing a new Markdown package.",
+    "checks": "Exact heading/fence/table boundaries; same code text after index/read; no execution or network; saved Manual choice.",
+    "unit": "test/unit_test/test_phase6_08.py",
+    "e2e": "test/testcases/test_phase6_08_flow.py"
+  },
+  {
+    "n": 9,
+    "title": "Ingest structured JSON, CSV and Q&A pairs",
+    "req": [
+      "PARSE-15",
+      "PARSE-17",
+      "CHUNK-08",
+      "CHUNK-28"
+    ],
+    "goal": "A member uploads JSON records or quoted CSV Q&A and retrieves the corresponding answer chunk.",
+    "a": [
+      "rag/parsers/json.py",
+      "rag/parsers/csv.py",
+      "rag/parsers/router.py",
+      "rag/chunking/qa.py"
+    ],
+    "b": [
+      "rag/chunking/factory.py",
+      "common/ingest_codes.py",
+      "rag/svr/chunk_doc.py",
+      "web/src/constants/chunk-methods.ts"
+    ],
+    "act": "Dispatch JSON and CSV to their own parsers. Bound JSON depth/record counts and serialize stable key paths without evaluating values; CSV uses stdlib csv.reader with BOM, embedded newline/quote handling and header-row context. QA recognizes validated question/answer columns or explicit text pairs, preserves one pair per chunk and stores normalized question_tks alongside untouched answer/source text. JSON arrays, nested records and CSV multiline quoted fields have annotated golden output.",
+    "hard": "Register QA for text/CSV/XLSX/JSON record inputs only when its pair extraction succeeds; invalid shapes fail with fixed actionable reasons, not naive fallback. Make the existing dialog choice persist and retrieval test find the planted answer using its question field. Test duplicate headers, mismatched rows, formula-looking values as inert text, depth/size limits and empty questions. Python fulfills the already-approved CHUNK-28 QA mirror scope; no Go chunker is added.",
+    "checks": "Quoted multiline fields preserved; deterministic JSON paths; exactly paired QA chunks and question_tks; invalid pair shape refused.",
+    "unit": "test/unit_test/test_phase6_09.py",
+    "e2e": "test/testcases/test_phase6_09_flow.py"
+  },
+  {
+    "n": 10,
+    "title": "Read EPUB books in chapter order",
+    "req": [
+      "PARSE-16",
+      "CHUNK-04"
+    ],
+    "goal": "A member uploads an EPUB and selects Book to retrieve chapters in the document spine order.",
+    "a": [
+      "rag/parsers/epub.py",
+      "rag/parsers/router.py",
+      "rag/chunking/book.py",
+      "rag/chunking/factory.py"
+    ],
+    "b": [
+      "common/ingest_codes.py",
+      "rag/parsers/limits.py",
+      "web/src/constants/chunk-methods.ts",
+      "rag/parsers/types.py"
+    ],
+    "act": "Use safe ZIP/XML and existing HTML parsing for EPUB container/OPF/spine/TOC, reject path traversal/symlinks and external entities and never fetch resources. Book groups heading/TOC hierarchy while preserving chapter titles/paths and chunks oversized sections within their parent. The fixture intentionally has archive filename order different from spine order; assert the exact spine sequence and parent heading prefix.",
+    "hard": "Expose Book through existing controls and parser reports; use bounded expanded bytes/member count/depth and preserve non-EPUB book support from headings. Test missing/duplicate spine items, damaged containers, inherited XML namespaces, oversized chapter and empty content. Keep source ordering deterministic on retries and prove chapter citation text survives chunk inspector retrieval.",
+    "checks": "Spine order beats ZIP filename order; correct chapter ancestry; ZIP/XXE protections; deterministic IDs and source text.",
+    "unit": "test/unit_test/test_phase6_10.py",
+    "e2e": "test/testcases/test_phase6_10_flow.py"
+  },
+  {
+    "n": 11,
+    "title": "Read academic papers by section",
+    "req": [
+      "CHUNK-03"
+    ],
+    "goal": "A member selects Paper and sees Abstract, Introduction, Methods and References boundaries retained in chunks.",
+    "a": [
+      "rag/chunking/paper.py",
+      "rag/chunking/factory.py",
+      "common/ingest_codes.py",
+      "web/src/constants/chunk-methods.ts"
+    ],
+    "b": [
+      "rag/parsers/types.py",
+      "rag/svr/pipeline.py",
+      "web/src/components/chunk-method-dialog/chunk-method-form.tsx",
+      "rag/svr/chunk_doc.py"
+    ],
+    "act": "Implement paper section detection from typed layout headings and recognized text headings, preserving numbered/subnumbered ancestry and Abstract/References. Fit long sections within configured token budget without crossing a section boundary; attach source boxes and section titles. A paper fixture contains misleading heading-like words in body text and a two-page section; golden boundaries reject false splits.",
+    "hard": "Use method-specific config through existing API and dialog; include table/figure references without dropping positions. Test missing abstracts, multilingual heading labels, references-only content, heading ties and token-boundary overflow. Run native PDF paper fixture only after approved DeepDoc readiness; text/Markdown paper unit fixtures remain pure and fast.",
+    "checks": "Exact annotated sections; no split at body-text keyword; long section bounded; paper selection remains after reload.",
+    "unit": "test/unit_test/test_phase6_11.py",
+    "e2e": "test/testcases/test_phase6_11_flow.py"
+  },
+  {
+    "n": 12,
+    "title": "Read legal structure and normalize Chinese text",
+    "req": [
+      "CHUNK-05",
+      "CHUNK-17"
+    ],
+    "goal": "A member selects Laws and retrieves Chinese legal articles using simplified or traditional query text.",
+    "a": [
+      "rag/chunking/laws.py",
+      "rag/nlp/tokenizer.py",
+      "rag/chunking/factory.py",
+      "common/ingest_codes.py"
+    ],
+    "b": [
+      "web/src/constants/chunk-methods.ts",
+      "rag/svr/chunk_doc.py",
+      "rag/nlp/query.py",
+      "rag/parsers/types.py"
+    ],
+    "act": "After approved OpenCC/Jieba dependency installation, apply full-width folding, traditional-to-simplified normalization, URL/email removal and dictionary segmentation/fine tokens with stable offset provenance. Preserve existing English token/golden fusion behavior. Laws recognizes Chapter/Section/Article/Item including \u7b2c\u4e00\u7ae0/\u7b2c\u4e00\u6761 and keeps full ancestry per chunk; article-looking quoted body text does not become a top-level section. Keep normalized text separate from raw source/citation text.",
+    "hard": "Prove traditional/simplified equivalent legal queries find the same planted article and original characters/boxes still highlight the source. Test mixed Latin/Chinese, punctuation, repeated words, combining characters, offsets after removed URLs and article numbering. Register Laws in the form and retain unknown parser_config keys. Do not silently replace the approved tokenizer dictionary or download it at parse time.",
+    "checks": "Chapter/article hierarchy; traditional and simplified retrieval parity; original source offsets preserved; unchanged English scoring tests.",
+    "unit": "test/unit_test/test_phase6_12.py",
+    "e2e": "test/testcases/test_phase6_12_flow.py"
+  },
+  {
+    "n": 13,
+    "title": "Inspect presentation chunks per slide",
+    "req": [
+      "CHUNK-06",
+      "CHUNK-28"
+    ],
+    "goal": "A member selects Presentation and sees each slide\u2019s title, text, table and notes grouped without mixing slides.",
+    "a": [
+      "rag/chunking/presentation.py",
+      "rag/parsers/pptx.py",
+      "rag/chunking/factory.py",
+      "common/ingest_codes.py"
+    ],
+    "b": [
+      "web/src/constants/chunk-methods.ts",
+      "rag/parsers/types.py",
+      "rag/svr/pipeline.py",
+      "rag/svr/chunk_doc.py"
+    ],
+    "act": "Implement slide-aware grouping using existing PPTX blocks, title, notes and HTML tables. Append the slide title to each bounded chunk from that slide, preserve its page/slide identity, and never cross slide boundaries. Long notes split within the slide only; empty/title-only slides have explicit behavior. Add generated real PPTX fixtures and exact expected slide groups.",
+    "hard": "Expose the method in the saved form and inspector with slide labels, using typed structural metadata rather than parsing arbitrary title strings. Embedded images are owned by06-05/15 and remain referenced through that contract; do not claim those remainders complete here. Prove stable order/IDs, no duplicate title, blank slides and mixed notes/table content. CHUNK-28 is fulfilled by the Python presentation implementation per the recorded scope ruling.",
+    "checks": "No cross-slide chunks; titles and notes preserved; stable slide identity; persisted Presentation selection.",
+    "unit": "test/unit_test/test_phase6_13.py",
+    "e2e": "test/testcases/test_phase6_13_flow.py"
+  },
+  {
+    "n": 14,
+    "title": "Retrieve table rows with their headers",
+    "req": [
+      "CHUNK-07",
+      "CHUNK-28"
+    ],
+    "goal": "A member selects Table and retrieves a row together with the table title and column headers.",
+    "a": [
+      "rag/chunking/table.py",
+      "rag/chunking/factory.py",
+      "common/ingest_codes.py",
+      "rag/parsers/tabletext.py"
+    ],
+    "b": [
+      "web/src/constants/chunk-methods.ts",
+      "rag/svr/chunk_doc.py",
+      "rag/parsers/types.py",
+      "rag/svr/pipeline.py"
+    ],
+    "act": "Implement one logical data row per chunk with repeated title/column header context, including HTML row/column spans from TSR and office parsers. Use safe parsed structure, not regex on arbitrary model HTML. The fixture repeats the same numeric value under different column names so only the full title/header context disambiguates the retrieval. Honor cell escaping and position ownership.",
+    "hard": "Wire CSV/XLSX/PDF tables to the same method config while preserving source format-specific row positions and missing-coordinate honesty. Test merged/multilevel headers, empty cells, nested/malformed tables, very wide rows and explicit token-limit refusals. No Go chunker is added; Python table behavior closes its approved CHUNK-28 remainder.",
+    "checks": "One row per chunk; exact header/title context; merged-cell semantics; no fabricated coordinates.",
+    "unit": "test/unit_test/test_phase6_14.py",
+    "e2e": "test/testcases/test_phase6_14_flow.py"
+  },
+  {
+    "n": 15,
+    "title": "Caption pictures with a configured vision model",
+    "req": [
+      "PARSE-18",
+      "PARSE-19",
+      "CHUNK-10",
+      "LLM-10"
+    ],
+    "goal": "A member configures a vision model, uploads a picture and retrieves a supported caption linked to its actual image.",
+    "a": [
+      "rag/llm/vision_model.py",
+      "rag/llm/__init__.py",
+      "api/db/services/llm_service.py",
+      "rag/chunking/picture.py"
+    ],
+    "b": [
+      "rag/parsers/image.py",
+      "rag/parsers/router.py",
+      "api/db/services/provider_service.py",
+      "web/src/components/parse-configuration/index.tsx"
+    ],
+    "act": "Extend ProviderSpec/LLMBundle with a typed vision operation using the existing OpenRouter/OpenAI-compatible client, sealed tenant credentials and fixed whitelisted generation parameters. Provider-save probes count against vision budget. image parser uses native OCR/image normalization in DeepDoc and picture chunks store real model captions plus actual asset IDs; OCR-only mode remains explicit, not an invented caption. Use bounded bytes/data URLs, never let a model fetch arbitrary remote image URLs.",
+    "hard": "Expose only configured vision choices in the existing settings and make Picture parser/method availability honest. Add deterministic local model responses for unit/API/browser tests, then one separately budgeted real caption in06-30. Test malicious image instructions as data, oversized images, timeout/cancel, no configured model, empty caption, usage/cross-tenant key isolation and source-image preservation. Figure caption prompts live beside the existing fixed prompt generators without changing Phase5 citation rules.",
+    "checks": "Configured vision model resolves tenant key; real caption references stored image; no fallback fictional description; provider usage and cancellation bounded.",
+    "unit": "test/unit_test/test_phase6_15.py",
+    "e2e": "test/testcases/test_phase6_15_flow.py"
+  },
+  {
+    "n": 16,
+    "title": "Transcribe audio into timestamped chunks",
+    "req": [
+      "PARSE-20",
+      "CHUNK-15",
+      "LLM-11"
+    ],
+    "goal": "A member selects Audio, uploads WAV or MP3 and reads timestamped speech chunks using the configured ASR model.",
+    "a": [
+      "deepdoc/asr.py",
+      "rag/llm/asr_model.py",
+      "rag/parsers/audio.py",
+      "rag/chunking/audio.py"
+    ],
+    "b": [
+      "rag/llm/__init__.py",
+      "api/db/services/llm_service.py",
+      "api/db/services/provider_service.py",
+      "web/src/constants/chunk-methods.ts"
+    ],
+    "act": "After the exact approved faster-whisper/PyAV/CTranslate2 lock and pinned tiny model are provisioned, expose bounded authenticated /v1/asr in DeepDoc. Local-only WhisperModel CPU int8 produces segment start/end/text; no automatic VAD/model fetch. Add ASR provider type/factory/LLMBundle operation with credential-free exact trusted service default and optional guarded remote provider only if explicitly configured. Audio parsing/chunking retains monotonic seconds, source audio identity and bounded segment length, never claims PDF positions.",
+    "hard": "Register MP3/WAV through router and the real Audio form; wire provider model capability/defaults through existing typed API/frontend selectors in the declared file manifest before edits. Native decode remains in DeepDoc; limit audio duration/decoded samples and handle silence, damaged media, timeouts/cancellation and language mismatch with fixed errors. Tests use a licensed/original short spoken fact with ground-truth transcript; the final real local ASR run has at most three calls including save probe and measures actual accuracy/latency.",
+    "checks": "WAV/MP3 planted spoken fact; monotonic timestamps; no imaginary page boxes; local-only loading; duration/silence/corruption/cancel cases.",
+    "unit": "test/unit_test/test_phase6_16.py",
+    "e2e": "test/testcases/test_phase6_16_flow.py"
+  },
+  {
+    "n": 17,
+    "title": "Read email envelopes and message bodies",
+    "req": [
+      "PARSE-21",
+      "CHUNK-12"
+    ],
+    "goal": "A member uploads an .eml file and reads From, To, Subject, Date and decoded message-body chunks.",
+    "a": [
+      "rag/parsers/email.py",
+      "rag/parsers/router.py",
+      "rag/chunking/email.py",
+      "rag/chunking/factory.py"
+    ],
+    "b": [
+      "common/ingest_codes.py",
+      "web/src/constants/chunk-methods.ts",
+      "rag/parsers/types.py",
+      "rag/svr/pipeline.py"
+    ],
+    "act": "Use stdlib email policy/header decoding for MIME multipart alternative/mixed, charset and folded headers. Prefer an explicit body selection policy and sanitize HTML with existing parser. Email chunks repeat the relevant envelope fields, preserve message/attachment provenance and bounded text boundaries; never auto-fetch remote images or execute attachments. Fixtures cover encoded subject, multilingual body and nested MIME.",
+    "hard": "Expose Email through existing dialog and upload allowlist only with its implemented parser; add safe suffix/MIME catalog updates in the file manifest. Test invalid dates, absent headers, duplicate recipients, deep nesting, oversized decoded parts, malicious HTML and traversal filenames. Unsupported attachments are reported honestly as ignored/bounded artifacts, not parsed as body or silently claimed supported.",
+    "checks": "Correct decoded envelope/body; deterministic MIME alternative policy; no network/attachment execution; bounded nesting and saved Email method.",
+    "unit": "test/unit_test/test_phase6_17.py",
+    "e2e": "test/testcases/test_phase6_17_flow.py"
+  },
+  {
+    "n": 18,
+    "title": "Read structured r\u00e9sum\u00e9 sections",
+    "req": [
+      "CHUNK-09"
+    ],
+    "goal": "A member selects Resume and can inspect validated name/contact/work/education/skills sections with original source support.",
+    "a": [
+      "rag/chunking/resume.py",
+      "rag/chunking/factory.py",
+      "rag/prompts/enrichment.py",
+      "common/ingest_codes.py"
+    ],
+    "b": [
+      "rag/svr/enrichment.py",
+      "rag/svr/pipeline.py",
+      "web/src/constants/chunk-methods.ts",
+      "api/db/services/parser_config.py"
+    ],
+    "act": "Implement bounded r\u00e9sum\u00e9 entity extraction with configured tenant chat model and a fixed JSON schema for name/contact/work history/education/skills. A section-based deterministic path handles clearly structured headings; model inference is explicit for unstructured content. Missing values are absent, never invented, and extracted fields retain source text/positions. One bounded call per input; no free-form tool execution or external lookup.",
+    "hard": "Wire selected model/config through the existing Resume method and inspector, count paid calls before submission and preserve cancellation/lock checks. Test missing sections, misleading prompt instructions, malformed JSON, invented-contact prevention, repeated jobs and redaction of source logs. Real r\u00e9sum\u00e9 inference is covered inside06-30's approved chat cap; deterministic tests do not impersonate production providers.",
+    "checks": "Exact supported entities and source links; absent unknown contact values; schema refusal and bounded model call; no PII in logs.",
+    "unit": "test/unit_test/test_phase6_18.py",
+    "e2e": "test/testcases/test_phase6_18_flow.py"
+  },
+  {
+    "n": 19,
+    "title": "Manage tags and produce retrieval rank features",
+    "req": [
+      "CHUNK-13",
+      "KB-10",
+      "KB-11",
+      "RETR-13"
+    ],
+    "goal": "A member parses a tag-oriented document, sees weighted dataset tags and retrieves with the documented tag/PageRank feature.",
+    "a": [
+      "rag/chunking/tag.py",
+      "api/db/services/dataset_tag_service.py",
+      "api/apps/restful_apis/dataset_tag_api.py",
+      "rag/nlp/search.py"
+    ],
+    "b": [
+      "rag/svr/chunk_doc.py",
+      "api/db/services/parser_config.py",
+      "web/src/pages/dataset/tags.tsx",
+      "rag/nlp/fusion.py"
+    ],
+    "act": "Implement Tag chunking with bounded normalized tag_fea weights and actual index producers. Publish Knowledgebase.pagerank to pagerank_fea only from authorized dataset config; implement documented tag cosine and10*tag_score+pagerank consumption without changing old scores when no rank features exist. GET /api/v1/datasets/{id}/tags, DELETE that collection and GET /api/v1/datasets/tags/aggregation authorize every requested dataset before aggregation and reject rather than silently include an inaccessible private dataset. Store counts/weights with deterministic ordering and checked DocStore updates.",
+    "hard": "Expose Tag and a dataset tags section with list/empty/error/delete confirmation and selection-scoped aggregation. Extend route/schema/matrix/leak coverage and test unknown/foreign/mixed private datasets, zero denominators, NaN weights, no tags, duplicate normalized labels, concurrent delete/reparse and PageRank-only golden scores. RETR-13 closure is limited to the explicit tag/PageRank producer handoff; unrelated Phase5 partials stay partial.",
+    "checks": "Weighted tags listed/deleted/aggregated only for authorized datasets; tag cosine formula exact; old fusion goldens unchanged; actual pagerank_fea producer.",
+    "unit": "test/unit_test/test_phase6_19.py",
+    "e2e": "test/testcases/test_phase6_19_flow.py"
+  },
+  {
+    "n": 20,
+    "title": "Edit and inspect bounded document metadata",
+    "req": [
+      "DOC-17",
+      "KB-12",
+      "KB-13"
+    ],
+    "goal": "A member batch-edits selected document metadata and reads flattened fields and the dataset\u2019s auto-metadata configuration.",
+    "a": [
+      "api/db/services/document_metadata_service.py",
+      "api/apps/restful_apis/document_metadata_api.py",
+      "api/db/services/parser_config.py",
+      "api/db/models/knowledge.py"
+    ],
+    "b": [
+      "web/src/pages/dataset/metadata.tsx",
+      "web/src/pages/dataset/selection-bar.tsx",
+      "api/db/services/document_service.py",
+      "rag/svr/chunk_doc.py"
+    ],
+    "act": "Implement PATCH /api/v1/datasets/{id}/documents/metadatas with explicit selected document IDs, bounded scalar/array values, key/depth/total-size limits and atomic authorization of the entire batch. The current Document has no metadata column: add Document.meta_fields as a bounded JSONField(default=dict) through the next sequential Peewee migration, backfill old rows to {}, and verify real migrated MySQL plus generated schema/Go parity. Keep generated provenance separate from user edits in typed reserved internal metadata fields. Synchronize current index metadata through checked updates and report partial backend failure honestly. Implement GET /api/v1/datasets/metadata/flattened and GET /api/v1/datasets/{id}/metadata/config with private-dataset filtering and stable flattening rules.",
+    "hard": "Render a metadata section and selected-document edit form with unchanged-field preservation, per-field errors, busy state and rollback/refetch semantics. Run any necessary migration against real MySQL, regenerate both language schemas and verify data remains after restart. Add generated route/schema/isolation/matrix/leak tests, concurrent deletion, stale selection, unauthorized mixed batch, reserved-key/dot/path collision and malicious value rendering. Metadata changes do not overwrite source content or geometry.",
+    "checks": "Atomic authorized batch; bounded deterministic flattened keys; real persistence/index agreement; safe text UI; no source/geometry rewrite.",
+    "unit": "test/unit_test/test_phase6_20.py",
+    "e2e": "test/testcases/test_phase6_20_flow.py"
+  },
+  {
+    "n": 21,
+    "title": "Generate keywords and questions when requested",
+    "req": [
+      "CHUNK-22",
+      "CHUNK-23",
+      "LLM-32",
+      "UI-14"
+    ],
+    "goal": "A member enables bounded keyword/question counts, parses a document and retrieves using the generated terms and questions.",
+    "a": [
+      "rag/prompts/enrichment.py",
+      "rag/svr/enrichment.py",
+      "rag/svr/pipeline.py",
+      "rag/svr/chunk_doc.py"
+    ],
+    "b": [
+      "api/db/services/parser_config.py",
+      "web/src/components/parse-configuration/index.tsx",
+      "web/src/components/parse-configuration/schema.ts",
+      "api/db/services/chunk_view.py"
+    ],
+    "act": "Implement fixed keyword/question prompts and validated output types through LLMBundle, counts auto_keywords0..32 and auto_questions0..16 with default0/off. Enrichment occurs before embedding/index publication, contributes important_kwd/important_tks/question_tks and never replaces raw chunk source/boxes. Calls have per-stage deadlines, cancellation/lease checks and no open DB connection during inference. One bounded batch operation per planned stage replaces an uncontrolled per-token/repair loop; malformed output has an explicit bounded refusal policy.",
+    "hard": "Replace the keyword NotYetRow with persisted number input and a separate question count using inherited UI patterns; expose generated keywords/questions in chunk inspection. Test off=>zero model calls, exact maximum counts, normalized duplicate removal, untrusted document instructions, provider timeout, usage after cancellation and failure/retry idempotency. End-to-end retrieval finds a planted source using a generated query term while no-LLM original parsing still passes.",
+    "checks": "Off costs zero calls; correct generated fields/limits; raw source preserved; real retrieval uses generated terms; no unbounded repair calls.",
+    "unit": "test/unit_test/test_phase6_21.py",
+    "e2e": "test/testcases/test_phase6_21_flow.py"
+  },
+  {
+    "n": 22,
+    "title": "Apply controlled tags and auto metadata",
+    "req": [
+      "CHUNK-24",
+      "CHUNK-25",
+      "LLM-32"
+    ],
+    "goal": "A member enables an allowed tag set and metadata schema, then sees validated generated labels and fields for parsed documents.",
+    "a": [
+      "rag/prompts/enrichment.py",
+      "rag/svr/enrichment.py",
+      "api/db/services/parser_config.py",
+      "rag/svr/pipeline.py"
+    ],
+    "b": [
+      "api/db/services/dataset_tag_service.py",
+      "api/db/services/document_metadata_service.py",
+      "web/src/pages/dataset/metadata.tsx",
+      "web/src/pages/dataset/tags.tsx"
+    ],
+    "act": "Add bounded content-tagging and gen_metadata prompts using at most128 allowed tag labels and32 declared metadata fields; total serialized generated metadata<=16KiB. Parse structured output with explicit types, reject unknown keys/labels according to fixed schema rules and never coerce arbitrary nested model objects into executable or query content. Preserve human edits under an explicit user/generated provenance policy, and make deterministic retry/publication semantics observable.",
+    "hard": "Connect opt-in controls and selected model to the real tag/metadata endpoints from06-19/20; dynamic configuration is read through existing dataset updates, not a new unauthenticated store. Test generated/human conflict policy, absent fields, injection text, wrong types, model refusal, cancellation, duplicate task and private tag-set sources. Store only validated values, checked index results and approved non-secret usage counters.",
+    "checks": "Only allowed tags/schema keys; generated/human provenance preserved; bounded model calls; actual endpoints show resulting data.",
+    "unit": "test/unit_test/test_phase6_22.py",
+    "e2e": "test/testcases/test_phase6_22_flow.py"
+  },
+  {
+    "n": 23,
+    "title": "Run dataset-wide enrichment jobs safely",
+    "req": [
+      "ING-18",
+      "LLM-32"
+    ],
+    "goal": "A member starts a dataset-wide regeneration job, sees progress and can cancel it without pretending a sentinel is a real document.",
+    "a": [
+      "api/db/services/dataset_job_service.py",
+      "api/apps/restful_apis/dataset_job_api.py",
+      "rag/svr/task_executor.py",
+      "api/db/services/task_service.py"
+    ],
+    "b": [
+      "rag/svr/dataset_jobs.py",
+      "web/src/pages/dataset/derived-jobs.tsx",
+      "api/db/models/knowledge.py",
+      "rag/svr/progress.py"
+    ],
+    "act": "Add an explicit dataset job context with tenant_id,dataset_id,task_type,generation digest and ownership mapping; use documented sentinel IDs only in the task wire/storage format, never Document.get(sentinel). Authorize the run, bound fan-out/snapshot IDs and enqueue idempotent child enrichment through existing Valkey Streams. Store real task/progress/log rows and reuse existing lease/reclaim/attempt limits. First supported job refreshes existing enrichment from06-21/22, so this is a working user capability rather than a dispatcher-only foundation.",
+    "hard": "Add start/status/cancel routes only where no existing dataset action fits, registry-first and Python-owned; show the job in the dataset section with fixed phases and counts. Test dataset deletion, foreign sentinel/job IDs, lost owner, duplicate enqueue, two workers, unavailable queue and bounded fan-out/cancel. Any new relation requires actual migration/schema verification. Phase4 document roll-up never publishes dataset jobs as fake documents or changes their counts.",
+    "checks": "Real dataset refresh end-to-end; sentinel never dereferenced as Document; idempotent fan-out; scoped status/cancel and correct counts.",
+    "unit": "test/unit_test/test_phase6_23.py",
+    "e2e": "test/testcases/test_phase6_23_flow.py"
+  },
+  {
+    "n": 24,
+    "title": "Retrieve RAPTOR summaries with real source citations",
+    "req": [
+      "CHUNK-26",
+      "ING-18"
+    ],
+    "goal": "A member enables RAPTOR and retrieves recursive summaries whose citations open authorized original passages.",
+    "a": [
+      "rag/advanced_rag/raptor.py",
+      "rag/svr/dataset_jobs.py",
+      "rag/nlp/search.py",
+      "api/db/services/retrieval_service.py"
+    ],
+    "b": [
+      "api/db/services/chat_turn_reference.py",
+      "rag/svr/chunk_doc.py",
+      "api/db/services/document_service.py",
+      "web/src/pages/dataset/derived-jobs.tsx"
+    ],
+    "act": "Implement seeded UMAP/GMM clustering with deterministic small-N behavior, bounded max3 levels/max64 summaries and real LLMBundle summaries plus embeddings. Persist parent/leaf IDs, level, model/config/content generation digest and original dataset identity. Publish a whole completed generation atomically and make retry IDs stable. Integrate existing dataset job run/cancel/status and UI opt-in; tests prove at least two real hierarchy levels and changed higher-level content, not concatenation relabelled as a summary.",
+    "hard": "Before a summary is retrieved or referenced, resolve every source leaf through current dataset/document/chunk permissions and enabled state. Deleted/reparsed/disabled leaves invalidate descendants, and citations map to actual leaf passages/positions; do not fabricate a summary Document or PDF box. Test malicious summarized instructions, oversized clusters, token limits, provider failure, cancellation, generation races and nonmember/hidden-source leakage. Use deterministic model transports for most tests and a separately counted bounded real summary in06-30.",
+    "checks": "Actual recursive summaries indexed/retrieved; deterministic generation; all-source authorization; leaf citations survive reload and redact on source changes.",
+    "unit": "test/unit_test/test_phase6_24.py",
+    "e2e": "test/testcases/test_phase6_24_flow.py"
+  },
+  {
+    "n": 25,
+    "title": "Delete derived results and download authorized artifacts",
+    "req": [
+      "KB-17",
+      "DOC-19"
+    ],
+    "goal": "A member deletes only a selected derived index, reads its alteration history and downloads an authorized generated artifact.",
+    "a": [
+      "api/db/services/dataset_artifact_service.py",
+      "api/apps/restful_apis/dataset_artifact_api.py",
+      "api/db/services/dataset_job_service.py",
+      "rag/svr/dataset_jobs.py"
+    ],
+    "b": [
+      "web/src/pages/dataset/derived-jobs.tsx",
+      "api/db/services/document_asset_service.py",
+      "api/db/models/knowledge.py",
+      "api/db/services/knowledgebase_service.py"
+    ],
+    "act": "Implement DELETE /api/v1/datasets/{id}/{index_type} with a finite allowed derived-type map, GET /api/v1/datasets/{id}/artifacts/alteration and GET /api/v1/documents/artifact/{filename}. Resolve filename/ID through an owned artifact record and openable dataset/source lineage, never concatenate a caller path into object storage. Record actor/type/generation/outcome without content/secrets. Checked deletion leaves original source chunks/blobs intact and invalidates active generation publication safely.",
+    "hard": "Add bounded paged alteration history, authenticated blob download and existing destructive confirmation with exact object counts when known. Test path traversal/encoded separators, unsupported index_type, foreign artifact, partial storage/index failure, concurrent run/delete and retry idempotency. Dataset/document cleanup cascades derived ownership without deleting reused assets of another valid record. Necessary audit schema migrations and generated route/isolation/matrix/leak updates precede green claims.",
+    "checks": "Derived-only deletion; original data retained; authenticated owned artifact; bounded history; concurrent publication cannot resurrect removed generation.",
+    "unit": "test/unit_test/test_phase6_25.py",
+    "e2e": "test/testcases/test_phase6_25_flow.py"
+  },
+  {
+    "n": 26,
+    "title": "Select Docling or MinerU parsing",
+    "req": [
+      "PARSE-22"
+    ],
+    "goal": "A member selects a configured Docling or MinerU backend and gets genuine structured PDF chunks with normalized source positions.",
+    "a": [
+      "rag/parsers/backends/docling.py",
+      "rag/parsers/backends/mineru.py",
+      "rag/parsers/backend_registry.py",
+      "api/db/services/parser_config.py"
+    ],
+    "b": [
+      "deepdoc/server.py",
+      "rag/parsers/deepdoc_client.py",
+      "web/src/components/parse-configuration/index.tsx",
+      "common/settings.py"
+    ],
+    "act": "Implement separate real transports for pinned docling-serve POST /v1/convert/file (or explicitly selected /v1/convert/source version) and MinerU /file_parse. Use immutable recorded upstream response fixtures, bounded multipart/JSON/ZIP, typed requests and a shared normalized ParsedBlock/asset contract. Convert Docling bottom-left and MinerU normalized coordinates exactly once. Backend selection comes from validated config; endpoint/secret comes from trusted operator/tenant provider config, not a URL in the document.",
+    "hard": "Expose both selections only when configured, including missing-provider actionable state, no redirect following and no fallback to native on failure. Test async/poll dialect if selected, timeout/cancel, rejected auth, empty/invalid geometry, ZIP-slip/bombs and remote resource references. One real fixed one-page invocation per service is a credential/profile prerequisite of06-30; mock transports prove deterministic normalization but are not recorded as real-service success. Extra service images/SDKs require a supplemental audit checkpoint before acquisition.",
+    "checks": "Both distinct backend dialects; exact coordinate conversion; no runtime fallback or unsafe archive; real service evidence separated from transport tests.",
+    "unit": "test/unit_test/test_phase6_26.py",
+    "e2e": "test/testcases/test_phase6_26_flow.py"
+  },
+  {
+    "n": 27,
+    "title": "Select PaddleOCR or Mistral OCR models",
+    "req": [
+      "PARSE-23",
+      "LLM-13"
+    ],
+    "goal": "A member selects configured PaddleOCR or Mistral and sees OCR-derived chunks using the selected OCR model type.",
+    "a": [
+      "rag/parsers/backends/paddleocr.py",
+      "rag/llm/ocr_model.py",
+      "rag/parsers/backends/mistral.py",
+      "rag/llm/__init__.py"
+    ],
+    "b": [
+      "api/db/services/provider_service.py",
+      "api/db/services/llm_service.py",
+      "web/src/components/parse-configuration/index.tsx",
+      "common/settings.py"
+    ],
+    "act": "Add typed OCR capability/LLMBundle operation and per-tenant sealed credential resolution. PaddleOCR uses its pinned /api/v2/ocr/jobs submit/status contract with bounded polling; Mistral uses /v1/ocr with a pinned selected model and base64/upload document body, no latest alias in final evidence. LocalDeepDoc keyless OCR is allowed only for the exact trusted configured service and must not exempt arbitrary internal URLs from the existing guard. Normalize pages, images, tables, usage and coordinates into the same real parse flow.",
+    "hard": "Wire provider-save tiny probes, explicit OCR selectors and typed refusal states. Tests cover wrong tenant/model type, no credentials, malformed output, unknown labels, job deadline/cancel and key leakage in errors/logs. Do not copy the upstream practice of logging parsed response dictionaries. Real provider tests require explicit credential/budget approval and count probes as calls. Extend registry/generated schema/model selectors before exposing OCR type as supported.",
+    "checks": "Paddle and Mistral distinct flows; actual OCR model capability; tenant-safe keys/probes; bounded polling and fixed errors; no permissive internal-URL exception.",
+    "unit": "test/unit_test/test_phase6_27.py",
+    "e2e": "test/testcases/test_phase6_27_flow.py"
+  },
+  {
+    "n": 28,
+    "title": "Select Tencent ADP or SoMark parsing",
+    "req": [
+      "PARSE-23"
+    ],
+    "goal": "A member uses configured TCADP or SoMark parsing and receives actual provider-derived document blocks with safe error states.",
+    "a": [
+      "rag/parsers/backends/tcadp.py",
+      "rag/parsers/backends/somark.py",
+      "rag/parsers/backend_registry.py",
+      "common/settings.py"
+    ],
+    "b": [
+      "api/db/services/parser_config.py",
+      "web/src/components/parse-configuration/index.tsx",
+      "rag/parsers/deepdoc_client.py",
+      "rag/parsers/limits.py"
+    ],
+    "act": "Implement Tencent LKEAP v20240522 ReconstructDocumentSSE with proper signed request/stream events and a guarded returned result download; use existing crypto/httpx for signing or a separately audited approved SDK. Implement SoMark /api/v1/parse/async and /parse/async_check with its pinned task identifier/result dialect; /usage is non-secret usage metadata only. Give each backend separate request/response validation and immutable actual upstream response fixtures. Exact URLs/version/region/credentials are configured explicitly.",
+    "hard": "Connect each method into the real selection/worker path, normalize provider page coordinates and assets, and add explicit unavailable/forbidden/timeout/cancel/error mapping. Test forged result URLs, redirects/private destinations, malformed SSE/events, stalled jobs, invalid credentials and no response-body logging. One actual fixed one-page provider invocation each remains a declared credential prerequisite; never accept an in-test fake service as the cloud gate. Unknown dialect/version blocks that adapter until corrected behind its failing fixture.",
+    "checks": "Proper Tencent signed SSE and SoMark async dialects; guarded result downloads; real backend selection; no fake-success substitute.",
+    "unit": "test/unit_test/test_phase6_28.py",
+    "e2e": "test/testcases/test_phase6_28_flow.py"
+  },
+  {
+    "n": 29,
+    "title": "Select OpenDataLoader and figure-focused parsing",
+    "req": [
+      "PARSE-23",
+      "PARSE-19"
+    ],
+    "goal": "A member selects OpenDataLoader or Figure parsing and retrieves content linked to its actual page/figure sources.",
+    "a": [
+      "rag/parsers/backends/opendataloader.py",
+      "rag/parsers/backends/figure.py",
+      "rag/parsers/backend_registry.py",
+      "rag/prompts/enrichment.py"
+    ],
+    "b": [
+      "web/src/components/parse-configuration/index.tsx",
+      "rag/parsers/deepdoc_client.py",
+      "rag/svr/enrichment.py",
+      "api/db/services/parser_config.py"
+    ],
+    "act": "Implement OpenDataLoader hybrid POST /v1/convert/file nested DoclingDocument/JSON response normalization against pinned real fixtures, honoring requested pages and safe embedded assets. Figure backend uses actual extracted assets plus bounded adjacent text through the configured vision model and returns source-linked descriptions; it is not a constant caption or a rename of an unavailable backend. Keep native geometry/asset decoding inside DeepDoc and tenant model calls inside LLMBundle.",
+    "hard": "Expose both saved selections in the existing dialog and test provider missing/error/cancel, page-number normalization, nested output shape, caption HTML/instructions and dedup. Include the final distinct backend availability inventory (deepdoc plus every named optional backend), no silently omitted choice and no unsupported choice that actually runs another backend. Real OpenDataLoader/vision evidence is in the single06-30 budget and every absent required credential is recorded as an unresolved gate item.",
+    "checks": "OpenDataLoader real nested dialect; actual source-backed figure caption; all named backends inventoried; no silent alias/fallback.",
+    "unit": "test/unit_test/test_phase6_29.py",
+    "e2e": "test/testcases/test_phase6_29_flow.py"
+  },
+  {
+    "n": 30,
+    "title": "Prove the complete rich-document path and close the gate",
+    "req": [
+      "PARSE-04",
+      "PARSE-05",
+      "PARSE-06",
+      "PARSE-07",
+      "PARSE-08",
+      "PARSE-09",
+      "PARSE-11",
+      "PARSE-14",
+      "PARSE-15",
+      "PARSE-16",
+      "PARSE-17",
+      "PARSE-18",
+      "PARSE-19",
+      "PARSE-20",
+      "PARSE-21",
+      "PARSE-22",
+      "PARSE-23",
+      "PARSE-24",
+      "PARSE-25",
+      "PARSE-26",
+      "CHUNK-03",
+      "CHUNK-04",
+      "CHUNK-05",
+      "CHUNK-06",
+      "CHUNK-07",
+      "CHUNK-08",
+      "CHUNK-09",
+      "CHUNK-10",
+      "CHUNK-11",
+      "CHUNK-12",
+      "CHUNK-13",
+      "CHUNK-14",
+      "CHUNK-15",
+      "CHUNK-17",
+      "CHUNK-22",
+      "CHUNK-23",
+      "CHUNK-24",
+      "CHUNK-25",
+      "CHUNK-26",
+      "CHUNK-27",
+      "CHUNK-28",
+      "LLM-10",
+      "LLM-11",
+      "LLM-13",
+      "LLM-32",
+      "STOR-09",
+      "DOC-17",
+      "DOC-18",
+      "DOC-19",
+      "KB-10",
+      "KB-11",
+      "KB-12",
+      "KB-13",
+      "KB-17",
+      "ING-18",
+      "DEPLOY-08",
+      "SEC-08",
+      "UI-14",
+      "RETR-13"
+    ],
+    "goal": "A member uploads rich documents, chooses each method, runs opt-in enrichment/RAPTOR and opens supported cited sources on the real stack.",
+    "a": [
+      "test/testcases/test_live_phase6.py",
+      "test/testcases/test_spa_phase6_browser.py",
+      "test/unit_test/test_phase6_records.py",
+      "test/unit_test/test_phase6_traceability.py"
+    ],
+    "b": [
+      ".planning/phases/06-deep-parsing-and-chunking-breadth/06-GATE-LOG.md",
+      ".planning/phases/06-deep-parsing-and-chunking-breadth/06-HUMAN-UAT.md",
+      ".planning/phases/06-deep-parsing-and-chunking-breadth/06-VALIDATION.md",
+      ".planning/DECISIONS.md"
+    ],
+    "act": "Create a single module-scoped budget ledger incremented before every chat/vision/OCR/ASR/adapter/embedding call including provider saves, cancellations and retries. Fix original fixture content and OCR/table/read-order thresholds before the real run. Run approved DeepDoc model quality/CPU/RSS guards, all fourteen method boundary goldens, every documented file type, image ownership/dedup, real enrichment fields, two-level RAPTOR retrieval/leaf citations and deepdoc-offload proof. Real Chrome uses existing CDP harness for scanned PDF->chunks->cited answer/source, table/image preview, method settings persistence, tags/metadata and derived deletion. Use original/licensed test content only; no key/prompt/source dumps in evidence.",
+    "hard": "Rebuild the required cpu/elasticsearch/mail/tei-cpu/deepdoc profiles, run unit/web unit/build/integration/ordinary E2E, then serial alone and restore normal stack, then exactly one explicitly selected Phase6 live file within approved caps. Preserve previously paid Phase3/4/5 evidence; do not invoke broad live_model selection. Run ingress Vitest, exported-env Go race/tagged tiers, CI7/7, security/async lint, generated files and PHASE6_GATE traceability. Record every command/count/duration, latency/memory provenance, all five criteria, eight optional-backend real prerequisites and actual spend; no skip/weakening to green. Diagnose/fix any red behind a failing regression and rerun affected tiers only. Finish all summaries, scoped R232..R261 records, source/requirement coverage, formal code/threat/UI review and explicit human-only OCR/geometry/Chinese/answer checks. Leave B36 and unapproved Phase5 human results unchanged; requirement checkboxes/commits remain unauthorized.",
+    "checks": "All five roadmap criteria supported;14 method fixtures and every named backend accounted for; budget counters within approved limits; all tiers green or honest explicit blocker.",
+    "unit": "test/unit_test/test_phase6_traceability.py",
+    "e2e": "test/testcases/test_spa_phase6_browser.py"
+  }
+]

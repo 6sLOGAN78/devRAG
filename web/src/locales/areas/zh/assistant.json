@@ -1,0 +1,130 @@
+{
+  "assistant": {
+    "dialog": {
+      "titleCreate": "创建助手",
+      "titleSettings": "助手设置",
+      "submitCreate": "创建助手",
+      "submitSave": "保存助手",
+      "blocked": {
+        "heading": "请先添加聊天模型",
+        "body": "助手需要聊天模型来生成回答，但此工作区尚未配置聊天模型。",
+        "bodyMember": "请联系工作区所有者或管理员添加聊天模型。",
+        "action": "打开模型设置"
+      },
+      "modelsError": "无法加载模型"
+    },
+    "group": {
+      "basics": "基本信息",
+      "knowledge": "知识",
+      "model": "模型与措辞",
+      "retrieval": "检索"
+    },
+    "field": {
+      "name": "名称",
+      "picture": "图片（可选）",
+      "pictureHelp": "支持 PNG 或 JPEG，最大 1 MB，将自动缩放。",
+      "visibility": "谁可以使用",
+      "datasets": "数据集",
+      "datasetsHelp": "助手依据这些数据集回答。不选数据集时可进行无来源的聊天。",
+      "model": "聊天模型",
+      "modelHelp": "用于生成回答。",
+      "system": "指令",
+      "systemHelp": "描述助手的行为。检索段落和引用规则会自动添加。",
+      "prologue": "开场白",
+      "prologueHelp": "显示在每次新聊天的顶部。",
+      "empty": "未找到内容时的回复",
+      "emptyHelp": "当没有足够相关的段落时发送此消息，不会调用聊天模型。",
+      "threshold": "相似度阈值",
+      "thresholdHelp": "低于此分数的段落将被忽略。数值越大，筛选越严格。",
+      "thresholdLow": "宽松",
+      "thresholdHigh": "严格",
+      "weight": "关键词与向量权重",
+      "weightHelp": "设置文字匹配和语义匹配在段落分数中所占的比例。",
+      "weightValue": "关键词 {{keyword}}% · 向量 {{vector}}%",
+      "weightLow": "侧重关键词",
+      "weightHigh": "侧重向量",
+      "topN": "使用的段落数",
+      "topNHelp": "提供给聊天模型的段落数量。",
+      "rerank": "重排模型",
+      "rerankHelp": "使用专门模型重新排序段落，速度较慢，但通常更准确。",
+      "rerankNone": "不重排"
+    },
+    "picture": {
+      "choose": "选择图片",
+      "remove": "移除图片",
+      "type": "请选择 PNG 或 JPEG 图片。",
+      "size": "图片大小超过 1 MB。",
+      "read": "无法读取图片。"
+    },
+    "visibility": {
+      "meTitle": "仅自己",
+      "meBody": "只有您可以查看和使用此助手。",
+      "teamTitle": "整个团队",
+      "teamBody": "“{{workspace}}”中的所有人都可以使用，各自的聊天仍保持私密。只有创建者、工作区所有者和管理员可以修改或删除助手。",
+      "needsShared": "需要共享数据集",
+      "reason": "请先移除仅自己可见的数据集，或将其共享。",
+      "narrowingInfo": "仅当没有其他成员与此助手的聊天时，才能改为“仅自己”。",
+      "narrowingCreator": "更改后只有创建者可以查看，助手将从您的列表中移除。",
+      "me": "仅自己",
+      "team": "团队"
+    },
+    "datasets": {
+      "none": "暂无数据集。",
+      "link": "数据集页面",
+      "privateReason": "此数据集仅自己可见，共享助手无法使用。",
+      "skipped_one": "此助手使用的 {{count}} 个数据集对您不可见，将保留关联。",
+      "skipped_other": "此助手使用的 {{count}} 个数据集对您不可见，将保留关联。"
+    },
+    "default": {
+      "system": "你是一位乐于助人的助手。仅依据提供的知识回答。如果其中没有答案，请说明未能找到答案。",
+      "prologue": "您好，请就您的文档提问。",
+      "empty": "在所选数据集中未找到相关内容。"
+    },
+    "saved": {
+      "created": "助手已创建",
+      "updated": "助手已保存",
+      "narrowed": "助手已保存，现在只有创建者可以查看。"
+    },
+    "error": {
+      "duplicate": "此工作区已有名为“{{name}}”的助手，请使用其他名称。",
+      "notShared": "助手使用了未向团队共享的数据集，暂时无法共享此助手。",
+      "narrowing_one": "还有 {{count}} 位成员与此助手的聊天，暂时无法设为私有。请让他们删除相关聊天后重试。",
+      "narrowing_other": "还有 {{count}} 位成员与此助手的聊天，暂时无法设为私有。请让他们删除相关聊天后重试。",
+      "dataset": "选择的数据集已不可用，请重新选择。",
+      "model": "此工作区中该模型已不可用，请选择其他模型。",
+      "gone": "此助手已不存在。",
+      "fallback": "未能保存助手，请重试。"
+    },
+    "deleteChat": {
+      "title": "删除此对话？",
+      "body": "“{{name}}”及其回答将被删除，此操作无法撤销。",
+      "keep": "保留对话",
+      "confirm": "删除对话",
+      "done": "对话已删除",
+      "failed": "未能删除对话，请重试。"
+    },
+    "delete": {
+      "title": "删除此助手？",
+      "body": "“{{name}}”及其所有对话将被删除，知识库不受影响。",
+      "bodyTeam_one": "“{{name}}”及其所有对话将被删除，包括其他 {{count}} 位成员的对话。知识库不受影响。",
+      "bodyTeam_other": "“{{name}}”及其所有对话将被删除，包括其他 {{count}} 位成员的对话。知识库不受影响。",
+      "keep": "保留助手",
+      "confirm": "删除助手",
+      "done": "助手已删除",
+      "failed": "未能删除助手，请重试。"
+    }
+  },
+  "errors": {
+    "assistant": {
+      "nameRequired": "请输入名称。",
+      "nameMax": "最多使用 128 个字符。",
+      "systemMax": "最多使用 8,000 个字符。",
+      "prologueMax": "最多使用 500 个字符。",
+      "emptyRequired": "请输入未找到内容时发送的消息。",
+      "emptyMax": "最多使用 500 个字符。",
+      "topNRange": "请输入 1 到 30 之间的整数。",
+      "modelRequired": "请选择聊天模型。",
+      "scoreRange": "请选择 0 到 1 之间的数值，步长为 0.05。"
+    }
+  }
+}

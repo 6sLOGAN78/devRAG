@@ -434,7 +434,7 @@ Scope notes: thin by design: one engine, one embedding provider, one chunker, te
 
 ### Phase 5: Retrieval and Cited Chat (Core Value Gate)
 
-**Goal**: A user can ask a question about an uploaded document and receive an accurate, streamed, cited answer through the real pipeline (hybrid retrieve, rerank, generate) with no mocked stage
+**Goal**: As a user, I want to ask a question about an uploaded document and receive an accurate, streamed, cited answer through the real pipeline (hybrid retrieve, rerank, generate) with no mocked stage, so that I can get a supported answer from my documents.
 **Mode:** mvp
 **Depends on**: Phase 4
 **Requirements**: RETR-01..19, RETR-23, CHAT-01..23, CHAT-31, LLM-09, ING-21, TEN-03, KB-18, UI-05, UI-18, UI-20..25, DEPLOY-18, E2E-07..09, E2E-12
@@ -447,6 +447,8 @@ Scope notes: thin by design: one engine, one embedding provider, one chunker, te
   5. One automated browser run against the real stack goes from registration through dataset creation, upload, parse and question to a cited streamed answer, using a real embedding model and a real chat model with no fake in any production path
 
 **Plans**: 28 plans (execution is plan order; each plan is its own wave)
+
+**Execution status (2026-10-27):** 28/28 execution summaries complete. Automated Phase 5 gate PASS: unit 2411 (six existing skips), web unit 2136, integration 905, ordinary E2E 869, serial 13, remaining Phase 3/4 live 17, retained Phase 5 paid API/browser 14, ingress 61, Go tiers and CI 7/7. Full BGE timing selects cap 16 / dev memory 3 GiB. B-37/B-39/B-40 resolved. Human UAT and final validation approval remain pending; blanket automated-validation flags are withheld for the explicit human checkpoint. B-36 stays deferred. No requirement checkboxes changed. Phase 6 planning was subsequently authorized; its native implementation/acquisition is gated by06-01, while this Phase5 human review remains pending.
 Plans:
 
 **Wave 1**
@@ -479,87 +481,87 @@ Plans:
 
 **Wave 8** *(blocked on Wave 7 completion)*
 
-- [ ] 05-08-PLAN.md — Assistant routes under `/api/v1/chats`, Nginx families, e2e flow, isolation/matrix/leak coverage
+- [x] 05-08-PLAN.md — Assistant routes under `/api/v1/chats`, Nginx families, e2e flow, isolation/matrix/leak coverage
 
 **Wave 9** *(blocked on Wave 8 completion)*
 
-- [ ] 05-09-PLAN.md — Sessions per user, read-time redaction, feedback, turn lock and rate guard, `ChatSettings`, session routes and harness
+- [x] 05-09-PLAN.md — Sessions per user, read-time redaction, feedback, turn lock and rate guard, `ChatSettings`, session routes and harness
 
 **Wave 10** *(blocked on Wave 9 completion)*
 
-- [ ] 05-10-PLAN.md — Prompt, context and citation modules (marker canonicalisation, fallback insertion, pinned citation rules)
+- [x] 05-10-PLAN.md — Prompt, context and citation modules (marker canonicalisation, fallback insertion, pinned citation rules)
 
 **Wave 11** *(blocked on Wave 10 completion)*
 
-- [ ] 05-11-PLAN.md — Turn service and non-streaming completion: thin cited answer, empty response without a model call, BE-07
+- [x] 05-11-PLAN.md — Turn service and non-streaming completion: thin cited answer, empty response without a model call, BE-07
 
 **Wave 12** *(blocked on Wave 11 completion)*
 
-- [ ] 05-12-PLAN.md — SSE streaming, deadline, stop persistence (cited subset), mid-stream failure frames, first-frame-before-last through Nginx
+- [x] 05-12-PLAN.md — SSE streaming, deadline, stop persistence (cited subset), mid-stream failure frames, first-frame-before-last through Nginx
 
 **Wave 13** *(blocked on Wave 12 completion)*
 
-- [ ] 05-13-PLAN.md — Citation adherence probe for the live chat model (temperature 0, 14 of 15 bar) and the D-05 switch rule
+- [x] 05-13-PLAN.md — Citation adherence probe for the live chat model (temperature 0, 14 of 15 bar) and the D-05 switch rule
 
 **Wave 14** *(blocked on Wave 13 completion)*
 
-- [ ] 05-14-PLAN.md — Package, TEI image and model audit table, blocking human checkpoint (incl. UI-22 Partial and TEI provider row), approved web install
+- [x] 05-14-PLAN.md — Package, TEI image and model audit table, blocking human checkpoint (incl. UI-22 Partial and TEI provider row), approved web install
 
 **Wave 15** *(blocked on Wave 14 completion)*
 
-- [ ] 05-15-PLAN.md — TEI container in the stack, timing probe (R-52 closed), rerank cap and memory limit, real cross-encoder proof
+- [x] 05-15-PLAN.md — TEI container in the stack, timing probe (R-52 closed), rerank cap and memory limit, real cross-encoder proof
 
 **Wave 16** *(blocked on Wave 15 completion)*
 
-- [ ] 05-16-PLAN.md — Web SSE client, turn state machine, services and mappers, path constants
+- [x] 05-16-PLAN.md — Web SSE client, turn state machine, services and mappers, path constants
 
 **Wave 17** *(blocked on Wave 16 completion)*
 
-- [ ] 05-17-PLAN.md — Web hooks (`useChatTurn`, queries, mutations) and test-server areas
+- [x] 05-17-PLAN.md — Web hooks (`useChatTurn`, queries, mutations) and test-server areas
 
 **Wave 18** *(blocked on Wave 17 completion)*
 
-- [ ] 05-18-PLAN.md — Safe answer renderer, citation pills, marker hold-back, source gate
+- [x] 05-18-PLAN.md — Safe answer renderer, citation pills, marker hold-back, source gate
 
 **Wave 19** *(blocked on Wave 18 completion)*
 
-- [ ] 05-19-PLAN.md — Assistant dialog (create and settings), range field, avatar picker, dataset checklist
+- [x] 05-19-PLAN.md — Assistant dialog (create and settings), range field, avatar picker, dataset checklist
 
 **Wave 20** *(blocked on Wave 19 completion)*
 
-- [ ] 05-20-PLAN.md — Chat page shell: route and nav, assistant and chat rails, assistant-dialog mount, page states
+- [x] 05-20-PLAN.md — Chat page shell: route and nav, assistant and chat rails, assistant-dialog mount, page states
 
 **Wave 21** *(blocked on Wave 20 completion)*
 
-- [ ] 05-21-PLAN.md — Conversation header, delete confirmations, notices, stored message list
+- [x] 05-21-PLAN.md — Conversation header, delete confirmations, notices, stored message list
 
 **Wave 22** *(blocked on Wave 21 completion)*
 
-- [ ] 05-22-PLAN.md — Message input, streaming turn, stop, refusals, live region, scroll behaviour
+- [x] 05-22-PLAN.md — Message input, streaming turn, stop, refusals, live region, scroll behaviour
 
 **Wave 23** *(blocked on Wave 22 completion)*
 
-- [ ] 05-23-PLAN.md — Source drawer with PDF highlight, sources row, feedback buttons
+- [x] 05-23-PLAN.md — Source drawer with PDF highlight, sources row, feedback buttons
 
 **Wave 24** *(blocked on Wave 23 completion)*
 
-- [ ] 05-24-PLAN.md — Retrieval-testing page and dataset entry button
+- [x] 05-24-PLAN.md — Retrieval-testing page and dataset entry button
 
 **Wave 25** *(blocked on Wave 24 completion)*
 
-- [ ] 05-25-PLAN.md — Live tier: planted facts with real chat, embeddings and TEI rerank, OpenRouter rerank smoke call, SSE client live
+- [x] 05-25-PLAN.md — Live tier: planted facts with real chat, embeddings and TEI rerank, OpenRouter rerank smoke call, SSE client live
 
 **Wave 26** *(blocked on Wave 25 completion)*
 
-- [ ] 05-26-PLAN.md — Real-Chrome criterion-5 journey and deterministic stop, empty, retrieval and hostile-text scenes
+- [x] 05-26-PLAN.md — Real-Chrome criterion-5 journey and deterministic stop, empty, retrieval and hostile-text scenes
 
 **Wave 27** *(blocked on Wave 26 completion)*
 
-- [ ] 05-27-PLAN.md — Real-Chrome sharing journeys for D-23..D-26
+- [x] 05-27-PLAN.md — Real-Chrome sharing journeys for D-23..D-26
 
 **Wave 28** *(blocked on Wave 27 completion)*
 
-- [ ] 05-28-PLAN.md — Phase gate: pinned records, all tiers and CI gates, review checklist, human-only checks
+- [x] 05-28-PLAN.md — Phase gate: pinned records, all tiers and CI gates, review checklist, human-only checks
 
 Partial requirements (hand-offs recorded in DECISIONS.md R-230): RETR-03 (term weighting left to BM25 IDF), RETR-04 (small dictionary, no WordNet), RETR-09 (chunk-field conditions only; document metadata filter later), RETR-13 (formula built; tag and pagerank producers arrive in Phase 6), RETR-16 (several datasets of one workspace; several workspaces' indices in one call later), CHAT-05 (system prompt, prologue and empty response; prompt variables later), LLM-09 (TEI and OpenRouter rerank drivers; other direct drivers later), ING-21 (synonym cache; LLM cache and session store consumers later), UI-22 (GFM only; math, highlighting and image popovers later), UI-25 (core settings; temperature, top-p, penalty and max-token sliders later).
 
@@ -569,7 +571,7 @@ Scope notes: this is the PROJECT.md Core Value. No Phase 6, 7 or 8 work starts u
 
 ### Phase 6: Deep Parsing and Chunking Breadth
 
-**Goal**: Users can ingest every documented file type with layout-aware parsing and choose any documented chunking strategy and enrichment, and answers cite the richer content correctly
+**Goal**: As a workspace member, I want to ingest every documented file type with layout-aware parsing and choose any documented chunking strategy and enrichment, so that answers cite the richer content correctly.
 **Mode:** mvp
 **Depends on**: Phase 5
 **Requirements**: PARSE-04..08, PARSE-14..26, CHUNK-03..15, CHUNK-22..28, LLM-10..11, LLM-13, LLM-32, STOR-09, DOC-17..19, KB-10..13, KB-17, ING-18, DEPLOY-08, SEC-08; plus the Phase 6 remainders of CHUNK-17, PARSE-09, PARSE-11, UI-14 (partial in Phase 4, D-27)
@@ -581,7 +583,102 @@ Scope notes: this is the PROJECT.md Core Value. No Phase 6, 7 or 8 work starts u
   4. With enrichment enabled on a dataset, chunks carry LLM-generated keywords, questions, tags and metadata that are visible through the tag and metadata endpoints, and RAPTOR summary chunks are indexed and returned by retrieval
   5. Starting the `deepdoc` compose profile and setting `DEEPDOC_URL` moves layout, OCR and table recognition out of the worker process, and a parse still completes end to end
 
-**Plans**: TBD
+**Plans**: 30 plans; 30 sequential waves because parser/config/route capability files and scoped records are shared writers.
+
+**Planning status (2026-10-27):** Research and UI contract complete; structural checks30/30,90 task verifications,58/58 primary requirements plus RETR-13 producer handoff covered. No Phase6 native package/model acquisition or paid inference performed. Automatic entry completed the read-only audit/preparation and stops at the exact-candidate blocking-human approval in06-01 Task2.20 audit-tool tests pass; native acquisition/features have not started. Phase5 human UAT and Phase4 B36 remain pending.
+
+**Wave 1** *(admission audit and blocking-human acquisition checkpoint)*
+
+- [x] 06-01-PLAN.md — Review acquisition and budget before native implementation
+**Wave 2** *(blocked on Wave 1 completion and accepted06-01 snapshot)*
+
+- [x] 06-02-PLAN.md — Start the approved CPU OCR service
+**Wave 3** *(blocked on Wave 2 completion and accepted06-01 snapshot)*
+
+- [ ] 06-03-PLAN.md — Read scanned PDFs through the existing document UI
+**Wave 4** *(blocked on Wave 3 completion and accepted06-01 snapshot)*
+
+- [ ] 06-04-PLAN.md — Preserve visual reading order and remove page furniture
+**Wave 5** *(blocked on Wave 4 completion and accepted06-01 snapshot)*
+
+- [ ] 06-05-PLAN.md — Open extracted images and office figures securely
+**Wave 6** *(blocked on Wave 5 completion and accepted06-01 snapshot)*
+
+- [ ] 06-06-PLAN.md — Inspect reconstructed PDF tables and crops
+**Wave 7** *(blocked on Wave 6 completion and accepted06-01 snapshot)*
+
+- [ ] 06-07-PLAN.md — Choose whole-document chunks and inspect public pipeline templates
+**Wave 8** *(blocked on Wave 7 completion and accepted06-01 snapshot)*
+
+- [ ] 06-08-PLAN.md — Ingest Markdown and technical manuals
+**Wave 9** *(blocked on Wave 8 completion and accepted06-01 snapshot)*
+
+- [ ] 06-09-PLAN.md — Ingest structured JSON, CSV and Q&A pairs
+**Wave 10** *(blocked on Wave 9 completion and accepted06-01 snapshot)*
+
+- [ ] 06-10-PLAN.md — Read EPUB books in chapter order
+**Wave 11** *(blocked on Wave 10 completion and accepted06-01 snapshot)*
+
+- [ ] 06-11-PLAN.md — Read academic papers by section
+**Wave 12** *(blocked on Wave 11 completion and accepted06-01 snapshot)*
+
+- [ ] 06-12-PLAN.md — Read legal structure and normalize Chinese text
+**Wave 13** *(blocked on Wave 12 completion and accepted06-01 snapshot)*
+
+- [ ] 06-13-PLAN.md — Inspect presentation chunks per slide
+**Wave 14** *(blocked on Wave 13 completion and accepted06-01 snapshot)*
+
+- [ ] 06-14-PLAN.md — Retrieve table rows with their headers
+**Wave 15** *(blocked on Wave 14 completion and accepted06-01 snapshot)*
+
+- [ ] 06-15-PLAN.md — Caption pictures with a configured vision model
+**Wave 16** *(blocked on Wave 15 completion and accepted06-01 snapshot)*
+
+- [ ] 06-16-PLAN.md — Transcribe audio into timestamped chunks
+**Wave 17** *(blocked on Wave 16 completion and accepted06-01 snapshot)*
+
+- [ ] 06-17-PLAN.md — Read email envelopes and message bodies
+**Wave 18** *(blocked on Wave 17 completion and accepted06-01 snapshot)*
+
+- [ ] 06-18-PLAN.md — Read structured résumé sections
+**Wave 19** *(blocked on Wave 18 completion and accepted06-01 snapshot)*
+
+- [ ] 06-19-PLAN.md — Manage tags and produce retrieval rank features
+**Wave 20** *(blocked on Wave 19 completion and accepted06-01 snapshot)*
+
+- [ ] 06-20-PLAN.md — Edit and inspect bounded document metadata
+**Wave 21** *(blocked on Wave 20 completion and accepted06-01 snapshot)*
+
+- [ ] 06-21-PLAN.md — Generate keywords and questions when requested
+**Wave 22** *(blocked on Wave 21 completion and accepted06-01 snapshot)*
+
+- [ ] 06-22-PLAN.md — Apply controlled tags and auto metadata
+**Wave 23** *(blocked on Wave 22 completion and accepted06-01 snapshot)*
+
+- [ ] 06-23-PLAN.md — Run dataset-wide enrichment jobs safely
+**Wave 24** *(blocked on Wave 23 completion and accepted06-01 snapshot)*
+
+- [ ] 06-24-PLAN.md — Retrieve RAPTOR summaries with real source citations
+**Wave 25** *(blocked on Wave 24 completion and accepted06-01 snapshot)*
+
+- [ ] 06-25-PLAN.md — Delete derived results and download authorized artifacts
+**Wave 26** *(blocked on Wave 25 completion and accepted06-01 snapshot)*
+
+- [ ] 06-26-PLAN.md — Select Docling or MinerU parsing
+**Wave 27** *(blocked on Wave 26 completion and accepted06-01 snapshot)*
+
+- [ ] 06-27-PLAN.md — Select PaddleOCR or Mistral OCR models
+**Wave 28** *(blocked on Wave 27 completion and accepted06-01 snapshot)*
+
+- [ ] 06-28-PLAN.md — Select Tencent ADP or SoMark parsing
+**Wave 29** *(blocked on Wave 28 completion and accepted06-01 snapshot)*
+
+- [ ] 06-29-PLAN.md — Select OpenDataLoader and figure-focused parsing
+**Wave 30** *(blocked on Wave 29 completion and accepted06-01 snapshot)*
+
+- [ ] 06-30-PLAN.md — Prove the complete rich-document path and close the gate
+
+**Cross-cutting constraints:** Only authorized sources and approved models/assets are used; errors remain typed with no silent fallback. Preserve explicit geometry, current source-leaf visibility, exact package/budget approval and previous paid evidence. Shared factory/config/record writers execute sequentially. No staging, commits or requirement checkbox edits.
 
 Scope notes: highest research risk in the project (DeepDoc ONNX model acquisition, licence, CPU throughput, coordinate conventions); needs `--research-phase`. Models are provisioned in a build/init step, never downloaded at first parse. PARSE-26 and CHUNK-28 are satisfied by their Python implementations per the user decision; the Go mirrors are v2. Docs to read first: `06-document-processing` (all parser, OCR, layout, chunking files), `05-rag-pipeline`, `20-security/file-security.md`.
 
@@ -651,9 +748,9 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8. Ph
 |-------|----------------|--------|-----------|
 | 1. Reconciliation, Guardrails and Dual-Stack Foundation | 24/24 | Complete | 2026-10-07 |
 | 2. Identity, Tenancy and Authorization | 28/28 | Awaiting verification | - |
-| 3. Models, Knowledge Bases and Upload | 0/TBD | Not started | - |
-| 4. Ingestion Pipeline | 0/TBD | Not started | - |
-| 5. Retrieval and Cited Chat (Core Value Gate) | 0/TBD | Not started | - |
-| 6. Deep Parsing and Chunking Breadth | 0/TBD | Not started | - |
+| 3. Models, Knowledge Bases and Upload | 31/31 | Complete | 2026-10-10 |
+| 4. Ingestion Pipeline | 35/35 | Human verification pending (B-36 deferred) | 2026-10-19 |
+| 5. Retrieval and Cited Chat (Core Value Gate) | 28/28 | Automated gate passed; human review pending | 2026-10-27 |
+| 6. Deep Parsing and Chunking Breadth | 2/30 | Executing; native OCR slice passed | - |
 | 7. Agents and Workflows | 0/TBD | Not started | - |
 | 8. Go Surface, CLI, Integrations, Billing and Production Deployment | 0/TBD | Not started | - |

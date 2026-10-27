@@ -31,7 +31,7 @@ export function useModelTenantId(): string | null {
   return useActiveWorkspace()?.tenantId ?? null;
 }
 
-/** The active workspace's five providers with their models. No retry: a 503 or 403 is an answer, not a glitch. */
+/** The active workspace's registered providers with their models. No retry: a 503 or 403 is an answer, not a glitch. */
 export function useProvidersRequest() {
   const tenantId = useModelTenantId();
   return useQuery({

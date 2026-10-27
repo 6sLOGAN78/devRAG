@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Bounded readiness polling for the compose stack. This script is the only shell polling site
 # (tests use test/helpers/wait.py). Usage: wait_stack.sh [--infra-only] [--timeout S] [--interval S]
-# Waits until every long-running service of the project is healthy and any `init` service exited 0;
+# Waits until every long-running service (including enabled deepdoc) is healthy and any `init` service exited 0;
 # unless --infra-only it also waits for HTTP 200 from /health and /api/v1/system/healthz on the web port.
 set -uo pipefail
 

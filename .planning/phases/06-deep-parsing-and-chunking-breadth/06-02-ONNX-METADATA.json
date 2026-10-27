@@ -1,0 +1,130 @@
+{
+  "det.onnx": {
+    "inputs": [
+      {
+        "name": "x",
+        "shape": [
+          "p2o.DynamicDimension.0",
+          3,
+          "p2o.DynamicDimension.1",
+          "p2o.DynamicDimension.2"
+        ],
+        "type": "tensor(float)"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "sigmoid_0.tmp_0",
+        "shape": [
+          "p2o.DynamicDimension.3",
+          1,
+          "p2o.DynamicDimension.4",
+          "p2o.DynamicDimension.5"
+        ],
+        "type": "tensor(float)"
+      }
+    ],
+    "metadata": {}
+  },
+  "rec.onnx": {
+    "inputs": [
+      {
+        "name": "x",
+        "shape": [
+          "p2o.DynamicDimension.0",
+          3,
+          48,
+          "p2o.DynamicDimension.1"
+        ],
+        "type": "tensor(float)"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "softmax_11.tmp_0",
+        "shape": [
+          "p2o.DynamicDimension.2",
+          "p2o.DynamicDimension.3",
+          6625
+        ],
+        "type": "tensor(float)"
+      }
+    ],
+    "metadata": {}
+  },
+  "layout.onnx": {
+    "inputs": [
+      {
+        "name": "images",
+        "shape": [
+          1,
+          3,
+          1024,
+          1024
+        ],
+        "type": "tensor(float)"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "output0",
+        "shape": [
+          1,
+          300,
+          6
+        ],
+        "type": "tensor(float)"
+      }
+    ],
+    "metadata": {
+      "names": "{0: 'title', 1: 'plain text', 2: 'abandon', 3: 'figure', 4: 'figure_caption', 5: 'table', 6: 'table_caption', 7: 'table_footnote', 8: 'isolate_formula', 9: 'formula_caption'}",
+      "task": "detect",
+      "stride": "32",
+      "license": "AGPL-3.0 License (https://github.com/infiniflow/ragflow/blob/main/LICENSE)",
+      "imgsz": "[1024, 1024]",
+      "batch": "1",
+      "version": "0.0.2",
+      "date": "2024-11-01T03:21:37.979740",
+      "docs": "https://ragflow.io/docs",
+      "author": "Ultralytics",
+      "description": "Ultralytics YOLOv10m-doclayout model trained on /mnt/petrelfs/zhaozhiyuan/layout/yolov10/ultralytics/cfg/datasets/0830_mixed.yaml"
+    }
+  },
+  "tsr.onnx": {
+    "inputs": [
+      {
+        "name": "images",
+        "shape": [
+          1,
+          3,
+          640,
+          640
+        ],
+        "type": "tensor(float)"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "output0",
+        "shape": [
+          1,
+          11,
+          8400
+        ],
+        "type": "tensor(float)"
+      }
+    ],
+    "metadata": {
+      "names": "{0: 'table', 1: 'table column', 2: 'table row', 3: 'table column header', 4: 'table projected row header', 5: 'table spanning cell', 6: 'table grid cell'}",
+      "task": "detect",
+      "stride": "32",
+      "imgsz": "[640, 640]",
+      "batch": "1",
+      "version": "8.1.18",
+      "date": "2024-03-25T04:36:35.872713",
+      "license": "Apache-2.0 http://www.apache.org/licenses/LICENSE-2.0",
+      "author": "Ultralytics",
+      "description": "Ultralytics best model trained on PubTables-1M-yolo-datasets/data.yaml"
+    }
+  }
+}

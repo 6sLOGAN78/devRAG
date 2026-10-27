@@ -46,7 +46,7 @@ pytestmark = [pytest.mark.e2e, pytest.mark.serial]
 
 CHUNKS = 40
 DOCX = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-BANNED = ("Traceback", "/ragflow", "/tmp", "host.docker.internal", "127.0.0.1", 'File "')
+BANNED = ("Traceback", "/ragflow", "/tmp", "host.docker.internal", "127.0.0.1", 'File "')  # noqa: S108 - forbidden leak text, not a filesystem path used by this test
 KEY_SHAPE = re.compile(r"\bsk-[A-Za-z0-9]")
 
 

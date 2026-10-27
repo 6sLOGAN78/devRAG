@@ -52,10 +52,30 @@ def test_low_disk_fails_with_action() -> None:
     assert "ACTION:" in result.stdout and "never pruned automatically" in result.stdout
 
 
+def test_tei_disk_floor_cannot_be_bypassed_by_the_general_override(tmp_path: Path) -> None:
+    stub = tmp_path / "df"
+    stub.write_text("#!/bin/sh\nprintf 'Filesystem 1024-blocks Used Available Capacity Mounted\\n/dev/test 20000000 19000000 1048576 95%% /\\n'\n")
+    stub.chmod(0o755)
+    result = run(COMPOSE_PROFILES="tei-cpu", PATH=f"{tmp_path}:{os.environ['PATH']}", PREFLIGHT_ALLOW_LOW_DISK="1")
+    assert result.returncode == 1
+    assert "TEI requires at least 6 GB free" in result.stdout
+
+
 def test_low_ram_fails() -> None:
     result = run(PREFLIGHT_MIN_RAM_MB="999999")
     assert result.returncode == 1
     assert "FAIL RAM" in result.stdout
+
+
+def test_native_only_preflight_does_not_require_elasticsearch_map_count():
+    result = subprocess.run(
+        [str(SCRIPT), "--deepdoc"], capture_output=True, text=True, check=False, cwd=ROOT,
+        env={**os.environ, **LOOSE, "COMPOSE_PROFILES": "deepdoc", "PREFLIGHT_MIN_MAP_COUNT": "999999999",
+             "DEEPDOC_API_TOKEN": "test-only-native-preflight-token-0001"},
+    )
+    assert result.returncode == 0, result.stdout
+    assert "not required for native-only" in result.stdout
+    assert "test-only-native-preflight-token-0001" not in result.stdout
 
 
 def test_low_map_count_fails_and_names_sysctl() -> None:

@@ -95,13 +95,14 @@ export interface Forced {
   status: number;
   message: string;
   reason?: string;
+  data?: Record<string, unknown>;
 }
 
 export const ok = (config: InternalAxiosRequestConfig, data: unknown) =>
   ({ data: { code: 0, message: "", data }, status: 200, statusText: "OK", headers: new AxiosHeaders(), config }) as never;
 
 export function failure(config: InternalAxiosRequestConfig, f: Forced) {
-  const data = f.reason === undefined ? null : { reason: f.reason };
+  const data = f.reason === undefined && f.data === undefined ? null : { ...f.data, ...(f.reason === undefined ? {} : { reason: f.reason }) };
   const response = { data: { code: f.status, message: f.message, data }, status: f.status, statusText: String(f.status), headers: new AxiosHeaders(), config } as never;
   return Promise.reject(new AxiosError(`status ${f.status}`, "ERR_BAD_RESPONSE", config, null, response));
 }

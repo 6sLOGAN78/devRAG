@@ -1,0 +1,234 @@
+[
+  {
+    "id": "CHUNK-03",
+    "description": "`paper`: section-aware (Abstract, Introduction, Method, ..., References)"
+  },
+  {
+    "id": "CHUNK-04",
+    "description": "`book`: chapter/section hierarchy from headings or TOC depth"
+  },
+  {
+    "id": "CHUNK-05",
+    "description": "`laws`: Chapter / Section / Article / Item hierarchy"
+  },
+  {
+    "id": "CHUNK-06",
+    "description": "`presentation`: one chunk group per slide with slide title appended"
+  },
+  {
+    "id": "CHUNK-07",
+    "description": "`table`: one chunk per row prefixed with table title and column headers"
+  },
+  {
+    "id": "CHUNK-08",
+    "description": "`qa`: question/answer pairs from Excel/CSV/text; question stored in `question_tks`"
+  },
+  {
+    "id": "CHUNK-09",
+    "description": "`resume`: structured CV entities (name, contact, work history, education, skills)"
+  },
+  {
+    "id": "CHUNK-10",
+    "description": "`picture`: VLM description of images indexed as chunks"
+  },
+  {
+    "id": "CHUNK-11",
+    "description": "`manual`: groups code blocks, parameter tables, subsection diagrams"
+  },
+  {
+    "id": "CHUNK-12",
+    "description": "`email`: From/To/Subject/Date/Body sections"
+  },
+  {
+    "id": "CHUNK-13",
+    "description": "`tag`: extracts tag features and tag weights"
+  },
+  {
+    "id": "CHUNK-14",
+    "description": "`one`: whole document as a single chunk"
+  },
+  {
+    "id": "CHUNK-15",
+    "description": "`audio`: ASR transcript segmented into timestamped chunks"
+  },
+  {
+    "id": "CHUNK-17",
+    "description": "Text preprocessing: full-to-half-width, traditional-to-simplified Chinese, URL/email stripping, tokenize, fine-grained tokenize, token positions \u2014 *partly delivered in Phase 4 (R-160, D-27): full-to-half-width, URL/email stripping, tokenize and token positions through the in-repo stdlib tokenizer; traditional-to-simplified conversion and the dictionary fine-grained tokenizer move to Phase 6*"
+  },
+  {
+    "id": "CHUNK-22",
+    "description": "LLM keyword extraction per chunk populates `important_kwd`"
+  },
+  {
+    "id": "CHUNK-23",
+    "description": "LLM question proposal per chunk populates `question_tks`"
+  },
+  {
+    "id": "CHUNK-24",
+    "description": "LLM content tagging against tag sets"
+  },
+  {
+    "id": "CHUNK-25",
+    "description": "LLM auto-metadata generation (`gen_metadata`)"
+  },
+  {
+    "id": "CHUNK-26",
+    "description": "RAPTOR hierarchical summarization (cluster, summarize, index summary chunks) when enabled on the dataset"
+  },
+  {
+    "id": "CHUNK-27",
+    "description": "Public built-in pipeline listing: `GET /api/v1/pipelines?type=builtin`, `GET /api/v1/pipelines/:id`"
+  },
+  {
+    "id": "CHUNK-28",
+    "description": "Go chunker mirrors for `naive`, `one`, `qa`, `table`, `presentation` *(Python implementation in v1; Go mirror deferred to v2)*"
+  },
+  {
+    "id": "DEPLOY-08",
+    "description": "`deepdoc` profile running the layout-parsing service on 9390"
+  },
+  {
+    "id": "DOC-17",
+    "description": "User can batch-update document metadata via `PATCH /datasets/<dataset_id>/documents/metadatas`"
+  },
+  {
+    "id": "DOC-18",
+    "description": "User can fetch an extracted image via `GET /documents/images/<image_id>`"
+  },
+  {
+    "id": "DOC-19",
+    "description": "User can fetch a generated artifact via `GET /documents/artifact/<filename>`"
+  },
+  {
+    "id": "ING-18",
+    "description": "Dataset-wide fan-out tasks using sentinel document ids"
+  },
+  {
+    "id": "KB-10",
+    "description": "User can aggregate tags across datasets via `GET /datasets/tags/aggregation`"
+  },
+  {
+    "id": "KB-11",
+    "description": "User can list and delete tags of a dataset via `GET` / `DELETE /datasets/<dataset_id>/tags`"
+  },
+  {
+    "id": "KB-12",
+    "description": "User can fetch flattened metadata across datasets via `GET /datasets/metadata/flattened`"
+  },
+  {
+    "id": "KB-13",
+    "description": "User can read a dataset's auto-metadata configuration via `GET /datasets/<dataset_id>/metadata/config`"
+  },
+  {
+    "id": "KB-17",
+    "description": "User can delete a derived index of a dataset by type via `DELETE /datasets/<dataset_id>/<index_type>` and trace it via `GET /datasets/<dataset_id>/artifacts/alteration`"
+  },
+  {
+    "id": "LLM-10",
+    "description": "Vision (image-to-text) model type"
+  },
+  {
+    "id": "LLM-11",
+    "description": "Speech-to-text (ASR) model type"
+  },
+  {
+    "id": "LLM-13",
+    "description": "OCR model type"
+  },
+  {
+    "id": "LLM-32",
+    "description": "Prompt generators: keyword extraction, question proposal, content tagging, metadata generation, chunk formatting"
+  },
+  {
+    "id": "PARSE-04",
+    "description": "Layout analysis (DLA) detects regions labelled Text, Title, Figure, Figure caption, Table, Table caption, Header, Footer, Reference, Equation"
+  },
+  {
+    "id": "PARSE-05",
+    "description": "Text boxes are assigned to layout regions at overlap ratio >= 0.4; duplicates removed by IoU NMS; regions sorted into reading order"
+  },
+  {
+    "id": "PARSE-06",
+    "description": "OCR fallback (text detection plus recognition) runs when a page's text layer is missing or corrupt"
+  },
+  {
+    "id": "PARSE-07",
+    "description": "Table structure recognition reconstructs cropped tables into HTML `<table>`"
+  },
+  {
+    "id": "PARSE-08",
+    "description": "Headers and footers are filtered from chunk content"
+  },
+  {
+    "id": "PARSE-09",
+    "description": "DOCX parser: paragraphs, headings, embedded images, tables as HTML *(Python implementation in v1; Go mirror deferred to v2)* \u2014 *partly delivered in Phase 4 (R-160, D-27): paragraphs, headings and tables as HTML; embedded images are skipped and counted in the log; image handling moves to Phase 6*"
+  },
+  {
+    "id": "PARSE-11",
+    "description": "PPTX parser: slide titles, text frames, shape tables, speaker notes, images \u2014 *partly delivered in Phase 4 (R-160, D-27): slide titles, text frames, shape tables and speaker notes; images are skipped and counted in the log; image handling moves to Phase 6*"
+  },
+  {
+    "id": "PARSE-14",
+    "description": "Markdown parser"
+  },
+  {
+    "id": "PARSE-15",
+    "description": "JSON parser"
+  },
+  {
+    "id": "PARSE-16",
+    "description": "EPUB parser"
+  },
+  {
+    "id": "PARSE-17",
+    "description": "CSV ingestion"
+  },
+  {
+    "id": "PARSE-18",
+    "description": "Image files (JPG, PNG) are parsed via OCR and/or VLM description"
+  },
+  {
+    "id": "PARSE-19",
+    "description": "Embedded figures are extracted, hashed for dedup (`image2id`), captioned by a vision model, and stored"
+  },
+  {
+    "id": "PARSE-20",
+    "description": "Audio files (MP3, WAV) are transcribed by an ASR model"
+  },
+  {
+    "id": "PARSE-21",
+    "description": "Email (`.eml`) parsed into From, To, Subject, Date, Body"
+  },
+  {
+    "id": "PARSE-22",
+    "description": "Pluggable external PDF parsers: Docling and MinerU wrappers"
+  },
+  {
+    "id": "PARSE-23",
+    "description": "Additional parser backends: PaddleOCR, Mistral, TCADP, SoMark, OpenDataLoader, figure parser"
+  },
+  {
+    "id": "PARSE-24",
+    "description": "DLA / OCR / TSR can be offloaded to a remote DeepDoc service (`DEEPDOC_URL`, `TENSORRT_DLA_SVR`; container port 9390)"
+  },
+  {
+    "id": "PARSE-25",
+    "description": "Parsing honours the `pages` range in `parser_config`"
+  },
+  {
+    "id": "PARSE-26",
+    "description": "Go PDF and DOCX parser implementations with CGO bindings (PDFium, OfficeOxide) *(Python implementation in v1; Go mirror deferred to v2)*"
+  },
+  {
+    "id": "SEC-08",
+    "description": "Native document parsing isolated in the `deepdoc` container"
+  },
+  {
+    "id": "STOR-09",
+    "description": "Extracted images and table crops are stored under `{tenant_id}/{doc_id}/{img_id}.png` and `.../tables/{table_id}.png`"
+  },
+  {
+    "id": "UI-14",
+    "description": "Parser configurator: chunk token size, delimiter, layout-model toggle, auto-keyword count \u2014 *partly delivered in Phase 4 (R-160, D-27): chunk token size and delimiter; the layout-model toggle and the auto-keyword count move to Phase 6*"
+  }
+]

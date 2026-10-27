@@ -32,6 +32,7 @@ from test.testcases._matrix_fixtures import (
     A_EMBED_MODEL,
     A_PROVIDER_KEY,
     B_PROVIDER_KEY,
+    CHATS,
     COMPAT,
     DATASETS,
     MODELS,
@@ -40,6 +41,7 @@ from test.testcases._matrix_fixtures import (
     PROVIDERS,
     UPLOAD,
     World,
+    a_chat_id,
     build_world,
 )
 from test.testcases._routes import ROUTES_FILE
@@ -56,6 +58,7 @@ TOKENS = "/api/v1/system/tokens"
 USERS = "/api/v1/tenants/{tenant_id}/users"
 # A distinctive question text: it is sent on every retrieval-test call and must not appear in any log line of the stack (plan 05-04, T-05-04-04).
 SEARCH_QUESTION = "leaksweepquestion" + uuid.uuid4().hex[:12]
+CHAT_QUESTION = "leaksweepchatquestion" + uuid.uuid4().hex[:12]
 
 
 def implemented_rows(path: Path = ROUTES_FILE) -> list[str]:
@@ -741,6 +744,193 @@ def sweep_chunk_rows(s: Sweep, w: World) -> None:
     s.errors(row, "PATCH", path, "PUT")
 
 
+def sweep_chat_rows(s: Sweep, w: World) -> None:
+    """The five assistant rows on success and error paths (plan 05-08).
+
+    A's team assistant is open to every member and the owner's private one to nobody else, the owner and the admin included. Each row is tried as the owner,
+    as a member, with an API token and as an outsider, with bad bodies, absent and malformed ids, and the bearer error cases. The provider key is already a
+    registered secret, so any response that carried it would be flagged.
+    """
+    a, b, member, admin = w.a, w.b, w.normal, w.admin
+    token = str(w.a_tokens[0]["token"])
+    scope = {"tenant_id": a.tenant_id}
+    team_dataset, private_dataset = str(w.a_team_dataset["id"]), str(w.a_private_dataset["id"])
+    team, private = f"{CHATS}/{w.a_team_chat['id']}", f"{CHATS}/{w.a_private_chat['id']}"
+    absent, malformed = f"{CHATS}/{uuid.uuid4().hex}", f"{CHATS}/not-an-id"
+    model = {"llm_id": a_chat_id()}
+
+    row = f"POST {CHATS}"
+    made = s.req(row, "success as owner", "POST", CHATS, a.token, {"name": "leak sweep owner chat", **model})
+    s.req(row, "success as owner (team, with a dataset and settings)", "POST", CHATS, a.token, {
+        "name": "leak sweep team chat", "permission": "team", "kb_ids": [team_dataset], **model,
+        "prompt_config": {"system": "Answer from the knowledge only.", "prologue": "Hello.", "empty_response": "Nothing found."},
+        "llm_setting": {"temperature": 0}, "similarity_threshold": 0.3, "vector_similarity_weight": 0.5, "top_n": 4,
+    })  # fmt: skip
+    s.req(row, "success as a member", "POST", CHATS, member.token, {"name": "leak sweep member chat", **model, **scope})
+    s.req(row, "success with an API token", "POST", CHATS, token, {"name": "leak sweep token chat", **model})
+    s.req(row, "duplicate name", "POST", CHATS, a.token, {"name": "leak sweep owner chat", **model})
+    s.req(row, "no body fields", "POST", CHATS, a.token, {})
+    s.req(row, "name too long", "POST", CHATS, a.token, {"name": "n" * 200, **model})
+    s.req(row, "unknown field", "POST", CHATS, a.token, {"name": "leak sweep unknown", "status": "0", **model})
+    s.req(row, "mass assignment", "POST", CHATS, a.token, {"name": "leak sweep mass", "created_by": b.user_id, **model})
+    s.req(row, "no chat model", "POST", CHATS, a.token, {"name": "leak sweep no model"})
+    s.req(row, "unknown chat model", "POST", CHATS, a.token, {"name": "leak sweep bad model", "llm_id": "nothing@OpenAI-API-Compatible"})
+    s.req(row, "team assistant with a private dataset", "POST", CHATS, a.token, {"name": "leak sweep not shared", "permission": "team", "kb_ids": [private_dataset], **model})
+    s.req(row, "absent dataset", "POST", CHATS, a.token, {"name": "leak sweep absent dataset", "kb_ids": [uuid.uuid4().hex], **model})
+    s.req(row, "dataset the member cannot open", "POST", CHATS, member.token, {"name": "leak sweep member private", "kb_ids": [private_dataset], **model, **scope})
+    s.req(row, "setting out of range", "POST", CHATS, a.token, {"name": "leak sweep range", "top_n": 500, **model})
+    s.req(row, "as an outsider naming the workspace", "POST", CHATS, b.token, {"name": "leak sweep outsider", **model, **scope})
+    s.req(row, "as an outsider with the workspace's model", "POST", CHATS, b.token, {"name": "leak sweep outsider", **model})
+    s.errors(row, "POST", CHATS, "PUT")
+
+    row = f"GET {CHATS}"
+    s.req(row, "success as owner", "GET", CHATS, a.token)
+    s.req(row, "success as a member", "GET", f"{CHATS}?tenant_id={a.tenant_id}&page=1&page_size=5", member.token)
+    s.req(row, "success as an admin", "GET", f"{CHATS}?tenant_id={a.tenant_id}", admin.token)
+    s.req(row, "success with an API token", "GET", CHATS, token)
+    s.req(row, "success with keywords that are wildcards", "GET", f"{CHATS}?keywords=%25_leak", a.token)
+    s.req(row, "page size over the limit", "GET", f"{CHATS}?page_size=101", a.token)
+    s.req(row, "page that is not a number", "GET", f"{CHATS}?page=one", a.token)
+    s.req(row, "keywords too long", "GET", f"{CHATS}?keywords={'k' * 129}", a.token)
+    s.req(row, "malformed workspace", "GET", f"{CHATS}?tenant_id=nope", a.token)
+    s.req(row, "as an outsider naming the workspace", "GET", f"{CHATS}?tenant_id={a.tenant_id}", b.token)
+    s.req(row, "as an outsider", "GET", CHATS, b.token)
+    s.errors(row, "GET", CHATS, "PUT")
+
+    row = f"GET {CHATS}/{{chat_id}}"
+    s.req(row, "success as owner (team)", "GET", team, a.token)
+    s.req(row, "success as owner (private)", "GET", private, a.token)
+    s.req(row, "success as a member (team)", "GET", team, member.token)
+    s.req(row, "success as an admin (team)", "GET", team, admin.token)
+    s.req(row, "success with an API token", "GET", team, token)
+    s.req(row, "private as a member", "GET", private, member.token)
+    s.req(row, "private as an admin", "GET", private, admin.token)
+    s.req(row, "absent id", "GET", absent, a.token)
+    s.req(row, "malformed id", "GET", malformed, a.token)
+    s.req(row, "as an outsider", "GET", team, b.token)
+    s.req(row, "with an outsider's API token", "GET", team, w.b_api_token)
+    s.errors(row, "GET", team, "POST")
+
+    row = f"PUT {CHATS}/{{chat_id}}"
+    mine = f"{CHATS}/{made.json()['data']['id']}"
+    s.req(row, "success as owner (rename)", "PUT", mine, a.token, {"name": "leak sweep renamed"})
+    s.req(row, "success as owner (settings)", "PUT", mine, a.token, {"top_n": 5, "prompt_config": {"prologue": "Welcome."}, "llm_setting": {"temperature": 0.2}, "rerank_id": None})
+    s.req(row, "success with an API token", "PUT", mine, token, {"similarity_threshold": 0.25})
+    s.req(row, "share with the team", "PUT", mine, a.token, {"permission": "team", "kb_ids": [team_dataset]})
+    s.req(row, "team assistant as a member who did not create it", "PUT", mine, member.token, {"name": "leak sweep takeover"})
+    s.req(row, "success as an admin on a team assistant", "PUT", mine, admin.token, {"top_n": 6})
+    s.req(row, "no fields", "PUT", mine, a.token, {})
+    s.req(row, "unknown field", "PUT", mine, a.token, {"status": "0"})
+    s.req(row, "a field that cannot be cleared", "PUT", mine, a.token, {"name": None})
+    s.req(row, "setting out of range", "PUT", mine, a.token, {"vector_similarity_weight": 2})
+    s.req(row, "unknown chat model", "PUT", mine, a.token, {"llm_id": "nothing@OpenAI-API-Compatible"})
+    s.req(row, "absent dataset", "PUT", mine, a.token, {"kb_ids": [uuid.uuid4().hex]})
+    s.req(row, "team assistant with a private dataset", "PUT", mine, a.token, {"kb_ids": [private_dataset]})
+    s.req(row, "name of another assistant", "PUT", mine, a.token, {"name": "leak sweep team chat"})
+    s.req(row, "private as a member", "PUT", private, member.token, {"top_n": 3})
+    s.req(row, "private as an admin", "PUT", private, admin.token, {"top_n": 3})
+    s.req(row, "absent id", "PUT", absent, a.token, {"top_n": 3})
+    s.req(row, "malformed id", "PUT", malformed, a.token, {"top_n": 3})
+    s.req(row, "as an outsider", "PUT", team, b.token, {"top_n": 3})
+    s.errors(row, "PUT", team, "POST")
+
+    row = f"DELETE {CHATS}/{{chat_id}}"
+    s.req(row, "team assistant as a member who did not create it", "DELETE", mine, member.token)
+    s.req(row, "private as a member", "DELETE", private, member.token)
+    s.req(row, "private as an admin", "DELETE", private, admin.token)
+    s.req(row, "absent id", "DELETE", absent, a.token)
+    s.req(row, "malformed id", "DELETE", malformed, a.token)
+    s.req(row, "as an outsider", "DELETE", team, b.token)
+    s.req(row, "success as an admin on a team assistant", "DELETE", mine, admin.token)
+    token_chat = s.req(f"POST {CHATS}", "success for the token delete", "POST", CHATS, token, {"name": "leak sweep token delete", **model}).json()["data"]["id"]
+    s.req(row, "success with an API token", "DELETE", f"{CHATS}/{token_chat}", token)
+    own = s.req(f"POST {CHATS}", "success for the owner delete", "POST", CHATS, a.token, {"name": "leak sweep owner delete", **model}).json()["data"]["id"]
+    s.req(row, "success as owner", "DELETE", f"{CHATS}/{own}", a.token)
+    s.errors(row, "DELETE", team, "POST")
+
+
+def sweep_chat_session_rows(s: Sweep, w: World) -> None:
+    """Every plan 05-09 session row, including teammate and outsider refusals."""
+    a, member, outsider = w.a, w.normal, w.b
+    token = str(w.a_tokens[0]["token"])
+    chat = str(w.a_team_chat["id"])
+    base = f"{CHATS}/{chat}/sessions"
+    own = f"{base}/{w.a_team_session['id']}"
+    feedback = f"{own}/messages/{w.a_team_message_id}/feedback"
+    absent = f"{base}/{uuid.uuid4().hex}"
+    malformed = f"{base}/not-an-id"
+
+    row = f"POST {CHATS}/{{chat_id}}/sessions"
+    created = s.req(row, "success as owner", "POST", base, a.token, {})
+    s.req(row, "success as member", "POST", base, member.token, {})
+    s.req(row, "success with API token", "POST", base, token, {})
+    s.req(row, "unknown field", "POST", base, a.token, {"user_id": outsider.user_id})
+    s.req(row, "name too long", "POST", base, a.token, {"name": "n" * 256})
+    s.req(row, "absent assistant", "POST", f"{CHATS}/{uuid.uuid4().hex}/sessions", a.token, {})
+    s.req(row, "outsider", "POST", base, outsider.token, {})
+    s.errors(row, "POST", base, "PUT")
+
+    row = f"GET {CHATS}/{{chat_id}}/sessions"
+    for label, who in (("owner", a.token), ("member", member.token), ("API token", token), ("outsider", outsider.token)):
+        s.req(row, label, "GET", base, who)
+    s.req(row, "bad page", "GET", base + "?page=0", a.token)
+    s.req(row, "absent assistant", "GET", f"{CHATS}/{uuid.uuid4().hex}/sessions", a.token)
+    s.errors(row, "GET", base, "PUT")
+
+    row = f"GET {CHATS}/{{chat_id}}/sessions/{{session_id}}"
+    for label, path, who in (
+        ("owner", own, a.token), ("API token", own, token), ("teammate", own, member.token),
+        ("outsider", own, outsider.token), ("absent id", absent, a.token), ("malformed id", malformed, a.token),
+    ):
+        s.req(row, label, "GET", path, who)
+    s.req(row, "bad cursor", "GET", own + "?before=bad", a.token)
+    s.errors(row, "GET", own, "PUT")
+
+    row = f"POST {CHATS}/{{chat_id}}/sessions/{{session_id}}/messages/{{message_id}}/feedback"
+    for label, path, who, body in (
+        ("owner up", feedback, a.token, {"thumb": "up"}),
+        ("owner clear", feedback, a.token, {"thumb": None}),
+        ("API token", feedback, token, {"thumb": "down"}),
+        ("teammate", feedback, member.token, {"thumb": "up"}),
+        ("outsider", feedback, outsider.token, {"thumb": "up"}),
+        ("absent message", f"{own}/messages/{uuid.uuid4().hex}/feedback", a.token, {"thumb": "up"}),
+        ("malformed session", f"{malformed}/messages/{w.a_team_message_id}/feedback", a.token, {"thumb": "up"}),
+        ("invalid thumb", feedback, a.token, {"thumb": "maybe"}),
+        ("unknown field", feedback, a.token, {"thumb": "up", "status": "x"}),
+    ):
+        s.req(row, label, "POST", path, who, body)
+    s.errors(row, "POST", feedback, "PUT")
+
+    row = f"DELETE {CHATS}/{{chat_id}}/sessions/{{session_id}}"
+    s.req(row, "teammate", "DELETE", own, member.token)
+    s.req(row, "outsider", "DELETE", own, outsider.token)
+    s.req(row, "absent id", "DELETE", absent, a.token)
+    s.req(row, "malformed id", "DELETE", malformed, a.token)
+    disposable = f"{base}/{created.json()['data']['id']}"
+    s.req(row, "owner", "DELETE", disposable, a.token)
+    token_session = s.req(f"POST {CHATS}/{{chat_id}}/sessions", "for token delete", "POST", base, token, {}).json()["data"]["id"]
+    s.req(row, "API token", "DELETE", f"{base}/{token_session}", token)
+    s.errors(row, "DELETE", own, "POST")
+
+
+def sweep_completion_rows(s: Sweep, w: World) -> None:
+    row = "POST /api/v1/chat/completions"
+    path = "/api/v1/chat/completions"
+    chat = str(w.a_private_chat["id"])
+    body = {"chat_id": chat, "message": CHAT_QUESTION, "stream": False}
+    s.req(row, "success as owner", "POST", path, w.a.token, body)
+    s.req(row, "success with API token", "POST", path, str(w.a_tokens[0]["token"]), body)
+    streamed = s.req(row, "stream success", "POST", path, w.a.token, {**body, "stream": True})
+    assert streamed.status_code == 200 and streamed.text.endswith("data: [DONE]\n\n")
+    s.req(row, "blank question", "POST", path, w.a.token, {**body, "message": "   "})
+    s.req(row, "unknown field", "POST", path, w.a.token, {**body, "api_key": SENTINEL_PROVIDER_KEY})
+    s.req(row, "absent assistant", "POST", path, w.a.token, {**body, "chat_id": uuid.uuid4().hex})
+    s.req(row, "malformed assistant", "POST", path, w.a.token, {**body, "chat_id": "bad"})
+    s.req(row, "private assistant as member", "POST", path, w.normal.token, body)
+    s.req(row, "private assistant as outsider", "POST", path, w.b.token, body)
+    s.errors(row, "POST", path, "GET")
+
+
 def sweep_search_rows(s: Sweep, w: World) -> None:
     """The retrieval test on success and error paths (plan 05-04).
 
@@ -951,6 +1141,9 @@ def sweep(ingress: httpx.Client) -> Iterator[Sweep]:
             sweep_chunk_rows(s, world)
             sweep_ingestion_rows(s, world)
             sweep_search_rows(s, world)
+            sweep_chat_rows(s, world)
+            sweep_chat_session_rows(s, world)
+            sweep_completion_rows(s, world)
             sweep_page_rows(s, world)
             collect_database_secrets(s)
             s.secrets.extend(infrastructure_secrets())
@@ -1102,3 +1295,4 @@ def test_the_retrieval_test_answered_and_no_log_line_holds_the_question_text(swe
     text = proc.stdout + proc.stderr
     assert "/api/v1/datasets/search" in text, "the retrieval requests are in the log window, so an empty result means something"
     assert text.count(SEARCH_QUESTION) == 0, "the question text appears in the container log"
+    assert text.count(CHAT_QUESTION) == 0, "the chat question appears in the container log"

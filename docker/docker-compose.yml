@@ -89,16 +89,52 @@ x-app-env: &app-env
   INGEST_QUEUE_PREFIX: ${INGEST_QUEUE_PREFIX:-te}
   INGEST_CONSUMER_GROUP: ${INGEST_CONSUMER_GROUP:-ragflow_consumer_group}
   RETRIEVAL_TOP_K: ${RETRIEVAL_TOP_K:-1024}
-  RETRIEVAL_RERANK_MAX_CANDIDATES: ${RETRIEVAL_RERANK_MAX_CANDIDATES:-64}
+  RETRIEVAL_RERANK_MAX_CANDIDATES: ${RETRIEVAL_RERANK_MAX_CANDIDATES:-16}
   RETRIEVAL_MSM_PERCENT: ${RETRIEVAL_MSM_PERCENT:-30}
   RETRIEVAL_MSM_RETRY_PERCENT: ${RETRIEVAL_MSM_RETRY_PERCENT:-10}
   RETRIEVAL_SYNONYM_TTL_SECONDS: ${RETRIEVAL_SYNONYM_TTL_SECONDS:-86400}
   RETRIEVAL_RATE_MAX: ${RETRIEVAL_RATE_MAX:-30}
   RETRIEVAL_RATE_WINDOW_SECONDS: ${RETRIEVAL_RATE_WINDOW_SECONDS:-60}
+  CHAT_STREAM_DEADLINE_SECONDS: ${CHAT_STREAM_DEADLINE_SECONDS:-300}
+  CHAT_MAX_QUESTION_CHARS: ${CHAT_MAX_QUESTION_CHARS:-8000}
+  CHAT_MAX_SESSION_MESSAGES: ${CHAT_MAX_SESSION_MESSAGES:-400}
+  CHAT_RATE_MAX: ${CHAT_RATE_MAX:-30}
+  CHAT_RATE_WINDOW_SECONDS: ${CHAT_RATE_WINDOW_SECONDS:-60}
+  CHAT_MESSAGE_PAGE_SIZE: ${CHAT_MESSAGE_PAGE_SIZE:-50}
   LOG_DIR: ${LOG_DIR:-/ragflow/logs}
   TZ: ${TIMEZONE:-UTC}
+  DEEPDOC_URL: ${DEEPDOC_URL:-}
+  TENSORRT_DLA_SVR: ${TENSORRT_DLA_SVR:-}
+  DEEPDOC_API_TOKEN: ${DEEPDOC_API_TOKEN:-}
 
 services:
+  deepdoc:
+    profiles: [deepdoc]
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.deepdoc
+    image: ${DEEPDOC_IMAGE:-devrag-deepdoc:local}
+    restart: unless-stopped
+    user: "10001:10001"
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    pids_limit: 128
+    environment:
+      DEEPDOC_API_TOKEN: ${DEEPDOC_API_TOKEN:-}
+      DEEPDOC_MODEL_DIR: /models
+    volumes:
+      - ${DEEPDOC_MODEL_DIR:-../ragflow-logs/deepdoc-models}:/models:ro
+    tmpfs:
+      - /tmp:size=128m,mode=1777
+    networks: [deepdoc]
+    healthcheck:
+      test: ["CMD", "/ragflow/.venv/bin/python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:9390/health', timeout=3).read()"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 45s
+
   init:
     profiles: [cpu]
     build:
@@ -171,3 +207,7 @@ services:
       start_period: 30s
     networks:
       - ragflow
+
+networks:
+  deepdoc:
+    internal: true
