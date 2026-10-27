@@ -60,6 +60,7 @@ def test_selected_scan_upload_reaches_real_worker_chunks_and_authorized_preview(
             assert ok(api(ingress, "GET", route, owner.token))["pages"] == [[2, 2]]
             _check_page_form(ingress, owner, fake, dataset_id, doc["id"])
             assert ok(api(ingress, "GET", route, owner.token))["pages"] == [[2, 2]]
+            assert ok(api(ingress, "GET", route, owner.token))["layout_recognize"] is True
             started = start_parse(ingress, owner, dataset_id, [doc["id"]])
             assert started.status_code == 200, started.text
             row = wait_run(ingress, owner, dataset_id, doc["id"], "3", timeout=120)
@@ -99,6 +100,7 @@ def _check_page_form(ingress, owner, fake, dataset_id, doc_id):
                 assert browser.evaluate("document.querySelector('[data-testid=\"field-page-ranges\"]').value") == "2-3"
             browser.evaluate("(() => {const e = document.querySelector('[data-testid=\"field-page-ranges\"]');e.focus();e.select();})()")
             browser.call("Input.insertText", {"text": value})
+            _press(browser, "field-layout")
             _press(browser, "chunk-method-submit")
             browser.wait_for("document.querySelector('[data-testid=\"chunk-method-dialog\"]') === null", "page settings saved")
         output = Path("output/playwright/phase6-review")

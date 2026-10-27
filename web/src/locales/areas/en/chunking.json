@@ -62,7 +62,9 @@
         "overlap": "Overlap (%)",
         "overlapHelp": "How much of the end of one chunk is repeated at the start of the next.",
         "pages": "PDF pages",
-        "pagesHelp": "Leave blank for all pages, or enter inclusive ranges such as 2-4, 13-30. Other file types ignore this setting."
+        "pagesHelp": "Leave blank for all pages, or enter inclusive ranges such as 2-4, 13-30. Other file types ignore this setting.",
+        "layout": "Use layout analysis",
+        "layoutHelp": "Detect headings, tables and figures, follow columns, and remove page headers and footers."
       },
       "notYet": {
         "heading": "Not available yet",
@@ -87,7 +89,8 @@
       "delimitersRequired": "Enter at least one delimiter.",
       "delimitersMax": "Use 64 characters or fewer.",
       "overlapRange": "Enter a whole number from 0 to 50.",
-      "pagesRange": "Enter pages from 1 to 1000000, such as 2-4, 13-30."
+      "pagesRange": "Enter pages from 1 to 1000000, such as 2-4, 13-30.",
+      "layout": "Choose a valid layout option."
     }
   }
 }

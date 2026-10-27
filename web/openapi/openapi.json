@@ -254,6 +254,10 @@
             "default": null,
             "title": "Delimiter"
           },
+          "layout_recognize": {
+            "default": null,
+            "title": "Layout Recognize"
+          },
           "overlapped_percent": {
             "default": null,
             "title": "Overlapped Percent"
@@ -602,6 +606,18 @@
               }
             ],
             "title": "Last Log Id"
+          },
+          "layout_recognize": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "default": true,
+            "title": "Layout Recognize"
           },
           "name": {
             "title": "Name",

@@ -16,6 +16,7 @@ ENV PYTHONPATH=/opt/deepdoc/vendor:/ragflow \
 WORKDIR /ragflow
 COPY --from=native-dependencies /opt/deepdoc/vendor /opt/deepdoc/vendor
 COPY deepdoc ./deepdoc
+COPY rag/parsers ./rag/parsers
 LABEL org.opencontainers.image.source="https://github.com/6sLOGAN78/devrag-mvp"
 USER 10001:10001
 EXPOSE 9390

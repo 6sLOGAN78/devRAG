@@ -36,6 +36,7 @@ export interface UploadLimitsView {
 /** The dataset's default chunking values (the document dialog and the default chunking dialog load them). */
 export interface DatasetParserConfig {
   pages?: [number, number][];
+  layoutRecognize?: boolean | string;
   chunkTokenNum: number;
   delimiter: string;
   overlappedPercent: number;
@@ -126,6 +127,7 @@ function toParserConfig(raw: unknown): DatasetParserConfig {
     chunkTokenNum: tokens > 0 ? tokens : DEFAULT_CHUNK_TOKEN_NUM,
     delimiter: typeof dto.delimiter === "string" && dto.delimiter !== "" ? dto.delimiter : DEFAULT_DELIMITER,
     overlappedPercent: overlap > 0 ? overlap : DEFAULT_OVERLAPPED_PERCENT,
+    ...(typeof dto.layout_recognize === "boolean" || typeof dto.layout_recognize === "string" ? { layoutRecognize: dto.layout_recognize } : {}),
     ...(dto.pages !== undefined ? { pages: pageRangesOf(dto.pages) } : {}),
   };
 }
@@ -200,6 +202,7 @@ export async function deleteDatasets(ids: string[], tenantId: string): Promise<s
 /** The default chunking method and values a save may change. An absent key is no change (the server merges). */
 export type DatasetChunkingInput = Partial<{
   pages: [number, number][];
+  layoutRecognize: boolean | string;
   parserId: string;
   chunkTokenNum: number;
   delimiter: string;
@@ -218,6 +221,7 @@ export async function updateDatasetChunking(id: string, input: DatasetChunkingIn
   if (input.chunkTokenNum !== undefined) config.chunk_token_num = input.chunkTokenNum;
   if (input.delimiter !== undefined) config.delimiter = input.delimiter;
   if (input.overlappedPercent !== undefined) config.overlapped_percent = input.overlappedPercent;
+  if (input.layoutRecognize !== undefined) config.layout_recognize = input.layoutRecognize;
   if (input.pages !== undefined) config.pages = input.pages;
   if (Object.keys(config).length > 0) data.parser_config = config;
   return toDetail(await request<unknown>({ url: datasetPath(id), method: "PUT", data, timeout: CREATE_TIMEOUT_MS }, { silent: true }));

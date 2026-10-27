@@ -11,7 +11,7 @@ import httpx
 
 from common.settings import DeepDocSettings
 from rag.parsers.errors import FileDamaged, FileTooLarge, ParserError
-from rag.parsers.types import BLOCK_KINDS, PageBox, ParsedBlock, ParseLimits, ParseReport, SourceFile
+from rag.parsers.types import BLOCK_KINDS, LAYOUT_LABELS, PageBox, ParsedBlock, ParseLimits, ParseReport, SourceFile
 
 
 class NativeUnavailable(ParserError):
@@ -73,9 +73,12 @@ class DeepDocClient:
         return self._request("/v1/page-image", path, {"page": page, "zoom": zoom}, binary=True)
 
     def parse(self, source: SourceFile, report: ParseReport, *, page_range: tuple[int, int] | None,
-              limits: ParseLimits | None) -> list[ParsedBlock]:
+              limits: ParseLimits | None, parser_config: dict[str, Any] | None = None) -> list[ParsedBlock]:
         limit = limits or ParseLimits()
-        options = {"max_pages": limit.max_pages, "max_text_bytes": limit.max_text_bytes, "layout": False}
+        layout = (parser_config or {}).get("layout_recognize", False)
+        if type(layout) is not bool and layout != "deepdoc":
+            raise NativeUnavailable()
+        options = {"max_pages": limit.max_pages, "max_text_bytes": limit.max_text_bytes, "layout": layout is not False}
         if page_range is not None:
             options.update(start=page_range[0], end=page_range[1])
         data = self._request("/v1/parse", source.path, options)
@@ -85,6 +88,11 @@ class DeepDocClient:
                 raise ValueError
             total, missing = raw_report["pages_total"], raw_report["pages_without_text"]
             if type(total) is not int or type(missing) is not int or not 0 <= missing <= total <= limit.max_pages:
+                raise ValueError
+            backend, regions = raw_report.get("layout_backend"), raw_report.get("layout_regions", 0)
+            if backend not in (None,"deepdoc-onnx") or type(regions) is not int or not 0 <= regions <= 300*total:
+                raise ValueError
+            if options["layout"] and backend != "deepdoc-onnx" and total:
                 raise ValueError
             blocks, size = [], 0
             for raw in raw_blocks:
@@ -116,8 +124,12 @@ class DeepDocClient:
                     if not -1 <= x0 < x1 <= width + 1 or not -1 <= top < bottom <= height + 1:
                         raise ValueError
                     boxes.append(PageBox(page, x0, top, x1, bottom))
-                blocks.append(ParsedBlock(text, kind, tuple(boxes), sizes))
+                label = raw.get("layout_label")
+                if label is not None and label not in LAYOUT_LABELS:
+                    raise ValueError
+                blocks.append(ParsedBlock(text, kind, tuple(boxes), sizes, layout_label=label))
             report.pages_total, report.pages_without_text = total, missing
+            report.layout_backend, report.layout_regions = backend, regions
             return blocks
         except (KeyError, TypeError, ValueError, OverflowError):
             raise NativeUnavailable() from None

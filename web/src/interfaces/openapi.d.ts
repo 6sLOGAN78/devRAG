@@ -676,6 +676,11 @@ export interface components {
              */
             delimiter: unknown;
             /**
+             * Layout Recognize
+             * @default null
+             */
+            layout_recognize: unknown;
+            /**
              * Overlapped Percent
              * @default null
              */
@@ -816,6 +821,11 @@ export interface components {
             id: string;
             /** Last Log Id */
             last_log_id: string | null;
+            /**
+             * Layout Recognize
+             * @default true
+             */
+            layout_recognize: boolean | string;
             /** Name */
             name: string;
             /** Overlapped Percent */

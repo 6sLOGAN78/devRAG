@@ -1,0 +1,19 @@
+{
+  "origin": "Original hand-written PDF fixture; no third-party text or artwork",
+  "sha256": "5ca393a97a1cf5e350f1bbef7acd11ec30d4baca5ec17c2addf8e8a5f182f45f",
+  "pages": 2,
+  "reading_order": [
+    "ALPHA OBSERVATORY",
+    "BRAVO ORCHARD",
+    "CHARLIE HARBOR",
+    "DELTA LIBRARY"
+  ],
+  "remove": [
+    "PLANTED FIELD REPORT HEADER",
+    "PLANTED FIELD REPORT FOOTER"
+  ],
+  "retain_reference": true,
+  "score_threshold": 0.08,
+  "iou_threshold": 0.45,
+  "text_overlap_threshold": 0.4
+}

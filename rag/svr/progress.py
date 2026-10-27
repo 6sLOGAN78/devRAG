@@ -40,9 +40,10 @@ LOCK_TTL_SECONDS = 10
 RECONCILE_EVERY_SECONDS = 30
 RECONCILE_LIMIT = 100
 
-_MACHINE = re.compile(r"^(?:\d\d:\d\d:\d\d\s+)?\[(?:pages|skipped)\]\s")
+_MACHINE = re.compile(r"^(?:\d\d:\d\d:\d\d\s+)?\[(?:pages|skipped|layout)\]\s")
 _PAGES = re.compile(r"\[pages\]\s+total=(\d+)\s+without_text=(\d+)")
 _SKIPPED = re.compile(r"\[skipped\]\s+images=(\d+)")
+_LAYOUT = re.compile(r"\[layout\]\s+backend=(deepdoc-onnx)\s+regions=(\d+)")
 _STAMP = re.compile(r"^(\d\d:\d\d:\d\d)\s")
 
 
@@ -72,6 +73,8 @@ class _Summary:
     images_skipped: int
     first_failed: Any
     all_done: bool
+    layout_backend: str | None = None
+    layout_regions: int = 0
 
 
 def _running_documents(doc_ids: Sequence[str] | None) -> list[_Doc]:
@@ -101,13 +104,18 @@ def _merge_lines(tasks: Sequence[Any]) -> list[str]:
 
 
 def _summarise(tasks: Sequence[Any]) -> _Summary:
-    pages_total = pages_without = skipped = 0
+    pages_total = pages_without = skipped = layout_regions = 0
+    layout_backend = None
     for task in tasks:
         text = task.progress_msg or ""
         pages = _last_match(_PAGES, text)
         if pages:
             pages_total += int(pages.group(1))
             pages_without += int(pages.group(2))
+        layout = _last_match(_LAYOUT, text)
+        if layout:
+            layout_backend = layout.group(1)
+            layout_regions += int(layout.group(2))
         images = _last_match(_SKIPPED, text)
         if images:
             skipped += int(images.group(1))
@@ -122,6 +130,7 @@ def _summarise(tasks: Sequence[Any]) -> _Summary:
         images_skipped=skipped,
         first_failed=failed,
         all_done=all((t.progress or 0) >= 1 for t in tasks),
+        layout_backend=layout_backend, layout_regions=layout_regions,
     )
 
 
@@ -195,6 +204,7 @@ def _error_dsl(info: FailureInfo, attempts: int, max_attempts: int) -> dict[str,
 
 def _counts_dsl(summary: _Summary, chunks: int) -> dict[str, Any]:
     return {
+        **({"layout_backend": summary.layout_backend, "layout_regions": summary.layout_regions} if summary.layout_backend else {}),
         "chunks": chunks,
         "pages_total": summary.pages_total,
         "pages_without_text": summary.pages_without_text,

@@ -1,0 +1,38 @@
+{
+  "recorded_at": "2026-10-27T18:37:46.609664+00:00",
+  "plans": [
+    "06-03",
+    "06-04"
+  ],
+  "paid_calls": 0,
+  "python_unit": {
+    "passed": 2500,
+    "existing_skips": 8,
+    "log": "ragflow-logs/phase6-04-unit-reviewed.log"
+  },
+  "frontend_unit": {
+    "passed": 2141,
+    "files": 105,
+    "log": "ragflow-logs/phase6-04-web-all.log"
+  },
+  "additional_frontend_backend_preservation": {
+    "passed": 36,
+    "log": "ragflow-logs/phase6-04-backend-preservation.log"
+  },
+  "actual_native_api_browser_pdf_regressions": {
+    "passed": 21,
+    "seconds": 139.87,
+    "log": "ragflow-logs/phase6-04-stack-reviewed.log"
+  },
+  "ci": "7/7",
+  "security_async_lint": "pass",
+  "exact_acquisition_approval": "validated unchanged",
+  "guard": "06-04-LAYOUT-GUARD.json",
+  "reviewer": "assistant inline, no subagents authorized",
+  "human_uat_approval": false,
+  "screenshots": {
+    "output/playwright/phase6-review/scan-page-selection-saved.png": "09c79dec6d3f2309b4bba287f4f0083b757170bf6769197e0248c6f79f0acefd",
+    "output/playwright/phase6-review/layout-columns-highlight.png": "729ccb9d2b32163b681b8d1f1b0ca47f078b58305e2a5eda6c14266226fa29b7",
+    "output/playwright/phase6-review/scan-page2-highlight.png": "6191e38cde648a0da43763677a158693e2438e764264b84b9639c62ba6c3e195"
+  }
+}

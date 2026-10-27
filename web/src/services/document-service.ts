@@ -222,6 +222,7 @@ export async function setDocumentsEnabled(datasetId: string, ids: string[], enab
 /** One document opened on its own: the list row plus its chunking values and the kind of preview it supports. */
 export interface DocumentDetailView extends DocumentView {
   pages?: [number, number][];
+  layoutRecognize?: boolean | string;
   chunkTokenNum: number;
   delimiter: string;
   overlappedPercent: number;
@@ -240,12 +241,14 @@ export async function getDocument(datasetId: string, docId: string): Promise<Doc
     delimiter: text(dto.delimiter),
     overlappedPercent: count(dto.overlapped_percent),
     preview: dto.preview === "pages" ? "pages" : "none",
+    ...(typeof dto.layout_recognize === "boolean" || typeof dto.layout_recognize === "string" ? { layoutRecognize: dto.layout_recognize } : {}),
     ...(dto.pages !== undefined ? { pages: pageRangesOf(dto.pages) } : {}),
   };
 }
 
 export interface DocumentSettingsChanges {
   pages?: [number, number][];
+  layoutRecognize?: boolean | string;
   parserId?: string;
   chunkTokenNum?: number;
   delimiter?: string;
@@ -263,6 +266,7 @@ export async function updateDocumentSettings(datasetId: string, docId: string, c
   if (changes.chunkTokenNum !== undefined) config.chunk_token_num = changes.chunkTokenNum;
   if (changes.delimiter !== undefined) config.delimiter = changes.delimiter;
   if (changes.overlappedPercent !== undefined) config.overlapped_percent = changes.overlappedPercent;
+  if (changes.layoutRecognize !== undefined) config.layout_recognize = changes.layoutRecognize;
   if (changes.pages !== undefined) config.pages = changes.pages;
   if (Object.keys(config).length > 0) data.parser_config = config;
   const raw = await request<unknown>({ url: datasetDocumentPath(datasetId, docId), method: "PATCH", data, timeout: MAX_SETTINGS_TIMEOUT_MS }, { silent: true });
@@ -273,6 +277,7 @@ export async function updateDocumentSettings(datasetId: string, docId: string, c
     delimiter: text(dto.delimiter),
     overlappedPercent: count(dto.overlapped_percent),
     preview: dto.preview === "pages" ? "pages" : "none",
+    ...(typeof dto.layout_recognize === "boolean" || typeof dto.layout_recognize === "string" ? { layoutRecognize: dto.layout_recognize } : {}),
     ...(dto.pages !== undefined ? { pages: pageRangesOf(dto.pages) } : {}),
   };
 }

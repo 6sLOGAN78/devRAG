@@ -72,7 +72,7 @@ def _to_display(rect: tuple[float, float, float, float], crop: tuple[float, floa
     return min(xs), min(ys), max(xs), max(ys)
 
 
-def _page_blocks(page: pdfium.PdfPage, number: int) -> list[ParsedBlock] | None:
+def _page_blocks(page: pdfium.PdfPage, number: int, *, group_lines: bool = True) -> list[ParsedBlock] | None:
     """Blocks of one page, or None when the page has no text layer."""
     text_page = page.get_textpage()
     try:
@@ -90,6 +90,8 @@ def _page_blocks(page: pdfium.PdfPage, number: int) -> list[ParsedBlock] | None:
         lines.sort(key=lambda item: (round(item[1][1], 1), item[1][0]))
     finally:
         text_page.close()
+    if not group_lines:
+        return [ParsedBlock(text, boxes=(PageBox(number, *box),), page_sizes={number: size}) for text, box in lines]
     blocks: list[ParsedBlock] = []
     group: list[tuple[str, tuple[float, float, float, float]]] = []
 

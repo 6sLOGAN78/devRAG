@@ -12,6 +12,7 @@ from typing import Any
 from pydantic import BaseModel, ConfigDict, Field, StrictBool, StrictInt, ValidationError
 
 from deepdoc import pdf
+from deepdoc.geometry import apply_layout
 from deepdoc.model_runtime import NativeError
 from rag.parsers.errors import FileTooLarge, ParserError
 from rag.parsers.types import PageBox, ParsedBlock, ParseReport
@@ -52,10 +53,11 @@ def _parse(path: Path, options: PDFOptions, ocr) -> dict[str, Any]:
         for index in range(start, end):
             page = document[index]
             try:
-                page_blocks = pdf._page_blocks(page, index + 1)
+                page_blocks = pdf._page_blocks(page, index + 1, group_lines=not options.layout)
                 width, height = page.get_size()
             finally:
                 page.close()
+            image = None
             if not _valid_native_text(page_blocks):
                 image = pdf.rasterize_page(path, index, zoom=3)
                 buffer = io.BytesIO()
@@ -69,6 +71,12 @@ def _parse(path: Path, options: PDFOptions, ocr) -> dict[str, Any]:
                     page_blocks.append(ParsedBlock(span["text"], boxes=(box,), page_sizes={index + 1: (width, height)}))
                 if not page_blocks:
                     report.pages_without_text += 1
+            if options.layout:
+                image = image if image is not None else pdf.rasterize_page(path, index, zoom=3)
+                regions = ocr.layout(image, (width, height))
+                page_blocks = apply_layout(page_blocks or [], regions)
+                report.layout_backend = "deepdoc-onnx"
+                report.layout_regions += len(regions)
             for block in page_blocks or []:
                 produced += len(block.text.encode())
                 if produced > options.max_text_bytes:
@@ -86,8 +94,6 @@ def process(operation: str, content: bytes, raw_options: dict[str, Any], ocr) ->
             raise NativeError("invalid_options")
     except ValidationError:
         raise NativeError("invalid_options") from None
-    if options.layout:
-        raise NativeError("layout_unavailable", 503)
     try:
         with tempfile.TemporaryDirectory(prefix="deepdoc-pdf-") as folder:
             path = Path(folder) / "source.pdf"

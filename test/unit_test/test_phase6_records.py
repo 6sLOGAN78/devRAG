@@ -9,10 +9,10 @@ from test.unit_test import test_phase5_records as phase5
 
 pytestmark = pytest.mark.unit
 FIRST_ROW = 232
-LAST_ROW = 233  # Extended by the plan that actually records each decision.
+LAST_ROW = 235  # Extended by the plan that actually records each decision.
 FINAL_ROW = 261
 STATUS = "accepted (auto, not user-reviewed)"
-REQUIRED_TITLES = ["Phase 6 acquisition and admission", "CPU OCR service and native boundary"]
+REQUIRED_TITLES = ["Phase 6 acquisition and admission", "CPU OCR service and native boundary", "Read scanned PDFs through the existing document UI", "Preserve visual reading order and remove page furniture"]
 ROW = re.compile(r"^\| R-(\d+) \|")
 
 

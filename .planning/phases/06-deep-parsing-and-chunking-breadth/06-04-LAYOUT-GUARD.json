@@ -1,0 +1,3524 @@
+{
+  "fixture_sha256": "5ca393a97a1cf5e350f1bbef7acd11ec30d4baca5ec17c2addf8e8a5f182f45f",
+  "network": "none",
+  "model_load_seconds": 0.8470121080008539,
+  "cpu_quota": 2,
+  "memory_cap_mib": 3072,
+  "p50_per_page_seconds": 2.626106263499423,
+  "p95_per_page_seconds": 2.7947668864999287,
+  "peak_rss_mib": 561.84765625,
+  "samples": [
+    {
+      "repetition": 1,
+      "seconds": 5.589533772999857,
+      "per_page_seconds": 2.7947668864999287,
+      "peak_rss_kib": 575332,
+      "quality_pass": true,
+      "result": {
+        "schema_version": 1,
+        "blocks": [
+          {
+            "text": "Field Observations",
+            "kind": "heading",
+            "boxes": [
+              {
+                "page": 1,
+                "x0": 46.54800033569336,
+                "top": 48.7340087890625,
+                "x1": 194.40000915527344,
+                "bottom": 62.323974609375
+              }
+            ],
+            "page_sizes": {
+              "1": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Title"
+          },
+          {
+            "text": "ALPHA OBSERVATORY counted 73 meteors.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 1,
+                "x0": 45.13999938964844,
+                "top": 119.6300048828125,
+                "x1": 249.7699737548828,
+                "bottom": 127.17999267578125
+              }
+            ],
+            "page_sizes": {
+              "1": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "The observers recorded clear evening skies.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 1,
+                "x0": 45.13999938964844,
+                "top": 133.82000732421875,
+                "x1": 240.86996459960938,
+                "bottom": 143.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "1": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "Each measurement was entered in the ledger.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 1,
+                "x0": 45.86000061035156,
+                "top": 147.82000732421875,
+                "x1": 248.6699676513672,
+                "bottom": 157.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "1": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "The annual report preserves these findings.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 1,
+                "x0": 45.13999938964844,
+                "top": 161.719970703125,
+                "x1": 236.99998474121094,
+                "bottom": 171.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "1": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "BRAVO ORCHARD harvested 9100 kilograms.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 1,
+                "x0": 45.7400016784668,
+                "top": 244.6300048828125,
+                "x1": 252.5199737548828,
+                "bottom": 254.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "1": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "The gardeners weighed the complete harvest.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 1,
+                "x0": 45.13999938964844,
+                "top": 258.82000732421875,
+                "x1": 247.55996704101562,
+                "bottom": 268.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "1": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "Each delivery was entered in the ledger.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 1,
+                "x0": 45.86000061035156,
+                "top": 272.82000732421875,
+                "x1": 221.98997497558594,
+                "bottom": 282.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "1": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "The annual report preserves these findings.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 1,
+                "x0": 45.13999938964844,
+                "top": 286.719970703125,
+                "x1": 236.99998474121094,
+                "bottom": 296.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "1": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "CHARLIE HARBOR opened 52 berths.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 1,
+                "x0": 315.44000244140625,
+                "top": 119.6300048828125,
+                "x1": 486.41998291015625,
+                "bottom": 129.05999755859375
+              }
+            ],
+            "page_sizes": {
+              "1": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "The harbor team inspected every mooring.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 1,
+                "x0": 315.1400146484375,
+                "top": 133.82000732421875,
+                "x1": 502.53997802734375,
+                "bottom": 143.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "1": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "Each inspection was entered in the ledger.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 1,
+                "x0": 315.8599853515625,
+                "top": 147.82000732421875,
+                "x1": 502.5599670410156,
+                "bottom": 157.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "1": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "The annual report preserves these findings.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 1,
+                "x0": 315.1400146484375,
+                "top": 161.719970703125,
+                "x1": 507.0,
+                "bottom": 171.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "1": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "DELTA LIBRARY catalogued 281 books.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 1,
+                "x0": 315.80999755859375,
+                "top": 244.82000732421875,
+                "x1": 495.3299560546875,
+                "bottom": 254.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "1": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "The librarians checked every accession.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 1,
+                "x0": 315.1400146484375,
+                "top": 258.82000732421875,
+                "x1": 491.969970703125,
+                "bottom": 268.1300048828125
+              }
+            ],
+            "page_sizes": {
+              "1": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "Each accession was entered in the ledger.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 1,
+                "x0": 315.8599853515625,
+                "top": 272.82000732421875,
+                "x1": 501.9999694824219,
+                "bottom": 282.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "1": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "The annual report preserves these findings.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 1,
+                "x0": 315.1400146484375,
+                "top": 286.719970703125,
+                "x1": 507.0,
+                "bottom": 296.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "1": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "Field Observations",
+            "kind": "heading",
+            "boxes": [
+              {
+                "page": 2,
+                "x0": 46.54800033569336,
+                "top": 48.7340087890625,
+                "x1": 194.40000915527344,
+                "bottom": 62.323974609375
+              }
+            ],
+            "page_sizes": {
+              "2": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Title"
+          },
+          {
+            "text": "ALPHA OBSERVATORY counted 73 meteors.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 2,
+                "x0": 45.13999938964844,
+                "top": 119.6300048828125,
+                "x1": 249.7699737548828,
+                "bottom": 127.17999267578125
+              }
+            ],
+            "page_sizes": {
+              "2": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "The observers recorded clear evening skies.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 2,
+                "x0": 45.13999938964844,
+                "top": 133.82000732421875,
+                "x1": 240.86996459960938,
+                "bottom": 143.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "2": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "Each measurement was entered in the ledger.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 2,
+                "x0": 45.86000061035156,
+                "top": 147.82000732421875,
+                "x1": 248.6699676513672,
+                "bottom": 157.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "2": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "The annual report preserves these findings.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 2,
+                "x0": 45.13999938964844,
+                "top": 161.719970703125,
+                "x1": 236.99998474121094,
+                "bottom": 171.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "2": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "BRAVO ORCHARD harvested 9100 kilograms.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 2,
+                "x0": 45.7400016784668,
+                "top": 244.6300048828125,
+                "x1": 252.5199737548828,
+                "bottom": 254.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "2": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "The gardeners weighed the complete harvest.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 2,
+                "x0": 45.13999938964844,
+                "top": 258.82000732421875,
+                "x1": 247.55996704101562,
+                "bottom": 268.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "2": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "Each delivery was entered in the ledger.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 2,
+                "x0": 45.86000061035156,
+                "top": 272.82000732421875,
+                "x1": 221.98997497558594,
+                "bottom": 282.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "2": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "The annual report preserves these findings.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 2,
+                "x0": 45.13999938964844,
+                "top": 286.719970703125,
+                "x1": 236.99998474121094,
+                "bottom": 296.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "2": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "CHARLIE HARBOR opened 52 berths.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 2,
+                "x0": 315.44000244140625,
+                "top": 119.6300048828125,
+                "x1": 486.41998291015625,
+                "bottom": 129.05999755859375
+              }
+            ],
+            "page_sizes": {
+              "2": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "The harbor team inspected every mooring.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 2,
+                "x0": 315.1400146484375,
+                "top": 133.82000732421875,
+                "x1": 502.53997802734375,
+                "bottom": 143.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "2": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "Each inspection was entered in the ledger.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 2,
+                "x0": 315.8599853515625,
+                "top": 147.82000732421875,
+                "x1": 502.5599670410156,
+                "bottom": 157.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "2": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "The annual report preserves these findings.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 2,
+                "x0": 315.1400146484375,
+                "top": 161.719970703125,
+                "x1": 507.0,
+                "bottom": 171.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "2": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "DELTA LIBRARY catalogued 281 books.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 2,
+                "x0": 315.80999755859375,
+                "top": 244.82000732421875,
+                "x1": 495.3299560546875,
+                "bottom": 254.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "2": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "The librarians checked every accession.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 2,
+                "x0": 315.1400146484375,
+                "top": 258.82000732421875,
+                "x1": 491.969970703125,
+                "bottom": 268.1300048828125
+              }
+            ],
+            "page_sizes": {
+              "2": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "Each accession was entered in the ledger.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 2,
+                "x0": 315.8599853515625,
+                "top": 272.82000732421875,
+                "x1": 501.9999694824219,
+                "bottom": 282.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "2": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "The annual report preserves these findings.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 2,
+                "x0": 315.1400146484375,
+                "top": 286.719970703125,
+                "x1": 507.0,
+                "bottom": 296.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "2": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          }
+        ],
+        "report": {
+          "pages_total": 2,
+          "pages_without_text": 0,
+          "images_skipped": 0,
+          "notes": [],
+          "layout_backend": "deepdoc-onnx",
+          "layout_regions": 18
+        }
+      }
+    },
+    {
+      "repetition": 2,
+      "seconds": 5.499608459000228,
+      "per_page_seconds": 2.749804229500114,
+      "peak_rss_kib": 575332,
+      "quality_pass": true,
+      "result": {
+        "schema_version": 1,
+        "blocks": [
+          {
+            "text": "Field Observations",
+            "kind": "heading",
+            "boxes": [
+              {
+                "page": 1,
+                "x0": 46.54800033569336,
+                "top": 48.7340087890625,
+                "x1": 194.40000915527344,
+                "bottom": 62.323974609375
+              }
+            ],
+            "page_sizes": {
+              "1": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Title"
+          },
+          {
+            "text": "ALPHA OBSERVATORY counted 73 meteors.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 1,
+                "x0": 45.13999938964844,
+                "top": 119.6300048828125,
+                "x1": 249.7699737548828,
+                "bottom": 127.17999267578125
+              }
+            ],
+            "page_sizes": {
+              "1": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "The observers recorded clear evening skies.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 1,
+                "x0": 45.13999938964844,
+                "top": 133.82000732421875,
+                "x1": 240.86996459960938,
+                "bottom": 143.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "1": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "Each measurement was entered in the ledger.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 1,
+                "x0": 45.86000061035156,
+                "top": 147.82000732421875,
+                "x1": 248.6699676513672,
+                "bottom": 157.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "1": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "The annual report preserves these findings.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 1,
+                "x0": 45.13999938964844,
+                "top": 161.719970703125,
+                "x1": 236.99998474121094,
+                "bottom": 171.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "1": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "BRAVO ORCHARD harvested 9100 kilograms.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 1,
+                "x0": 45.7400016784668,
+                "top": 244.6300048828125,
+                "x1": 252.5199737548828,
+                "bottom": 254.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "1": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "The gardeners weighed the complete harvest.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 1,
+                "x0": 45.13999938964844,
+                "top": 258.82000732421875,
+                "x1": 247.55996704101562,
+                "bottom": 268.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "1": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "Each delivery was entered in the ledger.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 1,
+                "x0": 45.86000061035156,
+                "top": 272.82000732421875,
+                "x1": 221.98997497558594,
+                "bottom": 282.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "1": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "The annual report preserves these findings.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 1,
+                "x0": 45.13999938964844,
+                "top": 286.719970703125,
+                "x1": 236.99998474121094,
+                "bottom": 296.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "1": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "CHARLIE HARBOR opened 52 berths.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 1,
+                "x0": 315.44000244140625,
+                "top": 119.6300048828125,
+                "x1": 486.41998291015625,
+                "bottom": 129.05999755859375
+              }
+            ],
+            "page_sizes": {
+              "1": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "The harbor team inspected every mooring.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 1,
+                "x0": 315.1400146484375,
+                "top": 133.82000732421875,
+                "x1": 502.53997802734375,
+                "bottom": 143.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "1": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "Each inspection was entered in the ledger.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 1,
+                "x0": 315.8599853515625,
+                "top": 147.82000732421875,
+                "x1": 502.5599670410156,
+                "bottom": 157.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "1": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "The annual report preserves these findings.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 1,
+                "x0": 315.1400146484375,
+                "top": 161.719970703125,
+                "x1": 507.0,
+                "bottom": 171.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "1": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "DELTA LIBRARY catalogued 281 books.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 1,
+                "x0": 315.80999755859375,
+                "top": 244.82000732421875,
+                "x1": 495.3299560546875,
+                "bottom": 254.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "1": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "The librarians checked every accession.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 1,
+                "x0": 315.1400146484375,
+                "top": 258.82000732421875,
+                "x1": 491.969970703125,
+                "bottom": 268.1300048828125
+              }
+            ],
+            "page_sizes": {
+              "1": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "Each accession was entered in the ledger.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 1,
+                "x0": 315.8599853515625,
+                "top": 272.82000732421875,
+                "x1": 501.9999694824219,
+                "bottom": 282.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "1": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "The annual report preserves these findings.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 1,
+                "x0": 315.1400146484375,
+                "top": 286.719970703125,
+                "x1": 507.0,
+                "bottom": 296.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "1": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "Field Observations",
+            "kind": "heading",
+            "boxes": [
+              {
+                "page": 2,
+                "x0": 46.54800033569336,
+                "top": 48.7340087890625,
+                "x1": 194.40000915527344,
+                "bottom": 62.323974609375
+              }
+            ],
+            "page_sizes": {
+              "2": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Title"
+          },
+          {
+            "text": "ALPHA OBSERVATORY counted 73 meteors.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 2,
+                "x0": 45.13999938964844,
+                "top": 119.6300048828125,
+                "x1": 249.7699737548828,
+                "bottom": 127.17999267578125
+              }
+            ],
+            "page_sizes": {
+              "2": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "The observers recorded clear evening skies.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 2,
+                "x0": 45.13999938964844,
+                "top": 133.82000732421875,
+                "x1": 240.86996459960938,
+                "bottom": 143.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "2": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "Each measurement was entered in the ledger.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 2,
+                "x0": 45.86000061035156,
+                "top": 147.82000732421875,
+                "x1": 248.6699676513672,
+                "bottom": 157.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "2": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "The annual report preserves these findings.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 2,
+                "x0": 45.13999938964844,
+                "top": 161.719970703125,
+                "x1": 236.99998474121094,
+                "bottom": 171.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "2": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "BRAVO ORCHARD harvested 9100 kilograms.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 2,
+                "x0": 45.7400016784668,
+                "top": 244.6300048828125,
+                "x1": 252.5199737548828,
+                "bottom": 254.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "2": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "The gardeners weighed the complete harvest.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 2,
+                "x0": 45.13999938964844,
+                "top": 258.82000732421875,
+                "x1": 247.55996704101562,
+                "bottom": 268.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "2": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "Each delivery was entered in the ledger.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 2,
+                "x0": 45.86000061035156,
+                "top": 272.82000732421875,
+                "x1": 221.98997497558594,
+                "bottom": 282.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "2": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "The annual report preserves these findings.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 2,
+                "x0": 45.13999938964844,
+                "top": 286.719970703125,
+                "x1": 236.99998474121094,
+                "bottom": 296.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "2": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "CHARLIE HARBOR opened 52 berths.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 2,
+                "x0": 315.44000244140625,
+                "top": 119.6300048828125,
+                "x1": 486.41998291015625,
+                "bottom": 129.05999755859375
+              }
+            ],
+            "page_sizes": {
+              "2": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "The harbor team inspected every mooring.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 2,
+                "x0": 315.1400146484375,
+                "top": 133.82000732421875,
+                "x1": 502.53997802734375,
+                "bottom": 143.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "2": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "Each inspection was entered in the ledger.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 2,
+                "x0": 315.8599853515625,
+                "top": 147.82000732421875,
+                "x1": 502.5599670410156,
+                "bottom": 157.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "2": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "The annual report preserves these findings.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 2,
+                "x0": 315.1400146484375,
+                "top": 161.719970703125,
+                "x1": 507.0,
+                "bottom": 171.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "2": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "DELTA LIBRARY catalogued 281 books.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 2,
+                "x0": 315.80999755859375,
+                "top": 244.82000732421875,
+                "x1": 495.3299560546875,
+                "bottom": 254.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "2": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "The librarians checked every accession.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 2,
+                "x0": 315.1400146484375,
+                "top": 258.82000732421875,
+                "x1": 491.969970703125,
+                "bottom": 268.1300048828125
+              }
+            ],
+            "page_sizes": {
+              "2": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "Each accession was entered in the ledger.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 2,
+                "x0": 315.8599853515625,
+                "top": 272.82000732421875,
+                "x1": 501.9999694824219,
+                "bottom": 282.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "2": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "The annual report preserves these findings.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 2,
+                "x0": 315.1400146484375,
+                "top": 286.719970703125,
+                "x1": 507.0,
+                "bottom": 296.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "2": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          }
+        ],
+        "report": {
+          "pages_total": 2,
+          "pages_without_text": 0,
+          "images_skipped": 0,
+          "notes": [],
+          "layout_backend": "deepdoc-onnx",
+          "layout_regions": 18
+        }
+      }
+    },
+    {
+      "repetition": 3,
+      "seconds": 4.6213128059989685,
+      "per_page_seconds": 2.3106564029994843,
+      "peak_rss_kib": 575332,
+      "quality_pass": true,
+      "result": {
+        "schema_version": 1,
+        "blocks": [
+          {
+            "text": "Field Observations",
+            "kind": "heading",
+            "boxes": [
+              {
+                "page": 1,
+                "x0": 46.54800033569336,
+                "top": 48.7340087890625,
+                "x1": 194.40000915527344,
+                "bottom": 62.323974609375
+              }
+            ],
+            "page_sizes": {
+              "1": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Title"
+          },
+          {
+            "text": "ALPHA OBSERVATORY counted 73 meteors.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 1,
+                "x0": 45.13999938964844,
+                "top": 119.6300048828125,
+                "x1": 249.7699737548828,
+                "bottom": 127.17999267578125
+              }
+            ],
+            "page_sizes": {
+              "1": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "The observers recorded clear evening skies.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 1,
+                "x0": 45.13999938964844,
+                "top": 133.82000732421875,
+                "x1": 240.86996459960938,
+                "bottom": 143.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "1": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "Each measurement was entered in the ledger.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 1,
+                "x0": 45.86000061035156,
+                "top": 147.82000732421875,
+                "x1": 248.6699676513672,
+                "bottom": 157.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "1": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "The annual report preserves these findings.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 1,
+                "x0": 45.13999938964844,
+                "top": 161.719970703125,
+                "x1": 236.99998474121094,
+                "bottom": 171.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "1": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "BRAVO ORCHARD harvested 9100 kilograms.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 1,
+                "x0": 45.7400016784668,
+                "top": 244.6300048828125,
+                "x1": 252.5199737548828,
+                "bottom": 254.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "1": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "The gardeners weighed the complete harvest.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 1,
+                "x0": 45.13999938964844,
+                "top": 258.82000732421875,
+                "x1": 247.55996704101562,
+                "bottom": 268.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "1": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "Each delivery was entered in the ledger.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 1,
+                "x0": 45.86000061035156,
+                "top": 272.82000732421875,
+                "x1": 221.98997497558594,
+                "bottom": 282.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "1": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "The annual report preserves these findings.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 1,
+                "x0": 45.13999938964844,
+                "top": 286.719970703125,
+                "x1": 236.99998474121094,
+                "bottom": 296.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "1": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "CHARLIE HARBOR opened 52 berths.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 1,
+                "x0": 315.44000244140625,
+                "top": 119.6300048828125,
+                "x1": 486.41998291015625,
+                "bottom": 129.05999755859375
+              }
+            ],
+            "page_sizes": {
+              "1": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "The harbor team inspected every mooring.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 1,
+                "x0": 315.1400146484375,
+                "top": 133.82000732421875,
+                "x1": 502.53997802734375,
+                "bottom": 143.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "1": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "Each inspection was entered in the ledger.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 1,
+                "x0": 315.8599853515625,
+                "top": 147.82000732421875,
+                "x1": 502.5599670410156,
+                "bottom": 157.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "1": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "The annual report preserves these findings.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 1,
+                "x0": 315.1400146484375,
+                "top": 161.719970703125,
+                "x1": 507.0,
+                "bottom": 171.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "1": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "DELTA LIBRARY catalogued 281 books.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 1,
+                "x0": 315.80999755859375,
+                "top": 244.82000732421875,
+                "x1": 495.3299560546875,
+                "bottom": 254.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "1": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "The librarians checked every accession.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 1,
+                "x0": 315.1400146484375,
+                "top": 258.82000732421875,
+                "x1": 491.969970703125,
+                "bottom": 268.1300048828125
+              }
+            ],
+            "page_sizes": {
+              "1": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "Each accession was entered in the ledger.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 1,
+                "x0": 315.8599853515625,
+                "top": 272.82000732421875,
+                "x1": 501.9999694824219,
+                "bottom": 282.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "1": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "The annual report preserves these findings.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 1,
+                "x0": 315.1400146484375,
+                "top": 286.719970703125,
+                "x1": 507.0,
+                "bottom": 296.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "1": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "Field Observations",
+            "kind": "heading",
+            "boxes": [
+              {
+                "page": 2,
+                "x0": 46.54800033569336,
+                "top": 48.7340087890625,
+                "x1": 194.40000915527344,
+                "bottom": 62.323974609375
+              }
+            ],
+            "page_sizes": {
+              "2": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Title"
+          },
+          {
+            "text": "ALPHA OBSERVATORY counted 73 meteors.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 2,
+                "x0": 45.13999938964844,
+                "top": 119.6300048828125,
+                "x1": 249.7699737548828,
+                "bottom": 127.17999267578125
+              }
+            ],
+            "page_sizes": {
+              "2": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "The observers recorded clear evening skies.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 2,
+                "x0": 45.13999938964844,
+                "top": 133.82000732421875,
+                "x1": 240.86996459960938,
+                "bottom": 143.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "2": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "Each measurement was entered in the ledger.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 2,
+                "x0": 45.86000061035156,
+                "top": 147.82000732421875,
+                "x1": 248.6699676513672,
+                "bottom": 157.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "2": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "The annual report preserves these findings.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 2,
+                "x0": 45.13999938964844,
+                "top": 161.719970703125,
+                "x1": 236.99998474121094,
+                "bottom": 171.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "2": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "BRAVO ORCHARD harvested 9100 kilograms.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 2,
+                "x0": 45.7400016784668,
+                "top": 244.6300048828125,
+                "x1": 252.5199737548828,
+                "bottom": 254.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "2": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "The gardeners weighed the complete harvest.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 2,
+                "x0": 45.13999938964844,
+                "top": 258.82000732421875,
+                "x1": 247.55996704101562,
+                "bottom": 268.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "2": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "Each delivery was entered in the ledger.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 2,
+                "x0": 45.86000061035156,
+                "top": 272.82000732421875,
+                "x1": 221.98997497558594,
+                "bottom": 282.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "2": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "The annual report preserves these findings.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 2,
+                "x0": 45.13999938964844,
+                "top": 286.719970703125,
+                "x1": 236.99998474121094,
+                "bottom": 296.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "2": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "CHARLIE HARBOR opened 52 berths.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 2,
+                "x0": 315.44000244140625,
+                "top": 119.6300048828125,
+                "x1": 486.41998291015625,
+                "bottom": 129.05999755859375
+              }
+            ],
+            "page_sizes": {
+              "2": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "The harbor team inspected every mooring.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 2,
+                "x0": 315.1400146484375,
+                "top": 133.82000732421875,
+                "x1": 502.53997802734375,
+                "bottom": 143.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "2": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "Each inspection was entered in the ledger.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 2,
+                "x0": 315.8599853515625,
+                "top": 147.82000732421875,
+                "x1": 502.5599670410156,
+                "bottom": 157.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "2": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "The annual report preserves these findings.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 2,
+                "x0": 315.1400146484375,
+                "top": 161.719970703125,
+                "x1": 507.0,
+                "bottom": 171.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "2": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "DELTA LIBRARY catalogued 281 books.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 2,
+                "x0": 315.80999755859375,
+                "top": 244.82000732421875,
+                "x1": 495.3299560546875,
+                "bottom": 254.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "2": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "The librarians checked every accession.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 2,
+                "x0": 315.1400146484375,
+                "top": 258.82000732421875,
+                "x1": 491.969970703125,
+                "bottom": 268.1300048828125
+              }
+            ],
+            "page_sizes": {
+              "2": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "Each accession was entered in the ledger.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 2,
+                "x0": 315.8599853515625,
+                "top": 272.82000732421875,
+                "x1": 501.9999694824219,
+                "bottom": 282.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "2": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "The annual report preserves these findings.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 2,
+                "x0": 315.1400146484375,
+                "top": 286.719970703125,
+                "x1": 507.0,
+                "bottom": 296.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "2": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          }
+        ],
+        "report": {
+          "pages_total": 2,
+          "pages_without_text": 0,
+          "images_skipped": 0,
+          "notes": [],
+          "layout_backend": "deepdoc-onnx",
+          "layout_regions": 18
+        }
+      }
+    },
+    {
+      "repetition": 4,
+      "seconds": 5.197676398998738,
+      "per_page_seconds": 2.598838199499369,
+      "peak_rss_kib": 575332,
+      "quality_pass": true,
+      "result": {
+        "schema_version": 1,
+        "blocks": [
+          {
+            "text": "Field Observations",
+            "kind": "heading",
+            "boxes": [
+              {
+                "page": 1,
+                "x0": 46.54800033569336,
+                "top": 48.7340087890625,
+                "x1": 194.40000915527344,
+                "bottom": 62.323974609375
+              }
+            ],
+            "page_sizes": {
+              "1": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Title"
+          },
+          {
+            "text": "ALPHA OBSERVATORY counted 73 meteors.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 1,
+                "x0": 45.13999938964844,
+                "top": 119.6300048828125,
+                "x1": 249.7699737548828,
+                "bottom": 127.17999267578125
+              }
+            ],
+            "page_sizes": {
+              "1": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "The observers recorded clear evening skies.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 1,
+                "x0": 45.13999938964844,
+                "top": 133.82000732421875,
+                "x1": 240.86996459960938,
+                "bottom": 143.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "1": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "Each measurement was entered in the ledger.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 1,
+                "x0": 45.86000061035156,
+                "top": 147.82000732421875,
+                "x1": 248.6699676513672,
+                "bottom": 157.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "1": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "The annual report preserves these findings.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 1,
+                "x0": 45.13999938964844,
+                "top": 161.719970703125,
+                "x1": 236.99998474121094,
+                "bottom": 171.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "1": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "BRAVO ORCHARD harvested 9100 kilograms.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 1,
+                "x0": 45.7400016784668,
+                "top": 244.6300048828125,
+                "x1": 252.5199737548828,
+                "bottom": 254.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "1": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "The gardeners weighed the complete harvest.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 1,
+                "x0": 45.13999938964844,
+                "top": 258.82000732421875,
+                "x1": 247.55996704101562,
+                "bottom": 268.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "1": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "Each delivery was entered in the ledger.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 1,
+                "x0": 45.86000061035156,
+                "top": 272.82000732421875,
+                "x1": 221.98997497558594,
+                "bottom": 282.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "1": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "The annual report preserves these findings.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 1,
+                "x0": 45.13999938964844,
+                "top": 286.719970703125,
+                "x1": 236.99998474121094,
+                "bottom": 296.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "1": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "CHARLIE HARBOR opened 52 berths.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 1,
+                "x0": 315.44000244140625,
+                "top": 119.6300048828125,
+                "x1": 486.41998291015625,
+                "bottom": 129.05999755859375
+              }
+            ],
+            "page_sizes": {
+              "1": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "The harbor team inspected every mooring.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 1,
+                "x0": 315.1400146484375,
+                "top": 133.82000732421875,
+                "x1": 502.53997802734375,
+                "bottom": 143.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "1": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "Each inspection was entered in the ledger.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 1,
+                "x0": 315.8599853515625,
+                "top": 147.82000732421875,
+                "x1": 502.5599670410156,
+                "bottom": 157.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "1": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "The annual report preserves these findings.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 1,
+                "x0": 315.1400146484375,
+                "top": 161.719970703125,
+                "x1": 507.0,
+                "bottom": 171.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "1": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "DELTA LIBRARY catalogued 281 books.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 1,
+                "x0": 315.80999755859375,
+                "top": 244.82000732421875,
+                "x1": 495.3299560546875,
+                "bottom": 254.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "1": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "The librarians checked every accession.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 1,
+                "x0": 315.1400146484375,
+                "top": 258.82000732421875,
+                "x1": 491.969970703125,
+                "bottom": 268.1300048828125
+              }
+            ],
+            "page_sizes": {
+              "1": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "Each accession was entered in the ledger.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 1,
+                "x0": 315.8599853515625,
+                "top": 272.82000732421875,
+                "x1": 501.9999694824219,
+                "bottom": 282.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "1": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "The annual report preserves these findings.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 1,
+                "x0": 315.1400146484375,
+                "top": 286.719970703125,
+                "x1": 507.0,
+                "bottom": 296.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "1": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "Field Observations",
+            "kind": "heading",
+            "boxes": [
+              {
+                "page": 2,
+                "x0": 46.54800033569336,
+                "top": 48.7340087890625,
+                "x1": 194.40000915527344,
+                "bottom": 62.323974609375
+              }
+            ],
+            "page_sizes": {
+              "2": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Title"
+          },
+          {
+            "text": "ALPHA OBSERVATORY counted 73 meteors.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 2,
+                "x0": 45.13999938964844,
+                "top": 119.6300048828125,
+                "x1": 249.7699737548828,
+                "bottom": 127.17999267578125
+              }
+            ],
+            "page_sizes": {
+              "2": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "The observers recorded clear evening skies.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 2,
+                "x0": 45.13999938964844,
+                "top": 133.82000732421875,
+                "x1": 240.86996459960938,
+                "bottom": 143.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "2": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "Each measurement was entered in the ledger.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 2,
+                "x0": 45.86000061035156,
+                "top": 147.82000732421875,
+                "x1": 248.6699676513672,
+                "bottom": 157.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "2": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "The annual report preserves these findings.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 2,
+                "x0": 45.13999938964844,
+                "top": 161.719970703125,
+                "x1": 236.99998474121094,
+                "bottom": 171.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "2": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "BRAVO ORCHARD harvested 9100 kilograms.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 2,
+                "x0": 45.7400016784668,
+                "top": 244.6300048828125,
+                "x1": 252.5199737548828,
+                "bottom": 254.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "2": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "The gardeners weighed the complete harvest.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 2,
+                "x0": 45.13999938964844,
+                "top": 258.82000732421875,
+                "x1": 247.55996704101562,
+                "bottom": 268.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "2": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "Each delivery was entered in the ledger.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 2,
+                "x0": 45.86000061035156,
+                "top": 272.82000732421875,
+                "x1": 221.98997497558594,
+                "bottom": 282.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "2": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "The annual report preserves these findings.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 2,
+                "x0": 45.13999938964844,
+                "top": 286.719970703125,
+                "x1": 236.99998474121094,
+                "bottom": 296.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "2": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "CHARLIE HARBOR opened 52 berths.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 2,
+                "x0": 315.44000244140625,
+                "top": 119.6300048828125,
+                "x1": 486.41998291015625,
+                "bottom": 129.05999755859375
+              }
+            ],
+            "page_sizes": {
+              "2": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "The harbor team inspected every mooring.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 2,
+                "x0": 315.1400146484375,
+                "top": 133.82000732421875,
+                "x1": 502.53997802734375,
+                "bottom": 143.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "2": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "Each inspection was entered in the ledger.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 2,
+                "x0": 315.8599853515625,
+                "top": 147.82000732421875,
+                "x1": 502.5599670410156,
+                "bottom": 157.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "2": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "The annual report preserves these findings.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 2,
+                "x0": 315.1400146484375,
+                "top": 161.719970703125,
+                "x1": 507.0,
+                "bottom": 171.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "2": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "DELTA LIBRARY catalogued 281 books.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 2,
+                "x0": 315.80999755859375,
+                "top": 244.82000732421875,
+                "x1": 495.3299560546875,
+                "bottom": 254.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "2": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "The librarians checked every accession.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 2,
+                "x0": 315.1400146484375,
+                "top": 258.82000732421875,
+                "x1": 491.969970703125,
+                "bottom": 268.1300048828125
+              }
+            ],
+            "page_sizes": {
+              "2": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "Each accession was entered in the ledger.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 2,
+                "x0": 315.8599853515625,
+                "top": 272.82000732421875,
+                "x1": 501.9999694824219,
+                "bottom": 282.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "2": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "The annual report preserves these findings.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 2,
+                "x0": 315.1400146484375,
+                "top": 286.719970703125,
+                "x1": 507.0,
+                "bottom": 296.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "2": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          }
+        ],
+        "report": {
+          "pages_total": 2,
+          "pages_without_text": 0,
+          "images_skipped": 0,
+          "notes": [],
+          "layout_backend": "deepdoc-onnx",
+          "layout_regions": 18
+        }
+      }
+    },
+    {
+      "repetition": 5,
+      "seconds": 5.252212526998846,
+      "per_page_seconds": 2.626106263499423,
+      "peak_rss_kib": 575332,
+      "quality_pass": true,
+      "result": {
+        "schema_version": 1,
+        "blocks": [
+          {
+            "text": "Field Observations",
+            "kind": "heading",
+            "boxes": [
+              {
+                "page": 1,
+                "x0": 46.54800033569336,
+                "top": 48.7340087890625,
+                "x1": 194.40000915527344,
+                "bottom": 62.323974609375
+              }
+            ],
+            "page_sizes": {
+              "1": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Title"
+          },
+          {
+            "text": "ALPHA OBSERVATORY counted 73 meteors.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 1,
+                "x0": 45.13999938964844,
+                "top": 119.6300048828125,
+                "x1": 249.7699737548828,
+                "bottom": 127.17999267578125
+              }
+            ],
+            "page_sizes": {
+              "1": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "The observers recorded clear evening skies.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 1,
+                "x0": 45.13999938964844,
+                "top": 133.82000732421875,
+                "x1": 240.86996459960938,
+                "bottom": 143.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "1": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "Each measurement was entered in the ledger.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 1,
+                "x0": 45.86000061035156,
+                "top": 147.82000732421875,
+                "x1": 248.6699676513672,
+                "bottom": 157.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "1": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "The annual report preserves these findings.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 1,
+                "x0": 45.13999938964844,
+                "top": 161.719970703125,
+                "x1": 236.99998474121094,
+                "bottom": 171.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "1": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "BRAVO ORCHARD harvested 9100 kilograms.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 1,
+                "x0": 45.7400016784668,
+                "top": 244.6300048828125,
+                "x1": 252.5199737548828,
+                "bottom": 254.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "1": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "The gardeners weighed the complete harvest.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 1,
+                "x0": 45.13999938964844,
+                "top": 258.82000732421875,
+                "x1": 247.55996704101562,
+                "bottom": 268.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "1": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "Each delivery was entered in the ledger.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 1,
+                "x0": 45.86000061035156,
+                "top": 272.82000732421875,
+                "x1": 221.98997497558594,
+                "bottom": 282.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "1": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "The annual report preserves these findings.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 1,
+                "x0": 45.13999938964844,
+                "top": 286.719970703125,
+                "x1": 236.99998474121094,
+                "bottom": 296.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "1": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "CHARLIE HARBOR opened 52 berths.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 1,
+                "x0": 315.44000244140625,
+                "top": 119.6300048828125,
+                "x1": 486.41998291015625,
+                "bottom": 129.05999755859375
+              }
+            ],
+            "page_sizes": {
+              "1": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "The harbor team inspected every mooring.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 1,
+                "x0": 315.1400146484375,
+                "top": 133.82000732421875,
+                "x1": 502.53997802734375,
+                "bottom": 143.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "1": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "Each inspection was entered in the ledger.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 1,
+                "x0": 315.8599853515625,
+                "top": 147.82000732421875,
+                "x1": 502.5599670410156,
+                "bottom": 157.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "1": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "The annual report preserves these findings.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 1,
+                "x0": 315.1400146484375,
+                "top": 161.719970703125,
+                "x1": 507.0,
+                "bottom": 171.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "1": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "DELTA LIBRARY catalogued 281 books.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 1,
+                "x0": 315.80999755859375,
+                "top": 244.82000732421875,
+                "x1": 495.3299560546875,
+                "bottom": 254.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "1": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "The librarians checked every accession.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 1,
+                "x0": 315.1400146484375,
+                "top": 258.82000732421875,
+                "x1": 491.969970703125,
+                "bottom": 268.1300048828125
+              }
+            ],
+            "page_sizes": {
+              "1": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "Each accession was entered in the ledger.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 1,
+                "x0": 315.8599853515625,
+                "top": 272.82000732421875,
+                "x1": 501.9999694824219,
+                "bottom": 282.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "1": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "The annual report preserves these findings.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 1,
+                "x0": 315.1400146484375,
+                "top": 286.719970703125,
+                "x1": 507.0,
+                "bottom": 296.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "1": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "Field Observations",
+            "kind": "heading",
+            "boxes": [
+              {
+                "page": 2,
+                "x0": 46.54800033569336,
+                "top": 48.7340087890625,
+                "x1": 194.40000915527344,
+                "bottom": 62.323974609375
+              }
+            ],
+            "page_sizes": {
+              "2": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Title"
+          },
+          {
+            "text": "ALPHA OBSERVATORY counted 73 meteors.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 2,
+                "x0": 45.13999938964844,
+                "top": 119.6300048828125,
+                "x1": 249.7699737548828,
+                "bottom": 127.17999267578125
+              }
+            ],
+            "page_sizes": {
+              "2": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "The observers recorded clear evening skies.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 2,
+                "x0": 45.13999938964844,
+                "top": 133.82000732421875,
+                "x1": 240.86996459960938,
+                "bottom": 143.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "2": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "Each measurement was entered in the ledger.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 2,
+                "x0": 45.86000061035156,
+                "top": 147.82000732421875,
+                "x1": 248.6699676513672,
+                "bottom": 157.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "2": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "The annual report preserves these findings.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 2,
+                "x0": 45.13999938964844,
+                "top": 161.719970703125,
+                "x1": 236.99998474121094,
+                "bottom": 171.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "2": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "BRAVO ORCHARD harvested 9100 kilograms.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 2,
+                "x0": 45.7400016784668,
+                "top": 244.6300048828125,
+                "x1": 252.5199737548828,
+                "bottom": 254.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "2": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "The gardeners weighed the complete harvest.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 2,
+                "x0": 45.13999938964844,
+                "top": 258.82000732421875,
+                "x1": 247.55996704101562,
+                "bottom": 268.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "2": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "Each delivery was entered in the ledger.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 2,
+                "x0": 45.86000061035156,
+                "top": 272.82000732421875,
+                "x1": 221.98997497558594,
+                "bottom": 282.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "2": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "The annual report preserves these findings.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 2,
+                "x0": 45.13999938964844,
+                "top": 286.719970703125,
+                "x1": 236.99998474121094,
+                "bottom": 296.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "2": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "CHARLIE HARBOR opened 52 berths.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 2,
+                "x0": 315.44000244140625,
+                "top": 119.6300048828125,
+                "x1": 486.41998291015625,
+                "bottom": 129.05999755859375
+              }
+            ],
+            "page_sizes": {
+              "2": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "The harbor team inspected every mooring.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 2,
+                "x0": 315.1400146484375,
+                "top": 133.82000732421875,
+                "x1": 502.53997802734375,
+                "bottom": 143.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "2": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "Each inspection was entered in the ledger.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 2,
+                "x0": 315.8599853515625,
+                "top": 147.82000732421875,
+                "x1": 502.5599670410156,
+                "bottom": 157.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "2": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "The annual report preserves these findings.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 2,
+                "x0": 315.1400146484375,
+                "top": 161.719970703125,
+                "x1": 507.0,
+                "bottom": 171.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "2": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "DELTA LIBRARY catalogued 281 books.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 2,
+                "x0": 315.80999755859375,
+                "top": 244.82000732421875,
+                "x1": 495.3299560546875,
+                "bottom": 254.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "2": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "The librarians checked every accession.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 2,
+                "x0": 315.1400146484375,
+                "top": 258.82000732421875,
+                "x1": 491.969970703125,
+                "bottom": 268.1300048828125
+              }
+            ],
+            "page_sizes": {
+              "2": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "Each accession was entered in the ledger.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 2,
+                "x0": 315.8599853515625,
+                "top": 272.82000732421875,
+                "x1": 501.9999694824219,
+                "bottom": 282.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "2": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          },
+          {
+            "text": "The annual report preserves these findings.",
+            "kind": "text",
+            "boxes": [
+              {
+                "page": 2,
+                "x0": 315.1400146484375,
+                "top": 286.719970703125,
+                "x1": 507.0,
+                "bottom": 296.19000244140625
+              }
+            ],
+            "page_sizes": {
+              "2": [
+                595.0,
+                842.0
+              ]
+            },
+            "layout_label": "Text"
+          }
+        ],
+        "report": {
+          "pages_total": 2,
+          "pages_without_text": 0,
+          "images_skipped": 0,
+          "notes": [],
+          "layout_backend": "deepdoc-onnx",
+          "layout_regions": 18
+        }
+      }
+    }
+  ],
+  "images": {
+    "devrag-app:local": {
+      "id": "sha256:56d597afedc1aadcf980abc7dcf981a10ebbca08a4e002549631069839cf7912",
+      "bytes": 624182925
+    },
+    "devrag-deepdoc:local": {
+      "id": "sha256:5feee60faf20a191f78ec59f4293677b09d036142b7b5fe20515af9c57c01c19",
+      "bytes": 1129282100
+    }
+  },
+  "recorded_at": "2026-10-27T18:36:54.059704+00:00",
+  "guard_script_sha256": "6799e62d294de3bc14236ea99844b46a26ba7e8f5ca5ef23da43dd2176bc651b"
+}

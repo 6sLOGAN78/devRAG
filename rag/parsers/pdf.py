@@ -37,7 +37,7 @@ def parse(source: SourceFile, report: ParseReport, *, page_range: tuple[int, int
     if settings is not None and settings.deepdoc.url:
         from rag.parsers.deepdoc_client import DeepDocClient
 
-        return iter(DeepDocClient(settings.deepdoc).parse(source, report, page_range=page_range, limits=limits))
+        return iter(DeepDocClient(settings.deepdoc).parse(source, report, page_range=page_range, limits=limits, parser_config=parser_config))
     return _native().parse(source, report, page_range=page_range, limits=limits)
 
 

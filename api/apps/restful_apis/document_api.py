@@ -134,6 +134,7 @@ class DocumentDetailView(DocumentRowView):
     overlapped_percent: int
     preview: str
     pages: list[tuple[int, int]] = Field(default_factory=list)
+    layout_recognize: bool | str = True
 
 
 class DocumentDetailEnvelope(BaseModel):
@@ -151,6 +152,7 @@ class ChunkingValues(BaseModel):
     delimiter: Any = None
     overlapped_percent: Any = None
     pages: Any = None
+    layout_recognize: Any = None
 
 
 class UpdateDocumentBody(BaseModel):

@@ -16,7 +16,7 @@ export interface ParseConfigurationProps {
   onEdit?: (field: ParseConfigField) => void;
 }
 
-const NOT_YET = ["layout", "keywords"] as const;
+const NOT_YET = ["keywords"] as const;
 
 /** Two settings that exist in a later release: text only, never a control, never sent (UI-14 in part, D-27). */
 function NotYetRows() {
@@ -51,6 +51,20 @@ export function ParseConfiguration({ control, disabled = false, answers = {}, on
   const { t } = useTranslation();
   return (
     <div className="flex flex-col gap-4">
+      <FormField control={control} name="layoutRecognize" render={({ field }) => (
+        <FormItem>
+          <div className="flex min-h-10 items-center gap-3">
+            <FormControl>
+              <input type="checkbox" checked={field.value !== false} disabled={disabled} data-testid="field-layout"
+                className="h-5 w-5 accent-primary" ref={field.ref} name={field.name} onBlur={field.onBlur}
+                onChange={(event) => { onEdit?.("layoutRecognize"); field.onChange(event.target.checked); }} />
+            </FormControl>
+            <FormLabel>{t("datasets.chunking.field.layout")}</FormLabel>
+          </div>
+          <FormDescription>{t("datasets.chunking.field.layoutHelp")}</FormDescription>
+          <FormMessage /><ServerFieldError text={answers.layoutRecognize ?? null} />
+        </FormItem>
+      )} />
       <FormField control={control} name="pageRanges" render={({ field }) => (
         <FormItem>
           <FormLabel>{t("datasets.chunking.field.pages")}</FormLabel>

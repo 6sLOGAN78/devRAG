@@ -79,6 +79,7 @@ function checked(config: InternalAxiosRequestConfig, server: DatasetServer, sent
 function valuesOf(parserConfig: unknown) {
   const source = typeof parserConfig === "object" && parserConfig !== null ? (parserConfig as Record<string, unknown>) : {};
   return {
+    ...(typeof source.layout_recognize === "boolean" || typeof source.layout_recognize === "string" ? { layoutRecognize: source.layout_recognize } : {}),
     ...(Array.isArray(source.pages) ? { pages: source.pages as [number, number][] } : {}),
     ...(typeof source.chunk_token_num === "number" ? { chunkTokenNum: source.chunk_token_num } : {}),
     ...(typeof source.delimiter === "string" ? { delimiter: source.delimiter } : {}),

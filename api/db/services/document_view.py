@@ -171,5 +171,6 @@ def document_detail(settings: Settings, visible: VisibleDataset, doc_id: str, *,
         overlapped_percent=int(config.get("overlapped_percent") or 0),
         preview="pages" if (doc.suffix or "").lower() == "pdf" and body["pages_total"] is not None else "none",
         pages=config.get("pages", []),
+        layout_recognize=config.get("layout_recognize", True),
     )
     return body

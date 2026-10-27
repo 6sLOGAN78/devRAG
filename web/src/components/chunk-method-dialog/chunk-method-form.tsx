@@ -29,6 +29,7 @@ export type ChunkTarget =
 /** The stored method and values the form starts from, whichever mode loaded them. */
 export interface ChunkSettings {
   pages?: [number, number][];
+  layoutRecognize?: boolean | string;
   parserId: string;
   chunkTokenNum: number;
   delimiter: string;
@@ -47,20 +48,21 @@ export interface ChunkMethodFormProps {
   onClose: () => void;
 }
 
-type Changes = { parserId?: string; chunkTokenNum?: number; delimiter?: string; overlappedPercent?: number; pages?: [number, number][] };
+type Changes = { parserId?: string; chunkTokenNum?: number; delimiter?: string; overlappedPercent?: number; pages?: [number, number][]; layoutRecognize?: boolean | string };
 
 /** The keys whose value differs from the stored one: exactly what the request carries. Layout and keywords are never among them. */
-function changesOf(settings: ChunkSettings, method: string, values: { chunkSize: number; delimiters: string; overlap: number; pageRanges: [number, number][] }): Changes {
+function changesOf(settings: ChunkSettings, method: string, values: { chunkSize: number; delimiters: string; overlap: number; pageRanges: [number, number][]; layoutRecognize: boolean | string }): Changes {
   const changes: Changes = {};
   if (isImplemented(method) && method !== settings.parserId) changes.parserId = method;
   if (values.chunkSize !== settings.chunkTokenNum) changes.chunkTokenNum = values.chunkSize;
   if (values.delimiters !== settings.delimiter) changes.delimiter = values.delimiters;
   if (values.overlap !== settings.overlappedPercent) changes.overlappedPercent = values.overlap;
   if (JSON.stringify(values.pageRanges) !== JSON.stringify(settings.pages ?? [])) changes.pages = values.pageRanges;
+  if (values.layoutRecognize !== (settings.layoutRecognize ?? true)) changes.layoutRecognize = values.layoutRecognize;
   return changes;
 }
 
-const FIELD_NAMES = ["chunkSize", "delimiters", "overlap", "pageRanges"] as const satisfies readonly ParseConfigField[];
+const FIELD_NAMES = ["chunkSize", "delimiters", "overlap", "pageRanges", "layoutRecognize"] as const satisfies readonly ParseConfigField[];
 
 /**
  * The form of the chunking dialog: the method group (only General can be chosen), the settings of General and the
@@ -84,6 +86,7 @@ export function ChunkMethodForm({ target, settings, pendingRef, onClose }: Chunk
       chunkSize: String(settings.chunkTokenNum),
       delimiters: toEscaped(settings.delimiter),
       overlap: String(settings.overlappedPercent),
+      layoutRecognize: settings.layoutRecognize ?? true,
       pageRanges: (settings.pages ?? []).map(([start, end]) => start === end ? String(start) : `${start}-${end}`).join(", "),
     },
   });
@@ -114,6 +117,7 @@ export function ChunkMethodForm({ target, settings, pendingRef, onClose }: Chunk
   }
 
   function fieldMessage(field: ParseConfigField): string {
+    if (field === "layoutRecognize") return t("errors.chunking.layout");
     if (field === "pageRanges") return t("errors.chunking.pagesRange");
     if (field === "chunkSize") return t("errors.chunking.sizeRange");
     if (field === "overlap") return t("errors.chunking.overlapRange");

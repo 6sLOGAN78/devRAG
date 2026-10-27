@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Phase 6 plan 06-03 remote PDF and page-selection checkpoint; layout integration remains with 06-04
-last_updated: "2026-10-27T18:05:53.452073+00:00"
-last_activity: 2026-10-27 -- Verified remote scanned PDF worker/Chrome path and publishing checkpoint
+stopped_at: Phase 6 plans03/04 verified; continuing05 extracted images and ownership
+last_updated: "2026-10-27T18:37:46.609664+00:00"
+last_activity: 2026-10-28 -- Verified and closing scanned PDF/layout slices; continuing05
 progress:
   total_phases: 8
   completed_phases: 4
   total_plans: 176
-  completed_plans: 148
-  percent: 84
+  completed_plans: 150
+  percent: 85
 ---
 
 # Project State
@@ -21,18 +21,18 @@ progress:
 See: .planning/PROJECT.md (updated 2026-10-05)
 
 **Core value:** A user can upload a document into a knowledge base and get an accurate, cited answer to a question about it, end-to-end through the real pipeline (parse, chunk, embed, index, hybrid retrieve, rerank, generate), with no mocked stages.
-**Current focus:** Phase 6 execution — 06-03 remote PDF parsing and previews
+**Current focus:** Phase 6 execution — 06-05 extracted images and ownership
 
 ## Current Position
 
 Phase: 6 (deep-parsing-and-chunking-breadth) — EXECUTING
-Plan: 03 of 30; plans01–02 complete; remote PDF and page selection verified, layout control pending04
-Status: Actual user approval "Approve the exact packet" is bound to the unchanged audited snapshot in06-APPROVAL.json and validates. Plan01 safeguards pass37focused checks; two Phase6 exit checks are deferred. Decision gate232rows, Ruff and CI7/7 pass. Plan02 CPU OCR is complete with2real integration/1E2E pass and offline5repeatguard p950.624s/peak220.4MiB. No paid inference.
+Plan: 05 of 30; plans01–04 complete; extracted images slice next
+Status: Actual acquisition/layout-artifact decisions persist and audit passes. Plans01–04 complete; R234/R235 and summaries recorded. Final21real native/API/Chrome/PDF checks pass,unit2500/8existing skips,web2141 plus36focused preservation. Next05; no paid calls or requirement-checkbox updates.
 Prior checks: Phase5 UAT5/6 passed (two user answer judgments and delegated screenshot/Chinese/footprint review). Final Phase5 acceptance remains pending; Phase4 B36 remains separately deferred. Prior paid evidence retained.
-Current checkpoint: remote scanned PDF upload, selected source page2, stored52/9100 facts, authenticated preview and actual Chrome save/reopen/highlights pass. Source page-count bug fixed without changing per-task counters. Plan03 stays open for04 layout integration; no R234 or requirement claim yet. See06-03-PROGRESS.md and06-03-GLUE-REVIEW.md. Publication explicitly authorized; prior checkpoint72a7c54 is on origin/master.
+Current checkpoint: plans03/04 complete with original scan fact/page2 geometry and real column-order ONNX/Chrome flow. Final21native/API/browser/legacy checks pass,unit2500/8existing skips,frontend2141 plus preservation36focused, offline5repeatp95/page2.795s/peak561.85MiB. R234/R235 recorded; no requirement-checkbox or human UAT claim. Publication authorization persists; continue05 after verified checkpoint.
 Last activity: 2026-10-27
 
-Progress: 148/176 currently planned execution plans complete (84%); Phase6 2/30 complete.
+Progress: 150/176 currently planned execution plans complete (85%); Phase6 4/30 complete.
 
 ## Performance Metrics
 

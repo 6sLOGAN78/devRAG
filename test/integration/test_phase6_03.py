@@ -49,11 +49,13 @@ def test_remote_geometry_matches_actual_rotated_or_cropped_page_ink(options):
         assert _ink(image, SimpleNamespace(**block["boxes"][0]), block["page_sizes"]["1"]) >= 0.02
 
 
-def test_layout_request_is_refused_until_real_layout_capability_is_available():
+def test_layout_request_reaches_the_real_backend_after_plan04_activation():
     token = stack_env().get("DEEPDOC_API_TOKEN")
     assert token, "real DeepDoc service is required"
     with httpx.Client(base_url="http://127.0.0.1:9390", timeout=65) as client:
         result = client.post("/v1/parse", headers={"Authorization": f"Bearer {token}"},
                              files={"file": ("source.pdf", text_pdf([["NATIVE FACT"]]))},
                              data={"options": '{"layout":true}'})
-    assert result.status_code == 503 and result.json()["error"] == "layout_unavailable"
+    assert result.status_code == 200
+    assert result.json()["report"]["layout_backend"] == "deepdoc-onnx"
+    assert "NATIVE FACT" in " ".join(b["text"] for b in result.json()["blocks"])

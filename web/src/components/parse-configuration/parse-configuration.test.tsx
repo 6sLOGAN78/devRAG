@@ -105,6 +105,15 @@ describe("ParseConfiguration", () => {
     expect(parse({ pageRanges: "9-3" }).success).toBe(false);
     expect(parse({ pageRanges: "" }).success).toBe(true);
   });
+  it("offers a working layout checkbox with a persisted boolean value", async () => {
+    render(<Probe />);
+    const input = screen.getByRole("checkbox", { name: "Use layout analysis" });
+    expect(input).toBeChecked();
+    await userEvent.click(input);
+    expect(input).not.toBeChecked();
+    const result = parse({ layoutRecognize: false });
+    expect(result.success && result.data.layoutRecognize).toBe(false);
+  });
   it("renders the three fields with labels, helpers and a Mono delimiter input", () => {
     render(<Probe />);
     expect(screen.getByLabelText("Chunk size (tokens)")).toHaveValue(512);
@@ -117,13 +126,13 @@ describe("ParseConfiguration", () => {
     expect(screen.getByTestId("field-chunk-size")).toHaveAttribute("inputmode", "numeric");
   });
 
-  it("lists the two future settings as text with a badge and no form control", () => {
+  it("keeps only future auto-keywords as text with a badge and no form control", () => {
     render(<Probe />);
     const group = screen.getByTestId("parse-config-unavailable");
     expect(within(group).getByText("Not available yet")).toBeInTheDocument();
-    expect(within(group).getByText("Layout recognition")).toBeInTheDocument();
+    expect(within(group).queryByText("Layout recognition")).toBeNull();
     expect(within(group).getByText("Auto-keywords")).toBeInTheDocument();
-    expect(within(group).getAllByText("Available in a later release")).toHaveLength(2);
+    expect(within(group).getAllByText("Available in a later release")).toHaveLength(1);
     expect(group.querySelectorAll("input, select, textarea, button")).toHaveLength(0);
   });
 

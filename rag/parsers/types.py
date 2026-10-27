@@ -8,8 +8,11 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from pathlib import Path
+from typing import Literal, get_args
 
 BLOCK_KINDS = frozenset({"text", "heading", "table", "slide", "sheet"})
+LayoutLabel = Literal["_background_", "Text", "Title", "Figure", "Figure caption", "Table", "Table caption", "Header", "Footer", "Reference", "Equation"]
+LAYOUT_LABELS = get_args(LayoutLabel)
 MAX_NOTES = 200
 
 
@@ -31,7 +34,11 @@ class ParsedBlock:
     boxes: tuple[PageBox, ...] = ()
     page_sizes: dict[int, tuple[float, float]] = field(default_factory=dict)
 
+    layout_label: LayoutLabel | None = None
+
     def __post_init__(self) -> None:
+        if self.layout_label is not None and self.layout_label not in LAYOUT_LABELS:
+            raise ValueError("unknown layout label")
         if self.kind not in BLOCK_KINDS:
             raise ValueError("unknown block kind")
 
@@ -44,6 +51,8 @@ class ParseReport:
     pages_without_text: int = 0
     images_skipped: int = 0
     notes: list[str] = field(default_factory=list)
+    layout_backend: str | None = None
+    layout_regions: int = 0
 
     def add_note(self, sentence: str) -> None:
         if len(self.notes) < MAX_NOTES:

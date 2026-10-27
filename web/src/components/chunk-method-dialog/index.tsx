@@ -48,6 +48,7 @@ function Body({ target, pendingRef, onClose }: { target: ChunkTarget; pendingRef
       chunkCount: detail.chunkCount,
       run: detail.run,
       pages: detail.pages,
+      layoutRecognize: detail.layoutRecognize,
     };
   } else if (dataset.data !== undefined && !isDocument) {
     const detail = dataset.data;
@@ -59,6 +60,7 @@ function Body({ target, pendingRef, onClose }: { target: ChunkTarget; pendingRef
       chunkCount: 0,
       run: "0",
       pages: detail.parserConfig.pages,
+      layoutRecognize: detail.parserConfig.layoutRecognize,
     };
   }
   const query = isDocument ? document : dataset;

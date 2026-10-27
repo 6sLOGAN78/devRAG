@@ -14,7 +14,6 @@ from collections.abc import Iterator
 from contextlib import contextmanager
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any
 
 from api.db.services import task_service, tenant_model_service
 from api.db.services.task_service import TaskContext
@@ -213,4 +212,6 @@ def run_pipeline(ctx: TaskContext, control: TaskControl, deps: PipelineDeps) -> 
     # Single machine lines the roll-up reads back (the latest of each wins when a task is retried).
     task_service.set_progress(ctx.task_id, 1.0, f"[pages] total={pages_total} without_text={report.pages_without_text}")
     task_service.set_progress(ctx.task_id, 1.0, f"[skipped] images={report.images_skipped}")
+    if report.layout_backend:
+        task_service.set_progress(ctx.task_id, 1.0, f"[layout] backend={report.layout_backend} regions={report.layout_regions}")
     return PipelineResult(tuple(ids), len(ids), pages_total, report.pages_without_text, report.images_skipped)

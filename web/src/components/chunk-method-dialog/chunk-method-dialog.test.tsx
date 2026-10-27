@@ -95,7 +95,7 @@ describe("Chunking method dialog, document mode (UI-13, UI-14)", () => {
     expect(radios[1]).toHaveAccessibleDescription("Available in a later release");
   });
 
-  it("shows layout recognition and auto-keywords as text only and never sends them", async () => {
+  it("keeps auto-keywords unavailable and omits unchanged layout settings", async () => {
     const { dialog, user } = await openFirst();
     const group = within(dialog).getByTestId("parse-config-unavailable");
     expect(within(group).getByText("Not available yet")).toBeInTheDocument();
@@ -130,6 +130,27 @@ describe("Chunking method dialog, document mode (UI-13, UI-14)", () => {
     await user.click(within(dialog).getByTestId("chunk-method-submit"));
     await waitFor(() => expect(sent(detailUrl(1), "PATCH")).toHaveLength(1));
     expect(sent(detailUrl(1), "PATCH")[0]).toEqual({ parser_config: { delimiter: "\t;\n" } });
+  });
+
+  it("preserves an explicitly stored backend when another field changes", async () => {
+    setFileExtra(server, documentRow(1).id, { layoutRecognize: "docling" });
+    const { dialog, user } = await openFirst();
+    await replace(user, within(dialog).getByTestId("field-chunk-size"), "300");
+    await user.click(within(dialog).getByTestId("chunk-method-submit"));
+    await waitFor(() => expect(screen.queryByTestId("chunk-method-dialog")).toBeNull());
+    expect(sent(detailUrl(1), "PATCH")).toEqual([{ parser_config: { chunk_token_num: 300 } }]);
+    const next = await openDialog(1);
+    expect(within(next.dialog).getByRole("checkbox", { name: "Use layout analysis" })).toBeChecked();
+  });
+
+  it("saves layout off and restores the switch when reopened", async () => {
+    const { dialog, user } = await openFirst();
+    await user.click(within(dialog).getByRole("checkbox", { name: "Use layout analysis" }));
+    await user.click(within(dialog).getByTestId("chunk-method-submit"));
+    await waitFor(() => expect(screen.queryByTestId("chunk-method-dialog")).toBeNull());
+    expect(sent(detailUrl(1), "PATCH")).toEqual([{ parser_config: { layout_recognize: false } }]);
+    const next = await openDialog(1);
+    expect(within(next.dialog).getByRole("checkbox", { name: "Use layout analysis" })).not.toBeChecked();
   });
 
   it("saves inclusive PDF ranges and restores them when reopened", async () => {
