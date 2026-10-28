@@ -11,6 +11,8 @@
     "figure": "Extracted figure",
     "figures": "Extracted figures",
     "figureUnavailable": "This figure is unavailable.",
-    "retry": "Try again"
+    "retry": "Try again",
+    "tables": "Tables",
+    "crop": "Source crop"
   }
 }

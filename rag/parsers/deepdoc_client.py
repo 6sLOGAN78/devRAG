@@ -13,6 +13,7 @@ import httpx
 from common.settings import DeepDocSettings
 from rag.parsers.assets import InvalidAsset, ParsedAsset, decode_asset
 from rag.parsers.errors import FileDamaged, FileTooLarge, ParserError
+from rag.parsers.tables import Table
 from rag.parsers.types import BLOCK_KINDS, LAYOUT_LABELS, PageBox, ParsedBlock, ParseLimits, ParseReport, SourceFile
 
 
@@ -33,13 +34,23 @@ class DeepDocClient:
             if size > 100 * 1024 * 1024:
                 raise FileTooLarge()
             stream = io.BytesIO(path) if isinstance(path, bytes) else path.open("rb")
-            with stream as source, httpx.Client(
-                base_url=self.settings.url, timeout=self.settings.timeout_seconds, transport=self.transport,
-                follow_redirects=False, trust_env=False,
-            ) as client:
-                with client.stream("POST", endpoint, headers={"Authorization": f"Bearer {self.settings.api_token}"},
-                                   files={"file": ("source.bin", source, "application/octet-stream")},
-                                   data={} if options is None else {"options": json.dumps(options)}) as response:
+            with (
+                stream as source,
+                httpx.Client(
+                    base_url=self.settings.url,
+                    timeout=self.settings.timeout_seconds,
+                    transport=self.transport,
+                    follow_redirects=False,
+                    trust_env=False,
+                ) as client,
+            ):
+                with client.stream(
+                    "POST",
+                    endpoint,
+                    headers={"Authorization": f"Bearer {self.settings.api_token}"},
+                    files={"file": ("source.bin", source, "application/octet-stream")},
+                    data={} if options is None else {"options": json.dumps(options)},
+                ) as response:
                     if response.status_code == 413:
                         raise FileTooLarge()
                     if response.status_code == 400:
@@ -85,8 +96,7 @@ class DeepDocClient:
     def page_image(self, path: Path, page: int, zoom: float = 3) -> bytes:
         return self._request("/v1/page-image", path, {"page": page, "zoom": zoom}, binary=True)
 
-    def parse(self, source: SourceFile, report: ParseReport, *, page_range: tuple[int, int] | None,
-              limits: ParseLimits | None, parser_config: dict[str, Any] | None = None) -> list[ParsedBlock]:
+    def parse(self, source: SourceFile, report: ParseReport, *, page_range: tuple[int, int] | None, limits: ParseLimits | None, parser_config: dict[str, Any] | None = None) -> list[ParsedBlock]:
         limit = limits or ParseLimits()
         layout = (parser_config or {}).get("layout_recognize", False)
         if type(layout) is not bool and layout != "deepdoc":
@@ -103,7 +113,7 @@ class DeepDocClient:
             if type(total) is not int or type(missing) is not int or not 0 <= missing <= total <= limit.max_pages:
                 raise ValueError
             backend, regions = raw_report.get("layout_backend"), raw_report.get("layout_regions", 0)
-            if backend not in (None,"deepdoc-onnx") or type(regions) is not int or not 0 <= regions <= 300*total:
+            if backend not in (None, "deepdoc-onnx") or type(regions) is not int or not 0 <= regions <= 300 * total:
                 raise ValueError
             if options["layout"] and backend != "deepdoc-onnx" and total:
                 raise ValueError
@@ -144,7 +154,15 @@ class DeepDocClient:
                 if not isinstance(raw_assets, list) or len(raw_assets) > 128:
                     raise ValueError
                 assets = tuple(decode_asset(value) for value in raw_assets)
-                blocks.append(ParsedBlock(text, kind, tuple(boxes), sizes, layout_label=label, assets=assets))
+                table = Table.from_wire(raw["table"]) if raw.get("table") is not None else None
+                if table is not None:
+                    crops = [a for a in assets if a.kind == "table" and a.sha256 == table.asset_sha256]
+                    if table.asset_id or len(crops) != 1 or len(boxes) != 1:
+                        raise ValueError
+                    crop, box = crops[0], boxes[0]
+                    if crop.page != box.page or abs(crop.width - (box.x1 - box.x0) * 3) > 2 or abs(crop.height - (box.bottom - box.top) * 3) > 2:
+                        raise ValueError
+                blocks.append(ParsedBlock(text, kind, tuple(boxes), sizes, layout_label=label, assets=assets, table=table))
             report.pages_total, report.pages_without_text = total, missing
             report.layout_backend, report.layout_regions = backend, regions
             return blocks

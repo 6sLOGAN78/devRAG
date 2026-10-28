@@ -15,7 +15,7 @@ from __future__ import annotations
 
 import re
 
-from pydantic import BaseModel, ConfigDict, model_validator
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 from quart import Blueprint, Response, current_app, g, request
 from quart_schema import document_response, validate_request
 
@@ -47,7 +47,25 @@ class PositionView(BaseModel):
     bottom: int
 
 
+class TableCellView(BaseModel):
+    row: int
+    column: int
+    text: str
+    rowspan: int
+    colspan: int
+    header: bool
+
+
+class TableView(BaseModel):
+    rows: int
+    columns: int
+    cells: list[TableCellView]
+    caption: str
+    asset_id: str
+
+
 class ChunkView(BaseModel):
+    tables: list[TableView] = Field(default_factory=list)
     id: str
     text: str
     positions: list[PositionView]

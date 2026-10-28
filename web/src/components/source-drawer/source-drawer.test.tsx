@@ -102,4 +102,23 @@ describe("source drawer", () => {
     release();
   });
 
+  it("shows merged structured cells and the matching authenticated crop without executing cell markup", async () => {
+    const id = "d".repeat(32), url = `/api/v1/documents/images/${id}`;
+    setFileExtra(server, DOC, { preview: "none", assets: [{ id, kind: "table", caption: "Orchard measurements", page: 1, width: 900, height: 600 }] });
+    server.use(({ config, url: called }) => called === url ? { data: new Blob(["pixels"], { type: "image/png" }), status: 200, statusText: "OK", headers: {}, config } : undefined);
+    const table = { rows: 2, columns: 2, caption: "Orchard measurements", asset_id: id, cells: [
+      { row: 0, column: 0, text: "ORCHARD", rowspan: 1, colspan: 2, header: true },
+      { row: 1, column: 0, text: "<img src=x onerror=alert(1)>", rowspan: 1, colspan: 1, header: false },
+      { row: 1, column: 1, text: "", rowspan: 1, colspan: 1, header: false },
+    ] };
+    show(source({ positions: [], tables: [table] }));
+    await waitUntil(() => screen.queryByTestId("source-structured-table"));
+    expect(screen.getByRole("columnheader", { name: "ORCHARD" })).toHaveAttribute("colspan", "2");
+    expect(screen.getByRole("cell", { name: "<img src=x onerror=alert(1)>" })).toBeInTheDocument();
+    expect(screen.getByRole("cell", { name: "" })).toBeEmptyDOMElement();
+    expect(document.querySelector('[data-testid="source-drawer"] img[onerror]')).toBeNull();
+    await waitUntil(() => screen.queryByTestId("source-asset-image"));
+    expect(server.callsTo("GET", url)).toHaveLength(1);
+  });
+
 });

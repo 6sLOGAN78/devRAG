@@ -43,8 +43,7 @@ def validate_result(result: dict[str, Any]) -> None:
             raise NativeError("invalid_native_result", 502)
 
 
-def create_app(runtime: OCRRuntime, token: str, *, max_bytes: int = 100 * 1024 * 1024,
-               deadline: float = 60.0, max_result_bytes: int = 32 * 1024 * 1024) -> Quart:
+def create_app(runtime: OCRRuntime, token: str, *, max_bytes: int = 100 * 1024 * 1024, deadline: float = 60.0, max_result_bytes: int = 32 * 1024 * 1024) -> Quart:
     if len(token) < 24:
         raise ValueError("an operator token is required")
     app = Quart(__name__, static_folder=None)
@@ -83,9 +82,8 @@ def create_app(runtime: OCRRuntime, token: str, *, max_bytes: int = 100 * 1024 *
         if request.mimetype != "multipart/form-data":
             return jsonify(schema_version=1, error="invalid_request"), 400
         files, form = await request.files, await request.form
-        allowed_form = set() if operation in {"ocr", "layout", "normalize-image"} else {"options"}
-        if (set(files) != {"file"} or len(files.getlist("file")) != 1
-                or set(form) - allowed_form or request.args or len(form.getlist("options")) > 1):
+        allowed_form = set() if operation in {"ocr", "layout", "normalize-image", "tsr"} else {"options"}
+        if set(files) != {"file"} or len(files.getlist("file")) != 1 or set(form) - allowed_form or request.args or len(form.getlist("options")) > 1:
             return jsonify(schema_version=1, error="invalid_request"), 400
         content = files["file"].read(max_bytes + 1)
         if len(content) > max_bytes:
@@ -96,8 +94,9 @@ def create_app(runtime: OCRRuntime, token: str, *, max_bytes: int = 100 * 1024 *
             return jsonify(schema_version=1, error="busy"), 503
         if operation == "ocr":
             call, args = runtime.ocr, (content,)
-        elif operation in {"layout", "normalize-image"}:
-            call = getattr(runtime, "layout_image" if operation == "layout" else "normalize_image", None)
+        elif operation in {"layout", "normalize-image", "tsr"}:
+            handler = {"layout": "layout_image", "normalize-image": "normalize_image", "tsr": "table_image"}[operation]
+            call = getattr(runtime, handler, None)
             if call is None:
                 return jsonify(schema_version=1, error="capability_unavailable"), 503
             args = (content,)
@@ -149,6 +148,10 @@ def create_app(runtime: OCRRuntime, token: str, *, max_bytes: int = 100 * 1024 *
     @app.post("/v1/layout")
     async def layout():
         return await execute("layout")
+
+    @app.post("/v1/tsr")
+    async def tables():
+        return await execute("tsr")
 
     @app.post("/v1/images/normalize")
     async def normalize_image():

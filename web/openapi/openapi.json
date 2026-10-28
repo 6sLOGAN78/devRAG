@@ -227,6 +227,13 @@
             "title": "Positions",
             "type": "array"
           },
+          "tables": {
+            "items": {
+              "$ref": "#/components/schemas/TableView"
+            },
+            "title": "Tables",
+            "type": "array"
+          },
           "text": {
             "title": "Text",
             "type": "string"
@@ -1973,6 +1980,80 @@
           "token_total"
         ],
         "title": "SummaryView",
+        "type": "object"
+      },
+      "TableCellView": {
+        "properties": {
+          "colspan": {
+            "title": "Colspan",
+            "type": "integer"
+          },
+          "column": {
+            "title": "Column",
+            "type": "integer"
+          },
+          "header": {
+            "title": "Header",
+            "type": "boolean"
+          },
+          "row": {
+            "title": "Row",
+            "type": "integer"
+          },
+          "rowspan": {
+            "title": "Rowspan",
+            "type": "integer"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "row",
+          "column",
+          "text",
+          "rowspan",
+          "colspan",
+          "header"
+        ],
+        "title": "TableCellView",
+        "type": "object"
+      },
+      "TableView": {
+        "properties": {
+          "asset_id": {
+            "title": "Asset Id",
+            "type": "string"
+          },
+          "caption": {
+            "title": "Caption",
+            "type": "string"
+          },
+          "cells": {
+            "items": {
+              "$ref": "#/components/schemas/TableCellView"
+            },
+            "title": "Cells",
+            "type": "array"
+          },
+          "columns": {
+            "title": "Columns",
+            "type": "integer"
+          },
+          "rows": {
+            "title": "Rows",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "rows",
+          "columns",
+          "cells",
+          "caption",
+          "asset_id"
+        ],
+        "title": "TableView",
         "type": "object"
       },
       "TaskView": {

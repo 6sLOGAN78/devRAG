@@ -11,6 +11,7 @@ from pathlib import Path
 from typing import Literal, get_args
 
 from rag.parsers.assets import ParsedAsset
+from rag.parsers.tables import Table
 
 BLOCK_KINDS = frozenset({"text", "heading", "table", "slide", "sheet"})
 LayoutLabel = Literal["_background_", "Text", "Title", "Figure", "Figure caption", "Table", "Table caption", "Header", "Footer", "Reference", "Equation"]
@@ -38,6 +39,7 @@ class ParsedBlock:
 
     layout_label: LayoutLabel | None = None
     assets: tuple[ParsedAsset, ...] = ()
+    table: Table | None = None
 
     def __post_init__(self) -> None:
         if self.layout_label is not None and self.layout_label not in LAYOUT_LABELS:

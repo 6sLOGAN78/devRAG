@@ -74,7 +74,7 @@ def word_spans(active: list[int], ink_height: int) -> list[tuple[int, int]]:
     threshold = max(3, ink_height * 0.35)
     starts, ends = [active[0]], []
     for previous, current in zip(active, active[1:]):
-        if current - previous > threshold:
+        if current - previous - 1 > threshold:
             ends.append(previous + 1)
             starts.append(current)
     ends.append(active[-1] + 1)
@@ -95,9 +95,7 @@ class OCR:
         ratio = min(1.0, 960 / max(height, width))
         resized_h, resized_w = (max(32, round(value * ratio / 32) * 32) for value in (height, width))
         resized = cv2.resize(image, (resized_w, resized_h)).astype(np.float32) / 255
-        normalized = (resized - np.array([0.485, 0.456, 0.406], dtype=np.float32)) / np.array(
-            [0.229, 0.224, 0.225], dtype=np.float32
-        )
+        normalized = (resized - np.array([0.485, 0.456, 0.406], dtype=np.float32)) / np.array([0.229, 0.224, 0.225], dtype=np.float32)
         tensor = np.ascontiguousarray(normalized.transpose(2, 0, 1)[None])
         session = self.runtime.session("det.onnx")
         probabilities = session.run(None, {session.get_inputs()[0].name: tensor})[0]
@@ -113,7 +111,7 @@ class OCR:
             x, y, w, h = cv2.boundingRect(contour)
             mask = np.zeros((h, w), dtype=np.uint8)
             cv2.fillPoly(mask, [contour - np.array([[[x, y]]])], 1)
-            if cv2.mean(scores[y:y + h, x:x + w], mask)[0] < 0.5:
+            if cv2.mean(scores[y : y + h, x : x + w], mask)[0] < 0.5:
                 continue
             points = cv2.boxPoints(rectangle)
             polygon = Polygon(points)
@@ -170,13 +168,12 @@ class OCR:
             recognized_words += len(words)
             if recognized_words > 1000:
                 raise NativeError("too_many_text_regions", 413)
-            recognized = [self._recognize(crop[:, max(0, left - 2):min(crop.shape[1], right + 2)])
-                          for left, right in words]
+            recognized = [self._recognize(crop[:, max(0, left - 2) : min(crop.shape[1], right + 2)]) for left, right in words]
             text = " ".join(word for word, _ in recognized)
             confidence = min((score for _, score in recognized), default=0.0)
             if not text.strip() or confidence < 0.5:
                 continue
-            spans.append({"text": text, "confidence": min(1.0, max(0.0, confidence)),
-                          "box": [float(points[:, 0].min()), float(points[:, 1].min()),
-                                  float(points[:, 0].max()), float(points[:, 1].max())]})
+            spans.append(
+                {"text": text, "confidence": min(1.0, max(0.0, confidence)), "box": [float(points[:, 0].min()), float(points[:, 1].min()), float(points[:, 0].max()), float(points[:, 1].max())]}
+            )
         return {"schema_version": 1, "width": image.shape[1], "height": image.shape[0], "spans": spans}

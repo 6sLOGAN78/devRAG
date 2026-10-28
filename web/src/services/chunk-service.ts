@@ -1,5 +1,6 @@
 import { documentChunkPath, documentChunksPath } from "@/constants/api-paths";
 import { request } from "./http";
+import { tableViewsOf, type TableView } from "./table-features";
 import { asRecord, clampWhole, count, text } from "./mapping";
 
 /**
@@ -20,6 +21,7 @@ export interface ChunkPosition {
 }
 
 export interface ChunkView {
+  tables?: TableView[];
   id: string;
   text: string;
   positions: ChunkPosition[];
@@ -61,6 +63,7 @@ export function toChunk(raw: unknown): ChunkView {
   const origin = text(dto.origin);
   return {
     id: text(dto.id),
+    ...(dto.tables !== undefined ? { tables: tableViewsOf(dto.tables) } : {}),
     text: text(dto.text),
     positions: Array.isArray(dto.positions) ? dto.positions.map(toPosition).filter((p): p is ChunkPosition => p !== null) : [],
     origin: ORIGINS.includes(origin) ? (origin as ChunkOrigin) : "parsed",

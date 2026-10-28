@@ -236,3 +236,44 @@ def page_assets(page, number: int) -> list[ParsedBlock]:
         finally:
             obj.close()
     return blocks
+
+
+def page_words(page) -> list:
+    """Native word rectangles; do not assign a whole fused line to one table cell."""
+    from deepdoc.tables import TextToken
+
+    text_page = page.get_textpage()
+    words = []
+    chars = []
+    boxes = []
+    crop, rotation = page.get_cropbox(), page.get_rotation() % 360
+
+    def flush():
+        if chars and boxes:
+            words.append(TextToken("".join(chars), (min(b[0] for b in boxes), min(b[1] for b in boxes), max(b[2] for b in boxes), max(b[3] for b in boxes))))
+        chars.clear()
+        boxes.clear()
+
+    try:
+        if text_page.count_chars() > 1_000_000:
+            raise FileTooLarge()
+        for index in range(text_page.count_chars()):
+            char = text_page.get_text_range(index=index, count=1)
+            if not char or char.isspace():
+                flush()
+                continue
+            box = _to_display(text_page.get_charbox(index), crop, rotation)
+            if box[0] >= box[2] or box[1] >= box[3]:
+                continue
+            if boxes and (
+                abs((box[1] + box[3] - boxes[-1][1] - boxes[-1][3]) / 2) > max(3, max(box[3] - box[1], boxes[-1][3] - boxes[-1][1]) * 0.8) or box[0] - boxes[-1][2] > max(3, max(box[2] - box[0], boxes[-1][2] - boxes[-1][0]) * 1.5)
+            ):
+                flush()
+            chars.append(char)
+            boxes.append(box)
+            if len(words) > 20000:
+                raise FileTooLarge()
+        flush()
+    finally:
+        text_page.close()
+    return words

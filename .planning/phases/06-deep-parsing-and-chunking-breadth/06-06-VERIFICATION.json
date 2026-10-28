@@ -1,0 +1,85 @@
+{
+  "recorded_at": "2026-10-28T04:42:15.654894+00:00",
+  "plan": "06-06",
+  "paid_calls": 0,
+  "new_packages": 0,
+  "new_models": 0,
+  "human_uat_approved": false,
+  "phase_gate_complete": false,
+  "python_existing_skips": 8,
+  "evidence": {
+    "python_unit": {
+      "log": "ragflow-logs/phase6-06-unit-published.log",
+      "sha256": "07e48efbee54810f32e1a774ecc41f909d5d99a452e82b770f9c5c4bb6a91d4a",
+      "passed": 2438
+    },
+    "native_and_browser": {
+      "log": "ragflow-logs/phase6-06-stack-published.log",
+      "sha256": "c9f05720225d2aa577e00f64f51649ec3d08b079441dcec1a947ccb382c56fd3",
+      "passed": 23
+    },
+    "authorization_matrix": {
+      "log": "ragflow-logs/phase6-06-matrix-published.log",
+      "sha256": "5b6e609290199d942124a63dd3a5b477eec023ec3552dd29dbad5f30e5e0e95b",
+      "passed": 58
+    },
+    "response_and_log_leaks": {
+      "log": "ragflow-logs/phase6-06-leaks-published.log",
+      "sha256": "c3d42ac841a0c883cd93a26d7c964269b2cf9d34accd2396246967aacafb2331",
+      "passed": 6
+    },
+    "frontend_unit": {
+      "log": "ragflow-logs/phase6-06-web-all.log",
+      "sha256": "8bf92abdae08a511894a5b710ba6bd30a3c8112e6bc429430501cfdac87932cd",
+      "passed": 2154
+    },
+    "frontend_focused": {
+      "log": "ragflow-logs/phase6-06-web-final-focused.log",
+      "sha256": "251542322585d39a48bc09a9a0ad58bd8e7eb672c2b13259a9fd224211d136dc",
+      "passed": 29
+    },
+    "affected_services": {
+      "log": "ragflow-logs/phase6-06-services-final.log",
+      "sha256": "3e1a63d1d2c129c357d50e646292d2d1bc79ca1e4cd9101658b536a9a7e33d3e",
+      "passed": 140
+    },
+    "ci": {
+      "log": "ragflow-logs/phase6-06-ci-published.log",
+      "sha256": "cc025b05540143caf72881886f0abcc801cf8c1395e4f5bf3c4ec9b03711ded8",
+      "passed": 7
+    },
+    "security": {
+      "log": "ragflow-logs/phase6-06-security-published.log",
+      "sha256": "35ae83fb2d63969e1665d88aa247f8dce682613fa2d31b941cd34d7628ee0b44"
+    },
+    "admission": {
+      "log": "ragflow-logs/phase6-06-admission-final.log",
+      "sha256": "920b07e40447627f9d1bae1d17fe957b7152d5d9afe5fb5be2998a4eadad947d"
+    },
+    "remote_import_boundary": {
+      "log": "ragflow-logs/phase6-06-remote-boundary.log",
+      "sha256": "bc7c4e5bc6c9ba1651cb604e0f9a5b3007f46d8d7f79824358346221099366e9"
+    }
+  },
+  "screenshot": {
+    "path": "output/playwright/phase6-review/structured-table-and-crop.png",
+    "sha256": "eff5d53f14e7654e86c292020b975d13f59291ae37048a0dca595751bbbd49cb",
+    "reviewer": "assistant; actual Chrome screenshot"
+  },
+  "offline_guard": {
+    "path": "06-06-TABLE-GUARD.json",
+    "sha256": "3e3067b8682c99292d360d163fbde3cf02cd30d95a257e53d4553d53ec7562f7",
+    "runtime_image": "sha256:329b88176cef2dca6651ab25891e7ff10c00f5624fc0712387ca8cd2ca832d9d",
+    "p95_per_page_seconds": 2.4680655745000877,
+    "peak_rss_mib": 562.82421875,
+    "model_load_seconds": 0.8401581589996567,
+    "deterministic_crops": true,
+    "oom_killed": false,
+    "exit_code": 0
+  },
+  "pending": [
+    "Phase 6 plans07\u201330 and full gate",
+    "Phase5 final human acceptance",
+    "Phase4 B36 separately deferred"
+  ]
+}

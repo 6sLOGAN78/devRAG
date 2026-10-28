@@ -4,11 +4,12 @@ from __future__ import annotations
 from typing import Any
 
 from api.db.services.dialog_datasets import live_datasets, openable
+from rag.parsers.table_features import table_views
 
 _USER_FIELDS = frozenset({"id", "role", "content", "created_at"})
 _ASSISTANT_FIELDS = _USER_FIELDS | {"reference", "finish", "usage", "latency_ms", "empty", "feedback"}
 _CHUNK_FIELDS = frozenset({
-    "index", "chunk_id", "doc_id", "doc_name", "dataset_id", "content", "positions", "page_sizes",
+    "index", "chunk_id", "doc_id", "doc_name", "dataset_id", "content", "positions", "page_sizes", "tables",
     "similarity", "term_similarity", "vector_similarity", "rerank_similarity",
 })
 _DOC_FIELDS = frozenset({"doc_id", "doc_name", "count"})
@@ -37,7 +38,10 @@ def redact_messages(messages: list[dict[str, Any]], tenant_id: str, user_id: str
                 if not isinstance(chunk, dict):
                     continue
                 if chunk.get("dataset_id") in visible:
-                    chunks.append({key: chunk[key] for key in _CHUNK_FIELDS if key in chunk})
+                    view = {key: chunk[key] for key in _CHUNK_FIELDS if key in chunk}
+                    if "tables" in view:
+                        view["tables"] = table_views(view["tables"])
+                    chunks.append(view)
                     if isinstance(chunk.get("doc_id"), str):
                         visible_doc_ids.add(chunk["doc_id"])
                 else:

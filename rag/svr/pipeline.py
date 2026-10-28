@@ -103,13 +103,25 @@ def _parse_and_chunk(ctx: TaskContext, deps: PipelineDeps, control: TaskControl,
     generation = document_asset_service.current_generation(ctx) if deps.settings.deepdoc.url and spec.name in {"pdf", "docx", "pptx"} else None
 
     def text_blocks(blocks):
-        for block in blocks:
+        # Assets are normalized remotely already; persist once and substitute opaque ids before chunking.
+        materialized = list(blocks)
+        for block in materialized:
             control.check()
             assets.extend(block.assets)
             if len(assets) > 128 or sum(len(asset.content) for asset in assets) > 24 * 1024 * 1024:
                 from rag.parsers.errors import FileTooLarge
+
                 raise FileTooLarge()
-            yield replace(block, assets=())
+        unique = {(a.kind, a.sha256): a for a in assets}
+        with deps.limiters.minio_limiter:
+            ids = document_asset_service.persist_assets(deps.settings, ctx, generation, list(unique.values()), control, storage=deps.storage)
+        asset_ids = dict(zip(unique, ids, strict=True))
+        for block in materialized:
+            control.check()
+            table = block.table
+            if table is not None:
+                table = replace(table, asset_id=asset_ids[("table", table.asset_sha256)])
+            yield replace(block, assets=(), table=table)
 
     with deps.limiters.chunk_limiter:
         options = {"settings": deps.settings, "parser_config": ctx.parser_config} if spec.name == "pdf" else ({"settings": deps.settings} if spec.name in {"docx", "pptx"} else {})
@@ -118,8 +130,6 @@ def _parse_and_chunk(ctx: TaskContext, deps: PipelineDeps, control: TaskControl,
             control.check()
             if chunk.text.strip():
                 chunks.append(chunk)
-    with deps.limiters.minio_limiter:
-        document_asset_service.persist_assets(deps.settings, ctx, generation, assets, control, storage=deps.storage)
     return chunks
 
 
@@ -169,8 +179,16 @@ def _index_batches(ctx: TaskContext, deps: PipelineDeps, control: TaskControl, c
         with _step("index", ctx):
             rows = [
                 build_row(
-                    c, index=start + k, doc_id=ctx.doc_id, kb_id=ctx.dataset_id, doc_name=ctx.doc_name, task_id=ctx.task_id,
-                    from_page=ctx.from_page, to_page=ctx.to_page, vector=v, enabled=switch.enabled,
+                    c,
+                    index=start + k,
+                    doc_id=ctx.doc_id,
+                    kb_id=ctx.dataset_id,
+                    doc_name=ctx.doc_name,
+                    task_id=ctx.task_id,
+                    from_page=ctx.from_page,
+                    to_page=ctx.to_page,
+                    vector=v,
+                    enabled=switch.enabled,
                 )
                 for k, (c, v) in enumerate(zip(batch, vectors, strict=True))
             ]

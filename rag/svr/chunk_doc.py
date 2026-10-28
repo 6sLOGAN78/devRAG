@@ -8,6 +8,7 @@ Hand-added chunks use ``{doc_id}_m_{uuid4 hex}``, a grammar that never matches a
 from __future__ import annotations
 
 import datetime
+import json
 import math
 import uuid
 from typing import Any
@@ -15,6 +16,7 @@ from typing import Any
 from common.doc_store.doc_store_base import vector_field
 from rag.chunking.types import Chunk
 from rag.nlp.tokenizer import fine_grained_tokenize, tokenize
+from rag.parsers.table_features import MAX_TABLE_FEATURE_BYTES, TABLE_FIELD
 from rag.svr.failure import TaskFailure
 
 PAGE_STRIDE = 1000
@@ -65,7 +67,14 @@ def build_row(
     title = _stem(doc_name)
     boxes = chunk.positions
     pages = sorted({int(box.page) for box in boxes})
+    features = {}
+    if chunk.tables:
+        encoded = json.dumps([table.to_dto() for table in chunk.tables], ensure_ascii=False, separators=(",", ":"))
+        if len(encoded.encode()) > MAX_TABLE_FEATURE_BYTES or len(chunk.tables) > 16:
+            raise TaskFailure("chunk", "file_too_large")
+        features[TABLE_FIELD] = encoded
     return {
+        **features,
         "id": chunk_id,
         "doc_id": doc_id,
         "kb_id": kb_id,

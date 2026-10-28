@@ -9,6 +9,8 @@ from __future__ import annotations
 from collections.abc import Iterable, Mapping
 from typing import Any
 
+from rag.parsers.table_features import TABLE_FIELD, tables_of
+
 POSITION_STRIDE = 5
 _DIMS_ENTRY = 3
 
@@ -46,4 +48,4 @@ def merge_page_sizes(parts: Iterable[Mapping[str, list[float]]]) -> dict[str, li
 
 def chunk_view_fields(row: Mapping[str, Any]) -> dict[str, Any]:
     """The two location keys of one chunk view."""
-    return {"positions": positions_of(row), "page_sizes": page_sizes_of(row)}
+    return {"positions": positions_of(row), "page_sizes": page_sizes_of(row), **({"tables": tables_of(row)} if row.get(TABLE_FIELD) else {})}

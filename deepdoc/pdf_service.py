@@ -69,6 +69,47 @@ def _region_assets(image, regions, embedded, page, width, height):
     return result
 
 
+def _table_blocks(image, regions, words, page, width, height, runtime):
+    from deepdoc.images import normalize_image
+    from deepdoc.tables import TextToken, parse_table
+
+    result = []
+    produced_bytes = 0
+    for region in regions:
+        if region.label_id != 5:
+            continue
+        if len(result) >= MAX_ASSETS:
+            raise FileTooLarge()
+        x0, top, x1, bottom = region.box
+        pixels = (
+            max(0, math.floor(x0 * image.width / width)),
+            max(0, math.floor(top * image.height / height)),
+            min(image.width, math.ceil(x1 * image.width / width)),
+            min(image.height, math.ceil(bottom * image.height / height)),
+        )
+        crop = image.crop(pixels)
+        # Pixel edges, crop units and stored source box describe exactly the same crop.
+        box = (pixels[0] / image.width * width, pixels[1] / image.height * height, pixels[2] / image.width * width, pixels[3] / image.height * height)
+        local = [
+            TextToken(t.text, (t.box[0] - box[0], t.box[1] - box[1], t.box[2] - box[0], t.box[3] - box[1]))
+            for t in words
+            if box[0] <= (t.box[0] + t.box[2]) / 2 <= box[2] and box[1] <= (t.box[1] + t.box[3]) / 2 <= box[3]
+        ]
+        captions = [t for t in words if 0 <= box[1] - t.box[3] <= 45 and t.box[0] >= box[0] - 5 and t.box[2] <= box[2] + 5]
+        captions.sort(key=lambda t: (round(t.box[1] / 4), t.box[0]))
+        caption = " ".join(t.text for t in captions)
+        table = parse_table(runtime, crop, local, page_size=(box[2] - box[0], box[3] - box[1]), caption=caption)
+        buffer = io.BytesIO()
+        crop.save(buffer, "PNG")
+        asset = replace(normalize_image(buffer.getvalue()), page=page, kind="table", caption=caption[:1024])
+        produced_bytes += len(asset.content)
+        if produced_bytes > 24 * 1024 * 1024:
+            raise FileTooLarge()
+        table = replace(table, asset_sha256=asset.sha256)
+        result.append(ParsedBlock(table.plain_text(), "table", boxes=(PageBox(page, *box),), page_sizes={page: (width, height)}, layout_label="Table", assets=(asset,), table=table))
+    return result
+
+
 def _parse(path: Path, options: PDFOptions, ocr) -> dict[str, Any]:
     report = ParseReport()
     total = pdf.count_pages(path)
@@ -88,10 +129,12 @@ def _parse(path: Path, options: PDFOptions, ocr) -> dict[str, Any]:
                 page_blocks = pdf._page_blocks(page, index + 1, group_lines=not options.layout)
                 width, height = page.get_size()
                 asset_blocks = pdf.page_assets(page, index + 1)
+                words = pdf.page_words(page) if options.layout else []
             finally:
                 page.close()
             image = None
-            if not _valid_native_text(page_blocks):
+            native_text = _valid_native_text(page_blocks)
+            if not native_text:
                 image = pdf.rasterize_page(path, index, zoom=3)
                 buffer = io.BytesIO()
                 image.save(buffer, "PNG")
@@ -101,6 +144,9 @@ def _parse(path: Path, options: PDFOptions, ocr) -> dict[str, Any]:
                     x0, y0, x1, y1 = span["box"]
                     box = PageBox(index + 1, x0 * width / image.width, y0 * height / image.height, x1 * width / image.width, y1 * height / image.height)
                     page_blocks.append(ParsedBlock(span["text"], boxes=(box,), page_sizes={index + 1: (width, height)}))
+                from deepdoc.tables import TextToken
+
+                words = [TextToken(block.text, (block.boxes[0].x0, block.boxes[0].top, block.boxes[0].x1, block.boxes[0].bottom)) for block in page_blocks]
                 if not page_blocks:
                     report.pages_without_text += 1
             if options.layout:
@@ -109,9 +155,19 @@ def _parse(path: Path, options: PDFOptions, ocr) -> dict[str, Any]:
                 page_blocks = apply_layout(page_blocks or [], regions)
                 report.layout_backend = "deepdoc-onnx"
                 report.layout_regions += len(regions)
-                asset_blocks.extend(_region_assets(image, regions, asset_blocks, index + 1, width, height))
-            asset_count += sum(len(b.assets) for b in asset_blocks)
-            asset_bytes += sum(len(a.content) for b in asset_blocks for a in b.assets)
+                table_blocks = _table_blocks(image, regions, words, index + 1, width, height, ocr.runtime)
+                table_regions = [r for r in regions if r.label_id == 5]
+                from deepdoc.geometry import overlap_ratio
+
+                page_blocks = [
+                    block
+                    for block in page_blocks
+                    if not block.boxes or not any(overlap_ratio((block.boxes[0].x0, block.boxes[0].top, block.boxes[0].x1, block.boxes[0].bottom), r.box) >= 0.4 for r in table_regions)
+                ]
+                page_blocks = apply_layout(page_blocks + table_blocks, regions)
+                asset_blocks.extend(_region_assets(image, [r for r in regions if r.label_id != 5], asset_blocks, index + 1, width, height))
+            asset_count += sum(len(b.assets) for b in (page_blocks or []) + asset_blocks)
+            asset_bytes += sum(len(a.content) for b in (page_blocks or []) + asset_blocks for a in b.assets)
             if asset_count > MAX_ASSETS or asset_bytes > 24 * 1024 * 1024:
                 raise FileTooLarge()
             for block in (page_blocks or []) + asset_blocks:
@@ -123,7 +179,8 @@ def _parse(path: Path, options: PDFOptions, ocr) -> dict[str, Any]:
         document.close()
     wire = []
     for block in blocks:
-        item = asdict(replace(block, assets=()))
+        item = asdict(replace(block, assets=(), table=None))
+        item["table"] = block.table.to_wire() if block.table else None
         item["assets"] = [encode_asset(asset) for asset in block.assets]
         wire.append(item)
     return {"schema_version": 1, "blocks": wire, "report": asdict(report)}

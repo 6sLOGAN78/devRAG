@@ -226,7 +226,7 @@ def _documents_that_exist(dataset_ids: list[str]) -> Callable[[set[str]], Iterab
 
 def chunk_hit_view(hit: Hit) -> dict[str, Any]:
     """The contract hit shape (CONTRACTS section 4): the reference chunk without ``index``."""
-    row = {"position_int": hit.position_int, "page_dims_flt": hit.page_dims_flt}
+    row = {"position_int": hit.position_int, "page_dims_flt": hit.page_dims_flt, "table_features_with_weight": hit.table_features}
     out: dict[str, Any] = {
         "chunk_id": hit.chunk_id,
         "doc_id": hit.doc_id,

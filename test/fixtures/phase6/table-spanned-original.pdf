@@ -1,0 +1,91 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [4 0 R 6 0 R] /Count 2 >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+4 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 600 400] /Resources << /Font << /F1 3 0 R >> >> /Contents 5 0 R >>
+endobj
+5 0 obj
+<< /Length 774 >>
+stream
+0.8 w
+0.93 g 60 260 480 50 re f 0 g
+60 310 m 540 310 l S
+60 260 m 540 260 l S
+60 210 m 540 210 l S
+60 160 m 540 160 l S
+60 110 m 540 110 l S
+60 60 m 540 60 l S
+60 60 m 60 310 l S
+540 60 m 540 310 l S
+260 60 m 260 260 l S
+400 60 m 400 260 l S
+BT /F1 15 Tf 60 345 Td (Table 1. Orchard field measurements) Tj ET
+BT /F1 15 Tf 175 278 Td (ORCHARD MEASUREMENTS) Tj ET
+BT /F1 13 Tf 75 228 Td (Metric) Tj ET
+BT /F1 13 Tf 280 228 Td (Recorded) Tj ET
+BT /F1 13 Tf 415 228 Td (Unit) Tj ET
+BT /F1 13 Tf 75 178 Td (Harvest) Tj ET
+BT /F1 13 Tf 280 178 Td (9100) Tj ET
+BT /F1 13 Tf 415 178 Td (kg) Tj ET
+BT /F1 13 Tf 75 128 Td (Height) Tj ET
+BT /F1 13 Tf 280 128 Td (52) Tj ET
+BT /F1 13 Tf 415 128 Td (m) Tj ET
+BT /F1 13 Tf 75 78 Td (<b>Literal</b>) Tj ET
+BT /F1 13 Tf 280 78 Td (73) Tj ET
+endstream
+endobj
+6 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 600 400] /Resources << /Font << /F1 3 0 R >> >> /Contents 7 0 R >>
+endobj
+7 0 obj
+<< /Length 773 >>
+stream
+0.8 w
+0.93 g 60 260 480 50 re f 0 g
+60 310 m 540 310 l S
+60 260 m 540 260 l S
+60 210 m 540 210 l S
+60 160 m 540 160 l S
+60 110 m 540 110 l S
+60 60 m 540 60 l S
+60 60 m 60 310 l S
+540 60 m 540 310 l S
+260 60 m 260 260 l S
+400 60 m 400 260 l S
+BT /F1 15 Tf 60 345 Td (Table 2. Orchard field measurements) Tj ET
+BT /F1 15 Tf 175 278 Td (ORCHARD MEASUREMENTS) Tj ET
+BT /F1 13 Tf 75 228 Td (Metric) Tj ET
+BT /F1 13 Tf 280 228 Td (Recorded) Tj ET
+BT /F1 13 Tf 415 228 Td (Unit) Tj ET
+BT /F1 13 Tf 75 178 Td (Harvest) Tj ET
+BT /F1 13 Tf 280 178 Td (281) Tj ET
+BT /F1 13 Tf 415 178 Td (kg) Tj ET
+BT /F1 13 Tf 75 128 Td (Height) Tj ET
+BT /F1 13 Tf 280 128 Td (73) Tj ET
+BT /F1 13 Tf 415 128 Td (m) Tj ET
+BT /F1 13 Tf 75 78 Td (<b>Literal</b>) Tj ET
+BT /F1 13 Tf 280 78 Td (52) Tj ET
+endstream
+endobj
+xref
+0 8
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000121 00000 n 
+0000000191 00000 n 
+0000000317 00000 n 
+0000001142 00000 n 
+0000001268 00000 n 
+trailer
+<< /Size 8 /Root 1 0 R >>
+startxref
+2092
+%%EOF

@@ -1,0 +1,70 @@
+{
+  "origin": "Original hand-assembled two-page PDF; Helvetica text and vector grid; no third-party source",
+  "sha256": "dea7b945a7891c2f0424344b681c50f5e112e23f1efffdbffe75a59225cb31a1",
+  "page_size": [
+    600,
+    400
+  ],
+  "table_box": [
+    60,
+    90,
+    540,
+    340
+  ],
+  "minimum_crop_iou": 0.7,
+  "merged_header": {
+    "row": 0,
+    "column": 0,
+    "rowspan": 1,
+    "colspan": 3,
+    "text": "ORCHARD MEASUREMENTS"
+  },
+  "rows": 5,
+  "columns": 3,
+  "column_headers": [
+    "Metric",
+    "Recorded",
+    "Unit"
+  ],
+  "body_rows_by_page": {
+    "1": [
+      [
+        "Harvest",
+        "9100",
+        "kg"
+      ],
+      [
+        "Height",
+        "52",
+        "m"
+      ],
+      [
+        "<b>Literal</b>",
+        "73",
+        ""
+      ]
+    ],
+    "2": [
+      [
+        "Harvest",
+        "281",
+        "kg"
+      ],
+      [
+        "Height",
+        "73",
+        "m"
+      ],
+      [
+        "<b>Literal</b>",
+        "52",
+        ""
+      ]
+    ]
+  },
+  "empty_cell": {
+    "row": 4,
+    "column": 2
+  },
+  "frozen_before_native_inference": true
+}

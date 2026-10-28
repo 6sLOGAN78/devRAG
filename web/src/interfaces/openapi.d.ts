@@ -673,6 +673,8 @@ export interface components {
             origin: string;
             /** Positions */
             positions: components["schemas"]["PositionView"][];
+            /** Tables */
+            tables?: components["schemas"]["TableView"][];
             /** Text */
             text: string;
         };
@@ -1310,6 +1312,34 @@ export interface components {
             token_total: number;
             /** Unstart */
             unstart: number;
+        };
+        /** TableCellView */
+        TableCellView: {
+            /** Colspan */
+            colspan: number;
+            /** Column */
+            column: number;
+            /** Header */
+            header: boolean;
+            /** Row */
+            row: number;
+            /** Rowspan */
+            rowspan: number;
+            /** Text */
+            text: string;
+        };
+        /** TableView */
+        TableView: {
+            /** Asset Id */
+            asset_id: string;
+            /** Caption */
+            caption: string;
+            /** Cells */
+            cells: components["schemas"]["TableCellView"][];
+            /** Columns */
+            columns: number;
+            /** Rows */
+            rows: number;
         };
         /** TaskView */
         TaskView: {

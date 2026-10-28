@@ -1,0 +1,1307 @@
+{
+  "fixture_sha256": "dea7b945a7891c2f0424344b681c50f5e112e23f1efffdbffe75a59225cb31a1",
+  "deterministic_crops": true,
+  "network": "none",
+  "cpu_quota": 2,
+  "memory_cap_mib": 3072,
+  "model_load_seconds": 0.8401581589996567,
+  "p50_per_page_seconds": 2.3487180679999256,
+  "p95_per_page_seconds": 2.4680655745000877,
+  "peak_rss_mib": 562.82421875,
+  "samples": [
+    {
+      "repetition": 1,
+      "seconds": 4.936131149000175,
+      "per_page_seconds": 2.4680655745000877,
+      "peak_rss_kib": 575312,
+      "quality_pass": true,
+      "tables": [
+        {
+          "page": 1,
+          "source_box": [
+            58.0,
+            87.33333333333333,
+            542.0,
+            342.6666666666667
+          ],
+          "cells": [
+            {
+              "row": 0,
+              "column": 0,
+              "text": "ORCHARD MEASUREMENTS",
+              "rowspan": 1,
+              "colspan": 3,
+              "header": true
+            },
+            {
+              "row": 1,
+              "column": 0,
+              "text": "Metric",
+              "rowspan": 1,
+              "colspan": 1,
+              "header": true
+            },
+            {
+              "row": 1,
+              "column": 1,
+              "text": "Recorded",
+              "rowspan": 1,
+              "colspan": 1,
+              "header": true
+            },
+            {
+              "row": 1,
+              "column": 2,
+              "text": "Unit",
+              "rowspan": 1,
+              "colspan": 1,
+              "header": true
+            },
+            {
+              "row": 2,
+              "column": 0,
+              "text": "Harvest",
+              "rowspan": 1,
+              "colspan": 1,
+              "header": false
+            },
+            {
+              "row": 2,
+              "column": 1,
+              "text": "9100",
+              "rowspan": 1,
+              "colspan": 1,
+              "header": false
+            },
+            {
+              "row": 2,
+              "column": 2,
+              "text": "kg",
+              "rowspan": 1,
+              "colspan": 1,
+              "header": false
+            },
+            {
+              "row": 3,
+              "column": 0,
+              "text": "Height",
+              "rowspan": 1,
+              "colspan": 1,
+              "header": false
+            },
+            {
+              "row": 3,
+              "column": 1,
+              "text": "52",
+              "rowspan": 1,
+              "colspan": 1,
+              "header": false
+            },
+            {
+              "row": 3,
+              "column": 2,
+              "text": "m",
+              "rowspan": 1,
+              "colspan": 1,
+              "header": false
+            },
+            {
+              "row": 4,
+              "column": 0,
+              "text": "<b>Literal</b>",
+              "rowspan": 1,
+              "colspan": 1,
+              "header": false
+            },
+            {
+              "row": 4,
+              "column": 1,
+              "text": "73",
+              "rowspan": 1,
+              "colspan": 1,
+              "header": false
+            },
+            {
+              "row": 4,
+              "column": 2,
+              "text": "",
+              "rowspan": 1,
+              "colspan": 1,
+              "header": false
+            }
+          ],
+          "html": "<table>\n<caption>Table 1. Orchard field measurements</caption>\n<tr><th colspan=\"3\">ORCHARD MEASUREMENTS</th></tr>\n<tr><th>Metric</th><th>Recorded</th><th>Unit</th></tr>\n<tr><td>Harvest</td><td>9100</td><td>kg</td></tr>\n<tr><td>Height</td><td>52</td><td>m</td></tr>\n<tr><td>&lt;b&gt;Literal&lt;/b&gt;</td><td>73</td><td></td></tr>\n</table>",
+          "crop_sha256": "565450e7f27811f8feb8cc54f0ee013d71c50a0896cf75d44f32ab602e413da4",
+          "crop_bytes": 51527,
+          "crop_dimensions": [
+            1452,
+            766
+          ]
+        },
+        {
+          "page": 2,
+          "source_box": [
+            58.0,
+            87.33333333333333,
+            542.0,
+            342.6666666666667
+          ],
+          "cells": [
+            {
+              "row": 0,
+              "column": 0,
+              "text": "ORCHARD MEASUREMENTS",
+              "rowspan": 1,
+              "colspan": 3,
+              "header": true
+            },
+            {
+              "row": 1,
+              "column": 0,
+              "text": "Metric",
+              "rowspan": 1,
+              "colspan": 1,
+              "header": true
+            },
+            {
+              "row": 1,
+              "column": 1,
+              "text": "Recorded",
+              "rowspan": 1,
+              "colspan": 1,
+              "header": true
+            },
+            {
+              "row": 1,
+              "column": 2,
+              "text": "Unit",
+              "rowspan": 1,
+              "colspan": 1,
+              "header": true
+            },
+            {
+              "row": 2,
+              "column": 0,
+              "text": "Harvest",
+              "rowspan": 1,
+              "colspan": 1,
+              "header": false
+            },
+            {
+              "row": 2,
+              "column": 1,
+              "text": "281",
+              "rowspan": 1,
+              "colspan": 1,
+              "header": false
+            },
+            {
+              "row": 2,
+              "column": 2,
+              "text": "kg",
+              "rowspan": 1,
+              "colspan": 1,
+              "header": false
+            },
+            {
+              "row": 3,
+              "column": 0,
+              "text": "Height",
+              "rowspan": 1,
+              "colspan": 1,
+              "header": false
+            },
+            {
+              "row": 3,
+              "column": 1,
+              "text": "73",
+              "rowspan": 1,
+              "colspan": 1,
+              "header": false
+            },
+            {
+              "row": 3,
+              "column": 2,
+              "text": "m",
+              "rowspan": 1,
+              "colspan": 1,
+              "header": false
+            },
+            {
+              "row": 4,
+              "column": 0,
+              "text": "<b>Literal</b>",
+              "rowspan": 1,
+              "colspan": 1,
+              "header": false
+            },
+            {
+              "row": 4,
+              "column": 1,
+              "text": "52",
+              "rowspan": 1,
+              "colspan": 1,
+              "header": false
+            },
+            {
+              "row": 4,
+              "column": 2,
+              "text": "",
+              "rowspan": 1,
+              "colspan": 1,
+              "header": false
+            }
+          ],
+          "html": "<table>\n<caption>Table 2. Orchard field measurements</caption>\n<tr><th colspan=\"3\">ORCHARD MEASUREMENTS</th></tr>\n<tr><th>Metric</th><th>Recorded</th><th>Unit</th></tr>\n<tr><td>Harvest</td><td>281</td><td>kg</td></tr>\n<tr><td>Height</td><td>73</td><td>m</td></tr>\n<tr><td>&lt;b&gt;Literal&lt;/b&gt;</td><td>52</td><td></td></tr>\n</table>",
+          "crop_sha256": "24423a352e43b6a1f3d565e6c96f1f4e43417909340bf9575599885fb5df88da",
+          "crop_bytes": 50376,
+          "crop_dimensions": [
+            1452,
+            766
+          ]
+        }
+      ]
+    },
+    {
+      "repetition": 2,
+      "seconds": 4.5651267900002495,
+      "per_page_seconds": 2.2825633950001247,
+      "peak_rss_kib": 576068,
+      "quality_pass": true,
+      "tables": [
+        {
+          "page": 1,
+          "source_box": [
+            58.0,
+            87.33333333333333,
+            542.0,
+            342.6666666666667
+          ],
+          "cells": [
+            {
+              "row": 0,
+              "column": 0,
+              "text": "ORCHARD MEASUREMENTS",
+              "rowspan": 1,
+              "colspan": 3,
+              "header": true
+            },
+            {
+              "row": 1,
+              "column": 0,
+              "text": "Metric",
+              "rowspan": 1,
+              "colspan": 1,
+              "header": true
+            },
+            {
+              "row": 1,
+              "column": 1,
+              "text": "Recorded",
+              "rowspan": 1,
+              "colspan": 1,
+              "header": true
+            },
+            {
+              "row": 1,
+              "column": 2,
+              "text": "Unit",
+              "rowspan": 1,
+              "colspan": 1,
+              "header": true
+            },
+            {
+              "row": 2,
+              "column": 0,
+              "text": "Harvest",
+              "rowspan": 1,
+              "colspan": 1,
+              "header": false
+            },
+            {
+              "row": 2,
+              "column": 1,
+              "text": "9100",
+              "rowspan": 1,
+              "colspan": 1,
+              "header": false
+            },
+            {
+              "row": 2,
+              "column": 2,
+              "text": "kg",
+              "rowspan": 1,
+              "colspan": 1,
+              "header": false
+            },
+            {
+              "row": 3,
+              "column": 0,
+              "text": "Height",
+              "rowspan": 1,
+              "colspan": 1,
+              "header": false
+            },
+            {
+              "row": 3,
+              "column": 1,
+              "text": "52",
+              "rowspan": 1,
+              "colspan": 1,
+              "header": false
+            },
+            {
+              "row": 3,
+              "column": 2,
+              "text": "m",
+              "rowspan": 1,
+              "colspan": 1,
+              "header": false
+            },
+            {
+              "row": 4,
+              "column": 0,
+              "text": "<b>Literal</b>",
+              "rowspan": 1,
+              "colspan": 1,
+              "header": false
+            },
+            {
+              "row": 4,
+              "column": 1,
+              "text": "73",
+              "rowspan": 1,
+              "colspan": 1,
+              "header": false
+            },
+            {
+              "row": 4,
+              "column": 2,
+              "text": "",
+              "rowspan": 1,
+              "colspan": 1,
+              "header": false
+            }
+          ],
+          "html": "<table>\n<caption>Table 1. Orchard field measurements</caption>\n<tr><th colspan=\"3\">ORCHARD MEASUREMENTS</th></tr>\n<tr><th>Metric</th><th>Recorded</th><th>Unit</th></tr>\n<tr><td>Harvest</td><td>9100</td><td>kg</td></tr>\n<tr><td>Height</td><td>52</td><td>m</td></tr>\n<tr><td>&lt;b&gt;Literal&lt;/b&gt;</td><td>73</td><td></td></tr>\n</table>",
+          "crop_sha256": "565450e7f27811f8feb8cc54f0ee013d71c50a0896cf75d44f32ab602e413da4",
+          "crop_bytes": 51527,
+          "crop_dimensions": [
+            1452,
+            766
+          ]
+        },
+        {
+          "page": 2,
+          "source_box": [
+            58.0,
+            87.33333333333333,
+            542.0,
+            342.6666666666667
+          ],
+          "cells": [
+            {
+              "row": 0,
+              "column": 0,
+              "text": "ORCHARD MEASUREMENTS",
+              "rowspan": 1,
+              "colspan": 3,
+              "header": true
+            },
+            {
+              "row": 1,
+              "column": 0,
+              "text": "Metric",
+              "rowspan": 1,
+              "colspan": 1,
+              "header": true
+            },
+            {
+              "row": 1,
+              "column": 1,
+              "text": "Recorded",
+              "rowspan": 1,
+              "colspan": 1,
+              "header": true
+            },
+            {
+              "row": 1,
+              "column": 2,
+              "text": "Unit",
+              "rowspan": 1,
+              "colspan": 1,
+              "header": true
+            },
+            {
+              "row": 2,
+              "column": 0,
+              "text": "Harvest",
+              "rowspan": 1,
+              "colspan": 1,
+              "header": false
+            },
+            {
+              "row": 2,
+              "column": 1,
+              "text": "281",
+              "rowspan": 1,
+              "colspan": 1,
+              "header": false
+            },
+            {
+              "row": 2,
+              "column": 2,
+              "text": "kg",
+              "rowspan": 1,
+              "colspan": 1,
+              "header": false
+            },
+            {
+              "row": 3,
+              "column": 0,
+              "text": "Height",
+              "rowspan": 1,
+              "colspan": 1,
+              "header": false
+            },
+            {
+              "row": 3,
+              "column": 1,
+              "text": "73",
+              "rowspan": 1,
+              "colspan": 1,
+              "header": false
+            },
+            {
+              "row": 3,
+              "column": 2,
+              "text": "m",
+              "rowspan": 1,
+              "colspan": 1,
+              "header": false
+            },
+            {
+              "row": 4,
+              "column": 0,
+              "text": "<b>Literal</b>",
+              "rowspan": 1,
+              "colspan": 1,
+              "header": false
+            },
+            {
+              "row": 4,
+              "column": 1,
+              "text": "52",
+              "rowspan": 1,
+              "colspan": 1,
+              "header": false
+            },
+            {
+              "row": 4,
+              "column": 2,
+              "text": "",
+              "rowspan": 1,
+              "colspan": 1,
+              "header": false
+            }
+          ],
+          "html": "<table>\n<caption>Table 2. Orchard field measurements</caption>\n<tr><th colspan=\"3\">ORCHARD MEASUREMENTS</th></tr>\n<tr><th>Metric</th><th>Recorded</th><th>Unit</th></tr>\n<tr><td>Harvest</td><td>281</td><td>kg</td></tr>\n<tr><td>Height</td><td>73</td><td>m</td></tr>\n<tr><td>&lt;b&gt;Literal&lt;/b&gt;</td><td>52</td><td></td></tr>\n</table>",
+          "crop_sha256": "24423a352e43b6a1f3d565e6c96f1f4e43417909340bf9575599885fb5df88da",
+          "crop_bytes": 50376,
+          "crop_dimensions": [
+            1452,
+            766
+          ]
+        }
+      ]
+    },
+    {
+      "repetition": 3,
+      "seconds": 4.533416193999983,
+      "per_page_seconds": 2.2667080969999915,
+      "peak_rss_kib": 576332,
+      "quality_pass": true,
+      "tables": [
+        {
+          "page": 1,
+          "source_box": [
+            58.0,
+            87.33333333333333,
+            542.0,
+            342.6666666666667
+          ],
+          "cells": [
+            {
+              "row": 0,
+              "column": 0,
+              "text": "ORCHARD MEASUREMENTS",
+              "rowspan": 1,
+              "colspan": 3,
+              "header": true
+            },
+            {
+              "row": 1,
+              "column": 0,
+              "text": "Metric",
+              "rowspan": 1,
+              "colspan": 1,
+              "header": true
+            },
+            {
+              "row": 1,
+              "column": 1,
+              "text": "Recorded",
+              "rowspan": 1,
+              "colspan": 1,
+              "header": true
+            },
+            {
+              "row": 1,
+              "column": 2,
+              "text": "Unit",
+              "rowspan": 1,
+              "colspan": 1,
+              "header": true
+            },
+            {
+              "row": 2,
+              "column": 0,
+              "text": "Harvest",
+              "rowspan": 1,
+              "colspan": 1,
+              "header": false
+            },
+            {
+              "row": 2,
+              "column": 1,
+              "text": "9100",
+              "rowspan": 1,
+              "colspan": 1,
+              "header": false
+            },
+            {
+              "row": 2,
+              "column": 2,
+              "text": "kg",
+              "rowspan": 1,
+              "colspan": 1,
+              "header": false
+            },
+            {
+              "row": 3,
+              "column": 0,
+              "text": "Height",
+              "rowspan": 1,
+              "colspan": 1,
+              "header": false
+            },
+            {
+              "row": 3,
+              "column": 1,
+              "text": "52",
+              "rowspan": 1,
+              "colspan": 1,
+              "header": false
+            },
+            {
+              "row": 3,
+              "column": 2,
+              "text": "m",
+              "rowspan": 1,
+              "colspan": 1,
+              "header": false
+            },
+            {
+              "row": 4,
+              "column": 0,
+              "text": "<b>Literal</b>",
+              "rowspan": 1,
+              "colspan": 1,
+              "header": false
+            },
+            {
+              "row": 4,
+              "column": 1,
+              "text": "73",
+              "rowspan": 1,
+              "colspan": 1,
+              "header": false
+            },
+            {
+              "row": 4,
+              "column": 2,
+              "text": "",
+              "rowspan": 1,
+              "colspan": 1,
+              "header": false
+            }
+          ],
+          "html": "<table>\n<caption>Table 1. Orchard field measurements</caption>\n<tr><th colspan=\"3\">ORCHARD MEASUREMENTS</th></tr>\n<tr><th>Metric</th><th>Recorded</th><th>Unit</th></tr>\n<tr><td>Harvest</td><td>9100</td><td>kg</td></tr>\n<tr><td>Height</td><td>52</td><td>m</td></tr>\n<tr><td>&lt;b&gt;Literal&lt;/b&gt;</td><td>73</td><td></td></tr>\n</table>",
+          "crop_sha256": "565450e7f27811f8feb8cc54f0ee013d71c50a0896cf75d44f32ab602e413da4",
+          "crop_bytes": 51527,
+          "crop_dimensions": [
+            1452,
+            766
+          ]
+        },
+        {
+          "page": 2,
+          "source_box": [
+            58.0,
+            87.33333333333333,
+            542.0,
+            342.6666666666667
+          ],
+          "cells": [
+            {
+              "row": 0,
+              "column": 0,
+              "text": "ORCHARD MEASUREMENTS",
+              "rowspan": 1,
+              "colspan": 3,
+              "header": true
+            },
+            {
+              "row": 1,
+              "column": 0,
+              "text": "Metric",
+              "rowspan": 1,
+              "colspan": 1,
+              "header": true
+            },
+            {
+              "row": 1,
+              "column": 1,
+              "text": "Recorded",
+              "rowspan": 1,
+              "colspan": 1,
+              "header": true
+            },
+            {
+              "row": 1,
+              "column": 2,
+              "text": "Unit",
+              "rowspan": 1,
+              "colspan": 1,
+              "header": true
+            },
+            {
+              "row": 2,
+              "column": 0,
+              "text": "Harvest",
+              "rowspan": 1,
+              "colspan": 1,
+              "header": false
+            },
+            {
+              "row": 2,
+              "column": 1,
+              "text": "281",
+              "rowspan": 1,
+              "colspan": 1,
+              "header": false
+            },
+            {
+              "row": 2,
+              "column": 2,
+              "text": "kg",
+              "rowspan": 1,
+              "colspan": 1,
+              "header": false
+            },
+            {
+              "row": 3,
+              "column": 0,
+              "text": "Height",
+              "rowspan": 1,
+              "colspan": 1,
+              "header": false
+            },
+            {
+              "row": 3,
+              "column": 1,
+              "text": "73",
+              "rowspan": 1,
+              "colspan": 1,
+              "header": false
+            },
+            {
+              "row": 3,
+              "column": 2,
+              "text": "m",
+              "rowspan": 1,
+              "colspan": 1,
+              "header": false
+            },
+            {
+              "row": 4,
+              "column": 0,
+              "text": "<b>Literal</b>",
+              "rowspan": 1,
+              "colspan": 1,
+              "header": false
+            },
+            {
+              "row": 4,
+              "column": 1,
+              "text": "52",
+              "rowspan": 1,
+              "colspan": 1,
+              "header": false
+            },
+            {
+              "row": 4,
+              "column": 2,
+              "text": "",
+              "rowspan": 1,
+              "colspan": 1,
+              "header": false
+            }
+          ],
+          "html": "<table>\n<caption>Table 2. Orchard field measurements</caption>\n<tr><th colspan=\"3\">ORCHARD MEASUREMENTS</th></tr>\n<tr><th>Metric</th><th>Recorded</th><th>Unit</th></tr>\n<tr><td>Harvest</td><td>281</td><td>kg</td></tr>\n<tr><td>Height</td><td>73</td><td>m</td></tr>\n<tr><td>&lt;b&gt;Literal&lt;/b&gt;</td><td>52</td><td></td></tr>\n</table>",
+          "crop_sha256": "24423a352e43b6a1f3d565e6c96f1f4e43417909340bf9575599885fb5df88da",
+          "crop_bytes": 50376,
+          "crop_dimensions": [
+            1452,
+            766
+          ]
+        }
+      ]
+    },
+    {
+      "repetition": 4,
+      "seconds": 4.794164296000417,
+      "per_page_seconds": 2.3970821480002087,
+      "peak_rss_kib": 576332,
+      "quality_pass": true,
+      "tables": [
+        {
+          "page": 1,
+          "source_box": [
+            58.0,
+            87.33333333333333,
+            542.0,
+            342.6666666666667
+          ],
+          "cells": [
+            {
+              "row": 0,
+              "column": 0,
+              "text": "ORCHARD MEASUREMENTS",
+              "rowspan": 1,
+              "colspan": 3,
+              "header": true
+            },
+            {
+              "row": 1,
+              "column": 0,
+              "text": "Metric",
+              "rowspan": 1,
+              "colspan": 1,
+              "header": true
+            },
+            {
+              "row": 1,
+              "column": 1,
+              "text": "Recorded",
+              "rowspan": 1,
+              "colspan": 1,
+              "header": true
+            },
+            {
+              "row": 1,
+              "column": 2,
+              "text": "Unit",
+              "rowspan": 1,
+              "colspan": 1,
+              "header": true
+            },
+            {
+              "row": 2,
+              "column": 0,
+              "text": "Harvest",
+              "rowspan": 1,
+              "colspan": 1,
+              "header": false
+            },
+            {
+              "row": 2,
+              "column": 1,
+              "text": "9100",
+              "rowspan": 1,
+              "colspan": 1,
+              "header": false
+            },
+            {
+              "row": 2,
+              "column": 2,
+              "text": "kg",
+              "rowspan": 1,
+              "colspan": 1,
+              "header": false
+            },
+            {
+              "row": 3,
+              "column": 0,
+              "text": "Height",
+              "rowspan": 1,
+              "colspan": 1,
+              "header": false
+            },
+            {
+              "row": 3,
+              "column": 1,
+              "text": "52",
+              "rowspan": 1,
+              "colspan": 1,
+              "header": false
+            },
+            {
+              "row": 3,
+              "column": 2,
+              "text": "m",
+              "rowspan": 1,
+              "colspan": 1,
+              "header": false
+            },
+            {
+              "row": 4,
+              "column": 0,
+              "text": "<b>Literal</b>",
+              "rowspan": 1,
+              "colspan": 1,
+              "header": false
+            },
+            {
+              "row": 4,
+              "column": 1,
+              "text": "73",
+              "rowspan": 1,
+              "colspan": 1,
+              "header": false
+            },
+            {
+              "row": 4,
+              "column": 2,
+              "text": "",
+              "rowspan": 1,
+              "colspan": 1,
+              "header": false
+            }
+          ],
+          "html": "<table>\n<caption>Table 1. Orchard field measurements</caption>\n<tr><th colspan=\"3\">ORCHARD MEASUREMENTS</th></tr>\n<tr><th>Metric</th><th>Recorded</th><th>Unit</th></tr>\n<tr><td>Harvest</td><td>9100</td><td>kg</td></tr>\n<tr><td>Height</td><td>52</td><td>m</td></tr>\n<tr><td>&lt;b&gt;Literal&lt;/b&gt;</td><td>73</td><td></td></tr>\n</table>",
+          "crop_sha256": "565450e7f27811f8feb8cc54f0ee013d71c50a0896cf75d44f32ab602e413da4",
+          "crop_bytes": 51527,
+          "crop_dimensions": [
+            1452,
+            766
+          ]
+        },
+        {
+          "page": 2,
+          "source_box": [
+            58.0,
+            87.33333333333333,
+            542.0,
+            342.6666666666667
+          ],
+          "cells": [
+            {
+              "row": 0,
+              "column": 0,
+              "text": "ORCHARD MEASUREMENTS",
+              "rowspan": 1,
+              "colspan": 3,
+              "header": true
+            },
+            {
+              "row": 1,
+              "column": 0,
+              "text": "Metric",
+              "rowspan": 1,
+              "colspan": 1,
+              "header": true
+            },
+            {
+              "row": 1,
+              "column": 1,
+              "text": "Recorded",
+              "rowspan": 1,
+              "colspan": 1,
+              "header": true
+            },
+            {
+              "row": 1,
+              "column": 2,
+              "text": "Unit",
+              "rowspan": 1,
+              "colspan": 1,
+              "header": true
+            },
+            {
+              "row": 2,
+              "column": 0,
+              "text": "Harvest",
+              "rowspan": 1,
+              "colspan": 1,
+              "header": false
+            },
+            {
+              "row": 2,
+              "column": 1,
+              "text": "281",
+              "rowspan": 1,
+              "colspan": 1,
+              "header": false
+            },
+            {
+              "row": 2,
+              "column": 2,
+              "text": "kg",
+              "rowspan": 1,
+              "colspan": 1,
+              "header": false
+            },
+            {
+              "row": 3,
+              "column": 0,
+              "text": "Height",
+              "rowspan": 1,
+              "colspan": 1,
+              "header": false
+            },
+            {
+              "row": 3,
+              "column": 1,
+              "text": "73",
+              "rowspan": 1,
+              "colspan": 1,
+              "header": false
+            },
+            {
+              "row": 3,
+              "column": 2,
+              "text": "m",
+              "rowspan": 1,
+              "colspan": 1,
+              "header": false
+            },
+            {
+              "row": 4,
+              "column": 0,
+              "text": "<b>Literal</b>",
+              "rowspan": 1,
+              "colspan": 1,
+              "header": false
+            },
+            {
+              "row": 4,
+              "column": 1,
+              "text": "52",
+              "rowspan": 1,
+              "colspan": 1,
+              "header": false
+            },
+            {
+              "row": 4,
+              "column": 2,
+              "text": "",
+              "rowspan": 1,
+              "colspan": 1,
+              "header": false
+            }
+          ],
+          "html": "<table>\n<caption>Table 2. Orchard field measurements</caption>\n<tr><th colspan=\"3\">ORCHARD MEASUREMENTS</th></tr>\n<tr><th>Metric</th><th>Recorded</th><th>Unit</th></tr>\n<tr><td>Harvest</td><td>281</td><td>kg</td></tr>\n<tr><td>Height</td><td>73</td><td>m</td></tr>\n<tr><td>&lt;b&gt;Literal&lt;/b&gt;</td><td>52</td><td></td></tr>\n</table>",
+          "crop_sha256": "24423a352e43b6a1f3d565e6c96f1f4e43417909340bf9575599885fb5df88da",
+          "crop_bytes": 50376,
+          "crop_dimensions": [
+            1452,
+            766
+          ]
+        }
+      ]
+    },
+    {
+      "repetition": 5,
+      "seconds": 4.697436135999851,
+      "per_page_seconds": 2.3487180679999256,
+      "peak_rss_kib": 576332,
+      "quality_pass": true,
+      "tables": [
+        {
+          "page": 1,
+          "source_box": [
+            58.0,
+            87.33333333333333,
+            542.0,
+            342.6666666666667
+          ],
+          "cells": [
+            {
+              "row": 0,
+              "column": 0,
+              "text": "ORCHARD MEASUREMENTS",
+              "rowspan": 1,
+              "colspan": 3,
+              "header": true
+            },
+            {
+              "row": 1,
+              "column": 0,
+              "text": "Metric",
+              "rowspan": 1,
+              "colspan": 1,
+              "header": true
+            },
+            {
+              "row": 1,
+              "column": 1,
+              "text": "Recorded",
+              "rowspan": 1,
+              "colspan": 1,
+              "header": true
+            },
+            {
+              "row": 1,
+              "column": 2,
+              "text": "Unit",
+              "rowspan": 1,
+              "colspan": 1,
+              "header": true
+            },
+            {
+              "row": 2,
+              "column": 0,
+              "text": "Harvest",
+              "rowspan": 1,
+              "colspan": 1,
+              "header": false
+            },
+            {
+              "row": 2,
+              "column": 1,
+              "text": "9100",
+              "rowspan": 1,
+              "colspan": 1,
+              "header": false
+            },
+            {
+              "row": 2,
+              "column": 2,
+              "text": "kg",
+              "rowspan": 1,
+              "colspan": 1,
+              "header": false
+            },
+            {
+              "row": 3,
+              "column": 0,
+              "text": "Height",
+              "rowspan": 1,
+              "colspan": 1,
+              "header": false
+            },
+            {
+              "row": 3,
+              "column": 1,
+              "text": "52",
+              "rowspan": 1,
+              "colspan": 1,
+              "header": false
+            },
+            {
+              "row": 3,
+              "column": 2,
+              "text": "m",
+              "rowspan": 1,
+              "colspan": 1,
+              "header": false
+            },
+            {
+              "row": 4,
+              "column": 0,
+              "text": "<b>Literal</b>",
+              "rowspan": 1,
+              "colspan": 1,
+              "header": false
+            },
+            {
+              "row": 4,
+              "column": 1,
+              "text": "73",
+              "rowspan": 1,
+              "colspan": 1,
+              "header": false
+            },
+            {
+              "row": 4,
+              "column": 2,
+              "text": "",
+              "rowspan": 1,
+              "colspan": 1,
+              "header": false
+            }
+          ],
+          "html": "<table>\n<caption>Table 1. Orchard field measurements</caption>\n<tr><th colspan=\"3\">ORCHARD MEASUREMENTS</th></tr>\n<tr><th>Metric</th><th>Recorded</th><th>Unit</th></tr>\n<tr><td>Harvest</td><td>9100</td><td>kg</td></tr>\n<tr><td>Height</td><td>52</td><td>m</td></tr>\n<tr><td>&lt;b&gt;Literal&lt;/b&gt;</td><td>73</td><td></td></tr>\n</table>",
+          "crop_sha256": "565450e7f27811f8feb8cc54f0ee013d71c50a0896cf75d44f32ab602e413da4",
+          "crop_bytes": 51527,
+          "crop_dimensions": [
+            1452,
+            766
+          ]
+        },
+        {
+          "page": 2,
+          "source_box": [
+            58.0,
+            87.33333333333333,
+            542.0,
+            342.6666666666667
+          ],
+          "cells": [
+            {
+              "row": 0,
+              "column": 0,
+              "text": "ORCHARD MEASUREMENTS",
+              "rowspan": 1,
+              "colspan": 3,
+              "header": true
+            },
+            {
+              "row": 1,
+              "column": 0,
+              "text": "Metric",
+              "rowspan": 1,
+              "colspan": 1,
+              "header": true
+            },
+            {
+              "row": 1,
+              "column": 1,
+              "text": "Recorded",
+              "rowspan": 1,
+              "colspan": 1,
+              "header": true
+            },
+            {
+              "row": 1,
+              "column": 2,
+              "text": "Unit",
+              "rowspan": 1,
+              "colspan": 1,
+              "header": true
+            },
+            {
+              "row": 2,
+              "column": 0,
+              "text": "Harvest",
+              "rowspan": 1,
+              "colspan": 1,
+              "header": false
+            },
+            {
+              "row": 2,
+              "column": 1,
+              "text": "281",
+              "rowspan": 1,
+              "colspan": 1,
+              "header": false
+            },
+            {
+              "row": 2,
+              "column": 2,
+              "text": "kg",
+              "rowspan": 1,
+              "colspan": 1,
+              "header": false
+            },
+            {
+              "row": 3,
+              "column": 0,
+              "text": "Height",
+              "rowspan": 1,
+              "colspan": 1,
+              "header": false
+            },
+            {
+              "row": 3,
+              "column": 1,
+              "text": "73",
+              "rowspan": 1,
+              "colspan": 1,
+              "header": false
+            },
+            {
+              "row": 3,
+              "column": 2,
+              "text": "m",
+              "rowspan": 1,
+              "colspan": 1,
+              "header": false
+            },
+            {
+              "row": 4,
+              "column": 0,
+              "text": "<b>Literal</b>",
+              "rowspan": 1,
+              "colspan": 1,
+              "header": false
+            },
+            {
+              "row": 4,
+              "column": 1,
+              "text": "52",
+              "rowspan": 1,
+              "colspan": 1,
+              "header": false
+            },
+            {
+              "row": 4,
+              "column": 2,
+              "text": "",
+              "rowspan": 1,
+              "colspan": 1,
+              "header": false
+            }
+          ],
+          "html": "<table>\n<caption>Table 2. Orchard field measurements</caption>\n<tr><th colspan=\"3\">ORCHARD MEASUREMENTS</th></tr>\n<tr><th>Metric</th><th>Recorded</th><th>Unit</th></tr>\n<tr><td>Harvest</td><td>281</td><td>kg</td></tr>\n<tr><td>Height</td><td>73</td><td>m</td></tr>\n<tr><td>&lt;b&gt;Literal&lt;/b&gt;</td><td>52</td><td></td></tr>\n</table>",
+          "crop_sha256": "24423a352e43b6a1f3d565e6c96f1f4e43417909340bf9575599885fb5df88da",
+          "crop_bytes": 50376,
+          "crop_dimensions": [
+            1452,
+            766
+          ]
+        }
+      ]
+    }
+  ],
+  "recorded_at": "2026-10-28T00:52:08.618334+00:00",
+  "exit_code": 0,
+  "runtime_image": "sha256:329b88176cef2dca6651ab25891e7ff10c00f5624fc0712387ca8cd2ca832d9d",
+  "oom_killed": false,
+  "image_size_bytes": 1129416663,
+  "guard_script_sha256": "9d7173e92b5d1a47a0d502d667a3c892d5adc3f38d8938eedaa213a0a53a2536",
+  "docker_guards": {
+    "NetworkMode": "none",
+    "Memory": 3221225472,
+    "NanoCpus": 2000000000,
+    "ReadonlyRootfs": true,
+    "PidsLimit": 128,
+    "CapDrop": [
+      "ALL"
+    ],
+    "SecurityOpt": [
+      "no-new-privileges"
+    ],
+    "Tmpfs": {
+      "/tmp": "rw,noexec,nosuid,nodev,size=134217728"
+    },
+    "Binds": [
+      "/home/logan78/desktop x/devRAG/ragflow-logs/deepdoc-models:/models:ro",
+      "/home/logan78/desktop x/devRAG/test/fixtures/phase6:/fixtures:ro",
+      "/home/logan78/desktop x/devRAG/scripts/probe/phase6_tables_guard.py:/guard.py:ro"
+    ]
+  },
+  "per_page_method": "Whole two-page parse elapsed/2; nearest-rank p95 across five repetitions. Raw document durations retained.",
+  "trial_cap_note": "3 GiB retained pending audio and full-corpus guard; fixed table source is not production capacity proof."
+}

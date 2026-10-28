@@ -6,6 +6,7 @@ from collections.abc import Mapping
 from dataclasses import dataclass
 
 from rag.parsers.types import PageBox
+from rag.parsers.tables import Table
 
 
 @dataclass(frozen=True)
@@ -15,3 +16,4 @@ class Chunk:
     page_sizes: Mapping[int, tuple[float, float]]
     token_num: int
     index: int
+    tables: tuple[Table, ...] = ()

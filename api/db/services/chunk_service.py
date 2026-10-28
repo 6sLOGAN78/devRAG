@@ -55,7 +55,9 @@ MAX_CHUNK_CHARS = 32000
 WRITE_DEADLINE_SECONDS = 40.0
 _RUNNING = "1"
 _ENABLED = "1"
-_LIST_FIELDS = ["content_with_weight", "position_int", "origin_kwd", "available_int", "page_dims_flt", "order_int"]
+from rag.parsers.table_features import TABLE_FIELD, tables_of
+
+_LIST_FIELDS = ["content_with_weight", "position_int", "origin_kwd", "available_int", "page_dims_flt", "order_int", TABLE_FIELD]
 
 
 def _not_found() -> ServiceError:
@@ -85,6 +87,7 @@ def chunk_dto(source: dict[str, Any]) -> dict[str, Any]:
         "positions": positions_of(source),
         "origin": str(source.get("origin_kwd") or ORIGIN_PARSED),
         "enabled": int(source.get("available_int", 1)) == 1,
+        **({"tables": tables_of(source)} if source.get(TABLE_FIELD) else {}),
     }
 
 
@@ -308,6 +311,8 @@ def update_chunk(
 
     values: dict[str, Any] = {}
     if clean is not None:
+        if stored.get(TABLE_FIELD):
+            values[TABLE_FIELD] = ""
         vector = _embed(settings, visible, clean)  # any failure ends here: nothing has been written
         _check_deadline(started)
         values.update(

@@ -1,0 +1,49 @@
+{
+  "recorded_at": "2026-10-28T00:18:00.608200+00:00",
+  "source": "actual approved native-container ONNXRuntime session metadata",
+  "revision": "9c7aa2c730d7a242d7f04cf6109a6a239aefc717",
+  "artifact": {
+    "sha256": "1585f88015c60209f16a079a26d944afca790ab7022fe7d0574113ccb9a6f9b4",
+    "bytes": 12243033
+  },
+  "inputs": [
+    {
+      "name": "images",
+      "shape": [
+        1,
+        3,
+        640,
+        640
+      ],
+      "type": "tensor(float)"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "output0",
+      "shape": [
+        1,
+        11,
+        8400
+      ],
+      "type": "tensor(float)"
+    }
+  ],
+  "score_channels": [
+    "table",
+    "table column",
+    "table row",
+    "table column header",
+    "table projected row header",
+    "table spanning cell",
+    "table grid cell"
+  ],
+  "embedded_license": "Apache-2.0 http://www.apache.org/licenses/LICENSE-2.0",
+  "local_reference_commit": "6677f14bdff0e80b29ec94378ebd02a9c4ef8d54",
+  "reference_wrapper_difference": "Six named labels; exact artifact contains a seventh grid-cell class. Explicit adapter handles all seven.",
+  "preprocessing": "RGB resize640x640, float32/255, CHW; cxcywh boxes in tensor pixels with seven class scores and no objectness channel",
+  "score_threshold": 0.2,
+  "class_aware_nms_iou": 0.2,
+  "source_evidence": "ragflow-logs/phase6-06-raw-tensors.json",
+  "quality_correction": "Observed vector/raster rules refine agreeing model row/column anchors; no model/fixture/threshold substitution."
+}
