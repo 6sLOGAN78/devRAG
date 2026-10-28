@@ -1,0 +1,25 @@
+{
+  "origin": "Original hand-authored paper fixture frozen before implementation.",
+  "sections": [
+    "Abstract",
+    "1 Introduction",
+    "2 Methods",
+    "2.1 Measurements",
+    "References"
+  ],
+  "facts": [
+    "ABSTRACT FACT: lighthouse height is 52 metres.",
+    "INTRODUCTION FACT: orchard harvest is 9100 kilograms.",
+    "The introduction of methods in body text is not a heading.\nMETHOD FACT: calibration offset is 73 units.",
+    "MEASUREMENT FACT: archive holds 730 maps.",
+    "REFERENCE FACT: report identifier is 881."
+  ],
+  "method_pages": [
+    1,
+    2
+  ],
+  "sha256": {
+    "paper-original.md": "69f446aa036e81b4ba26892192b1ce5bdcb796d2f8fd6cf13029c17eb11c56ba",
+    "paper-original.pdf": "04749512be89e08a180684e307415943a7ddc680d973028416425cd77a655158"
+  }
+}

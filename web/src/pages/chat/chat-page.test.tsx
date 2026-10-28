@@ -81,7 +81,7 @@ describe("ChatPage shell", () => {
   it("closes the mobile rail before opening the assistant dialog", async () => {
     vi.stubGlobal("matchMedia", (media: string) => ({ matches: false, media, addEventListener: vi.fn(), removeEventListener: vi.fn() }));
     context.mount(); fireEvent.click(screen.getByTestId("rail-open")); await ready(); fireEvent.click(screen.getByTestId("rail-assistant-new"));
-    await waitUntil(() => screen.queryByTestId("field-assistant-name")); expect(screen.getAllByRole("dialog")).toHaveLength(1);
+    await waitUntil(() => screen.queryByTestId("field-assistant-name") === document.activeElement); expect(screen.getAllByRole("dialog")).toHaveLength(1);
     expect(screen.queryByTestId("chat-rail")).toBeNull(); expect(screen.getByTestId("field-assistant-name")).toHaveFocus();
     fireEvent.click(screen.getByTestId("assistant-close")); await waitUntil(() => document.activeElement === screen.getByTestId("rail-open"));
   });

@@ -132,7 +132,7 @@ def _parse_and_chunk(ctx: TaskContext, deps: PipelineDeps, control: TaskControl,
         options = {"settings": deps.settings, "parser_config": ctx.parser_config} if spec.name == "pdf" else ({"settings": deps.settings} if spec.name in {"docx", "pptx"} else {})
         if ctx.parser_id == "qa" and spec.name == "xlsx":
             options["structured_records"] = True
-        if ctx.parser_id == "one" and spec.name == "pdf":
+        if ctx.parser_id in {"one", "paper"} and spec.name == "pdf":
             from rag.parsers.page_selection import selected_ranges
             from rag.parsers.errors import FileTooLarge
 

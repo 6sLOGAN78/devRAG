@@ -587,7 +587,7 @@ Scope notes: this is the PROJECT.md Core Value. No Phase 6, 7 or 8 work starts u
 
 **Planning status (2026-10-27):** Research and UI contract complete; structural checks30/30,90 task verifications,58/58 primary requirements plus RETR-13 producer handoff covered. No Phase6 native package/model acquisition or paid inference performed. Automatic entry completed the read-only audit/preparation and stops at the exact-candidate blocking-human approval in06-01 Task2.20 audit-tool tests pass; native acquisition/features have not started. Phase5 human UAT and Phase4 B36 remain pending.
 
-**Execution status (2026-10-28):** 10/30 plans complete. EPUB/Book verified: full unit2605/8existing skips,web2163,Go,worker2,browser1,stack36,services84,routes166,leaks6; CI7/generated/security/admission pass. Zero paid calls. Next11 Paper sections; full phase gate and human validation pending.
+**Execution status (2026-10-28):** 11/30 plans complete. Paper verified: unit2621/8existing skips,web2164,Go,worker2,browser1,stack39,services84,routes-leaks172,CI7/security/generated/admission. Zero paid calls. Next12 Laws/Chinese normalization; full phase gate and human validation pending.
 
 **Wave 1** *(admission audit and blocking-human acquisition checkpoint)*
 
@@ -621,7 +621,7 @@ Scope notes: this is the PROJECT.md Core Value. No Phase 6, 7 or 8 work starts u
 - [x] 06-10-PLAN.md — Read EPUB books in chapter order
 **Wave 11** *(blocked on Wave 10 completion and accepted06-01 snapshot)*
 
-- [ ] 06-11-PLAN.md — Read academic papers by section
+- [x] 06-11-PLAN.md — Read academic papers by section
 **Wave 12** *(blocked on Wave 11 completion and accepted06-01 snapshot)*
 
 - [ ] 06-12-PLAN.md — Read legal structure and normalize Chinese text
@@ -753,6 +753,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8. Ph
 | 3. Models, Knowledge Bases and Upload | 31/31 | Complete | 2026-10-10 |
 | 4. Ingestion Pipeline | 35/35 | Human verification pending (B-36 deferred) | 2026-10-19 |
 | 5. Retrieval and Cited Chat (Core Value Gate) | 28/28 | Automated gate passed; human review pending | 2026-10-27 |
-| 6. Deep Parsing and Chunking Breadth | 10/30 | Executing; EPUB and Book passed | - |
+| 6. Deep Parsing and Chunking Breadth | 11/30 | Executing; Paper passed | - |
 | 7. Agents and Workflows | 0/TBD | Not started | - |
 | 8. Go Surface, CLI, Integrations, Billing and Production Deployment | 0/TBD | Not started | - |
