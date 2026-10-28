@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Phase6 plan09 verified; continuing10
-last_updated: "2026-10-28T06:58:06.980000+00:00"
-last_activity: 2026-10-28 -- Structured JSON/CSV/QA verified; continuing10
+stopped_at: Phase6 plan10 verified; continuing11
+last_updated: "2026-10-28T08:18:49.995818+00:00"
+last_activity: 2026-10-28 -- EPUB/Book verified; continuing11
 progress:
   total_phases: 8
   completed_phases: 4
   total_plans: 176
-  completed_plans: 155
-  percent: 88
+  completed_plans: 156
+  percent: 89
 ---
 
 # Project State
@@ -21,18 +21,18 @@ progress:
 See: .planning/PROJECT.md (updated 2026-10-05)
 
 **Core value:** A user can upload a document into a knowledge base and get an accurate, cited answer to a question about it, end-to-end through the real pipeline (parse, chunk, embed, index, hybrid retrieve, rerank, generate), with no mocked stages.
-**Current focus:** Phase 6 execution — 06-10 EPUB books and chapter order
+**Current focus:** Phase 6 execution — 06-11 academic paper sections
 
 ## Current Position
 
 Phase: 6 (deep-parsing-and-chunking-breadth) — EXECUTING
-Plan: 10 of 30; plans01–09 complete; EPUB/Book next
-Status: Plans01–09 complete; R232..240 recorded. Final09 unit2572/8existing skips plus23focused,web2162,Go internal,stack34,services104,routes70,leaks6; CI/generated/security/admission pass. Zero paid calls. Continue10.
+Plan: 11 of 30; plans01–10 complete; Paper next
+Status: Plans01–10 complete; R232..241 recorded. Full10 unit2605/8existing skips,web2163,Go,worker2,browser1,stack36,services84,routes166,leaks6; CI7/generated/security/admission green. Zero paid calls.
 Prior checks: Phase5 UAT5/6 passed (two user answer judgments and delegated screenshot/Chinese/footprint review). Final Phase5 acceptance remains pending; Phase4 B36 remains separately deferred. Prior paid evidence retained.
-Current checkpoint:09 verified: bounded structured records and exact atomic Q&A, question index field and real saved-choice/retrieval journey. Continue10; publication authorization persists.
+Current checkpoint:10 verified; safe EPUB/Book chapter sources and real retrieval. Continue11; publication authorization persists.
 Last activity: 2026-10-28
 
-Progress: 155/176 currently planned execution plans complete (88%); Phase6 9/30 complete.
+Progress: 156/176 currently planned execution plans complete (89%); Phase6 10/30 complete.
 
 ## Performance Metrics
 
@@ -190,7 +190,7 @@ Recent decisions affecting current work:
 - [Phase 03]: 03-31: the dataset workspace page binds the workspace by ref (boundTenantRef is written before the store switch; the leave-for-/datasets effect reads the store and compares it with the ref, so a deep link into a joined workspace stays and only a user switch navigates); a deep-link switch goes through the store's bindActive/bound flag so the header selector announces it; the sidebar marks Datasets on /dataset/ paths through Link plus isNavActive (NavLink cannot); document-table copy is under datasets.files.* (documents.* collides with the copy scan); UI-11 and UI-12 complete
 - [Phase 03]: 03-26: the browser tiers never see the real provider key (Node fake provider for vitest, Python fake_provider_stack for Chrome; 0 real provider calls); real-Chrome presses are real mouse events that wait for document.getAnimations() to settle and run in a 1280x900 metrics override (headless default viewport put dialog buttons off-screen); the throttled 12 MiB upload (1 MiB/s, >10 s) proves the upload call's timeout 0; the window drop guard could not be confirmed in headless Chrome (an unguarded page does not navigate on a CDP drop) and stays jsdom-only; SECRET_BULLETS renamed MASK_BULLETS so the secrets gate stays 7/7
 - [Phase 03]: 03-29: the phase exit gate (`scripts/clean_room.sh --runs 3`, port 8088, key present, `live-model` included) passed three consecutive runs on attempt 4 (746, 782, 762 s); the Go cross-tenant matrix covers owner-go rows only (R-153, Python matrix is the superset); tamper tests flip a fully significant base64 character; a provider ERROR_TIMEOUT on the first gate attempt was transient and nothing was loosened
-- [Phase 04]: Phase 4 Plan 03: too_many_chunks is a terminal failure code (R-155)
+- [Phase 04]: Phase 4 Plan 03: too_many_chunks is a terminal failure code (R-156)
 - [Phase 04]: 04-10: start refuses in a fixed order across all ids, re-checks not-running under the dataset lock before pruning the index; cancel settles totals only for cancelled documents
 - [Phase 4]: 04-11: run_pipeline is synchronous and leaves task_limiter and mark_task_done/failure-line persistence to the 04-12 executor; PLAIN_MESSAGES lives in common/ingest_codes.py
 - [Phase ?]: 04-12: user cancel keeps indexed chunks; lock released before republish; roll-up reads latest [pages]/[skipped] per task

@@ -15,7 +15,7 @@ describe("assistant and chat rail", () => {
   afterEach(() => { cleanup(); context.client.clear(); http.defaults.adapter = adapter; useWorkspaceStore.getState().reset(); useUserStore.getState().reset(); vi.unstubAllGlobals(); });
   const ready = () => waitUntil(() => screen.queryAllByTestId("rail-assistant-row").length > 0);
   it("auto-selects the first assistant with replace", async () => {
-    const { router } = context.mount(); await ready(); await waitUntil(() => router.state.location.search.includes(A));
+    const { router } = context.mount(); await ready(); await waitUntil(() => router.state.location.search.includes(A) && screen.queryAllByTestId("rail-assistant-row")[0]?.getAttribute("aria-current") === "true");
     expect(router.state.historyAction).toBe("REPLACE"); expect(screen.getAllByTestId("rail-assistant-row")[0]).toHaveAttribute("aria-current", "true");
   });
   it("keeps both valid parameters on a reload", async () => {
@@ -69,6 +69,7 @@ describe("assistant and chat rail", () => {
   });
   it("retains keyboard focus on Next while fetching the last assistant page", async () => {
     setAssistants(context.server, Array.from({ length: 21 }, (_, i) => assistantRow(i + 1))); context.mount(); await ready();
+    await waitUntil(() => screen.queryByTestId("chat-input") === document.activeElement);
     const next = within(screen.getByRole("navigation", { name: "Assistant pages" })).getByRole("button", { name: "Next" }); next.focus();
     let release = () => {}; context.server.holds["GET /api/v1/chats"] = new Promise<void>((resolve) => { release = resolve; });
     await userEvent.keyboard("{Enter}"); await waitUntil(() => context.server.callsTo("GET", "/api/v1/chats").some((call) => call.params?.page === 2)); expect(next).toHaveFocus();

@@ -128,6 +128,12 @@ async def test_every_family_probe_follows_the_generated_policy(probe: Any) -> No
     """Each family probe `prefixprobe-<uuid>` answers 401 unless the family is declared auth none."""
     path = probe.request_path(token=f"prefixprobe-{uuid.uuid4().hex}")
     resp = await real_app().test_client().get(path)
+    expected = policy_for("GET", path)
+    if path == "/api/v1/pipelines" or (path.startswith("/api/v1/pipelines/") and path.count("/") == 4):
+        # Exact public GET catalog routes belong to Go; the Python router has no controller.
+        assert (expected.owner, expected.auth) == ("go", "none")
+        assert resp.status_code == 404
+        return
     if probe.auth == "none":
         assert resp.status_code != 401, f"{probe.id} is a public family"
     else:

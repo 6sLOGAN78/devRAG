@@ -1,0 +1,23 @@
+{
+  "origin": "Original fixture authored for Phase 6; no third party content. Frozen before implementation.",
+  "sha256": "c48a56d93f5a94a2f3f3eb85c9b6a59c16a47370cc81ff0ed2b171680ab2e485",
+  "spine": [
+    "OPS/z-lighthouse.xhtml",
+    "OPS/a-orchard.xhtml"
+  ],
+  "chapter_paths": [
+    [
+      "Field guide",
+      "Coast",
+      "Lighthouse"
+    ],
+    [
+      "Field guide",
+      "Orchard"
+    ]
+  ],
+  "facts": [
+    "The Brantwell-6130 lighthouse stands 52 metres above Corvane Bay.",
+    "The Oskarine-8847 orchard harvested 9100 kilograms of quinces."
+  ]
+}

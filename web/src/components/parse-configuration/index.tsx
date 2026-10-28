@@ -12,6 +12,7 @@ export interface ParseConfigurationProps {
   disabled?: boolean;
   wholeDocument?: boolean;
   questionAnswer?: boolean;
+  book?: boolean;
   /** A refusal placed by the server under one field: the finished sentence, shown as a text node. */
   answers?: Partial<Record<ParseConfigField, string>>;
   /** Called when the reader edits a field, so its server answer can be cleared. */
@@ -49,7 +50,7 @@ function NotYetRows() {
  * The settings of the General method: chunk size, delimiters and overlap, then the read-only "Not available yet" rows.
  * The delimiter field shows and takes `\n` and `\t` as typed text; the schema turns them into real characters.
  */
-export function ParseConfiguration({ control, disabled = false, wholeDocument = false, questionAnswer = false, answers = {}, onEdit }: ParseConfigurationProps) {
+export function ParseConfiguration({ control, disabled = false, wholeDocument = false, questionAnswer = false, book = false, answers = {}, onEdit }: ParseConfigurationProps) {
   const { t } = useTranslation();
   return (
     <div className="flex flex-col gap-4">
@@ -76,6 +77,7 @@ export function ParseConfiguration({ control, disabled = false, wholeDocument = 
           <FormMessage /><ServerFieldError text={answers.pageRanges ?? null} />
         </FormItem>
       )} />
+      {book ? <p data-testid="book-settings-note" className="text-sm text-muted-foreground">{t("datasets.chunking.bookSettings")}</p> : null}
       {questionAnswer ? <p data-testid="qa-pair-settings" className="text-sm text-muted-foreground">{t("datasets.chunking.qaSettings")}</p> : null}
       {wholeDocument ? <p data-testid="one-document-settings" className="text-sm text-muted-foreground">{t("datasets.chunking.oneSettings")}</p> : null}
       <FormField
@@ -117,7 +119,7 @@ export function ParseConfiguration({ control, disabled = false, wholeDocument = 
                 {...field}
                 autoComplete="off"
                 spellCheck={false}
-                disabled={disabled || wholeDocument || questionAnswer}
+                disabled={disabled || wholeDocument || questionAnswer || book}
                 data-testid="field-delimiters"
                 className="font-mono"
                 onChange={(event) => {
@@ -146,7 +148,7 @@ export function ParseConfiguration({ control, disabled = false, wholeDocument = 
                 min={OVERLAP_MIN}
                 max={OVERLAP_MAX}
                 step={1}
-                disabled={disabled || wholeDocument || questionAnswer}
+                disabled={disabled || wholeDocument || questionAnswer || book}
                 data-testid="field-overlap"
                 onChange={(event) => {
                   onEdit?.("overlap");

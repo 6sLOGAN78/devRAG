@@ -33,7 +33,7 @@
     "description": "Follow chapters and sections.",
     "parser_id": "book",
     "parser_config": {},
-    "available": false
+    "available": true
   },
   {
     "id": "laws",

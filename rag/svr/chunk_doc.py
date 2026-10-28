@@ -68,6 +68,9 @@ def build_row(
     boxes = chunk.positions
     pages = sorted({int(box.page) for box in boxes})
     features = {}
+    if chunk.sections:
+        features["section_paths_kwd"] = list(dict.fromkeys(" / ".join(s.path) for s in chunk.sections))
+        features["source_paths_kwd"] = list(dict.fromkeys(s.source_path for s in chunk.sections if s.source_path))
     if chunk.question:
         features["question_tks"] = " ".join(tokenize(chunk.question))
     if chunk.source_lines:

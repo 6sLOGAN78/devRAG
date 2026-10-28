@@ -31,6 +31,7 @@ PARSERS: tuple[ParserSpec, ...] = (
     ParserSpec("markdown", frozenset({"md", "markdown"}), "rag.parsers.markdown"),
     ParserSpec("json", frozenset({"json"}), "rag.parsers.json"),
     ParserSpec("csv", frozenset({"csv"}), "rag.parsers.csv"),
+    ParserSpec("epub", frozenset({"epub"}), "rag.parsers.epub"),
     ParserSpec("txt", frozenset({"txt"}), "rag.parsers.txt"),
 )
 

@@ -32,7 +32,7 @@
         },
         "book": {
           "title": "书籍",
-          "body": "按章节切分。"
+          "body": "适用于 EPUB 和含标题的文档，保留章节顺序与层级。"
         },
         "laws": {
           "title": "法律",
@@ -106,7 +106,8 @@
         "loadHeading": "无法加载分块设置"
       },
       "oneSettings": "整个文档不按分块大小、分隔符或重叠比例拆分。PDF 页码选择和版面分析仍然适用。",
-      "qaSettings": "每组问题与答案保留为一个分块。请使用 Question 和 Answer 列，或 Question:/Answer: 文本对。分块设置不会拆分问答对。"
+      "qaSettings": "每组问题与答案保留为一个分块。请使用 Question 和 Answer 列，或 Question:/Answer: 文本对。分块设置不会拆分问答对。",
+      "bookSettings": "按 EPUB 书脊顺序和章节标题分块。大章节在所属章节内按块大小拆分；分隔符和重叠不适用。"
     }
   },
   "errors": {

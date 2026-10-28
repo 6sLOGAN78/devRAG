@@ -1,0 +1,103 @@
+{
+  "recorded_at": "2026-10-28T08:18:49.995818+00:00",
+  "plan": "06-10",
+  "paid_calls": 0,
+  "new_packages": 0,
+  "new_models": 0,
+  "python_existing_skips": 8,
+  "human_uat_approved": false,
+  "phase_gate_complete": false,
+  "evidence": {
+    "python_unit": {
+      "log": "ragflow-logs/phase6-10-unit-all.log",
+      "sha256": "4dbc22d4ee1e09e3a8eec6a43f9c5ac8614bc78884d834180ee01004dc3e626f",
+      "passed": 2605
+    },
+    "frontend": {
+      "log": "ragflow-logs/phase6-10-web-final.log",
+      "sha256": "e6c641f823de2da170b28dd09e1548d12030d1ad77db060c7035a7c4980c0e24",
+      "passed": 2163
+    },
+    "go": {
+      "log": "ragflow-logs/phase6-10-go.log",
+      "sha256": "a652078d6af6d752fd7cab6fc0796fdfaa8e149ecaadd53ff9636683365b5e27",
+      "passed": null
+    },
+    "worker": {
+      "log": "ragflow-logs/phase6-10-integration-final.log",
+      "sha256": "2b1de2f830d76664f66cfe4e0a619a803504508f18fb395c3ece000468f23876",
+      "passed": 2
+    },
+    "browser": {
+      "log": "ragflow-logs/phase6-10-browser.log",
+      "sha256": "7b82f28c96173a16ce2449240138a6400d96d0582022db96b90a0d195f67c816",
+      "passed": 1
+    },
+    "stack_regressions": {
+      "log": "ragflow-logs/phase6-10-stack-regressions.log",
+      "sha256": "de8d8acc151e911f90eaa3238de2e40268b96548057c01fbb3e287ecee99e2a4",
+      "passed": 36
+    },
+    "services": {
+      "log": "ragflow-logs/phase6-10-services-final.log",
+      "sha256": "d7ddb415dafd6aeb61eb428162a10cdf2549c4cb70ea8e2b7187a037052582d4",
+      "passed": 84
+    },
+    "routes": {
+      "log": "ragflow-logs/phase6-10-routes-final.log",
+      "sha256": "5eae5459c196b5a9bce7c48b5e5e9b9faaa9f14b293bf222227ddc76b2aa3576",
+      "passed": 166
+    },
+    "leaks": {
+      "log": "ragflow-logs/phase6-10-leaks.log",
+      "sha256": "56531b1c8165b669fde8c688389568892772a7147100f99620abba574a1e43bd",
+      "passed": 6
+    },
+    "ci": {
+      "log": "ragflow-logs/phase6-10-ci-final.log",
+      "sha256": "b9982edc352d0dd4f9168a38fdd6a0102b4583f06505e7a3606cf236d759c736",
+      "passed": 7
+    },
+    "security": {
+      "log": "ragflow-logs/phase6-10-security-final.log",
+      "sha256": "35ae83fb2d63969e1665d88aa247f8dce682613fa2d31b941cd34d7628ee0b44",
+      "passed": null
+    },
+    "openapi": {
+      "log": "ragflow-logs/phase6-10-openapi.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "passed": null
+    },
+    "admission": {
+      "log": "ragflow-logs/phase6-10-admission.log",
+      "sha256": "920b07e40447627f9d1bae1d17fe957b7152d5d9afe5fb5be2998a4eadad947d",
+      "passed": null
+    }
+  },
+  "containers": [
+    {
+      "name": "devrag-stack-app-1",
+      "image": "sha256:12964faf80714ad3c360d4e8ca441c92540a73bc5e3f4e74df9e61c4c1ae8592",
+      "health": "healthy",
+      "started_at": "2026-10-28T08:14:22.212466397Z"
+    },
+    {
+      "name": "devrag-stack-task-executor-3",
+      "image": "sha256:12964faf80714ad3c360d4e8ca441c92540a73bc5e3f4e74df9e61c4c1ae8592",
+      "health": "healthy",
+      "started_at": "2026-10-28T08:14:21.877055194Z"
+    },
+    {
+      "name": "devrag-stack-deepdoc-1",
+      "image": "sha256:39218360f308079f307f12d27544c3ce98dbb48b9461c27777ab92c40d1ad4ed",
+      "health": "healthy",
+      "started_at": "2026-10-28T08:14:22.053798389Z"
+    }
+  ],
+  "screenshot": {
+    "path": "output/playwright/phase6-review/epub-book-source.png",
+    "sha256": "cb5473e82e55ae27089abf9d232642977af2ec8afaa19add5632e1194c4a3e71",
+    "reviewer": "assistant, actual Chrome"
+  },
+  "dependency_base": "06-08-BASE-RUNTIME.json"
+}

@@ -32,7 +32,7 @@
         },
         "book": {
           "title": "Book",
-          "body": "Follows chapters and sections."
+          "body": "EPUB books and heading-based documents; preserves chapter order and ancestry."
         },
         "laws": {
           "title": "Laws",
@@ -106,7 +106,8 @@
         "loadHeading": "Couldn't load the chunking settings"
       },
       "oneSettings": "Chunk size, delimiters and overlap do not split One document. PDF page selection and layout still apply.",
-      "qaSettings": "Each question and answer stays in one chunk. Use Question and Answer columns, or Question:/Answer: text pairs. Split settings do not divide a pair."
+      "qaSettings": "Each question and answer stays in one chunk. Use Question and Answer columns, or Question:/Answer: text pairs. Split settings do not divide a pair.",
+      "bookSettings": "Follows EPUB spine order and chapter headings. Large sections split within their parent chapter; chunk size applies. Delimiters and overlap do not apply."
     }
   },
   "errors": {

@@ -40,6 +40,11 @@ def parse(
         raise FileDamaged() from None
     if len(data) > limits.max_text_bytes:
         raise FileTooLarge()
+    return iter(parse_markup(data))
+
+
+def parse_markup(data: bytes) -> list[ParsedBlock]:
+    """Inert bounded-by-caller markup extraction, shared with EPUB members."""
     markup = _decode(data)
     soup = BeautifulSoup(markup, "lxml")
     for node in soup.find_all(string=lambda s: isinstance(s, Comment)):
@@ -59,11 +64,12 @@ def parse(
         else:
             text = _text(tag)
         if text:
-            blocks.append(ParsedBlock(text, "heading" if tag.name in _HEADINGS else "text"))
+            level = int(tag.name[1]) if tag.name in _HEADINGS else 0
+            blocks.append(ParsedBlock(text, "heading" if level else "text", heading_level=level))
     if not blocks:
         fallback = _text(soup)
         if fallback:
             blocks.append(ParsedBlock(fallback))
     if not blocks:
         raise NoReadableText()
-    return iter(blocks)
+    return blocks
