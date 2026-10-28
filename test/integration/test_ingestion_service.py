@@ -266,7 +266,7 @@ def test_an_image_is_parse_unavailable(settings, space, storage):
 def test_an_unimplemented_chunker_is_refused(settings, space, storage):
     owner, dataset = space
     doc = one_doc(settings, owner, dataset, storage)
-    sql("UPDATE `document` SET `parser_id` = 'qa' WHERE `id` = %s", (doc["id"],))
+    sql("UPDATE `document` SET `parser_id` = 'unbuilt-fixture' WHERE `id` = %s", (doc["id"],))
     err = refused(lambda: start(settings, owner, dataset, [doc["id"]]))
     assert (err.kind, err.reason) == (Kind.INVALID, "chunker_unavailable") and tasks(doc["id"]) == []
 

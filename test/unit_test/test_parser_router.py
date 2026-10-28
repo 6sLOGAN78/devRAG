@@ -21,7 +21,7 @@ def test_office_and_pdf_suffixes_map_to_their_parsers():
 
 
 def test_text_like_suffixes_map_to_txt():
-    for suffix in ("txt", "csv", "json"):
+    for suffix in ("txt",):
         assert router.parser_for_suffix(suffix).name == "txt"
 
 
@@ -47,7 +47,7 @@ def test_every_router_suffix_is_an_allowed_upload_extension():
 
 
 def test_loaders_are_dotted_module_paths_and_importing_router_is_light():
-    assert {spec.loader for spec in router.PARSERS} == {f"rag.parsers.{n}" for n in ("pdf", "docx", "xlsx", "pptx", "html", "txt", "markdown")}
+    assert {spec.loader for spec in router.PARSERS} == {f"rag.parsers.{n}" for n in ("pdf", "docx", "xlsx", "pptx", "html", "txt", "markdown", "json", "csv")}
 
 
 def test_types_are_frozen_and_report_caps_notes():

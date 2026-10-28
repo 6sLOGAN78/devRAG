@@ -29,7 +29,9 @@ PARSERS: tuple[ParserSpec, ...] = (
     ParserSpec("pptx", frozenset({"pptx"}), "rag.parsers.pptx"),
     ParserSpec("html", frozenset({"html", "htm"}), "rag.parsers.html"),
     ParserSpec("markdown", frozenset({"md", "markdown"}), "rag.parsers.markdown"),
-    ParserSpec("txt", frozenset({"txt", "csv", "json"}), "rag.parsers.txt"),
+    ParserSpec("json", frozenset({"json"}), "rag.parsers.json"),
+    ParserSpec("csv", frozenset({"csv"}), "rag.parsers.csv"),
+    ParserSpec("txt", frozenset({"txt"}), "rag.parsers.txt"),
 )
 
 _BY_SUFFIX: dict[str, ParserSpec] = {suffix: spec for spec in PARSERS for suffix in spec.suffixes}

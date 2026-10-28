@@ -101,7 +101,7 @@ describe("ChatPage shell", () => {
   it("deletes a stored chat from the header and returns to draft", async () => {
     const { router } = context.mount(`/chats?chat=${A}&session=${S}`); await waitUntil(() => screen.queryByTestId("chat-more"));
     await menu("chat-menu-delete-chat"); await waitUntil(() => screen.queryByTestId("delete-chat-confirm")); fireEvent.click(screen.getByTestId("delete-chat-confirm"));
-    await waitUntil(() => router.state.location.search === `?chat=${A}`); expect(screen.queryByRole("alertdialog")).toBeNull(); expect(screen.getByTestId("chat-draft")).toBeInTheDocument();
+    await waitUntil(() => router.state.location.search === `?chat=${A}` && screen.queryByTestId("chat-draft")); expect(screen.queryByRole("alertdialog")).toBeNull(); expect(screen.getByTestId("chat-draft")).toBeInTheDocument();
   });
   it("refetches the team count before deleting an assistant and selects another", async () => {
     setAssistants(context.server, [assistantRow(1, { permission: "team" }), assistantRow(2)]); setMembersWithChats(context.server, A, 2);

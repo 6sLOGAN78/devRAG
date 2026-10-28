@@ -1,0 +1,100 @@
+{
+  "recorded_at": "2026-10-28T06:58:06.980000+00:00",
+  "plan": "06-09",
+  "paid_calls": 0,
+  "new_packages": 0,
+  "new_models": 0,
+  "python_existing_skips": 8,
+  "human_uat_approved": false,
+  "phase_gate_complete": false,
+  "evidence": {
+    "python_unit": {
+      "log": "ragflow-logs/phase6-09-unit-all.log",
+      "sha256": "849c03cf75335b04b141e829f3f93558446b0c06474e0d2b46baaf5a31bb170e",
+      "passed": 2572
+    },
+    "final_focused_unit": {
+      "log": "ragflow-logs/phase6-09-unit-focused-final.log",
+      "sha256": "a0527b12b8884d9854b4384ff8b4f624e2ce706708b36724f29ae32a049f12a4",
+      "passed": 23
+    },
+    "frontend_unit": {
+      "log": "ragflow-logs/phase6-09-web-final.log",
+      "sha256": "05c223bb9c9e893205fc08dbbda4bf71850d938c4fba65b75da5ca78131d18ee",
+      "passed": 2162
+    },
+    "go_internal": {
+      "log": "ragflow-logs/phase6-09-go.log",
+      "sha256": "8ed54ecf0fbb410c33ccb543fb33372e9dd052f4b3769fae03abfde906e61876"
+    },
+    "new_stack": {
+      "log": "ragflow-logs/phase6-09-stack-first.log",
+      "sha256": "1082431b30dd5bff73869a447a53427ac3a99d021bcfec887f3d14adc9f58228",
+      "passed": 6
+    },
+    "stack_regressions": {
+      "log": "ragflow-logs/phase6-09-stack-regressions.log",
+      "sha256": "068c8f103ee823f51a75e35ed06622bf5c73d961672b9ff9d27a501abbce9fe5",
+      "passed": 34
+    },
+    "services": {
+      "log": "ragflow-logs/phase6-09-services-final.log",
+      "sha256": "549a290432d127efd86595074186152f0f09c8b48333389ddd64ff41eb09bc1b",
+      "passed": 104
+    },
+    "routes": {
+      "log": "ragflow-logs/phase6-09-routes.log",
+      "sha256": "3ce75e6301c45582a1350c7432b800d6e341fd15a9ae414010fe85a4c2a9ace3",
+      "passed": 70
+    },
+    "leaks": {
+      "log": "ragflow-logs/phase6-09-leaks.log",
+      "sha256": "850de87ab319069d6e54cb5ec753276e42f4c12b41eb4100bee4cc59f7e7db44",
+      "passed": 6
+    },
+    "ci": {
+      "log": "ragflow-logs/phase6-09-ci-current.log",
+      "sha256": "53a6741361b4dea86a01795f3f3c32eacd06b4885d4ccd08b49e8b157e1e43a7",
+      "passed": 7
+    },
+    "security": {
+      "log": "ragflow-logs/phase6-09-security-current.log",
+      "sha256": "35ae83fb2d63969e1665d88aa247f8dce682613fa2d31b941cd34d7628ee0b44"
+    },
+    "admission": {
+      "log": "ragflow-logs/phase6-09-admission.log",
+      "sha256": "920b07e40447627f9d1bae1d17fe957b7152d5d9afe5fb5be2998a4eadad947d"
+    },
+    "openapi": {
+      "log": "ragflow-logs/phase6-09-openapi.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  "containers": [
+    {
+      "name": "devrag-stack-app-1",
+      "image": "sha256:8737d9e363e0434cc81c8e4c2292f52ef9e964bd4784c3ccd2921073ac3092bb",
+      "health": "healthy",
+      "started_at": "2026-10-28T06:43:20.66762777Z"
+    },
+    {
+      "name": "devrag-stack-task-executor-3",
+      "image": "sha256:8737d9e363e0434cc81c8e4c2292f52ef9e964bd4784c3ccd2921073ac3092bb",
+      "health": "healthy",
+      "started_at": "2026-10-28T06:43:21.095671976Z"
+    },
+    {
+      "name": "devrag-stack-deepdoc-1",
+      "image": "sha256:d64cb8e3e7b86206ca1935fab1d18d5a1cd35923ea02b6fe517a57a3f21647fd",
+      "health": "healthy",
+      "started_at": "2026-10-28T06:43:20.923042985Z"
+    }
+  ],
+  "dependency_base": "06-08-BASE-RUNTIME.json",
+  "screenshot": {
+    "path": "output/playwright/phase6-review/qa-multiline-source.png",
+    "sha256": "b4746f57516451c6967894c1f8f05af3fc7370772b1ef2f8e58aedc053ffd57c",
+    "reviewer": "assistant, actual Chrome"
+  },
+  "note": "Full root run preceded four added focused guards; final23 focused checks cover those additions. No production changes after final image build."
+}

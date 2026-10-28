@@ -8,7 +8,7 @@ from collections.abc import Iterator
 import openpyxl
 from lxml import etree
 
-from rag.parsers.errors import FileDamaged, NoReadableText
+from rag.parsers.errors import FileDamaged, FileTooLarge, NoReadableText
 from rag.parsers.limits import check_ooxml_limits
 from rag.parsers.tabletext import render_table
 from rag.parsers.types import ParsedBlock, ParseLimits, ParseReport, SourceFile
@@ -62,18 +62,55 @@ def blocks_for(blocks: list[ParsedBlock], title: str) -> bool:
     return any(b.text.startswith(f"{title}\n") for b in blocks)
 
 
+def _extract_records(source: SourceFile, max_cells: int) -> list[ParsedBlock]:
+    from rag.parsers.records import MAX_RECORDS, row_record, pointer_part
+
+    from datetime import date, datetime, time
+
+    wb = openpyxl.load_workbook(str(source.path), read_only=True, data_only=True)
+    blocks = []
+    cells = 0
+    try:
+        for ws in wb.worksheets:
+            header = None
+            for number, row in enumerate(ws.iter_rows(values_only=True), 1):
+                values = list(row)
+                while values and values[-1] in (None, ""):
+                    values.pop()
+                if not values:
+                    continue
+                cells += len(row)
+                if cells > max_cells or len(blocks) >= MAX_RECORDS:
+                    raise FileTooLarge()
+                prefix = "/" + pointer_part(ws.title) + "/" + str(number)
+                if header is None:
+                    header = values
+                    row_record(header, [""] * len(header), prefix)
+                    continue
+                if len(values) > len(header):
+                    raise FileDamaged()
+                values += [None] * (len(header) - len(values))
+                values = [value.isoformat() if isinstance(value, (datetime, date, time)) else value for value in values]
+                record = row_record(header, values, prefix, (number, number))
+                blocks.append(ParsedBlock(record.text(), "sheet", record=record, line_range=record.line_range))
+    finally:
+        wb.close()
+    return blocks
+
+
 def parse(
     source: SourceFile,
     report: ParseReport,
     *,
     page_range: tuple[int, int] | None = None,
     limits: ParseLimits | None = None,
+    structured_records: bool = False,
 ) -> Iterator[ParsedBlock]:
     del page_range
     limits = limits or ParseLimits()
     check_ooxml_limits(source.path)
     try:
-        blocks = _extract(source, report, limits.xlsx_max_cells)
+        blocks = _extract_records(source, limits.xlsx_max_cells) if structured_records else _extract(source, report, limits.xlsx_max_cells)
     except _DAMAGE:
         raise FileDamaged() from None
     if not blocks:

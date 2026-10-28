@@ -11,6 +11,7 @@ export interface ParseConfigurationProps {
   control: Control<ChunkFormInput>;
   disabled?: boolean;
   wholeDocument?: boolean;
+  questionAnswer?: boolean;
   /** A refusal placed by the server under one field: the finished sentence, shown as a text node. */
   answers?: Partial<Record<ParseConfigField, string>>;
   /** Called when the reader edits a field, so its server answer can be cleared. */
@@ -48,7 +49,7 @@ function NotYetRows() {
  * The settings of the General method: chunk size, delimiters and overlap, then the read-only "Not available yet" rows.
  * The delimiter field shows and takes `\n` and `\t` as typed text; the schema turns them into real characters.
  */
-export function ParseConfiguration({ control, disabled = false, wholeDocument = false, answers = {}, onEdit }: ParseConfigurationProps) {
+export function ParseConfiguration({ control, disabled = false, wholeDocument = false, questionAnswer = false, answers = {}, onEdit }: ParseConfigurationProps) {
   const { t } = useTranslation();
   return (
     <div className="flex flex-col gap-4">
@@ -75,6 +76,7 @@ export function ParseConfiguration({ control, disabled = false, wholeDocument = 
           <FormMessage /><ServerFieldError text={answers.pageRanges ?? null} />
         </FormItem>
       )} />
+      {questionAnswer ? <p data-testid="qa-pair-settings" className="text-sm text-muted-foreground">{t("datasets.chunking.qaSettings")}</p> : null}
       {wholeDocument ? <p data-testid="one-document-settings" className="text-sm text-muted-foreground">{t("datasets.chunking.oneSettings")}</p> : null}
       <FormField
         control={control}
@@ -90,7 +92,7 @@ export function ParseConfiguration({ control, disabled = false, wholeDocument = 
                 min={CHUNK_SIZE_MIN}
                 max={CHUNK_SIZE_MAX}
                 step={1}
-                disabled={disabled || wholeDocument}
+                disabled={disabled || wholeDocument || questionAnswer}
                 data-testid="field-chunk-size"
                 onChange={(event) => {
                   onEdit?.("chunkSize");
@@ -115,7 +117,7 @@ export function ParseConfiguration({ control, disabled = false, wholeDocument = 
                 {...field}
                 autoComplete="off"
                 spellCheck={false}
-                disabled={disabled || wholeDocument}
+                disabled={disabled || wholeDocument || questionAnswer}
                 data-testid="field-delimiters"
                 className="font-mono"
                 onChange={(event) => {
@@ -144,7 +146,7 @@ export function ParseConfiguration({ control, disabled = false, wholeDocument = 
                 min={OVERLAP_MIN}
                 max={OVERLAP_MAX}
                 step={1}
-                disabled={disabled || wholeDocument}
+                disabled={disabled || wholeDocument || questionAnswer}
                 data-testid="field-overlap"
                 onChange={(event) => {
                   onEdit?.("overlap");

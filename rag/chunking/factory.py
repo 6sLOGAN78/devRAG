@@ -6,7 +6,7 @@ from collections.abc import Callable, Iterable, Iterator
 from typing import Any
 
 from common.ingest_codes import IMPLEMENTED_PARSERS, METHOD_ORDER
-from rag.chunking import naive, one, manual
+from rag.chunking import naive, one, manual, qa
 from rag.chunking.types import Chunk
 from rag.parsers.types import ParsedBlock
 
@@ -26,7 +26,7 @@ def available(method: str) -> bool:
     return method in IMPLEMENTED_PARSERS and method in _CHUNKERS
 
 
-_CHUNKERS: dict[str, Chunker] = {"naive": naive.chunk, "one": one.chunk, "manual": manual.chunk}
+_CHUNKERS: dict[str, Chunker] = {"naive": naive.chunk, "one": one.chunk, "manual": manual.chunk, "qa": qa.chunk}
 
 
 def get_chunker(parser_id: str) -> Chunker:
@@ -38,6 +38,8 @@ def get_chunker(parser_id: str) -> Chunker:
 def get_chunker_config(parser_id: str, raw: dict[str, Any]):
     """Each built method owns its configuration; unbuilt methods cannot borrow General."""
     get_chunker(parser_id)
+    if parser_id == "qa":
+        return qa.QAConfig()
     if parser_id == "manual":
         return manual.ManualConfig(chunk_token_num=int(raw.get("chunk_token_num") or 512))
     if parser_id == "one":

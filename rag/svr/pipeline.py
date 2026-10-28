@@ -95,6 +95,10 @@ def _fetch(ctx: TaskContext, deps: PipelineDeps, directory: Path) -> Path:
 def _parse_and_chunk(ctx: TaskContext, deps: PipelineDeps, control: TaskControl, path: Path, report: ParseReport) -> list[Chunk]:
     spec = parser_for_suffix(ctx.doc_suffix)
     chunker = get_chunker(ctx.parser_id)
+    if ctx.parser_id == "qa" and spec.name not in {"txt", "csv", "json", "xlsx"}:
+        from rag.parsers.errors import UnsupportedType
+
+        raise UnsupportedType()
     limits = ParseLimits(xlsx_max_cells=deps.settings.ingest.xlsx_max_cells)
     source = SourceFile(path, ctx.doc_suffix.lower().lstrip("."), path.stat().st_size)
     page_range = (ctx.from_page, ctx.to_page) if spec.name == "pdf" else None
@@ -126,6 +130,8 @@ def _parse_and_chunk(ctx: TaskContext, deps: PipelineDeps, control: TaskControl,
 
     with deps.limiters.chunk_limiter:
         options = {"settings": deps.settings, "parser_config": ctx.parser_config} if spec.name == "pdf" else ({"settings": deps.settings} if spec.name in {"docx", "pptx"} else {})
+        if ctx.parser_id == "qa" and spec.name == "xlsx":
+            options["structured_records"] = True
         if ctx.parser_id == "one" and spec.name == "pdf":
             from rag.parsers.page_selection import selected_ranges
             from rag.parsers.errors import FileTooLarge

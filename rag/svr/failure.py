@@ -15,7 +15,7 @@ from common.doc_store.doc_store_base import DimensionConflict, DocStoreError
 from common.ingest_codes import PLAIN_MESSAGES, is_terminal
 from common.log_utils import redact_text
 from rag.chunking.factory import ChunkerUnavailable
-from rag.chunking.errors import ChunkTooLong
+from rag.chunking.errors import ChunkTooLong, InvalidPair
 from rag.parsers.errors import ParserError
 from rag.utils.storage_base import StorageError
 
@@ -97,6 +97,8 @@ def classify(exc: BaseException, step: str) -> TaskFailure:
         return exc
     if isinstance(exc, ParserError):
         return TaskFailure("parse", exc.code)
+    if isinstance(exc, InvalidPair):
+        return TaskFailure("chunk", "qa_invalid")
     if isinstance(exc, ChunkTooLong):
         return TaskFailure("chunk", "chunk_too_long")
     if isinstance(exc, ChunkerUnavailable):

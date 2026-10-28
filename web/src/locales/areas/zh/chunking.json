@@ -24,7 +24,7 @@
         },
         "qa": {
           "title": "问答",
-          "body": "让每个问题与其答案保持在一起。"
+          "body": "将 TXT、CSV、JSON 或 XLSX 中的每个问题与答案保留在一起。"
         },
         "paper": {
           "title": "论文",
@@ -105,7 +105,8 @@
       "error": {
         "loadHeading": "无法加载分块设置"
       },
-      "oneSettings": "整个文档不按分块大小、分隔符或重叠比例拆分。PDF 页码选择和版面分析仍然适用。"
+      "oneSettings": "整个文档不按分块大小、分隔符或重叠比例拆分。PDF 页码选择和版面分析仍然适用。",
+      "qaSettings": "每组问题与答案保留为一个分块。请使用 Question 和 Answer 列，或 Question:/Answer: 文本对。分块设置不会拆分问答对。"
     }
   },
   "errors": {

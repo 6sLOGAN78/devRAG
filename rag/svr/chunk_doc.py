@@ -68,6 +68,8 @@ def build_row(
     boxes = chunk.positions
     pages = sorted({int(box.page) for box in boxes})
     features = {}
+    if chunk.question:
+        features["question_tks"] = " ".join(tokenize(chunk.question))
     if chunk.source_lines:
         features["source_lines_int"] = [list(bounds) for bounds in chunk.source_lines]
     if chunk.image_ids:

@@ -1,0 +1,24 @@
+{
+  "provenance": "Original authored field records; frozen before implementation",
+  "questions": [
+    "What is the lighthouse height?",
+    "What is the orchard harvest?"
+  ],
+  "answers": [
+    "52 metres.\nQuoted note: \"height, verified\".",
+    "9100 kilograms."
+  ],
+  "json_first_paths": [
+    "/0/answer",
+    "/0/metadata/number",
+    "/0/metadata/site",
+    "/0/question"
+  ],
+  "literal_formula": "=SUM(20,32)",
+  "sha256": {
+    "qa-original.csv": "1c94b5e95b7df21e1819d4fc31ec7d24441a7ab30cd29397f37990daa98a74a1",
+    "qa-original.json": "abd4b28b4fd93d5fcaf2d3f05cae17807fddd62a09364b6eb4cc83c3e70ff492",
+    "qa-original.txt": "a176f4e6db558115cd255b9c38a24ec393fb4cc74a9b497c457cab9f112f4389",
+    "qa-original.xlsx": "dc9203eeb515f3080c3d4de83e7caa18f841c7db53a78aa0fb21cf0992367cf2"
+  }
+}

@@ -29,6 +29,7 @@ FAILURE_CODES: tuple[str, ...] = (
     "archive_limits_exceeded",
     "too_many_chunks",
     "chunk_too_long",
+    "qa_invalid",
     "provider_timeout",
     "provider_rate_limited",
     "provider_unreachable",
@@ -53,6 +54,7 @@ TERMINAL_CODES: frozenset[str] = frozenset(
         "archive_limits_exceeded",
         "too_many_chunks",
         "chunk_too_long",
+        "qa_invalid",
         "provider_refused",
         "dimension_mismatch",
         "model_unavailable",
@@ -71,6 +73,7 @@ PLAIN_MESSAGES: dict[str, str] = {
     "archive_limits_exceeded": "The file unpacks to more data than is allowed, so it wasn't opened.",
     "too_many_chunks": "This document produced more chunks than one parsing task can store.",
     "chunk_too_long": "The whole document exceeds the embedding model context. Choose another chunking method.",
+    "qa_invalid": "Each Q&A record needs one nonempty question and answer. Use Question and Answer columns or explicit text pairs.",
     "provider_timeout": "The embedding provider timed out.",
     "provider_rate_limited": "The embedding provider is limiting requests.",
     "provider_unreachable": "The embedding provider couldn't be reached.",
@@ -87,7 +90,7 @@ PLAIN_MESSAGES: dict[str, str] = {
 
 # Chunking methods in documentation order (UI-SPEC chunking-method dialog).
 METHOD_ORDER: tuple[str, ...] = ("naive", "qa", "paper", "book", "laws", "presentation", "table", "manual", "resume", "picture", "email", "tag", "one", "audio")
-IMPLEMENTED_PARSERS: frozenset[str] = frozenset({"naive", "one", "manual"})
+IMPLEMENTED_PARSERS: frozenset[str] = frozenset({"naive", "one", "manual", "qa"})
 
 
 def is_terminal(code: str) -> bool:

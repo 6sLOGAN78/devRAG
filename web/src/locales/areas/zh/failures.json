@@ -22,7 +22,8 @@
         "documentGone": "解析过程中该文档已被删除。",
         "unknown": "解析因意外原因失败。",
         "nativeUnavailable": "原生解析服务暂时不可用，请稍后重试。",
-        "chunkTooLong": "整个文档超出了嵌入模型的上下文限制。请选择其他分块方法。"
+        "chunkTooLong": "整个文档超出了嵌入模型的上下文限制。请选择其他分块方法。",
+        "qaInvalid": "每条问答记录必须包含一个非空问题和答案。请使用 Question 和 Answer 列或显式文本对。"
       },
       "step": {
         "queue": "等待处理程序",

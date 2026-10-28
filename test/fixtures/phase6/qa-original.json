@@ -1,0 +1,18 @@
+[
+  {
+    "question": "What is the lighthouse height?",
+    "answer": "52 metres.\nQuoted note: \"height, verified\".",
+    "metadata": {
+      "site": "LIGHTHOUSE",
+      "number": 52
+    }
+  },
+  {
+    "question": "What is the orchard harvest?",
+    "answer": "9100 kilograms.",
+    "metadata": {
+      "site": "ORCHARD",
+      "number": 9100
+    }
+  }
+]

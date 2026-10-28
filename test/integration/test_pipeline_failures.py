@@ -170,7 +170,7 @@ def test_a_deleted_document_leaves_no_orphan_chunk(world, fake):
 
 def test_a_chunking_method_that_is_not_built_is_terminal(world, caplog):
     doc = add_document(world, "qa.txt", paragraphs(3))
-    sql("UPDATE `document` SET `parser_id` = 'qa' WHERE `id` = %s", (doc,))
+    sql("UPDATE `document` SET `parser_id` = 'unbuilt-fixture' WHERE `id` = %s", (doc,))
     failure = fails(world, add_task(doc), caplog)
     assert (failure.code, failure.terminal) == ("chunker_unavailable", True)
     assert indexed(world, doc_id=[doc]) == []
@@ -228,7 +228,7 @@ def test_the_failure_line_is_the_last_line_and_parses_back(world, caplog):
     from rag.svr.failure import parse_failure_line
 
     doc = add_document(world, "line.txt", paragraphs(2))
-    sql("UPDATE `document` SET `parser_id` = 'qa' WHERE `id` = %s", (doc,))
+    sql("UPDATE `document` SET `parser_id` = 'unbuilt-fixture' WHERE `id` = %s", (doc,))
     task = add_task(doc)
     failure = fails(world, task, caplog)
     mark_task_failed(task, failure.line())

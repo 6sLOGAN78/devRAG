@@ -587,7 +587,7 @@ Scope notes: this is the PROJECT.md Core Value. No Phase 6, 7 or 8 work starts u
 
 **Planning status (2026-10-27):** Research and UI contract complete; structural checks30/30,90 task verifications,58/58 primary requirements plus RETR-13 producer handoff covered. No Phase6 native package/model acquisition or paid inference performed. Automatic entry completed the read-only audit/preparation and stops at the exact-candidate blocking-human approval in06-01 Task2.20 audit-tool tests pass; native acquisition/features have not started. Phase5 human UAT and Phase4 B36 remain pending.
 
-**Execution status (2026-10-28):** 8/30 plans complete. Native parser/image/table, One/static catalog and Markdown/manual verified. Final08 unit2553/8existing skips,web2160 plus61focused,Go internal,stack28,services55,routes70,leaks6; CI/generated/security/admission pass. Zero paid calls or requirement-checkbox edits. Next09 structured JSON/CSV/Q&A; full phase gate and human validation pending.
+**Execution status (2026-10-28):** 9/30 plans complete. Parser/media/table/One/Manual plus structured JSON/CSV/QA verified. Final09 unit2572/8existing skips plus23focused,web2162,Go internal,stack34,services104,routes70,leaks6; CI/generated/security/admission pass. Zero paid calls or requirement-checkbox edits. Next10 EPUB/Book; full phase gate and human validation pending.
 
 **Wave 1** *(admission audit and blocking-human acquisition checkpoint)*
 
@@ -615,7 +615,7 @@ Scope notes: this is the PROJECT.md Core Value. No Phase 6, 7 or 8 work starts u
 - [x] 06-08-PLAN.md — Ingest Markdown and technical manuals
 **Wave 9** *(blocked on Wave 8 completion and accepted06-01 snapshot)*
 
-- [ ] 06-09-PLAN.md — Ingest structured JSON, CSV and Q&A pairs
+- [x] 06-09-PLAN.md — Ingest structured JSON, CSV and Q&A pairs
 **Wave 10** *(blocked on Wave 9 completion and accepted06-01 snapshot)*
 
 - [ ] 06-10-PLAN.md — Read EPUB books in chapter order
@@ -753,6 +753,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8. Ph
 | 3. Models, Knowledge Bases and Upload | 31/31 | Complete | 2026-10-10 |
 | 4. Ingestion Pipeline | 35/35 | Human verification pending (B-36 deferred) | 2026-10-19 |
 | 5. Retrieval and Cited Chat (Core Value Gate) | 28/28 | Automated gate passed; human review pending | 2026-10-27 |
-| 6. Deep Parsing and Chunking Breadth | 8/30 | Executing; Markdown and Manual passed | - |
+| 6. Deep Parsing and Chunking Breadth | 9/30 | Executing; structured records and QA passed | - |
 | 7. Agents and Workflows | 0/TBD | Not started | - |
 | 8. Go Surface, CLI, Integrations, Billing and Production Deployment | 0/TBD | Not started | - |

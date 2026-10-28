@@ -19,7 +19,7 @@ import { waitUntil } from "@/test/wait-until";
 useFilesServer();
 
 const MEMBER: SessionUser = { ...OWNER, id: "u4", nickname: "Dan", tenantId: "t4", tenantName: "Dan's workspace" };
-const SERVER_METHOD = "qa";
+const SERVER_METHOD = "paper";
 const detailUrl = (n: number) => `${DOCS_URL}/${documentRow(n).id}`;
 const datasetUrl = `/api/v1/datasets/${DATASET_ID}`;
 
@@ -81,18 +81,18 @@ describe("Chunking method dialog, document mode (UI-13, UI-14)", () => {
     expect(within(dialog).getByTestId("field-overlap")).toHaveValue(10);
   });
 
-  it("lists fourteen methods in documentation order with eleven disabled radios and the badge", async () => {
+  it("lists fourteen methods in documentation order with ten disabled radios and the badge", async () => {
     const { dialog } = await openFirst();
     const radios = within(dialog).getAllByRole("radio");
     expect(radios).toHaveLength(14);
-    expect(radios.filter((radio) => radio.hasAttribute("disabled"))).toHaveLength(11);
+    expect(radios.filter((radio) => radio.hasAttribute("disabled"))).toHaveLength(10);
     expect(radios.map((radio) => radio.getAttribute("data-testid"))).toEqual(CHUNK_METHODS.map((id) => `chunk-method-option-${id}`));
     expect(screen.getByTestId(`chunk-method-option-${GENERAL_METHOD}`)).toBeChecked();
     const group = within(dialog).getByTestId("chunk-method-group");
-    expect(within(group).getAllByText("Available in a later release")).toHaveLength(11);
+    expect(within(group).getAllByText("Available in a later release")).toHaveLength(10);
     expect(within(group).getByText("Choose an available method for the next parse.")).toBeInTheDocument();
     for (const title of ["General", "Q&A", "Paper", "Book", "Laws", "Presentation", "Tables", "Manual"]) expect(within(group).getByText(title)).toBeInTheDocument();
-    expect(radios[1]).toHaveAccessibleDescription("Available in a later release");
+    expect(radios.find((radio) => radio.hasAttribute("disabled"))).toHaveAccessibleDescription("Available in a later release");
   });
 
   it("keeps auto-keywords unavailable and omits unchanged layout settings", async () => {
@@ -174,8 +174,8 @@ describe("Chunking method dialog, document mode (UI-13, UI-14)", () => {
 
   it("does nothing when a disabled method is pressed and never sends one", async () => {
     const { dialog, user } = await openFirst();
-    await user.click(screen.getByTestId("chunk-method-option-qa"));
-    expect(screen.getByTestId("chunk-method-option-qa")).not.toBeChecked();
+    await user.click(screen.getByTestId("chunk-method-option-paper"));
+    expect(screen.getByTestId("chunk-method-option-paper")).not.toBeChecked();
     expect(screen.getByTestId(`chunk-method-option-${GENERAL_METHOD}`)).toBeChecked();
     await replace(user, within(dialog).getByTestId("field-overlap"), "5");
     await user.click(within(dialog).getByTestId("chunk-method-submit"));
@@ -187,7 +187,7 @@ describe("Chunking method dialog, document mode (UI-13, UI-14)", () => {
     server.documents[DATASET_ID] = [documentRow(1, { parser_id: SERVER_METHOD })];
     const { dialog, user } = await openFirst();
     expect(within(dialog).getAllByRole("radio").filter((radio) => (radio as HTMLInputElement).checked)).toHaveLength(0);
-    expect(within(dialog).getByTestId("chunk-method-unavailable")).toHaveTextContent("This document is set to Q&A, which isn't available yet. Choose General to parse it.");
+    expect(within(dialog).getByTestId("chunk-method-unavailable")).toHaveTextContent("This document is set to Paper, which isn't available yet. Choose General to parse it.");
     await replace(user, within(dialog).getByTestId("field-overlap"), "5");
     await user.click(within(dialog).getByTestId("chunk-method-submit"));
     expect(within(dialog).getByTestId("chunk-method-submit")).toHaveAttribute("aria-disabled", "true");
@@ -466,4 +466,14 @@ it("saves the implemented Manual method and restores it", async () => {
   await waitFor(() => expect(screen.queryByTestId("chunk-method-dialog")).toBeNull());
   const reopened=await openDialog();
   expect(within(reopened.dialog).getByTestId("chunk-method-option-manual")).toBeChecked();
+});
+
+it("saves Q&A and explains that a pair stays together", async () => {
+ const {dialog,user}=await openFirst();
+ await user.click(within(dialog).getByTestId("chunk-method-option-qa"));
+ expect(within(dialog).getByTestId("qa-pair-settings")).toBeInTheDocument();
+ expect(within(dialog).getByTestId("field-chunk-size")).toBeDisabled();
+ await user.click(within(dialog).getByTestId("chunk-method-submit"));
+ await waitFor(() => expect(sent(detailUrl(1),"PATCH")).toHaveLength(1));
+ expect(sent(detailUrl(1),"PATCH")[0]).toMatchObject({parser_id:"qa"});
 });
