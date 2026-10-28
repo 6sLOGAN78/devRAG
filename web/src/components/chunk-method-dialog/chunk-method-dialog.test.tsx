@@ -81,15 +81,15 @@ describe("Chunking method dialog, document mode (UI-13, UI-14)", () => {
     expect(within(dialog).getByTestId("field-overlap")).toHaveValue(10);
   });
 
-  it("lists fourteen methods in documentation order with twelve disabled radios and the badge", async () => {
+  it("lists fourteen methods in documentation order with eleven disabled radios and the badge", async () => {
     const { dialog } = await openFirst();
     const radios = within(dialog).getAllByRole("radio");
     expect(radios).toHaveLength(14);
-    expect(radios.filter((radio) => radio.hasAttribute("disabled"))).toHaveLength(12);
+    expect(radios.filter((radio) => radio.hasAttribute("disabled"))).toHaveLength(11);
     expect(radios.map((radio) => radio.getAttribute("data-testid"))).toEqual(CHUNK_METHODS.map((id) => `chunk-method-option-${id}`));
     expect(screen.getByTestId(`chunk-method-option-${GENERAL_METHOD}`)).toBeChecked();
     const group = within(dialog).getByTestId("chunk-method-group");
-    expect(within(group).getAllByText("Available in a later release")).toHaveLength(12);
+    expect(within(group).getAllByText("Available in a later release")).toHaveLength(11);
     expect(within(group).getByText("Choose an available method for the next parse.")).toBeInTheDocument();
     for (const title of ["General", "Q&A", "Paper", "Book", "Laws", "Presentation", "Tables", "Manual"]) expect(within(group).getByText(title)).toBeInTheDocument();
     expect(radios[1]).toHaveAccessibleDescription("Available in a later release");
@@ -455,4 +455,15 @@ it("saves and reopens One document without losing common settings", async () => 
   await waitFor(() => expect(screen.queryByTestId("chunk-method-dialog")).toBeNull());
   const reopened = await openDialog();
   expect(within(reopened.dialog).getByTestId("chunk-method-option-one")).toBeChecked();
+});
+
+it("saves the implemented Manual method and restores it", async () => {
+  const {dialog,user}=await openFirst();
+  await user.click(within(dialog).getByTestId("chunk-method-option-manual"));
+  await user.click(within(dialog).getByTestId("chunk-method-submit"));
+  await waitFor(() => expect(sent(detailUrl(1),"PATCH")).toHaveLength(1));
+  expect(sent(detailUrl(1),"PATCH")[0]).toMatchObject({parser_id:"manual"});
+  await waitFor(() => expect(screen.queryByTestId("chunk-method-dialog")).toBeNull());
+  const reopened=await openDialog();
+  expect(within(reopened.dialog).getByTestId("chunk-method-option-manual")).toBeChecked();
 });

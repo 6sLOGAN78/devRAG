@@ -18,3 +18,4 @@ class Chunk:
     index: int
     tables: tuple[Table, ...] = ()
     image_ids: tuple[str, ...] = ()
+    source_lines: tuple[tuple[int, int], ...] = ()

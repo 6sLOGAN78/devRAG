@@ -1,3 +1,4 @@
+import { SourceMarkdown } from "@/components/markdown-content/source-markdown";
 import { StructuredTable } from "@/components/markdown-content/structured-table";
 import { useQuery } from "@tanstack/react-query";
 import { useBlobUrl } from "@/components/document-preview/use-blob-url";
@@ -30,6 +31,7 @@ interface Props { source: SourceView | null; open: boolean; onOpenChange: (open:
 function Body({ source, onCloseAutoFocus }: { source: SourceView; onCloseAutoFocus?: (event: Event) => void }) {
   const { t, i18n } = useTranslation(), passage = useRef<HTMLDivElement>(null);
   const firstPage = source.positions[0]?.page, [page, setPage] = useState(firstPage ?? 1);
+  const markdown = /\.(md|markdown)$/i.test(source.docName);
   const detail = useDocumentDetailRequest(source.datasetId, source.docId);
   const tables = (source.tables ?? []).filter((table) => detail.data?.assets?.some((asset) => asset.kind === "table" && asset.id === table.assetId));
   const tableIds = new Set(tables.map((table) => table.assetId));
@@ -47,7 +49,7 @@ function Body({ source, onCloseAutoFocus }: { source: SourceView; onCloseAutoFoc
         {pages.length ? <div><dt className="text-xs font-semibold text-muted-foreground">{t("source.pages")}</dt><dd data-testid="source-pages" className="font-semibold tabular-nums">{pages.join(", ")}</dd></div> : null}
         {(["overall", "term", "vector", "rerank"] as const).map((key) => source.scores[key] !== null && Number.isFinite(source.scores[key]) ? <div key={key}><dt className="text-xs font-semibold text-muted-foreground">{t(`retrieval.score.${key}`)}</dt><dd data-testid={`source-score-${key}`} className="font-semibold tabular-nums">{number.format(source.scores[key]!)}</dd></div> : null)}
       </dl>
-      <div className="grid gap-2"><h2 className="text-xs font-semibold">{t("source.passage")}</h2><div ref={passage} role="region" aria-label={t("source.passageLabel")} tabIndex={0} data-testid="source-passage" className="max-h-60 overflow-auto whitespace-pre-wrap break-words rounded-md border bg-background p-4 text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">{source.content}</div></div>
+      <div className="grid gap-2"><h2 className="text-xs font-semibold">{t("source.passage")}</h2><div ref={passage} role="region" aria-label={t("source.passageLabel")} tabIndex={0} data-testid="source-passage" className={`${markdown ? "max-h-[65vh]" : "max-h-60"} overflow-auto whitespace-pre-wrap break-words rounded-md border bg-background p-4 text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring`}>{markdown ? <SourceMarkdown text={source.content} /> : source.content}</div></div>
       {!gone && tables.length ? <section aria-label={t("source.tables")} className="grid gap-4">{tables.map((table, index) => <div key={`${table.assetId}:${index}`}><StructuredTable table={table} /><p className="mb-2 text-xs font-semibold">{t("source.crop")}</p><Figure asset={detail.data!.assets!.find((asset) => asset.id === table.assetId)!} source={source} showCaption={false} /></div>)}</section> : null}
       {!gone && figures.length ? <section aria-label={t("source.figures")} className="grid gap-3"><h2 className="text-xs font-semibold">{t("source.figures")}</h2>{figures.map((asset) => <Figure key={asset.id} asset={asset} source={source} />)}</section> : null}
       {gone ? <p data-testid="source-gone" className="text-sm text-muted-foreground">{t("source.gone")}</p> : null}

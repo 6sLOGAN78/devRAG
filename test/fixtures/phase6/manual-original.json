@@ -1,0 +1,19 @@
+{
+  "provenance": "Original text authored for this test; no external source",
+  "sha256": "f0f0862df915e931ab2b334db13dff4151105d051bb32b4c34a3448a4dc33e6e",
+  "required_facts": [
+    "LIGHTHOUSE FACT: tower height 52 metres.",
+    "ORCHARD FACT: harvest 9100 kilograms.",
+    "CALIBRATION FACT: offset 73 units."
+  ],
+  "section_titles": [
+    "Orchard controller",
+    "Setup",
+    "Calibration"
+  ],
+  "code_fence_length": 4,
+  "must_not_fetch": [
+    "https://example.invalid/diagram.png",
+    "../../../../etc/passwd"
+  ]
+}

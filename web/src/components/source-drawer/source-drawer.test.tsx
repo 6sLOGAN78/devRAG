@@ -121,4 +121,12 @@ describe("source drawer", () => {
     expect(server.callsTo("GET", url)).toHaveLength(1);
   });
 
+  it("renders original Markdown source code and parameter tables without fetching diagrams", () => {
+    show(source({ doc_name:"manual.md",positions:[],content:'# Setup\n\n````python\npayload = "```"\nprint(52)\n````\n\n| Parameter | Value |\n|---|---|\n| harvest | 9100 |\n\n![diagram 52](https://example.invalid/tracker.png)\n\n<script>window.manualExecuted=true</script>' }));
+    const passage=screen.getByTestId("source-passage");
+    expect(passage.querySelector("pre code")?.textContent).toBe('payload = "```"\nprint(52)\n');
+    expect(passage.querySelector("table")).not.toBeNull();
+    expect(passage.querySelector("img,script")).toBeNull();
+    expect(passage.textContent).toContain("diagram 52");
+  });
 });

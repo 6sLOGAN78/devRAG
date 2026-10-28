@@ -13,7 +13,7 @@ from typing import Literal, get_args
 from rag.parsers.assets import ParsedAsset
 from rag.parsers.tables import Table
 
-BLOCK_KINDS = frozenset({"text", "heading", "table", "slide", "sheet"})
+BLOCK_KINDS = frozenset({"text", "heading", "table", "slide", "sheet", "code", "list", "image"})
 LayoutLabel = Literal["_background_", "Text", "Title", "Figure", "Figure caption", "Table", "Table caption", "Header", "Footer", "Reference", "Equation"]
 LAYOUT_LABELS = get_args(LayoutLabel)
 MAX_NOTES = 200
@@ -41,8 +41,14 @@ class ParsedBlock:
     assets: tuple[ParsedAsset, ...] = ()
     table: Table | None = None
     image_ids: tuple[str, ...] = ()
+    heading_level: int = 0
+    line_range: tuple[int, int] | None = None
 
     def __post_init__(self) -> None:
+        if type(self.heading_level) is not int or not 0 <= self.heading_level <= 6:
+            raise ValueError("invalid heading level")
+        if self.line_range is not None and (len(self.line_range) != 2 or any(type(v) is not int for v in self.line_range) or not 1 <= self.line_range[0] <= self.line_range[1] <= 1_000_000):
+            raise ValueError("invalid source lines")
         if self.layout_label is not None and self.layout_label not in LAYOUT_LABELS:
             raise ValueError("unknown layout label")
         if self.kind not in BLOCK_KINDS:

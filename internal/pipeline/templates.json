@@ -64,8 +64,10 @@
     "name": "Manual",
     "description": "Keep technical heading groups.",
     "parser_id": "manual",
-    "parser_config": {},
-    "available": false
+    "parser_config": {
+      "chunk_token_num": 512
+    },
+    "available": true
   },
   {
     "id": "resume",

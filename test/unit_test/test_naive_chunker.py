@@ -73,9 +73,11 @@ def test_empty_input_yields_nothing():
     assert list(chunk(_blocks("  \n"), NaiveConfig())) == []
 
 
-def test_factory_returns_naive_and_refuses_the_rest():
+def test_factory_returns_implemented_methods_and_refuses_the_rest():
     assert callable(get_chunker("naive"))
-    for method in ("qa", "paper", "book", "laws", "presentation", "table", "manual", "unknown", ""):
+    assert callable(get_chunker("manual")) and get_chunker("manual") is not get_chunker("naive")
+    assert callable(get_chunker("one")) and get_chunker("one") is not get_chunker("naive")
+    for method in ("qa", "paper", "book", "laws", "presentation", "table", "unknown", ""):
         with pytest.raises(ChunkerUnavailable) as info:
             get_chunker(method)
         assert info.value.code == "chunker_unavailable"

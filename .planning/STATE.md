@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Phase 6 plan07 verified; continuing08
-last_updated: "2026-10-28T05:48:16.882678+00:00"
-last_activity: 2026-10-28 -- One and static catalog verified; continuing08
+stopped_at: Phase6 plan08 verified; continuing09
+last_updated: "2026-10-28T06:26:08.827636+00:00"
+last_activity: 2026-10-28 -- Markdown/Manual verified; continuing09
 progress:
   total_phases: 8
   completed_phases: 4
   total_plans: 176
-  completed_plans: 153
-  percent: 87
+  completed_plans: 154
+  percent: 88
 ---
 
 # Project State
@@ -21,18 +21,18 @@ progress:
 See: .planning/PROJECT.md (updated 2026-10-05)
 
 **Core value:** A user can upload a document into a knowledge base and get an accurate, cited answer to a question about it, end-to-end through the real pipeline (parse, chunk, embed, index, hybrid retrieve, rerank, generate), with no mocked stages.
-**Current focus:** Phase 6 execution — 06-08 Markdown and technical manuals
+**Current focus:** Phase 6 execution — 06-09 Structured JSON/CSV and Q&A
 
 ## Current Position
 
 Phase: 6 (deep-parsing-and-chunking-breadth) — EXECUTING
-Plan: 08 of 30; plans01–07 complete; Markdown/manual next
-Status: Plans01–07 complete; R232..238 recorded. Final07 unit2541/8existing skips,web2158,Go internal,services104,native/Chrome20,routes70,leaks6,final image checks5; CI/generated/security/admission pass. Zero paid calls. Continue08.
+Plan: 09 of 30; plans01–08 complete; JSON/CSV/Q&A next
+Status: Plans01–08 complete; R232..239 recorded. Final08 unit2553/8existing skips,web2160 plus61focused,Go internal,stack28,services55,routes70,leaks6; CI/generated/security/admission pass. Zero paid calls. Continue09.
 Prior checks: Phase5 UAT5/6 passed (two user answer judgments and delegated screenshot/Chinese/footprint review). Final Phase5 acceptance remains pending; Phase4 B36 remains separately deferred. Prior paid evidence retained.
-Current checkpoint:07 verified: exactly one complete selected-document chunk with model context refusal; finite public static Go catalog with exact policy exceptions and credential parity. Continue08; publication authorization persists.
+Current checkpoint:08 verified: bounded Markdown/manual structure, exact code/table source, typed line evidence and safe saved-source rendering. Continue09; publication authorization persists.
 Last activity: 2026-10-28
 
-Progress: 153/176 currently planned execution plans complete (87%); Phase6 7/30 complete.
+Progress: 154/176 currently planned execution plans complete (88%); Phase6 8/30 complete.
 
 ## Performance Metrics
 

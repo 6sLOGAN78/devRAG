@@ -16,6 +16,7 @@ class OneConfig:
 def chunk(blocks: Iterable[ParsedBlock], cfg: OneConfig) -> Iterator[Chunk]:
     texts, positions, tables, image_ids = [], [], [], []
     sizes = {}
+    source_lines = []
     total_bytes = 0
     for block in blocks:
         total_bytes += len(block.text.encode("utf-8"))
@@ -24,6 +25,8 @@ def chunk(blocks: Iterable[ParsedBlock], cfg: OneConfig) -> Iterator[Chunk]:
         if block.text.strip():
             texts.append(block.text)
         positions.extend(block.boxes)
+        if block.line_range is not None:
+            source_lines.append(block.line_range)
         sizes.update(block.page_sizes)
         if block.table is not None:
             tables.append(block.table)
@@ -36,4 +39,4 @@ def chunk(blocks: Iterable[ParsedBlock], cfg: OneConfig) -> Iterator[Chunk]:
     tokens = count_tokens(text)
     if tokens > cfg.max_tokens:
         raise ChunkTooLong()
-    yield Chunk(text, tuple(positions), sizes, tokens, 0, tables=tuple(tables), image_ids=tuple(image_ids))
+    yield Chunk(text, tuple(positions), sizes, tokens, 0, tables=tuple(tables), image_ids=tuple(image_ids), source_lines=tuple(source_lines))

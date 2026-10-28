@@ -5,7 +5,7 @@ describe('implemented method availability', () => {
     expect(CHUNK_METHODS).toContain('one');
     expect(CHUNK_METHODS).toHaveLength(14);
     expect(new Set(CHUNK_METHODS).size).toBe(14);
-    expect(IMPLEMENTED).toEqual(['naive', 'one']);
+    expect(IMPLEMENTED).toEqual(['naive', 'one', 'manual']);
     expect(isImplemented('paper')).toBe(false);
     expect(METHOD_STEMS).toHaveProperty('one', 'one');
   });

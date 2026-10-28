@@ -1,0 +1,8 @@
+{
+  "base_image": "sha256:492ec570ffc27f30fbfee824bb4f89afa90a73e6acd9c827c54a3b9ceaaa824e",
+  "dependency_manifests": {
+    "pyproject.toml": "3318b87678aedfd1231e3cc3fe594ed5ec6d500e54025ef2993f27b5113d81d9",
+    "uv.lock": "4744c5b9745a9d102dd87a4dbf0099b5cf2ae53a1d3e299dc0c05d1e643431ab"
+  },
+  "rule": "Reuse only while both manifests match; current Go/web and all app/native source copied normally. No external image or dependency acquisition."
+}
