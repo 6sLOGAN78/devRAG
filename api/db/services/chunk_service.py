@@ -36,8 +36,8 @@ from api.utils import reasons
 from common.doc_store.doc_store_base import DocStoreConnection, DocStoreError, MatchTextExpr, OrderByExpr, index_name, vector_field
 from common.settings import Settings
 from rag.nlp.token_count import count_tokens
-from rag.nlp.tokenizer import fine_grained_tokenize, tokenize
-from rag.svr.chunk_doc import ORIGIN_EDITED, ORIGIN_MANUAL, ORIGIN_PARSED, l2_normalize, manual_row
+from rag.nlp.tokenizer import tokenize
+from rag.svr.chunk_doc import ORIGIN_EDITED, ORIGIN_MANUAL, ORIGIN_PARSED, l2_normalize, manual_row, text_features
 from rag.svr.failure import TaskFailure
 from rag.utils.es_conn import MAX_RESULT_WINDOW, get_doc_store
 
@@ -315,11 +315,13 @@ def update_chunk(
             values[TABLE_FIELD] = ""
         vector = _embed(settings, visible, clean)  # any failure ends here: nothing has been written
         _check_deadline(started)
+        features = text_features(clean)
+        if stored.get("content_token_offsets_int") and "content_token_offsets_int" not in features:
+            features["content_token_offsets_int"] = []
         values.update(
             {
                 "content_with_weight": clean,
-                "content_ltks": " ".join(tokenize(clean)),
-                "content_sm_ltks": " ".join(fine_grained_tokenize(clean)),
+                **features,
                 "token_num_int": count_tokens(clean),
                 vector_field(len(vector)): vector,
                 "origin_kwd": ORIGIN_MANUAL if stored.get("origin_kwd") == ORIGIN_MANUAL else ORIGIN_EDITED,

@@ -46,6 +46,11 @@ def _lines(blocks):
 
 
 def chunk(blocks, cfg: PaperConfig):
+    yield from section_chunks(_lines(blocks), cfg, _heading)
+
+
+def section_chunks(blocks, cfg, heading_of):
+    """Shared bounded emission; each domain supplies its own heading recognition."""
     ancestry = []
     group = []
     index = 0
@@ -57,7 +62,7 @@ def chunk(blocks, cfg: PaperConfig):
         labels = tuple(title for title, _ in parents)
         prefix = "\n".join(labels)
         prefix = prefix + "\n" if prefix else ""
-        body = "\n".join(b.text for b in items if _heading(b) is None)
+        body = "\n".join(b.text for b in items if heading_of(b) is None)
         limit = max(1, min(cfg.chunk_token_num, 8191))
         budget = limit - count_tokens(prefix)
         if budget < 1:
@@ -81,10 +86,10 @@ def chunk(blocks, cfg: PaperConfig):
                         sections=(Section(labels),))
             index += 1
 
-    for block in _lines(blocks):
-        heading = _heading(block)
+    for block in blocks:
+        heading = heading_of(block)
         if heading:
-            if any(_heading(b) is None for b in group):
+            if any(heading_of(b) is None for b in group):
                 yield from emit(group, ancestry)
                 group = []
             title, level = heading

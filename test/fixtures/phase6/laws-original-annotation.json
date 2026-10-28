@@ -1,0 +1,29 @@
+{
+  "origin": "Original invented legal-format test document, not a real law. Frozen before implementation.",
+  "sha256": "941aae12da823cdf848e4a4394652476d9ae34b2441c22629201101e567028b8",
+  "paths": [
+    [
+      "第一章 檔案管理",
+      "第一節 保存規則",
+      "第一條 保存期限"
+    ],
+    [
+      "第一章 檔案管理",
+      "第一節 保存規則",
+      "第二條 公開資料"
+    ],
+    [
+      "第二章 燈塔維護",
+      "第三條 高度記錄"
+    ]
+  ],
+  "queries": [
+    "檔案保存期限",
+    "档案保存期限"
+  ],
+  "facts": [
+    "七十三年",
+    "九千一百份",
+    "五十二公尺"
+  ]
+}

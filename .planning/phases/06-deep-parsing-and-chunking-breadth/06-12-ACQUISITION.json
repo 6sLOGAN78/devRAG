@@ -1,0 +1,64 @@
+{
+  "packages": [
+    {
+      "name": "jieba",
+      "version": "0.42.1",
+      "filename": "jieba-0.42.1.tar.gz",
+      "bytes": 19214172,
+      "sha256": "055ca12f62674fafed09427f176506079bc135638a14e23e25be909131928db2",
+      "source": "https://files.pythonhosted.org/packages/c6/cb/18eeb235f833b726522d7ebed54f2278ce28ba9438e3135ab0278d9792a2/jieba-0.42.1.tar.gz"
+    },
+    {
+      "name": "opencc-python-reimplemented",
+      "version": "0.1.7",
+      "filename": "opencc_python_reimplemented-0.1.7-py2.py3-none-any.whl",
+      "bytes": 481813,
+      "sha256": "41b3b92943c7bed291f448e9c7fad4b577c8c2eae30fcfe5a74edf8818493aa6",
+      "source": "https://files.pythonhosted.org/packages/30/6b/055b7806f320cc8f2cdf23c5f70221c0dc1683fca9ffaf76dfc2ad4b91b6/opencc_python_reimplemented-0.1.7-py2.py3-none-any.whl"
+    }
+  ],
+  "jieba_setup_sha256": "47babfbd4fb1504e5871d95e31fe207203f1c23105781039d63ba3a6ccbdc74f",
+  "jieba_dictionary_sha256": "7197c3211ddd98962b036cdf40324d1ea2bfaa12bd028e68faa70111a88e12a8",
+  "jieba_built_wheel": {
+    "filename": "jieba-0.42.1-py3-none-any.whl",
+    "sha256": "e436995a0a151b54770be86c66027d8875ba5a839de4e15466fd93d5e6d055e1"
+  },
+  "whole_app_dry_run": "ragflow-logs/phase6-12-whole-app-dry-run.log",
+  "lock_change": "only exact jieba0.42.1 and opencc-python-reimplemented0.1.7; no existing version changes",
+  "runtime": {
+    "base_before": "sha256:492ec570ffc27f30fbfee824bb4f89afa90a73e6acd9c827c54a3b9ceaaa824e",
+    "base_after": "sha256:62f389511ce063e2f97700fb6a71a6b8036a283c4904d3fe251c66f507ffc33f",
+    "manifests": {
+      "pyproject.toml": "a8eb4d8d2050b765a501d8737d64993fc67b97d5e446ffd980942ca315cb831c",
+      "uv.lock": "eb2d16cae34e3d893b2f1261be215a18d3a3c0f276e4b0aef3ae8e9ace2ea016"
+    },
+    "installation": "offline local hash-verified wheels; --no-index --no-deps --no-compile; existing base packages unchanged"
+  },
+  "paid_calls": 0,
+  "opencc_dictionary_config_hashes": {
+    "opencc/config/hk2s.json": "11d1001e56bf26f73a9bd4e88e63e064bbab421054701f22d948bb4d72e0a6cb",
+    "opencc/config/s2hk.json": "423ae690c62e0829044ce76cd5736667ff196562b06b1beedd60d1446bfd0ec9",
+    "opencc/config/s2t.json": "246f559aaf3756b280157f4eb2ab1dd22f31ebac2a9e0aafa2b4a99c1cb676ce",
+    "opencc/config/s2tw.json": "5eaf3d5138ad09ca34aae6b424c9928aaf870fcadd8495e4f8bd4172f57c3017",
+    "opencc/config/s2twp.json": "e2eeb094abf6ef8f1b75971110ab9b37471d19eb4d79b7cbe2dc7ce8eb46def1",
+    "opencc/config/t2hk.json": "2362f65edb9eb6627762e959ebb22e7c91a7260435e3135ecb7a21844ee913f8",
+    "opencc/config/t2s.json": "3848b420a86a7c5f79a796321029db6f9aaa534bc3a7a67b90fc66744d3030d0",
+    "opencc/config/t2tw.json": "0cb4078cd55c50892c8beeae79be73bbd4dc7c256b13c12f0aa6fe79f3436624",
+    "opencc/config/tw2s.json": "efefc6b3031f370558cb9f3a75c7940927d6849aa92512cd2896dffa4e1b9ce2",
+    "opencc/config/tw2sp.json": "ab8645dc184af734199701f09f515e68b5ef4f7f4fea20db79354c6fe6db33f2",
+    "opencc/dictionary/HKVariants.txt": "c3c93c35885902ba2b12a3235a7761b00fb2b027f36aa8314db2f6b6ad51d374",
+    "opencc/dictionary/HKVariantsPhrases.txt": "d790e9bcafd2610efc3c44db7d859d6882d2864ac43792fd13fd2825cb341192",
+    "opencc/dictionary/HKVariantsRev.txt": "2b4fdb5865703f1cf75d6e524e0b0d33733e9bb6f92df697cf1ad8fe27989619",
+    "opencc/dictionary/HKVariantsRevPhrases.txt": "c2da309afa7fdd9061f204664039d33b000a4dca0ecae4e7480dcbf9e20f658e",
+    "opencc/dictionary/JPVariants.txt": "7e998db5d6f437a605c901c9413ccd7505f8b2e1cd3f9e2dd84572d0af1d3fc0",
+    "opencc/dictionary/STCharacters.txt": "9207708da9f2e2a248f39c457b2fccad26ec42e7efaf47a860e6900464f4cac5",
+    "opencc/dictionary/STPhrases.txt": "a4de4d2471f73cdb7e5b1b22920139aa4e4bbb1ebeea8f1fc341f988aa75c586",
+    "opencc/dictionary/TSCharacters.txt": "6b5a0a799bea2bb22c001f635eaa3fc2904310f0c08addbff275477a80ecf09a",
+    "opencc/dictionary/TSPhrases.txt": "b2ef895dd4953b4bb77fc8ef8d26a2a9ca6d43a760ed9a1d767672cfafa6324f",
+    "opencc/dictionary/TWPhrases.txt": "2ac64976553b8dd1f8d308b699540716099c04238d175ff336f53ababed26f07",
+    "opencc/dictionary/TWPhrasesRev.txt": "85059c3722d6098a44db23d78ef583fb10e34002c5ea717ab738d3b170d48d14",
+    "opencc/dictionary/TWVariants.txt": "30e6f8395edbfdd74e293fd8b9c62105d787c849fbb208d2a7832eac696734d7",
+    "opencc/dictionary/TWVariantsRev.txt": "1ea2b90f85eea6a2c9440716beee3268c740408caa334aa890bb4a35833f1b72",
+    "opencc/dictionary/TWVariantsRevPhrases.txt": "bef60ceb4e57b6b062351406cb5d4644875574231d64787e03711317b7e773f3"
+  }
+}

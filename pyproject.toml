@@ -32,6 +32,8 @@ dependencies = [
     "beautifulsoup4==4.15.0",
     "soupsieve<3",
     "charset-normalizer==3.5.2",
+    "jieba==0.42.1",
+    "opencc-python-reimplemented==0.1.7",
 ]
 
 [dependency-groups]

@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Phase6 plan11 verified; continuing12
-last_updated: "2026-10-28T08:54:55.994216+00:00"
-last_activity: 2026-10-28 -- Paper verified; continuing12
+stopped_at: Phase6 plan12 verified; continuing13
+last_updated: "2026-10-28T16:12:04.929560+00:00"
+last_activity: 2026-10-28 -- Laws verified; continuing13
 progress:
   total_phases: 8
   completed_phases: 4
   total_plans: 176
-  completed_plans: 157
-  percent: 89
+  completed_plans: 158
+  percent: 90
 ---
 
 # Project State
@@ -21,18 +21,18 @@ progress:
 See: .planning/PROJECT.md (updated 2026-10-05)
 
 **Core value:** A user can upload a document into a knowledge base and get an accurate, cited answer to a question about it, end-to-end through the real pipeline (parse, chunk, embed, index, hybrid retrieve, rerank, generate), with no mocked stages.
-**Current focus:** Phase 6 execution — 06-12 legal structure and Chinese normalization
+**Current focus:** Phase 6 execution — 06-13 presentation slide grouping
 
 ## Current Position
 
 Phase: 6 (deep-parsing-and-chunking-breadth) — EXECUTING
-Plan: 12 of 30; plans01–11 complete; Laws next
-Status: Plans01–11 complete; R232..242 recorded. Unit2621/8existing skips,web2164,Go,worker2,browser1,stack39,services84,routes-leaks172,CI7/security/generated/admission green. Zero paid calls.
+Plan: 13 of 30; plans01–12 complete; Presentation next
+Status: Plans01–12 complete; R232..243 recorded. Unit2632/8existing skips,web2165,Go,worker/edit51,browser1,stack40,services85,routes-leaks172,CI7/security/generated/admission green. Two approved packages; zero paid calls.
 Prior checks: Phase5 UAT5/6 passed (two user answer judgments and delegated screenshot/Chinese/footprint review). Final Phase5 acceptance remains pending; Phase4 B36 remains separately deferred. Prior paid evidence retained.
-Current checkpoint:11 verified; Paper sections and real retrieval. Continue12; existing acquisition/publication approvals persist.
+Current checkpoint:12 verified; Laws ancestry and real Chinese retrieval parity. Continue13; existing acquisition/publication approvals persist.
 Last activity: 2026-10-28
 
-Progress: 157/176 currently planned execution plans complete (89%); Phase6 11/30 complete.
+Progress: 158/176 currently planned execution plans complete (90%); Phase6 12/30 complete.
 
 ## Performance Metrics
 

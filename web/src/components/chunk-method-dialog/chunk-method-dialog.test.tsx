@@ -81,15 +81,15 @@ describe("Chunking method dialog, document mode (UI-13, UI-14)", () => {
     expect(within(dialog).getByTestId("field-overlap")).toHaveValue(10);
   });
 
-  it("lists fourteen methods in documentation order with eight disabled radios and the badge", async () => {
+  it("lists fourteen methods in documentation order with seven disabled radios and the badge", async () => {
     const { dialog } = await openFirst();
     const radios = within(dialog).getAllByRole("radio");
     expect(radios).toHaveLength(14);
-    expect(radios.filter((radio) => radio.hasAttribute("disabled"))).toHaveLength(8);
+    expect(radios.filter((radio) => radio.hasAttribute("disabled"))).toHaveLength(7);
     expect(radios.map((radio) => radio.getAttribute("data-testid"))).toEqual(CHUNK_METHODS.map((id) => `chunk-method-option-${id}`));
     expect(screen.getByTestId(`chunk-method-option-${GENERAL_METHOD}`)).toBeChecked();
     const group = within(dialog).getByTestId("chunk-method-group");
-    expect(within(group).getAllByText("Available in a later release")).toHaveLength(8);
+    expect(within(group).getAllByText("Available in a later release")).toHaveLength(7);
     expect(within(group).getByText("Choose an available method for the next parse.")).toBeInTheDocument();
     for (const title of ["General", "Q&A", "Paper", "Book", "Laws", "Presentation", "Tables", "Manual"]) expect(within(group).getByText(title)).toBeInTheDocument();
     expect(radios.find((radio) => radio.hasAttribute("disabled"))).toHaveAccessibleDescription("Available in a later release");
@@ -508,5 +508,21 @@ describe("Paper section controls", () => {
     await user.click(within(dialog).getByTestId("chunk-method-submit"));
     await waitFor(() => expect(sent(detailUrl(1), "PATCH")).toHaveLength(1));
     expect(sent(detailUrl(1), "PATCH")[0]).toEqual({ parser_id: "paper" });
+  });
+});
+
+describe("Laws section controls", () => {
+  it("saves Laws with size control and explains section boundaries without ignored split controls", async () => {
+    const { user, dialog } = await openFirst();
+    const option = within(dialog).getByTestId("chunk-method-option-laws");
+    expect(option).not.toBeDisabled();
+    await user.click(option);
+    expect(within(dialog).getByTestId("laws-settings-note")).toHaveTextContent("chapters, sections, articles and items");
+    expect(within(dialog).getByTestId("field-chunk-size")).not.toBeDisabled();
+    expect(within(dialog).getByTestId("field-delimiters")).toBeDisabled();
+    expect(within(dialog).getByTestId("field-overlap")).toBeDisabled();
+    await user.click(within(dialog).getByTestId("chunk-method-submit"));
+    await waitFor(() => expect(sent(detailUrl(1), "PATCH")).toHaveLength(1));
+    expect(sent(detailUrl(1), "PATCH")[0]).toEqual({ parser_id: "laws" });
   });
 });

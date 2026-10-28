@@ -15,7 +15,7 @@ func TestStaticCatalogIsFiniteAndReturnedCopiesAreIndependent(t *testing.T) {
 		require.Equal(t, v.ID, v.ParserID)
 		require.NotEmpty(t, v.Description)
 		require.NotNil(t, v.ParserConfig)
-		require.Equal(t, v.ID == "naive" || v.ID == "one" || v.ID == "manual" || v.ID == "qa" || v.ID == "book" || v.ID == "paper", v.Available)
+		require.Equal(t, v.ID == "naive" || v.ID == "one" || v.ID == "manual" || v.ID == "qa" || v.ID == "book" || v.ID == "paper" || v.ID == "laws", v.Available)
 	}
 	catalog[0].ParserConfig["credential"] = "test-only-mutation"
 	catalog[0].Name = "changed"

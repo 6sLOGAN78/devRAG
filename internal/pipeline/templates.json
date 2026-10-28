@@ -41,7 +41,7 @@
     "description": "Follow legal articles.",
     "parser_id": "laws",
     "parser_config": {},
-    "available": false
+    "available": true
   },
   {
     "id": "presentation",

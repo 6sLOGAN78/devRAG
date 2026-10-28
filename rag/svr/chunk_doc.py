@@ -15,7 +15,7 @@ from typing import Any
 
 from common.doc_store.doc_store_base import vector_field
 from rag.chunking.types import Chunk
-from rag.nlp.tokenizer import fine_grained_tokenize, tokenize
+from rag.nlp.tokenizer import fine_grained_tokenize, has_chinese, tokenize, tokenize_with_offsets
 from rag.parsers.table_features import MAX_TABLE_FEATURE_BYTES, TABLE_FIELD
 from rag.svr.failure import TaskFailure
 
@@ -46,6 +46,19 @@ def l2_normalize(vector: list[float]) -> list[float]:
 
 def _stem(name: str) -> str:
     return name.rsplit(".", 1)[0] if "." in name else name
+
+
+def text_features(text: str) -> dict[str, Any]:
+    """Indexed tokens and original half-open source offsets change together."""
+    features: dict[str, Any] = {"content_sm_ltks": " ".join(fine_grained_tokenize(text))}
+    if has_chinese(text):
+        spans = tokenize_with_offsets(text)
+        tokens = [span.text for span in spans]
+        features["content_token_offsets_int"] = [[span.start, span.end] for span in spans]
+    else:
+        tokens = tokenize(text)
+    features["content_ltks"] = " ".join(tokens)
+    return features
 
 
 def build_row(
@@ -84,13 +97,12 @@ def build_row(
         features[TABLE_FIELD] = encoded
     return {
         **features,
+        **text_features(chunk.text),
         "id": chunk_id,
         "doc_id": doc_id,
         "kb_id": kb_id,
         "docnm_kwd": doc_name,
         "content_with_weight": chunk.text,
-        "content_ltks": " ".join(tokenize(chunk.text)),
-        "content_sm_ltks": " ".join(fine_grained_tokenize(chunk.text)),
         "title_tks": " ".join(tokenize(title)),
         "title_sm_tks": " ".join(fine_grained_tokenize(title)),
         "position_int": [[int(b.page), int(b.x0), int(b.top), int(b.x1), int(b.bottom)] for b in boxes],

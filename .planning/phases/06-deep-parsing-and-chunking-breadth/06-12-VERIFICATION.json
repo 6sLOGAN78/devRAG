@@ -1,0 +1,123 @@
+{
+  "recorded_at": "2026-10-28T16:12:42.682757+00:00",
+  "plan": "06-12",
+  "paid_calls": 0,
+  "new_packages": 2,
+  "new_models": 0,
+  "python_existing_skips": 8,
+  "human_uat_approved": false,
+  "phase_gate_complete": false,
+  "evidence": {
+    "python_unit": {
+      "log": "ragflow-logs/phase6-12-unit-final.log",
+      "sha256": "9211dacc5708e044e1afd4014e51ada2a149053940481ebb35de21becd928b19",
+      "passed": 2632
+    },
+    "focused": {
+      "log": "ragflow-logs/phase6-12-token-focused-final.log",
+      "sha256": "7c14b39b33d0a66e347371ae12812e5180d41a3f68518b7ac73cc31e5144be52",
+      "passed": 66
+    },
+    "frontend": {
+      "log": "ragflow-logs/phase6-12-web-final.log",
+      "sha256": "2131f581c6480baa337d99981f5cbd16401a8d1257a9aa353cd4e5567e277ce3",
+      "passed": 2165
+    },
+    "frontend_focused": {
+      "log": "ragflow-logs/phase6-12-ui-final.log",
+      "sha256": "22220a7a884b404d5a38333c8ddacd1aeca80a0b67e9dc7f5a448cb042297952",
+      "passed": 64
+    },
+    "go": {
+      "log": "ragflow-logs/phase6-12-go.log",
+      "sha256": "1eaec44245f83423a2e01d83575eb62d150373040b533c721f8117b8413d8da7",
+      "passed": null
+    },
+    "worker_edits_paper": {
+      "log": "ragflow-logs/phase6-12-focused-green.log",
+      "sha256": "3bace14a04721b174c61f6cd29c8ba6320c5aabe01fcaee1db31501e65915ea2",
+      "passed": 51
+    },
+    "browser": {
+      "log": "ragflow-logs/phase6-12-browser-request-proof.log",
+      "sha256": "cc27e3de7e923bb6cdbd0f28cc11422a0d058f6ba7c7a3818835f59d300c84f6",
+      "passed": 1
+    },
+    "stack_regressions": {
+      "log": "ragflow-logs/phase6-12-stack-regressions.log",
+      "sha256": "0f22c39774f3ab2f343b50fcaad5c0caad9c243a891dd377c59660bc6b500549",
+      "passed": 40
+    },
+    "services": {
+      "log": "ragflow-logs/phase6-12-services.log",
+      "sha256": "979f3f357e386a2b29e5fc43e9a5a93d62f4f3cd8d233e6d02d2586023fefcd1",
+      "passed": 85
+    },
+    "routes_leaks": {
+      "log": "ragflow-logs/phase6-12-routes-leaks.log",
+      "sha256": "9f3fe0fb68216857f005714ed65d172118d8fa6c27340fd16ad814de22bf3084",
+      "passed": 172
+    },
+    "records": {
+      "log": "ragflow-logs/phase6-12-records-final.log",
+      "sha256": "62a94b055a6a8977edabd336b5aaf273fb43a93cda229775ba1641a2c3f39356",
+      "passed": 16
+    },
+    "ci": {
+      "log": "ragflow-logs/phase6-12-ci-final.log",
+      "sha256": "e5ba51248111b092319eae753b8d7a2cd4350ddd3573d338c0c00d6b10c7ca62",
+      "passed": 7
+    },
+    "security": {
+      "log": "ragflow-logs/phase6-12-security.log",
+      "sha256": "b367c16ffbb73dfdcc3c1aeae396f76fca403b16dd14131d796f57bfdd669a84",
+      "passed": null
+    },
+    "openapi": {
+      "log": "ragflow-logs/phase6-12-openapi.log",
+      "sha256": "9ced52903c5f49dc098b68b9f9f5af8a59c137ea3be0fadf34b7db918656d612",
+      "passed": null
+    },
+    "admission": {
+      "log": "ragflow-logs/phase6-12-admission.log",
+      "sha256": "4c252837496ecc81e6a3983922a33c8ab1831da0e1cbbe0e62baf321c8b05dcb",
+      "passed": null
+    },
+    "offline_runtime": {
+      "log": "ragflow-logs/phase6-12-runtime-check.log",
+      "sha256": "4554a9ccfacd8110ba11655279db08ebf1e0bd2c26d47eb52a3e417c5d8e8c90",
+      "passed": null
+    },
+    "health": {
+      "log": "ragflow-logs/phase6-12-health.log",
+      "sha256": "dafbc61308f1b634ab2b7661060fda84684fc4f7765f0cef827fdae1fe10e130",
+      "passed": null
+    }
+  },
+  "containers": [
+    {
+      "name": "devrag-stack-app-1",
+      "image": "sha256:c8e5b5f4d2894ee204056f6c892219e89afdccbd3bcffecf8db730a3f4f961eb",
+      "health": "healthy",
+      "started_at": "2026-10-28T16:02:17.768317347Z"
+    },
+    {
+      "name": "devrag-stack-task-executor-3",
+      "image": "sha256:c8e5b5f4d2894ee204056f6c892219e89afdccbd3bcffecf8db730a3f4f961eb",
+      "health": "healthy",
+      "started_at": "2026-10-28T16:02:17.351914494Z"
+    },
+    {
+      "name": "devrag-stack-deepdoc-1",
+      "image": "sha256:4011c5f8b1853b88d5403c87cfec1199431cdd6c74c435d72696bccae2e3de3b",
+      "health": "healthy",
+      "started_at": "2026-10-28T16:02:17.968755372Z"
+    }
+  ],
+  "screenshot": {
+    "path": "output/playwright/phase6-review/laws-original-source.png",
+    "sha256": "7ab5c9a650643b80b189e7d3658b128c83a5f06afc283c68822633ad4ab9c168",
+    "reviewer": "assistant, actual Chrome"
+  },
+  "dependency_base": "06-12-ACQUISITION.json"
+}

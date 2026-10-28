@@ -1,7 +1,6 @@
 """Text normalisation for tokenising: NFKC (full-width to half-width), lower case, whitespace collapse.
 
-Traditional-to-simplified Chinese conversion is NOT performed (D-27, R-160): it needs a mapping table that is not in the
-approved package set. CHUNK-17 is therefore recorded as partial. Every function here runs in linear time.
+Chinese dictionary conversion and source offsets are handled separately by token_offsets/chinese.
 """
 
 from __future__ import annotations

@@ -468,3 +468,19 @@ def test_adds_and_edits_share_a_per_tenant_window_with_parse_numbers():
             raw.delete(f"chunk:{tenant}")
         finally:
             raw.close()
+
+
+def test_chinese_edit_replaces_offsets_and_english_edit_clears_them(world, fake):
+    doc_id = document(world)
+    ids = seed(world, doc_id, 1, text="檔案保存期限")
+    fake.embedding_dim = DIMENSION
+    edit(world, doc_id, ids[0], text="ＡＢＣ 新檔案")
+    row = stored(world, ids[0])
+    terms = row["content_ltks"].split()
+    spans = row["content_token_offsets_int"]
+    assert len(terms) == len(spans)
+    assert row["content_with_weight"][slice(*spans[terms.index("abc")])] == "ＡＢＣ"
+    edit(world, doc_id, ids[0], text="English only")
+    row = stored(world, ids[0])
+    assert row["content_ltks"] == "english only"
+    assert row["content_token_offsets_int"] == []
