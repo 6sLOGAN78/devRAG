@@ -40,6 +40,7 @@ class ParsedBlock:
     layout_label: LayoutLabel | None = None
     assets: tuple[ParsedAsset, ...] = ()
     table: Table | None = None
+    image_ids: tuple[str, ...] = ()
 
     def __post_init__(self) -> None:
         if self.layout_label is not None and self.layout_label not in LAYOUT_LABELS:

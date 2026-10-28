@@ -139,7 +139,12 @@ def load_endpoints(path: Path, routes: list[dict[str, Any]]) -> list[dict[str, A
         # A row may tighten a family that accepts API or beta tokens to session-only (`jwt`), never loosen it:
         # key-writing methods share a path with readable ones (plan 03-04, D-19).
         tightens = raw["auth"] == "jwt" and family["auth"] in ("api", "beta")
-        if family["auth"] != raw["auth"] and not tightens:
+        # The documented static catalog has exactly two public GETs under a protected Go family.
+        static_catalog_get = (raw["method"], raw["path"], raw["owner"], raw["auth"], raw["scope"]) in {
+            ("GET", "/api/v1/pipelines", "go", "none", "none"),
+            ("GET", "/api/v1/pipelines/{id}", "go", "none", "none"),
+        } and family["auth"] == "jwt" and not raw["roles"]
+        if family["auth"] != raw["auth"] and not tightens and not static_catalog_get:
             raise RouteError(f"endpoint {where} auth {raw['auth']} disagrees with family {family['path']}")
         rows.append({k: raw[k] for k in sorted(REQUIRED_FIELDS)})
     return rows

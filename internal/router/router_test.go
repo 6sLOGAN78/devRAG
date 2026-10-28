@@ -280,14 +280,14 @@ func TestRegisteredRoutesBelongToGoEntriesInRoutesYAML(t *testing.T) {
 	}
 	owned := func(entries []routeEntry, path string) bool {
 		for _, r := range entries {
-			if (r.Match == "exact" && r.Path == path) || (r.Match == "prefix" && !strings.HasPrefix(r.Path, "/api/") && strings.HasPrefix(path, r.Path)) {
+			if (r.Match == "exact" && r.Path == path) || (r.Match == "prefix" && (!strings.HasPrefix(r.Path, "/api/") || r.Path == "/api/v1/pipelines/") && strings.HasPrefix(path, r.Path)) {
 				return true
 			}
 		}
 		return false
 	}
 	routes := healthy(t).Routes()
-	require.Len(t, routes, 5)
+	require.Len(t, routes, 7)
 	for _, r := range routes {
 		assert.True(t, owned(goEntries, r.Path), "route %s is not a Go entry in routes.yaml", r.Path)
 		for _, py := range pyEntries {
@@ -468,6 +468,11 @@ func TestEveryGoFamilyIsDeniedUnlessPublic(t *testing.T) {
 			path += "prefixprobe-0b8f3c1e"
 		}
 		checked++
+		if common.PolicyFor(http.MethodGet, path).Auth == "none" {
+			// Exact documented public GETs override their protected routing family.
+			assert.Equal(t, http.StatusUnauthorized, do(e, http.MethodPost, path, nil).Code)
+			continue
+		}
 		assert.Equal(t, http.StatusUnauthorized, do(e, http.MethodGet, path, nil).Code, "%s %s", r.Match, r.Path)
 	}
 	assert.GreaterOrEqual(t, checked, 8)

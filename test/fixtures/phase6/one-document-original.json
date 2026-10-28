@@ -1,0 +1,25 @@
+{
+  "source": "original hand-written PDF; frozen before execution",
+  "sha256": "7f782a2228ba148994bdec38e326e5264a922100c4ccb709a4f54499e0b2d09d",
+  "source_page_count": 14,
+  "selection": [
+    [
+      2,
+      3
+    ],
+    [
+      13,
+      14
+    ]
+  ],
+  "expected_pages": [
+    2,
+    3,
+    13,
+    14
+  ],
+  "required_facts": [
+    "LIGHTHOUSE 52",
+    "ORCHARD 9100"
+  ]
+}

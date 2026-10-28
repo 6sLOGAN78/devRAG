@@ -76,6 +76,8 @@ func NewEngine(cfg server.Config, logger *zap.Logger, sys *handler.System, opts 
 	e.GET("/api/v1/system/config", sys.Config)
 	e.GET("/api/v1/system/version", sys.Version)
 	e.GET("/api/v1/language", sys.Language)
+	e.GET("/api/v1/pipelines", handler.BuiltinPipelines)
+	e.GET("/api/v1/pipelines/:id", handler.BuiltinPipeline)
 
 	for _, register := range st.routes {
 		register(e)

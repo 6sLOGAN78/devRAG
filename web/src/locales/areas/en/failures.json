@@ -21,7 +21,8 @@
         "queue": "The task queue wasn't available.",
         "documentGone": "The document was deleted while it was being parsed.",
         "unknown": "Parsing failed for an unexpected reason.",
-        "nativeUnavailable": "The native parsing service is not available. Try again shortly."
+        "nativeUnavailable": "The native parsing service is not available. Try again shortly.",
+        "chunkTooLong": "The whole document exceeds the embedding model context. Choose another chunking method."
       },
       "step": {
         "queue": "Waiting for a worker",

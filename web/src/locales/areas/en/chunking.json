@@ -17,7 +17,7 @@
       "later": "Available in a later release",
       "method": {
         "legend": "Method",
-        "help": "General is the only method in this release.",
+        "help": "Choose an available method for the next parse.",
         "general": {
           "title": "General",
           "body": "Splits text into chunks of a set size, ending at the delimiters you choose. Works for most documents."
@@ -49,6 +49,30 @@
         "manual": {
           "title": "Manual",
           "body": "Follows the heading structure of technical manuals."
+        },
+        "resume": {
+          "title": "Resume",
+          "body": "Extracts structured resume details."
+        },
+        "picture": {
+          "title": "Picture",
+          "body": "Describes document images."
+        },
+        "email": {
+          "title": "Email",
+          "body": "Keeps each email together."
+        },
+        "tag": {
+          "title": "Tag",
+          "body": "Reads explicit document tags."
+        },
+        "one": {
+          "title": "One document",
+          "body": "Keeps all selected content in one chunk. Documents exceeding the embedding context are refused."
+        },
+        "audio": {
+          "title": "Audio",
+          "body": "Keeps transcript timestamps."
         }
       },
       "storedUnavailable": "This document is set to {{method}}, which isn't available yet. Choose General to parse it.",
@@ -80,7 +104,8 @@
       "saved": "Chunking settings saved",
       "error": {
         "loadHeading": "Couldn't load the chunking settings"
-      }
+      },
+      "oneSettings": "Chunk size, delimiters and overlap do not split One document. PDF page selection and layout still apply."
     }
   },
   "errors": {

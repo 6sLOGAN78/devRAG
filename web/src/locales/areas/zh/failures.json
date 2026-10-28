@@ -21,7 +21,8 @@
         "queue": "任务队列当时不可用。",
         "documentGone": "解析过程中该文档已被删除。",
         "unknown": "解析因意外原因失败。",
-        "nativeUnavailable": "原生解析服务暂时不可用，请稍后重试。"
+        "nativeUnavailable": "原生解析服务暂时不可用，请稍后重试。",
+        "chunkTooLong": "整个文档超出了嵌入模型的上下文限制。请选择其他分块方法。"
       },
       "step": {
         "queue": "等待处理程序",

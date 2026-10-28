@@ -17,3 +17,4 @@ class Chunk:
     token_num: int
     index: int
     tables: tuple[Table, ...] = ()
+    image_ids: tuple[str, ...] = ()

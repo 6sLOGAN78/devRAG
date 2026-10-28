@@ -121,11 +121,36 @@ def _parse_and_chunk(ctx: TaskContext, deps: PipelineDeps, control: TaskControl,
             table = block.table
             if table is not None:
                 table = replace(table, asset_id=asset_ids[("table", table.asset_sha256)])
-            yield replace(block, assets=(), table=table)
+            owned_ids = tuple(dict.fromkeys((*block.image_ids, *(asset_ids[(a.kind, a.sha256)] for a in block.assets))))
+            yield replace(block, assets=(), table=table, image_ids=owned_ids)
 
     with deps.limiters.chunk_limiter:
         options = {"settings": deps.settings, "parser_config": ctx.parser_config} if spec.name == "pdf" else ({"settings": deps.settings} if spec.name in {"docx", "pptx"} else {})
-        blocks = spec.load().parse(source, report, page_range=page_range, limits=limits, **options)
+        if ctx.parser_id == "one" and spec.name == "pdf":
+            from rag.parsers.page_selection import selected_ranges
+            from rag.parsers.errors import FileTooLarge
+
+            def selected_blocks():
+                report.pages_total = 0
+                text_bytes = 0
+                for interval in selected_ranges(ctx.parser_config.get("pages"), page_range):
+                    control.check()
+                    part = ParseReport()
+                    for block in spec.load().parse(source, part, page_range=interval, limits=limits, **options):
+                        text_bytes += len(block.text.encode("utf-8"))
+                        if text_bytes > limits.max_text_bytes:
+                            raise FileTooLarge()
+                        yield block
+                    report.pages_total += int(part.pages_total or 0)
+                    report.pages_without_text += part.pages_without_text
+                    report.images_skipped += part.images_skipped
+                    report.layout_regions += part.layout_regions
+                    report.layout_backend = part.layout_backend or report.layout_backend
+                    for note in part.notes:
+                        report.add_note(note)
+            blocks = selected_blocks()
+        else:
+            blocks = spec.load().parse(source, report, page_range=page_range, limits=limits, **options)
         for chunk in chunker(text_blocks(blocks), get_chunker_config(ctx.parser_id, ctx.parser_config)):
             control.check()
             if chunk.text.strip():

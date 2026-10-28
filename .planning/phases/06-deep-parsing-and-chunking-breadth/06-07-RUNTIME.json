@@ -1,0 +1,50 @@
+{
+  "recorded_at": "2026-10-28T05:48:16.882678+00:00",
+  "native_vendor_source_image": "sha256:6358c0f705ecb113ee4c5b4abe924a771c45eea405d3a841abc44170b440fcec",
+  "native_rebuild_recipe": "06-07-NATIVE-REBUILD.Dockerfile",
+  "dependency_change": false,
+  "new_package_acquisition": false,
+  "notes": "Fresh app/worker and current DeepDoc/parser source; unchanged already-verified native vendor copied from exact plan06 image. Native standard rebuild was interrupted before service replacement when re-download stalled. No new model or package/version.",
+  "pre_format_containers": [
+    {
+      "name": "devrag-stack-app-1",
+      "image": "sha256:537d42be4427aedf4027ab20db5f469b2b6a8ec1db663e933dcff694231370d5",
+      "health": "healthy",
+      "started_at": "2026-10-28T04:53:11.669187619Z"
+    },
+    {
+      "name": "devrag-stack-task-executor-3",
+      "image": "sha256:537d42be4427aedf4027ab20db5f469b2b6a8ec1db663e933dcff694231370d5",
+      "health": "healthy",
+      "started_at": "2026-10-28T04:53:12.06655471Z"
+    },
+    {
+      "name": "devrag-stack-deepdoc-1",
+      "image": "sha256:6358c0f705ecb113ee4c5b4abe924a771c45eea405d3a841abc44170b440fcec",
+      "health": "healthy",
+      "started_at": "2026-10-28T04:53:11.887287487Z"
+    }
+  ],
+  "containers": [
+    {
+      "name": "devrag-stack-app-1",
+      "image": "sha256:492ec570ffc27f30fbfee824bb4f89afa90a73e6acd9c827c54a3b9ceaaa824e",
+      "health": "healthy",
+      "started_at": "2026-10-28T04:59:03.672912807Z"
+    },
+    {
+      "name": "devrag-stack-task-executor-3",
+      "image": "sha256:492ec570ffc27f30fbfee824bb4f89afa90a73e6acd9c827c54a3b9ceaaa824e",
+      "health": "healthy",
+      "started_at": "2026-10-28T04:59:03.471345695Z"
+    },
+    {
+      "name": "devrag-stack-deepdoc-1",
+      "image": "sha256:4094795686816f469f5d7324d927d7a71740f89a81f4855d25c9e34e07e8b182",
+      "health": "healthy",
+      "started_at": "2026-10-28T04:59:03.278405454Z"
+    }
+  ],
+  "final_status": "healthy images; final five feature checks passed after approved cache-only cleanup",
+  "native_vendor_first_verified_image": "sha256:329b88176cef2dca6651ab25891e7ff10c00f5624fc0712387ca8cd2ca832d9d"
+}

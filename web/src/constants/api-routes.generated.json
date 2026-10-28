@@ -77,6 +77,14 @@
       "port": 9380
     },
     {
+      "owner": "go",
+      "match": "exact",
+      "path": "/api/v1/pipelines",
+      "auth": "jwt",
+      "publicUntilPhase": null,
+      "port": 9384
+    },
+    {
       "owner": "python",
       "match": "exact",
       "path": "/api/v1/providers",
@@ -177,6 +185,14 @@
       "match": "prefix",
       "path": "/api/v1/searchbots/",
       "auth": "beta",
+      "publicUntilPhase": null,
+      "port": 9384
+    },
+    {
+      "owner": "go",
+      "match": "prefix",
+      "path": "/api/v1/pipelines/",
+      "auth": "jwt",
       "publicUntilPhase": null,
       "port": 9384
     },

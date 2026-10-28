@@ -43,6 +43,7 @@ class _Builder:
         self.boxes: list[PageBox] = []
         self.sizes: dict[int, tuple[float, float]] = {}
         self.tables = []
+        self.image_ids = []
         self.fresh = False  # True once a real unit (not only an overlap tail) was added
 
     def add_meta(self, block: ParsedBlock) -> None:
@@ -50,6 +51,9 @@ class _Builder:
             if box not in self.boxes:
                 self.boxes.append(box)
         self.sizes.update(block.page_sizes)
+        for identifier in block.image_ids:
+            if identifier not in self.image_ids:
+                self.image_ids.append(identifier)
         if block.table is not None and block.table not in self.tables:
             self.tables.append(block.table)
 
@@ -64,7 +68,7 @@ def chunk(blocks: Iterable[ParsedBlock], cfg: NaiveConfig) -> Iterator[Chunk]:
         nonlocal index
         if not text.strip():
             return None
-        made = Chunk(text, tuple(builder.boxes), dict(builder.sizes), count_tokens(text), index, tables=tuple(builder.tables))
+        made = Chunk(text, tuple(builder.boxes), dict(builder.sizes), count_tokens(text), index, tables=tuple(builder.tables), image_ids=tuple(builder.image_ids))
         index += 1
         return made
 

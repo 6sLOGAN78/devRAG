@@ -2,13 +2,13 @@
  * Chunking methods in the order of docs/02-frontend/components.md (D-15). Ids live here so no component carries a method
  * name as a literal. `IMPLEMENTED` mirrors the server's `IMPLEMENTED_PARSERS`: only those can be chosen or sent.
  */
-export const CHUNK_METHODS = ["naive", "qa", "paper", "book", "laws", "presentation", "table", "manual"] as const;
+export const CHUNK_METHODS = ["naive", "qa", "paper", "book", "laws", "presentation", "table", "manual", "resume", "picture", "email", "tag", "one", "audio"] as const;
 
 export type ChunkMethod = (typeof CHUNK_METHODS)[number];
 
 export const GENERAL_METHOD: ChunkMethod = "naive";
 
-export const IMPLEMENTED: readonly ChunkMethod[] = [GENERAL_METHOD];
+export const IMPLEMENTED: readonly ChunkMethod[] = [GENERAL_METHOD, "one"];
 
 /** The locale stem of a method: `datasets.chunking.method.<stem>` has `.title` and `.body`. */
 export const METHOD_STEMS: Readonly<Record<ChunkMethod, string>> = {
@@ -20,6 +20,12 @@ export const METHOD_STEMS: Readonly<Record<ChunkMethod, string>> = {
   presentation: "presentation",
   table: "table",
   manual: "manual",
+  resume: "resume",
+  picture: "picture",
+  email: "email",
+  tag: "tag",
+  one: "one",
+  audio: "audio",
 };
 
 export const isChunkMethod = (value: string): value is ChunkMethod => (CHUNK_METHODS as readonly string[]).includes(value);

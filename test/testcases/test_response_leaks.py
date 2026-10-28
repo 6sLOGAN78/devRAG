@@ -107,6 +107,13 @@ class Sweep:
 
 
 def sweep_public_rows(s: Sweep) -> None:
+    row = "GET /api/v1/pipelines"
+    s.req(row, "success", "GET", "/api/v1/pipelines?type=builtin")
+    s.req(row, "unknown type", "GET", "/api/v1/pipelines?type=private")
+    s.req(row, "invalid credential ignored", "GET", "/api/v1/pipelines?type=builtin", token="catalog-invalid-credential")
+    row = "GET /api/v1/pipelines/{id}"
+    s.req(row, "success", "GET", "/api/v1/pipelines/one")
+    s.req(row, "unknown id", "GET", "/api/v1/pipelines/unknown")
     for path in ("/health", "/api/v1/system/ping", "/api/v1/system/config", "/api/v1/language", "/api/v1/system/healthz", "/system/healthz"):
         s.req(f"GET {path}", "success", "GET", path)
         s.req(f"GET {path}", "wrong method", "POST", path)

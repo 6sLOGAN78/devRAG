@@ -127,6 +127,39 @@
         "title": "AssistantView",
         "type": "object"
       },
+      "BuiltinPipelineTemplate": {
+        "additionalProperties": false,
+        "properties": {
+          "available": {
+            "type": "boolean"
+          },
+          "description": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "parser_config": {
+            "additionalProperties": true,
+            "type": "object"
+          },
+          "parser_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "description",
+          "parser_id",
+          "parser_config",
+          "available"
+        ],
+        "type": "object"
+      },
       "CheckView": {
         "properties": {
           "dimension": {
@@ -2159,7 +2192,7 @@
     }
   },
   "info": {
-    "title": "devRag Python API",
+    "title": "devRag API",
     "version": "1"
   },
   "openapi": "3.1.0",
@@ -4892,6 +4925,112 @@
           }
         },
         "summary": "Set or clear the default chat and embedding model. Only the slots named in the body change."
+      }
+    },
+    "/api/v1/pipelines": {
+      "get": {
+        "description": "Public static build metadata served by Go. No tenant or runtime state.",
+        "operationId": "listBuiltinPipelines",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "type",
+            "required": true,
+            "schema": {
+              "enum": [
+                "builtin"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "const": 0,
+                      "type": "integer"
+                    },
+                    "data": {
+                      "items": {
+                        "$ref": "#/components/schemas/BuiltinPipelineTemplate"
+                      },
+                      "type": "array"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "message",
+                    "data"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Static template metadata"
+          },
+          "400": {
+            "description": "Fixed refusal"
+          }
+        },
+        "security": [],
+        "x-api-owner": "go"
+      }
+    },
+    "/api/v1/pipelines/{id}": {
+      "get": {
+        "description": "Public static build metadata served by Go. No tenant or runtime state.",
+        "operationId": "getBuiltinPipeline",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "const": 0,
+                      "type": "integer"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/BuiltinPipelineTemplate"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "message",
+                    "data"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Static template metadata"
+          },
+          "404": {
+            "description": "Fixed refusal"
+          }
+        },
+        "security": [],
+        "x-api-owner": "go"
       }
     },
     "/api/v1/providers": {

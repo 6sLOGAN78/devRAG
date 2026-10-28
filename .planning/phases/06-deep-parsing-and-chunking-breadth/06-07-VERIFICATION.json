@@ -1,0 +1,84 @@
+{
+  "recorded_at": "2026-10-28T05:48:16.882678+00:00",
+  "plan": "06-07",
+  "paid_calls": 0,
+  "new_packages": 0,
+  "new_models": 0,
+  "python_existing_skips": 8,
+  "human_uat_approved": false,
+  "phase_gate_complete": false,
+  "evidence": {
+    "python_unit": {
+      "log": "ragflow-logs/phase6-07-full-unit-final.log",
+      "sha256": "6ea4c330b11bf6ffdd1eddc27115478b5e5435616cacd7516bed12aba0b94a4c",
+      "passed": 2541
+    },
+    "focused_unit": {
+      "log": "ragflow-logs/phase6-07-focused-final.log",
+      "sha256": "cdfe6b484edc735ab29e6e718b73573bdbc5ff0d2abedfa93fa93039b6e0cd4a",
+      "passed": 12
+    },
+    "frontend_unit": {
+      "log": "ragflow-logs/phase6-07-web-all.log",
+      "sha256": "4a2e8b2d5483da62e05db3b3ee1f1bdf5f4c406ffab87815160fd38936a818da",
+      "passed": 2158
+    },
+    "go_internal": {
+      "log": "ragflow-logs/phase6-07-go-current.log",
+      "sha256": "f3655581f7dfdfd76a06d9aa587428cff910eaf388e5378ebdc87466c984caec"
+    },
+    "published_stack": {
+      "log": "ragflow-logs/phase6-07-published-stack.log",
+      "sha256": "fc582d06b62a41eb16b3c363fb0e63a512e498a26fbabf34d10a651a8c1b96eb",
+      "passed": 5
+    },
+    "native_regressions": {
+      "log": "ragflow-logs/phase6-07-native-regressions.log",
+      "sha256": "c10fed1dd7d09fe8bc11487b4e5a1bf5455538c325476f91cce65dc50392e688",
+      "passed": 20
+    },
+    "affected_services": {
+      "log": "ragflow-logs/phase6-07-services.log",
+      "sha256": "8af80bd3acd3a2f3c5db1576508e277cf8e4683c92456037a127f9cbaee59cf0",
+      "passed": 104
+    },
+    "routes_and_openapi": {
+      "log": "ragflow-logs/phase6-07-routes.log",
+      "sha256": "029deef6a92c8d65c74765f71fc94e9f1ab82273b2abbb55c0c8a3338deebf91",
+      "passed": 70
+    },
+    "response_log_leaks": {
+      "log": "ragflow-logs/phase6-07-leaks.log",
+      "sha256": "d546237bd7e2881a529bdafa1534e3638c05c5769e05a1e6f1c64314241d2725",
+      "passed": 6
+    },
+    "ci": {
+      "log": "ragflow-logs/phase6-07-ci.log",
+      "sha256": "955c9903de0c5db64410bee0bcbe7200b2d2ec821f8caf5e834848a37d36b592",
+      "passed": 7
+    },
+    "security": {
+      "log": "ragflow-logs/phase6-07-security.log",
+      "sha256": "35ae83fb2d63969e1665d88aa247f8dce682613fa2d31b941cd34d7628ee0b44"
+    },
+    "admission": {
+      "log": "ragflow-logs/phase6-07-admission.log",
+      "sha256": "920b07e40447627f9d1bae1d17fe957b7152d5d9afe5fb5be2998a4eadad947d"
+    },
+    "generated": {
+      "log": "ragflow-logs/phase6-07-generated-check.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  "runtime": "06-07-RUNTIME.json",
+  "screenshot": {
+    "path": "output/playwright/phase6-review/one-document-choice.png",
+    "sha256": "3a09c1e4a2398a3fd7d517a50ad3a0cd066001ba120681f73e22530db5ed39ab",
+    "reviewer": "assistant; real Chrome"
+  },
+  "notes": [
+    "Final image contains formatted current sources; full unit/frontend/Go/service/native regressions passed before the formatting-only delta, focused unit and five actual stack checks passed afterward.",
+    "Go parsing/chunking runtime mirrors remain deferred; this is the required static Go catalog and Python One implementation.",
+    "Phase5 final human acceptance and Phase4 B36 remain separate/pending."
+  ]
+}

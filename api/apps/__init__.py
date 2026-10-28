@@ -8,6 +8,7 @@ from quart_schema import QuartSchema
 
 from api.apps.auth import Resolver, register_auth_gate
 from api.apps.errors import register_error_handlers
+from api.apps.catalog_schema import CatalogOpenAPIProvider
 from api.apps.middleware import register_middleware
 from api.apps.request_body import CappedRequest
 from api.db.services import auth_service
@@ -40,7 +41,8 @@ def create_app(
         swagger_ui_path=None,
         redoc_ui_path=None,
         scalar_ui_path=None,
-        info={"title": "devRag Python API", "version": "1"},
+        info={"title": "devRag API", "version": "1"},
+        openapi_provider_class=CatalogOpenAPIProvider,
     )
     # Registered after QuartSchema so these handlers win over its default 400 responses.
     register_error_handlers(app)

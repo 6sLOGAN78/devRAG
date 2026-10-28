@@ -1,0 +1,118 @@
+[
+  {
+    "id": "naive",
+    "name": "General",
+    "description": "Split text at a configured token budget.",
+    "parser_id": "naive",
+    "parser_config": {
+      "chunk_token_num": 512,
+      "delimiter": "\n",
+      "overlapped_percent": 0
+    },
+    "available": true
+  },
+  {
+    "id": "qa",
+    "name": "Q&A",
+    "description": "Keep each question with its answer.",
+    "parser_id": "qa",
+    "parser_config": {},
+    "available": false
+  },
+  {
+    "id": "paper",
+    "name": "Paper",
+    "description": "Follow academic sections.",
+    "parser_id": "paper",
+    "parser_config": {},
+    "available": false
+  },
+  {
+    "id": "book",
+    "name": "Book",
+    "description": "Follow chapters and sections.",
+    "parser_id": "book",
+    "parser_config": {},
+    "available": false
+  },
+  {
+    "id": "laws",
+    "name": "Laws",
+    "description": "Follow legal articles.",
+    "parser_id": "laws",
+    "parser_config": {},
+    "available": false
+  },
+  {
+    "id": "presentation",
+    "name": "Presentation",
+    "description": "Keep slide boundaries.",
+    "parser_id": "presentation",
+    "parser_config": {},
+    "available": false
+  },
+  {
+    "id": "table",
+    "name": "Tables",
+    "description": "Repeat headers for each row.",
+    "parser_id": "table",
+    "parser_config": {},
+    "available": false
+  },
+  {
+    "id": "manual",
+    "name": "Manual",
+    "description": "Keep technical heading groups.",
+    "parser_id": "manual",
+    "parser_config": {},
+    "available": false
+  },
+  {
+    "id": "resume",
+    "name": "Resume",
+    "description": "Extract validated resume entities.",
+    "parser_id": "resume",
+    "parser_config": {},
+    "available": false
+  },
+  {
+    "id": "picture",
+    "name": "Picture",
+    "description": "Describe document images.",
+    "parser_id": "picture",
+    "parser_config": {},
+    "available": false
+  },
+  {
+    "id": "email",
+    "name": "Email",
+    "description": "Keep email records.",
+    "parser_id": "email",
+    "parser_config": {},
+    "available": false
+  },
+  {
+    "id": "tag",
+    "name": "Tag",
+    "description": "Read explicit document tags.",
+    "parser_id": "tag",
+    "parser_config": {},
+    "available": false
+  },
+  {
+    "id": "one",
+    "name": "One document",
+    "description": "Keep all selected content in exactly one chunk; refuse context overflow.",
+    "parser_id": "one",
+    "parser_config": {},
+    "available": true
+  },
+  {
+    "id": "audio",
+    "name": "Audio",
+    "description": "Keep transcript timestamps.",
+    "parser_id": "audio",
+    "parser_config": {},
+    "available": false
+  }
+]

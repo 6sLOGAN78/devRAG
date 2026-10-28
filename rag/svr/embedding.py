@@ -53,6 +53,12 @@ class EmbedRunner:
         with self._limiters.embed_limiter:
             bundle = self._bundle(ctx, dimension)
             release_database_connection()
+            if ctx.parser_id == "one":
+                from rag.nlp.token_count import count_tokens
+                from rag.svr.failure import TaskFailure
+
+                if any(count_tokens(text) > bundle.token_limit for text in texts):
+                    raise TaskFailure("embed", "chunk_too_long")
             vectors, _ = bundle.encode(texts)
         return vectors
 

@@ -68,6 +68,8 @@ def build_row(
     boxes = chunk.positions
     pages = sorted({int(box.page) for box in boxes})
     features = {}
+    if chunk.image_ids:
+        features["image_ids_kwd"] = list(chunk.image_ids)
     if chunk.tables:
         encoded = json.dumps([table.to_dto() for table in chunk.tables], ensure_ascii=False, separators=(",", ":"))
         if len(encoded.encode()) > MAX_TABLE_FEATURE_BYTES or len(chunk.tables) > 16:

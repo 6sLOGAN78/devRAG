@@ -421,6 +421,40 @@ export interface paths {
         patch: operations["patch_patch_defaults"];
         trace?: never;
     };
+    "/api/v1/pipelines": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Public static build metadata served by Go. No tenant or runtime state. */
+        get: operations["listBuiltinPipelines"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/pipelines/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Public static build metadata served by Go. No tenant or runtime state. */
+        get: operations["getBuiltinPipeline"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/providers": {
         parameters: {
             query?: never;
@@ -635,6 +669,16 @@ export interface components {
             update_time: number;
             /** Vector Similarity Weight */
             vector_similarity_weight: number;
+        };
+        BuiltinPipelineTemplate: {
+            available: boolean;
+            description: string;
+            id: string;
+            name: string;
+            parser_config: {
+                [key: string]: unknown;
+            };
+            parser_id: string;
         };
         /** CheckView */
         CheckView: {
@@ -2798,6 +2842,74 @@ export interface operations {
                         message: string;
                     };
                 };
+            };
+        };
+    };
+    listBuiltinPipelines: {
+        parameters: {
+            query: {
+                type: "builtin";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Static template metadata */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        code: 0;
+                        data: components["schemas"]["BuiltinPipelineTemplate"][];
+                        message: string;
+                    };
+                };
+            };
+            /** @description Fixed refusal */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getBuiltinPipeline: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Static template metadata */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        code: 0;
+                        data: components["schemas"]["BuiltinPipelineTemplate"];
+                        message: string;
+                    };
+                };
+            };
+            /** @description Fixed refusal */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };

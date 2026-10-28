@@ -36,8 +36,8 @@ def test_terminal_codes_exclude_retryable():
 
 
 def test_methods():
-    assert c.METHOD_ORDER == ("naive", "qa", "paper", "book", "laws", "presentation", "table", "manual")
-    assert c.IMPLEMENTED_PARSERS == frozenset({"naive"})
+    assert c.METHOD_ORDER == ("naive", "qa", "paper", "book", "laws", "presentation", "table", "manual", "resume", "picture", "email", "tag", "one", "audio")
+    assert c.IMPLEMENTED_PARSERS == frozenset({"naive", "one"})
     assert set(c.METHOD_ORDER) <= set(PARSER_IDS)
 
 

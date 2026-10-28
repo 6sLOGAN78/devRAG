@@ -9,7 +9,7 @@ import { documentDetailOf, setDatasetDefaults, setFileExtra } from "./files";
  * the `files` area state, so the document detail and the dataset detail show them. Fake data only.
  */
 
-const IMPLEMENTED = ["naive"];
+const IMPLEMENTED = ["naive", "one"];
 const DELIMITER_MAX = 64;
 
 export interface SettingsRefusal {
