@@ -31,8 +31,7 @@ from rag.llm import ProviderSpec, UnknownProvider, resolve_provider
 
 logger = logging.getLogger(__name__)
 
-TYPE_BITS = {"chat": 1, "embedding": 2, "rerank": 16}  # bit 16 is reserved for rerank in tenant_llm.model_type (plan 05-05, R-206)
-_BIT_TYPES = {bit: name for name, bit in TYPE_BITS.items()}
+from common.model_capabilities import TYPE_BITS, types_for_bits, legacy_union
 MASK_PREFIX = "********"
 MAX_DIMENSION = 65536
 MAX_TOKENS = 2147483647
@@ -42,7 +41,7 @@ MAX_EXTRA = 512  # tenant_model_instance.extra is VARCHAR(512)
 _ENVELOPE_PREFIX = "v1:"
 _ACTIVE_LLM = "1"
 _ACTIVE = "active"
-_DEFAULT_FIELDS = {"chat": ("llm_id", "tenant_llm_id"), "embedding": ("embd_id", "tenant_embd_id"), "rerank": ("rerank_id", "tenant_rerank_id")}
+_DEFAULT_FIELDS = {"chat": ("llm_id", "tenant_llm_id"), "embedding": ("embd_id", "tenant_embd_id"), "rerank": ("rerank_id", "tenant_rerank_id"),"vision":("img2txt_id","tenant_img2txt_id")}
 
 
 @dataclass(frozen=True)
@@ -88,6 +87,7 @@ class ProviderInfo:
 class Defaults:
     chat: str
     embedding: str
+    vision: str = ""
 
 
 class Unset:
@@ -142,9 +142,13 @@ def _check_instance(provider: str, instance: str) -> None:
 
 def _check_models(provider: str, instance: str, models: Sequence[NewModel]) -> None:
     """Refuse bad types, sizes and names (including a composite id over 128 characters) before any write."""
-    seen: set[str] = set()
+    seen: set[tuple[str,str]] = set()
+    names: dict[str,set[str]] = {}
     for model in models:
-        bad = model.model_type not in TYPE_BITS or model.name in seen
+        kinds = names.setdefault(model.name,set())
+        kinds.add(model.model_type)
+        incompatible = len(kinds)>1 and not kinds <= {"chat","vision"}
+        bad = incompatible or model.model_type not in TYPE_BITS or (model.name,model.model_type) in seen
         bad = bad or not isinstance(model.max_tokens, int) or not 1 <= model.max_tokens <= MAX_TOKENS
         if model.model_type == "embedding":
             bad = bad or not isinstance(model.dimension, int) or not 1 <= model.dimension <= MAX_DIMENSION
@@ -157,7 +161,7 @@ def _check_models(provider: str, instance: str, models: Sequence[NewModel]) -> N
                 raise _invalid(reasons.MODELS_INVALID, "that model name is too long for this provider") from None
         if bad:
             raise _invalid(reasons.MODELS_INVALID, "the model list is not valid")
-        seen.add(model.name)
+        seen.add((model.name,model.model_type))
 
 
 def _extra_json(last4: str, api_base: str | None, api_version: str | None) -> str:
@@ -182,6 +186,14 @@ def _conflict() -> ServiceError:
 
 
 def _insert_model(tenant_id: str, provider: str, provider_id: str, instance_id: str, model: NewModel, envelope: str, api_base: str | None) -> None:
+    existing = TenantModel.get_or_none(TenantModel.provider_id==provider_id,TenantModel.model_name==model.name)
+    if existing is not None:
+        if existing.instance_id != instance_id:
+            raise _conflict()
+        TenantModel.update(model_type=existing.model_type | TYPE_BITS[model.model_type],**_stamp()).where(TenantModel.id==existing.id).execute()
+        legacy=TenantLLM.get((TenantLLM.tenant_id==tenant_id)&(TenantLLM.llm_factory==provider)&(TenantLLM.llm_name==model.name))
+        TenantLLM.update(model_type=legacy_union(legacy.model_type,model.model_type),**_stamp()).where(TenantLLM.id==legacy.id).execute()
+        return
     TenantModel.create(
         id=_new_id(),
         model_name=model.name,
@@ -217,7 +229,9 @@ def _check_existing(requested: Sequence[NewModel], owned: dict[str, TenantModel]
             if model.name in orphans:
                 raise _conflict()
             continue
-        if not upsert or row.instance_id != instance_id or _BIT_TYPES.get(row.model_type) != model.model_type:
+        same = bool(row.model_type & TYPE_BITS[model.model_type])
+        compatible = set(types_for_bits(row.model_type)) | {model.model_type}
+        if row.status != _ACTIVE or row.instance_id != instance_id or (same and not upsert) or (not same and (not compatible <= {"chat","vision"} or row.model_type & ~sum(TYPE_BITS.values()))):
             raise _conflict()
         if model.model_type == "embedding" and _loads(row.extra).get("dimension") != model.dimension:
             raise _invalid(reasons.DIMENSION_MISMATCH, "the model's vector size changed")
@@ -265,7 +279,7 @@ def _write_save(llm: LlmSettings, tenant_id: str, spec: ProviderSpec, instance: 
         if reseal:
             updates["api_key"] = envelope
         TenantLLM.update(**updates).where(TenantLLM.tenant_id == tenant_id, TenantLLM.llm_factory == name, TenantLLM.llm_name << own_names).execute()
-    added = [m for m in models if m.name not in owned]
+    added = [m for m in models if m.name not in owned or not owned[m.name].model_type & TYPE_BITS[m.model_type]]
     for model in added:
         _insert_model(tenant_id, name, provider.id, row.id, model, envelope, base)
     return len(added)
@@ -360,8 +374,8 @@ def _load(tenant_id: str, provider: str | None = None) -> list[ProviderInfo]:
     if not providers:
         return []
     ids = [p.id for p in providers]
-    instances = list(TenantModelInstance.select().where(TenantModelInstance.provider_id << ids).order_by(TenantModelInstance.instance_name))
-    rows = list(TenantModel.select().where(TenantModel.provider_id << ids).order_by(TenantModel.model_name))
+    instances = list(TenantModelInstance.select().where((TenantModelInstance.provider_id << ids) & (TenantModelInstance.status == _ACTIVE)).order_by(TenantModelInstance.instance_name))
+    rows = list(TenantModel.select().where((TenantModel.provider_id << ids) & (TenantModel.status == _ACTIVE) & (TenantModel.instance_id << [i.id for i in instances])).order_by(TenantModel.model_name))
     sealed = TenantLLM.api_key.startswith(_ENVELOPE_PREFIX).alias("sealed")
     llm_rows = {
         (r["llm_factory"], r["llm_name"]): r
@@ -377,19 +391,20 @@ def _load(tenant_id: str, provider: str | None = None) -> list[ProviderInfo]:
             instance = inst_names.get(m.instance_id, DEFAULT_INSTANCE)
             has_key[m.instance_id] = has_key.get(m.instance_id, False) or bool(llm_row.get("sealed"))
             extra = _loads(m.extra)
-            models.append(
-                ModelInfo(
-                    id=m.id,
-                    model=m.model_name,
-                    provider=prov.provider_name,
-                    instance=instance,
-                    model_type=_BIT_TYPES.get(m.model_type, "other"),
-                    dimension=extra.get("dimension") if isinstance(extra.get("dimension"), int) else None,
-                    max_tokens=int(llm_row.get("max_tokens") or extra.get("max_tokens") or 0),
-                    used_tokens=int(llm_row.get("used_tokens") or 0),
-                    composite=_composite(m.model_name, prov.provider_name, instance),
+            for kind in types_for_bits(m.model_type) or ("other",):
+                models.append(
+                    ModelInfo(
+                        id=m.id,
+                        model=m.model_name,
+                        provider=prov.provider_name,
+                        instance=instance,
+                        model_type=kind,
+                        dimension=extra.get("dimension") if isinstance(extra.get("dimension"), int) else None,
+                        max_tokens=int(llm_row.get("max_tokens") or extra.get("max_tokens") or 0),
+                        used_tokens=int(llm_row.get("used_tokens") or 0),
+                        composite=_composite(m.model_name, prov.provider_name, instance),
+                    )
                 )
-            )
         required = _key_required(prov.provider_name)
         infos = []
         for inst in (i for i in instances if i.provider_id == prov.id):
@@ -423,14 +438,14 @@ def get_instance(tenant_id: str, provider: str, instance: str) -> InstanceInfo |
     return next((i for i in info.instances if i.instance == instance), None) if info else None
 
 
-def _find(tenant_id: str, ref: ModelRef) -> ModelInfo | None:
+def _find(tenant_id: str, ref: ModelRef, model_type: str | None = None) -> ModelInfo | None:
     try:
         name = resolve_provider(ref.provider).name
     except UnknownProvider:
         return None
     for prov in _load(tenant_id, name):
         for model in prov.models:
-            if model.model == ref.model and model.instance == ref.instance:
+            if model.model == ref.model and model.instance == ref.instance and (model_type is None or model.model_type == model_type):
                 return model
     return None
 
@@ -486,24 +501,24 @@ def delete_provider(tenant_id: str, provider: str) -> bool:
 def get_defaults(tenant_id: str) -> Defaults:
     with DB.connection_context():
         tenant = Tenant.get_or_none(Tenant.id == tenant_id)
-    return Defaults(chat=(tenant.llm_id or "") if tenant else "", embedding=(tenant.embd_id or "") if tenant else "")
+    return Defaults(chat=(tenant.llm_id or "") if tenant else "", embedding=(tenant.embd_id or "") if tenant else "",vision=(tenant.img2txt_id or "") if tenant else "")
 
 
-def set_defaults(tenant_id: str, *, chat: ModelRef | None | Unset = UNSET, embedding: ModelRef | None | Unset = UNSET) -> Defaults:
+def set_defaults(tenant_id: str, *, chat: ModelRef | None | Unset = UNSET, embedding: ModelRef | None | Unset = UNSET, vision: ModelRef | None | Unset = UNSET) -> Defaults:
     """Store workspace defaults as composite ids plus the ``tenant_model`` ids. ``UNSET`` keeps, ``None`` clears."""
     with DB.connection_context():
         if Tenant.get_or_none(Tenant.id == tenant_id) is None:
             raise ServiceError(Kind.NOT_FOUND, "workspace_not_found", "that workspace does not exist")
         updates: dict[str, Any] = {}
-        for kind, ref in (("chat", chat), ("embedding", embedding)):
+        for kind, ref in (("chat", chat), ("embedding", embedding), ("vision", vision)):
             if isinstance(ref, Unset):
                 continue
             field, id_field = _DEFAULT_FIELDS[kind]
             if ref is None:
                 updates.update({field: "", id_field: None})
                 continue
-            found = _find(tenant_id, ref)
-            if found is None or found.model_type != kind:
+            found = _find(tenant_id, ref, kind)
+            if found is None:
                 raise _invalid(reasons.MODEL_UNAVAILABLE, "that model is not available in this workspace")
             updates.update({field: found.composite, id_field: found.id})
         if updates:

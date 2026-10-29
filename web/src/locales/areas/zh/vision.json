@@ -1,0 +1,6 @@
+{
+  "models": {
+    "type": { "vision": "视觉" },
+    "defaults": { "vision": "默认视觉模型" }
+  }
+}

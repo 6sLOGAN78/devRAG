@@ -49,6 +49,8 @@ function Body({ target, pendingRef, onClose }: { target: ChunkTarget; pendingRef
       run: detail.run,
       pages: detail.pages,
       layoutRecognize: detail.layoutRecognize,
+      imageModel:detail.imageModel,
+      pictureOcrOnly:detail.pictureOcrOnly,
     };
   } else if (dataset.data !== undefined && !isDocument) {
     const detail = dataset.data;
@@ -61,6 +63,8 @@ function Body({ target, pendingRef, onClose }: { target: ChunkTarget; pendingRef
       run: "0",
       pages: detail.parserConfig.pages,
       layoutRecognize: detail.parserConfig.layoutRecognize,
+      imageModel:detail.parserConfig.imageModel,
+      pictureOcrOnly:detail.parserConfig.pictureOcrOnly,
     };
   }
   const query = isDocument ? document : dataset;

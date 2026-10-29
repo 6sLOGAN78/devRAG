@@ -30,6 +30,8 @@ class ParserConfig(BaseModel):
     layout_recognize: StrictBool | StrictStr = True
     auto_keywords: StrictInt = Field(default=0, ge=0, le=32)
     table_context_size: StrictInt = Field(default=0, ge=0)
+    image_model: StrictStr = Field(default="",max_length=128)
+    picture_ocr_only: StrictBool = False
     image_context_size: StrictInt = Field(default=0, ge=0)
 
     @field_validator("pages")

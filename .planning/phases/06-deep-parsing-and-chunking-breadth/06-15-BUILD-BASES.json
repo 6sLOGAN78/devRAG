@@ -1,0 +1,12 @@
+{
+  "source": "Observed previously used stage digests from phase6-13 build-cache inventory; unchanged exact Python base12 manifest hashes",
+  "stages": {
+    "node:22-alpine": "sha256:fe4f6d74e20370acb04ad889077d14d0f64a9c8ea6a42bc60cddf1e844699914",
+    "golang:1.25-alpine": "sha256:1ae0735f00daffa3aaf1363a5184c0d2dc55c78e3db4ec70241cdac97bf84b59"
+  },
+  "runtime": "sha256:62f389511ce063e2f97700fb6a71a6b8036a283c4904d3fe251c66f507ffc33f",
+  "dependency_manifests": {
+    "pyproject.toml": "a8eb4d8d2050b765a501d8737d64993fc67b97d5e446ffd980942ca315cb831c",
+    "uv.lock": "eb2d16cae34e3d893b2f1261be215a18d3a3c0f276e4b0aef3ae8e9ace2ea016"
+  }
+}

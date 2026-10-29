@@ -740,6 +740,11 @@ export interface components {
              */
             delimiter: unknown;
             /**
+             * Image Model
+             * @default null
+             */
+            image_model: unknown;
+            /**
              * Layout Recognize
              * @default null
              */
@@ -754,6 +759,11 @@ export interface components {
              * @default null
              */
             pages: unknown;
+            /**
+             * Picture Ocr Only
+             * @default null
+             */
+            picture_ocr_only: unknown;
         };
         /** CompletionView */
         CompletionView: {
@@ -838,6 +848,8 @@ export interface components {
             chat: string;
             /** Embedding */
             embedding: string;
+            /** Vision */
+            vision: string;
         };
         /** DeletedAssistant */
         DeletedAssistant: {
@@ -900,6 +912,11 @@ export interface components {
             error: components["schemas"]["DocumentErrorView"] | null;
             /** Id */
             id: string;
+            /**
+             * Image Model
+             * @default
+             */
+            image_model: string;
             /** Last Log Id */
             last_log_id: string | null;
             /**
@@ -924,6 +941,11 @@ export interface components {
             parseable: boolean;
             /** Parser Id */
             parser_id: string;
+            /**
+             * Picture Ocr Only
+             * @default false
+             */
+            picture_ocr_only: boolean;
             /** Preview */
             preview: string;
             /** Progress */
@@ -1175,7 +1197,7 @@ export interface components {
              * Type
              * @enum {string}
              */
-            type: "chat" | "embedding" | "rerank";
+            type: "chat" | "embedding" | "rerank" | "vision";
         };
         /** ModelDescription */
         ModelDescription: {
@@ -2834,6 +2856,11 @@ export interface operations {
                      * @default null
                      */
                     tenant_id?: string | null;
+                    /**
+                     * Vision
+                     * @default null
+                     */
+                    vision?: string | null;
                 };
             };
         };

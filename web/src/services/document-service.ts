@@ -237,6 +237,8 @@ export interface DocumentDetailView extends DocumentView {
   assets?: DocumentAssetView[];
   pages?: [number, number][];
   layoutRecognize?: boolean | string;
+  imageModel?: string;
+  pictureOcrOnly?: boolean;
   chunkTokenNum: number;
   delimiter: string;
   overlappedPercent: number;
@@ -256,6 +258,8 @@ export async function getDocument(datasetId: string, docId: string): Promise<Doc
     delimiter: text(dto.delimiter),
     overlappedPercent: count(dto.overlapped_percent),
     preview: dto.preview === "pages" ? "pages" : "none",
+    ...(dto.image_model !== undefined ? {imageModel:text(dto.image_model)} : {}),
+    ...(dto.picture_ocr_only !== undefined ? {pictureOcrOnly:dto.picture_ocr_only===true} : {}),
     ...(typeof dto.layout_recognize === "boolean" || typeof dto.layout_recognize === "string" ? { layoutRecognize: dto.layout_recognize } : {}),
     ...(dto.pages !== undefined ? { pages: pageRangesOf(dto.pages) } : {}),
   };
@@ -264,6 +268,8 @@ export async function getDocument(datasetId: string, docId: string): Promise<Doc
 export interface DocumentSettingsChanges {
   pages?: [number, number][];
   layoutRecognize?: boolean | string;
+  imageModel?: string;
+  pictureOcrOnly?: boolean;
   parserId?: string;
   chunkTokenNum?: number;
   delimiter?: string;
@@ -281,6 +287,8 @@ export async function updateDocumentSettings(datasetId: string, docId: string, c
   if (changes.chunkTokenNum !== undefined) config.chunk_token_num = changes.chunkTokenNum;
   if (changes.delimiter !== undefined) config.delimiter = changes.delimiter;
   if (changes.overlappedPercent !== undefined) config.overlapped_percent = changes.overlappedPercent;
+  if (changes.imageModel !== undefined) config.image_model = changes.imageModel;
+  if (changes.pictureOcrOnly !== undefined) config.picture_ocr_only = changes.pictureOcrOnly;
   if (changes.layoutRecognize !== undefined) config.layout_recognize = changes.layoutRecognize;
   if (changes.pages !== undefined) config.pages = changes.pages;
   if (Object.keys(config).length > 0) data.parser_config = config;
@@ -293,6 +301,8 @@ export async function updateDocumentSettings(datasetId: string, docId: string, c
     delimiter: text(dto.delimiter),
     overlappedPercent: count(dto.overlapped_percent),
     preview: dto.preview === "pages" ? "pages" : "none",
+    ...(dto.image_model !== undefined ? {imageModel:text(dto.image_model)} : {}),
+    ...(dto.picture_ocr_only !== undefined ? {pictureOcrOnly:dto.picture_ocr_only===true} : {}),
     ...(typeof dto.layout_recognize === "boolean" || typeof dto.layout_recognize === "string" ? { layoutRecognize: dto.layout_recognize } : {}),
     ...(dto.pages !== undefined ? { pages: pageRangesOf(dto.pages) } : {}),
   };

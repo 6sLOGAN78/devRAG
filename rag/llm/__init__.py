@@ -45,8 +45,8 @@ PROVIDER_SPECS: tuple[ProviderSpec, ...] = (
     ProviderSpec(Provider.OPENAI, "openai", "openai/", "https://api.openai.com/v1", "required", "default", False, False),
     ProviderSpec(Provider.AZURE_OPENAI, "azure-openai", "azure/", None, "required", "required", True, False),
     ProviderSpec(Provider.OLLAMA, "ollama", "ollama_chat/", None, "none", "required", False, True),
-    ProviderSpec(Provider.OPENROUTER, "openrouter", "openai/", "https://openrouter.ai/api/v1", "required", "default", False, False, ("chat", "embedding", "rerank")),
-    ProviderSpec(Provider.OPENAI_COMPATIBLE, "openai-compatible", "openai/", None, "optional", "required", False, False),
+    ProviderSpec(Provider.OPENROUTER, "openrouter", "openai/", "https://openrouter.ai/api/v1", "required", "default", False, False, ("chat", "embedding", "rerank", "vision")),
+    ProviderSpec(Provider.OPENAI_COMPATIBLE, "openai-compatible", "openai/", None, "optional", "required", False, False, ("chat", "embedding", "vision")),
     # Rerank only, no key, the compose service address (D-01, R-206). The exact default address skips the SSRF guard.
     ProviderSpec(Provider.TEI, "tei", "", "http://tei:80", "none", "default", False, False, ("rerank",)),
 )

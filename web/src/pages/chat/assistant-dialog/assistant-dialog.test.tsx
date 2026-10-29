@@ -132,7 +132,7 @@ describe("AssistantDialog create and settings", () => {
   afterEach(() => { cleanup(); client.clear(); http.defaults.adapter = originalAdapter; useUserStore.getState().reset(); useWorkspaceStore.getState().reset(); });
 
   it("focuses Name and prefills all documented create defaults", async () => {
-    open(); await ready(); expect(screen.getByTestId("field-assistant-name")).toHaveFocus();
+    open(); await ready(); await waitUntil(() => document.activeElement === screen.queryByTestId("field-assistant-name")); expect(screen.getByTestId("field-assistant-name")).toHaveFocus();
     expect(screen.getByTestId("field-assistant-system")).toHaveValue(en.assistant.default.system);
     expect(screen.getByTestId("field-assistant-threshold")).toHaveValue("0.2"); expect(screen.getByTestId("field-assistant-weight")).toHaveValue("0.3");
     expect(screen.getByTestId("field-assistant-topn")).toHaveValue(6); expect(screen.getByTestId("assistant-visibility-me")).toBeChecked();

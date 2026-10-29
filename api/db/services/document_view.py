@@ -175,5 +175,7 @@ def document_detail(settings: Settings, visible: VisibleDataset, doc_id: str, *,
         preview="pages" if (doc.suffix or "").lower() == "pdf" and body["pages_total"] is not None else "none",
         pages=config.get("pages", []),
         layout_recognize=config.get("layout_recognize", True),
+        image_model=config.get("image_model", ""),
+        picture_ocr_only=config.get("picture_ocr_only", False),
     )
     return body

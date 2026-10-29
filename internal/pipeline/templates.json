@@ -83,7 +83,7 @@
     "description": "Describe document images.",
     "parser_id": "picture",
     "parser_config": {},
-    "available": false
+    "available": true
   },
   {
     "id": "email",

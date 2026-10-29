@@ -83,14 +83,14 @@ def test_the_owner_lists_models_and_chooses_defaults_explicitly(ingress: httpx.C
     bad_type = call("GET", MODELS, params={"type": "image"})
     assert bad_type.status_code == 400 and reason_of(bad_type) == "models_invalid"
 
-    assert ok(call("GET", DEFAULTS)) == {"chat": "", "embedding": ""}, "nothing is auto-picked after a save"
+    assert ok(call("GET", DEFAULTS)) == {"chat": "", "embedding": "", "vision": ""}, "nothing is auto-picked after a save"
 
-    assert ok(call("PATCH", DEFAULTS, body={"embedding": EMBED_ID})) == {"chat": "", "embedding": EMBED_ID}
-    assert ok(call("GET", DEFAULTS)) == {"chat": "", "embedding": EMBED_ID}
+    assert ok(call("PATCH", DEFAULTS, body={"embedding": EMBED_ID})) == {"chat": "", "embedding": EMBED_ID, "vision": ""}
+    assert ok(call("GET", DEFAULTS)) == {"chat": "", "embedding": EMBED_ID, "vision": ""}
     # An absent key never changes a value, a null clears it (T-03-13-05).
-    assert ok(call("PATCH", DEFAULTS, body={"chat": CHAT_ID})) == {"chat": CHAT_ID, "embedding": EMBED_ID}
-    assert ok(call("PATCH", DEFAULTS, body={"chat": None})) == {"chat": "", "embedding": EMBED_ID}
-    assert ok(call("GET", DEFAULTS)) == {"chat": "", "embedding": EMBED_ID}
+    assert ok(call("PATCH", DEFAULTS, body={"chat": CHAT_ID})) == {"chat": CHAT_ID, "embedding": EMBED_ID, "vision": ""}
+    assert ok(call("PATCH", DEFAULTS, body={"chat": None})) == {"chat": "", "embedding": EMBED_ID, "vision": ""}
+    assert ok(call("GET", DEFAULTS)) == {"chat": "", "embedding": EMBED_ID, "vision": ""}
 
     # Refusals change nothing.
     too_long = "x" * (129 - len(f"@{COMPAT}")) + f"@{COMPAT}"
@@ -111,14 +111,14 @@ def test_the_owner_lists_models_and_chooses_defaults_explicitly(ingress: httpx.C
         assert_unavailable(call("PATCH", DEFAULTS, body={slot: value}))
     mixed = call("PATCH", DEFAULTS, body={"chat": CHAT_ID, "embedding": CHAT_ID})
     assert_unavailable(mixed)
-    assert ok(call("GET", DEFAULTS)) == {"chat": "", "embedding": EMBED_ID}, "a refused change, even half of a valid pair, writes nothing"
+    assert ok(call("GET", DEFAULTS)) == {"chat": "", "embedding": EMBED_ID, "vision": ""}, "a refused change, even half of a valid pair, writes nothing"
 
     empty = call("PATCH", DEFAULTS, body={})
     assert empty.status_code == 400 and reason_of(empty) == "models_invalid"
     assert call("PATCH", DEFAULTS, body={"chat": CHAT_ID, "unknown_field": 1}).status_code == 400
     assert call("PATCH", DEFAULTS, body={"chat": 5}).status_code == 400
     assert call("PATCH", DEFAULTS, body={"chat": CHAT_ID, "tenant_id": "not-an-id"}).status_code == 400
-    assert ok(call("GET", DEFAULTS)) == {"chat": "", "embedding": EMBED_ID}
+    assert ok(call("GET", DEFAULTS)) == {"chat": "", "embedding": EMBED_ID, "vision": ""}
 
     assert_no_credentials(fake, *seen)
     assert all("foreign-chat" not in r.text for r in seen if r.status_code == 200), "the other workspace's model never shows"
@@ -136,20 +136,20 @@ def test_members_read_only_owners_and_admins_write_and_a_token_can_only_read(ing
     # The admin acts in the owner's workspace through tenant_id: reads and writes.
     seen = [api(ingress, "GET", MODELS, admin.token, params=scope), api(ingress, "GET", DEFAULTS, admin.token, params=scope)]
     assert {m["id"] for m in ok(seen[0])} == {CHAT_ID, EMBED_ID}
-    assert ok(seen[1]) == {"chat": "", "embedding": EMBED_ID}
+    assert ok(seen[1]) == {"chat": "", "embedding": EMBED_ID, "vision": ""}
     patched = api(ingress, "PATCH", DEFAULTS, admin.token, body={"chat": CHAT_ID, "tenant_id": owner.tenant_id})
     seen.append(patched)
-    assert ok(patched) == {"chat": CHAT_ID, "embedding": EMBED_ID}
+    assert ok(patched) == {"chat": CHAT_ID, "embedding": EMBED_ID, "vision": ""}
 
     # A normal member reads, never writes.
     member_models = api(ingress, "GET", MODELS, normal.token, params=scope)
     member_defaults = api(ingress, "GET", DEFAULTS, normal.token, params=scope)
     seen += [member_models, member_defaults]
     assert {m["id"] for m in ok(member_models)} == {CHAT_ID, EMBED_ID}
-    assert ok(member_defaults) == {"chat": CHAT_ID, "embedding": EMBED_ID}
+    assert ok(member_defaults) == {"chat": CHAT_ID, "embedding": EMBED_ID, "vision": ""}
     denied = api(ingress, "PATCH", DEFAULTS, normal.token, body={"chat": None, "tenant_id": owner.tenant_id})
     assert denied.status_code == 403 and denied.json()["code"] == 403, denied.text
-    assert ok(api(ingress, "GET", DEFAULTS, owner.token)) == {"chat": CHAT_ID, "embedding": EMBED_ID}, "the forbidden write changed nothing"
+    assert ok(api(ingress, "GET", DEFAULTS, owner.token)) == {"chat": CHAT_ID, "embedding": EMBED_ID, "vision": ""}, "the forbidden write changed nothing"
 
     # An API token reads (the list is `auth: api`) but the default write is session-only.
     created = ingress.post(TOKENS, headers=_bearer(owner.token))
@@ -160,7 +160,7 @@ def test_members_read_only_owners_and_admins_write_and_a_token_can_only_read(ing
     assert {m["id"] for m in ok(token_models)} == {CHAT_ID, EMBED_ID} and ok(token_defaults)["embedding"] == EMBED_ID
     refused = api(ingress, "PATCH", DEFAULTS, token, body={"chat": None})
     assert refused.status_code == 401 and refused.json() == UNAUTHORIZED
-    assert ok(api(ingress, "GET", DEFAULTS, owner.token)) == {"chat": CHAT_ID, "embedding": EMBED_ID}
+    assert ok(api(ingress, "GET", DEFAULTS, owner.token)) == {"chat": CHAT_ID, "embedding": EMBED_ID, "vision": ""}
 
     assert_no_credentials(fake, *seen)
 
@@ -181,18 +181,30 @@ def test_a_stranger_acting_in_another_workspace_gets_the_one_not_found_answer(in
 
     # The stranger's own workspace holds nothing, and A's id is unavailable there.
     assert ok(api(ingress, "GET", MODELS, stranger.token)) == []
-    assert ok(api(ingress, "GET", DEFAULTS, stranger.token)) == {"chat": "", "embedding": ""}
+    assert ok(api(ingress, "GET", DEFAULTS, stranger.token)) == {"chat": "", "embedding": "", "vision": ""}
     assert_unavailable(api(ingress, "PATCH", DEFAULTS, stranger.token, body={"embedding": EMBED_ID}))
-    assert ok(api(ingress, "GET", DEFAULTS, owner.token)) == {"chat": "", "embedding": EMBED_ID}
+    assert ok(api(ingress, "GET", DEFAULTS, owner.token)) == {"chat": "", "embedding": EMBED_ID, "vision": ""}
 
 
 def test_deleting_the_provider_clears_the_default_that_pointed_at_it(ingress: httpx.Client, registry: AccountRegistry, fake_provider_stack: FakeProvider) -> None:  # noqa: F811
     fake = fake_provider_stack
     owner = registry.register(prefix="mddel")
     ok(api(ingress, "PUT", PROVIDERS, owner.token, body=save_body(fake)))
-    assert ok(api(ingress, "PATCH", DEFAULTS, owner.token, body={"chat": CHAT_ID, "embedding": EMBED_ID})) == {"chat": CHAT_ID, "embedding": EMBED_ID}
+    assert ok(api(ingress, "PATCH", DEFAULTS, owner.token, body={"chat": CHAT_ID, "embedding": EMBED_ID})) == {"chat": CHAT_ID, "embedding": EMBED_ID, "vision": ""}
     deleted = api(ingress, "DELETE", f"{PROVIDERS}/{COMPAT_SLUG}", owner.token)
     assert deleted.status_code == 200
-    assert ok(api(ingress, "GET", DEFAULTS, owner.token)) == {"chat": "", "embedding": ""}
+    assert ok(api(ingress, "GET", DEFAULTS, owner.token)) == {"chat": "", "embedding": "", "vision": ""}
     assert ok(api(ingress, "GET", MODELS, owner.token)) == []
     assert_unavailable(api(ingress, "PATCH", DEFAULTS, owner.token, body={"chat": CHAT_ID}))
+
+
+def test_same_name_vision_union_and_default_use_the_existing_chat_identity(ingress,registry,fake_provider_stack):
+    owner=registry.register(prefix="mdvision")
+    ok(api(ingress,"PUT",PROVIDERS,owner.token,body=save_body(fake_provider_stack)))
+    ok(api(ingress,"PATCH",DEFAULTS,owner.token,body={"chat":CHAT_ID,"embedding":EMBED_ID}))
+    ok(api(ingress,"POST",f"{PROVIDERS}/{COMPAT_SLUG}/instances",owner.token,body={"instance_name":"default","models":[{"name":"fake-chat","type":"vision"}]}))
+    visible=ok(api(ingress,"GET",MODELS,owner.token,params={"type":"vision"}))
+    assert len(visible)==1 and visible[0]["id"]==CHAT_ID and visible[0]["type"]=="vision"
+    assert ok(api(ingress,"PATCH",DEFAULTS,owner.token,body={"vision":CHAT_ID}))=={"chat":CHAT_ID,"embedding":EMBED_ID,"vision":CHAT_ID}
+    ok(api(ingress,"DELETE",f"{PROVIDERS}/{COMPAT_SLUG}",owner.token))
+    assert ok(api(ingress,"GET",DEFAULTS,owner.token))=={"chat":"","embedding":"","vision":""}

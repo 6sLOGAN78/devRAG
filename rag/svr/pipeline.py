@@ -104,11 +104,21 @@ def _parse_and_chunk(ctx: TaskContext, deps: PipelineDeps, control: TaskControl,
     page_range = (ctx.from_page, ctx.to_page) if spec.name == "pdf" else None
     chunks: list[Chunk] = []
     assets = []
-    generation = document_asset_service.current_generation(ctx) if deps.settings.deepdoc.url and spec.name in {"pdf", "docx", "pptx"} else None
+    generation = document_asset_service.current_generation(ctx) if deps.settings.deepdoc.url and spec.name in {"pdf", "docx", "pptx", "image"} else None
 
     def text_blocks(blocks):
         # Assets are normalized remotely already; persist once and substitute opaque ids before chunking.
         materialized = list(blocks)
+        if spec.name == "image" and not ctx.parser_config.get("picture_ocr_only",False):
+            from api.db.services.tenant_model_service import get_defaults
+            model_id = ctx.parser_config.get("image_model") or get_defaults(ctx.tenant_id).vision
+            if not model_id:
+                raise TaskFailure("parse","model_unavailable")
+            for i,block in enumerate(materialized):
+                control.check()
+                caption = deps.embedder.describe_image(block.assets[0].content,model_id,ctx,control)
+                materialized[i] = replace(block,text=caption,assets=tuple(replace(asset,caption=caption) for asset in block.assets))
+
         for block in materialized:
             control.check()
             assets.extend(block.assets)
@@ -129,7 +139,7 @@ def _parse_and_chunk(ctx: TaskContext, deps: PipelineDeps, control: TaskControl,
             yield replace(block, assets=(), table=table, image_ids=owned_ids)
 
     with deps.limiters.chunk_limiter:
-        options = {"settings": deps.settings, "parser_config": ctx.parser_config} if spec.name == "pdf" else ({"settings": deps.settings} if spec.name in {"docx", "pptx"} else {})
+        options = {"settings": deps.settings, "parser_config": ctx.parser_config} if spec.name in {"pdf","image"} else ({"settings": deps.settings} if spec.name in {"docx", "pptx"} else {})
         if ctx.parser_id == "table" and spec.name in {"csv", "xlsx"}:
             options["structured_tables"] = True
             if spec.name == "csv":

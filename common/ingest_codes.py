@@ -90,7 +90,7 @@ PLAIN_MESSAGES: dict[str, str] = {
 
 # Chunking methods in documentation order (UI-SPEC chunking-method dialog).
 METHOD_ORDER: tuple[str, ...] = ("naive", "qa", "paper", "book", "laws", "presentation", "table", "manual", "resume", "picture", "email", "tag", "one", "audio")
-IMPLEMENTED_PARSERS: frozenset[str] = frozenset({"naive", "one", "manual", "qa", "book", "paper", "laws", "presentation", "table"})
+IMPLEMENTED_PARSERS: frozenset[str] = frozenset({"naive", "one", "manual", "qa", "book", "paper", "laws", "presentation", "table", "picture"})
 
 
 def is_terminal(code: str) -> bool:

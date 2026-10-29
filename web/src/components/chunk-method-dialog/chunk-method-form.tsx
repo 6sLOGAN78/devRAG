@@ -30,6 +30,8 @@ export type ChunkTarget =
 export interface ChunkSettings {
   pages?: [number, number][];
   layoutRecognize?: boolean | string;
+  imageModel?: string;
+  pictureOcrOnly?: boolean;
   parserId: string;
   chunkTokenNum: number;
   delimiter: string;
@@ -48,11 +50,13 @@ export interface ChunkMethodFormProps {
   onClose: () => void;
 }
 
-type Changes = { parserId?: string; chunkTokenNum?: number; delimiter?: string; overlappedPercent?: number; pages?: [number, number][]; layoutRecognize?: boolean | string };
+type Changes = {imageModel?:string;pictureOcrOnly?:boolean; parserId?: string; chunkTokenNum?: number; delimiter?: string; overlappedPercent?: number; pages?: [number, number][]; layoutRecognize?: boolean | string };
 
 /** The keys whose value differs from the stored one: exactly what the request carries. Layout and keywords are never among them. */
-function changesOf(settings: ChunkSettings, method: string, values: { chunkSize: number; delimiters: string; overlap: number; pageRanges: [number, number][]; layoutRecognize: boolean | string }): Changes {
+function changesOf(settings: ChunkSettings, method: string, values: { chunkSize: number; delimiters: string; overlap: number; pageRanges: [number, number][]; layoutRecognize: boolean | string; imageModel?:string;pictureOcrOnly?:boolean }): Changes {
   const changes: Changes = {};
+  if ((values.imageModel ?? "") !== (settings.imageModel ?? "")) changes.imageModel=values.imageModel ?? "";
+  if ((values.pictureOcrOnly ?? false) !== (settings.pictureOcrOnly ?? false)) changes.pictureOcrOnly=values.pictureOcrOnly ?? false;
   if (isImplemented(method) && method !== settings.parserId) changes.parserId = method;
   if (values.chunkSize !== settings.chunkTokenNum) changes.chunkTokenNum = values.chunkSize;
   if (values.delimiters !== settings.delimiter) changes.delimiter = values.delimiters;
@@ -62,7 +66,7 @@ function changesOf(settings: ChunkSettings, method: string, values: { chunkSize:
   return changes;
 }
 
-const FIELD_NAMES = ["chunkSize", "delimiters", "overlap", "pageRanges", "layoutRecognize"] as const satisfies readonly ParseConfigField[];
+const FIELD_NAMES = ["chunkSize", "delimiters", "overlap", "pageRanges", "layoutRecognize", "imageModel", "pictureOcrOnly"] as const satisfies readonly ParseConfigField[];
 
 /**
  * The form of the chunking dialog: the method group (only General can be chosen), the settings of General and the
@@ -87,6 +91,8 @@ export function ChunkMethodForm({ target, settings, pendingRef, onClose }: Chunk
       delimiters: toEscaped(settings.delimiter),
       overlap: String(settings.overlappedPercent),
       layoutRecognize: settings.layoutRecognize ?? true,
+      imageModel:settings.imageModel ?? "",
+      pictureOcrOnly:settings.pictureOcrOnly ?? false,
       pageRanges: (settings.pages ?? []).map(([start, end]) => start === end ? String(start) : `${start}-${end}`).join(", "),
     },
   });
@@ -218,7 +224,7 @@ export function ChunkMethodForm({ target, settings, pendingRef, onClose }: Chunk
             </FormItem>
           )}
         />
-        <ParseConfiguration control={form.control} wholeDocument={form.watch("method") === "one"} questionAnswer={form.watch("method") === "qa"} book={form.watch("method") === "book"} paper={form.watch("method") === "paper"} laws={form.watch("method") === "laws"} presentation={form.watch("method") === "presentation"} table={form.watch("method") === "table"} disabled={busy} answers={answers} onEdit={(field) => clearAnswers(FIELD_NAMES.find((name) => name === field))} />
+        <ParseConfiguration control={form.control} wholeDocument={form.watch("method") === "one"} questionAnswer={form.watch("method") === "qa"} book={form.watch("method") === "book"} paper={form.watch("method") === "paper"} laws={form.watch("method") === "laws"} presentation={form.watch("method") === "presentation"} table={form.watch("method") === "table"} picture={form.watch("method") === "picture"} disabled={busy} answers={answers} onEdit={(field) => clearAnswers(FIELD_NAMES.find((name) => name === field))} />
         <DialogFooter>
           <DialogClose asChild>
             <Button type="button" variant="ghost">

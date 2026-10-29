@@ -47,9 +47,10 @@ export interface ProviderView {
 export interface DefaultsView {
   chat: string;
   embedding: string;
+  vision?: string;
 }
 
-export type ModelType = "chat" | "embedding" | "rerank";
+export type ModelType = "chat" | "embedding" | "rerank" | "vision";
 
 interface ModelDto {
   id: string;
@@ -82,6 +83,7 @@ interface ProviderDto {
 interface DefaultsDto {
   chat: string;
   embedding: string;
+  vision?: string;
 }
 
 const text = (value: unknown): string => (typeof value === "string" ? value : "");
@@ -145,7 +147,7 @@ export async function listModels(tenantId: string, type?: ModelType): Promise<Mo
 export async function getDefaults(tenantId: string): Promise<DefaultsView> {
   const dto = await request<unknown>({ url: modelsDefaultPath, method: "GET", params: { tenant_id: tenantId } }, { silent: true });
   const record = asRecord(dto) as Partial<DefaultsDto>;
-  return { chat: text(record.chat), embedding: text(record.embedding) };
+  return { chat: text(record.chat), embedding: text(record.embedding), ...(record.vision !== undefined ? {vision:text(record.vision)} : {}) };
 }
 
 /** A request that tests a provider with real calls can take two server tests of 20 seconds each (Pitfall 8). */
@@ -190,8 +192,8 @@ function present(value: string | undefined): string | undefined {
  */
 export function registeredModelFor(provider: ProviderView | undefined): RegisteredModel[] {
   const models = provider?.models ?? [];
-  const chosen = models.find((m) => m.type === "chat") ?? models.find((m) => m.type === "embedding");
-  return chosen === undefined ? [] : [{ name: chosen.name, type: chosen.type === "embedding" ? "embedding" : "chat" }];
+  const chosen = models.find((m) => m.type === "chat") ?? models.find((m) => m.type === "embedding") ?? models.find((m) => m.type === "vision");
+  return chosen === undefined ? [] : [{ name: chosen.name, type: chosen.type === "embedding" ? "embedding" : chosen.type === "vision" ? "vision" : "chat" }];
 }
 
 /**
@@ -229,6 +231,7 @@ export async function deleteProvider(tenantId: string, provider: string, signal?
 export interface DefaultsChanges {
   chat?: string | null;
   embedding?: string | null;
+  vision?: string | null;
 }
 
 /**
@@ -239,7 +242,8 @@ export async function saveDefaults(tenantId: string, changes: DefaultsChanges): 
   const data: Record<string, unknown> = { tenant_id: tenantId };
   if (changes.chat !== undefined) data.chat = changes.chat;
   if (changes.embedding !== undefined) data.embedding = changes.embedding;
+  if (changes.vision !== undefined) data.vision = changes.vision;
   const raw = await request<unknown>({ url: modelsDefaultPath, method: "PATCH", data }, { silent: true });
   const record = asRecord(raw) as Partial<DefaultsDto>;
-  return { chat: text(record.chat), embedding: text(record.embedding) };
+  return { chat: text(record.chat), embedding: text(record.embedding), ...(record.vision !== undefined ? {vision:text(record.vision)} : {}) };
 }

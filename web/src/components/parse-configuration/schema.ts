@@ -15,6 +15,8 @@ function whole(min: number, max: number, message: string) {
  * server's `ParserConfig`. The delimiters are typed escaped and leave the schema as the real characters.
  */
 export const parseConfigSchema = z.object({
+  imageModel:z.string().max(128).optional(),
+  pictureOcrOnly:z.boolean().optional(),
   layoutRecognize: z.union([z.boolean(), z.string().max(64)]).optional().default(true),
   pageRanges: z.string().optional().default("").transform((value, context): [number, number][] => {
     if (!value.trim()) return [];

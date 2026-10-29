@@ -1,0 +1,132 @@
+{
+  "recorded_at": "2026-10-29T09:15:20.983678+00:00",
+  "plan": "06-15",
+  "paid_calls": 0,
+  "new_packages": 0,
+  "new_models": 0,
+  "python_existing_skips": 8,
+  "human_uat_approved": false,
+  "phase_gate_complete": false,
+  "evidence": {
+    "python_unit": {
+      "log": "ragflow-logs/phase6-15-unit-final.log",
+      "sha256": "d072735faa0780e4167e8b5f0ea02b3e9dc472f75e48f582671136dd49a0019b",
+      "result": "2655 passed"
+    },
+    "frontend": {
+      "log": "ragflow-logs/phase6-15-web-final.log",
+      "sha256": "a164446cdaaa012e13ad8a9e6d59aba79c3a02858a94245943987226e46b4e6f",
+      "result": "2173 passed"
+    },
+    "label_fix": {
+      "log": "ragflow-logs/phase6-15-label-green.log",
+      "sha256": "519ba16828cac3e1dcbaf90dcb65bd4f9e9e53cd9981bf0c6358659ad2f17755",
+      "result": "34 passed"
+    },
+    "go": {
+      "log": "ragflow-logs/phase6-15-go.log",
+      "sha256": "f622c51e2dd0b2c90aeff750412de9aea4c5dd6914d5baddf09ee47088748d91",
+      "result": "ok "
+    },
+    "browser": {
+      "log": "ragflow-logs/phase6-15-browser-final.log",
+      "sha256": "164c344454fe8983e38f0abc7d141dcfee652bf385c3c3f8c20e98380ea7e3b5",
+      "result": "1 passed"
+    },
+    "stack_regressions": {
+      "log": "ragflow-logs/phase6-15-stack-regressions.log",
+      "sha256": "1fa82f56ce6fde07c87bf9c87f314b2cb3ebf060f1785c5ac207f3bfa84fbe39",
+      "result": "57 passed"
+    },
+    "services": {
+      "log": "ragflow-logs/phase6-15-services-final.log",
+      "sha256": "4b7a282b9a439586e6c2500f311e5142b5240d477a973b43515bb5fe506f2ef9",
+      "result": "85 passed"
+    },
+    "routes_leaks": {
+      "log": "ragflow-logs/phase6-15-routes-leaks.log",
+      "sha256": "9942c7886b975b6dca9c0f9c90cae65934e0cb98ea41e2d643fc173b641987be",
+      "result": "186 passed"
+    },
+    "model_routes": {
+      "log": "ragflow-logs/phase6-15-models-routes-final.log",
+      "sha256": "7271afaaabd0d66dbeb6d9a3ba4f8431a0de5632d9c8247af2102b0f0192f58b",
+      "result": "20 passed"
+    },
+    "provider_keys": {
+      "log": "ragflow-logs/phase6-15-provider-key-regressions.log",
+      "sha256": "6c68e8f1efabbe3fd3ca6bbeb452145610604e7344d7e21e0cd387bcab683f35",
+      "result": "71 passed"
+    },
+    "active_credentials": {
+      "log": "ragflow-logs/phase6-15-active-models-final.log",
+      "sha256": "16ece4a898d4420118883543d75fe7ec989bb04493b4cc90d37a814768aca0c6",
+      "result": "33 passed"
+    },
+    "ci": {
+      "log": "ragflow-logs/phase6-15-ci-close.log",
+      "sha256": "881ce47c3923e72c98d8d6dc9714b2a3f043266d27111c1180f46865aff0c037",
+      "result": "7/7 gates passed"
+    },
+    "security": {
+      "log": "ragflow-logs/phase6-15-security-close.log",
+      "sha256": "35ae83fb2d63969e1665d88aa247f8dce682613fa2d31b941cd34d7628ee0b44",
+      "result": "All checks passed!"
+    },
+    "openapi": {
+      "log": "ragflow-logs/phase6-15-openapi-check.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "result": "exit0 recorded"
+    },
+    "admission": {
+      "log": "ragflow-logs/phase6-15-admission.log",
+      "sha256": "920b07e40447627f9d1bae1d17fe957b7152d5d9afe5fb5be2998a4eadad947d",
+      "result": "exit0 recorded"
+    },
+    "health": {
+      "log": "ragflow-logs/phase6-15-health-final.log",
+      "sha256": "dafbc61308f1b634ab2b7661060fda84684fc4f7765f0cef827fdae1fe10e130",
+      "result": "stack ready:"
+    },
+    "records": {
+      "log": "ragflow-logs/phase6-15-records-final.log",
+      "sha256": "91e7809b3e27d7be1de9408076076bc6e6dd5b4dae4cd48d190cef0d8ffa906b"
+    },
+    "ci_after_records": {
+      "log": "ragflow-logs/phase6-15-ci-records.log",
+      "sha256": "2864cd96912108c505fe8ca7d2f974cd33f36df05b1b95d3eaf5781e9e7416cb"
+    },
+    "native_boundary": {
+      "log": "ragflow-logs/phase6-15-native-boundary-final.log",
+      "sha256": "bfd0df9b8f936582f39fe4c8afcbbbfdf6f31ebe6f147851e24e679079590abd"
+    }
+  },
+  "containers": [
+    {
+      "name": "devrag-stack-app-1",
+      "image": "sha256:908388ea65aec5ed0cf8b9cbdec820a51fa5db741e54d55f69ea03f364077072",
+      "health": "healthy",
+      "started_at": "2026-10-29T09:13:41.468099476Z"
+    },
+    {
+      "name": "devrag-stack-task-executor-3",
+      "image": "sha256:908388ea65aec5ed0cf8b9cbdec820a51fa5db741e54d55f69ea03f364077072",
+      "health": "healthy",
+      "started_at": "2026-10-29T09:13:41.913267439Z"
+    },
+    {
+      "name": "devrag-stack-deepdoc-1",
+      "image": "sha256:66e16f388c50b2b10579dfc3df645a45c56eccf428b023cd9c125d0c3e4139d6",
+      "health": "healthy",
+      "started_at": "2026-10-29T08:54:54.089902727Z"
+    }
+  ],
+  "screenshot": {
+    "path": "output/playwright/phase6-review/picture-caption-source.png",
+    "sha256": "a53c72c64c55beca8a2c5fe076061d8df6f81adbcb29e9ab2d0b60054b7ad940",
+    "reviewer": "assistant, actual Chrome"
+  },
+  "dependency_base": "06-12-ACQUISITION.json",
+  "build_bases": "06-15-BUILD-BASES.json",
+  "regression_note": "Full root/frontend and native stack before label-only follow-up; focused labels34 plus rebuilt app/worker browser1 after it. Native unchanged."
+}

@@ -53,7 +53,7 @@ class EmbedRunner:
         with self._limiters.embed_limiter:
             bundle = self._bundle(ctx, dimension)
             release_database_connection()
-            if ctx.parser_id in {"one", "manual", "qa", "book", "paper", "laws", "presentation", "table"}:
+            if ctx.parser_id in {"one", "manual", "qa", "book", "paper", "laws", "presentation", "table", "picture"}:
                 from rag.nlp.token_count import count_tokens
                 from rag.svr.failure import TaskFailure
 
@@ -66,6 +66,19 @@ class EmbedRunner:
         release_database_connection()
         future = self._executor().submit(self._encode_blocking, texts, ctx, dimension)
         return wait_for(future, control)
+
+    def describe_image(self, image: bytes, model_id: str, ctx: TaskContext, control: TaskControl) -> str:
+        def describe():
+            release_database_connection()
+            with self._limiters.embed_limiter:
+                control.check()
+                bundle = LLMBundle(ctx.tenant_id,model_id,"vision",settings=self._settings)
+                control.check()
+                return bundle.describe(image)
+        control.check()
+        result = wait_for(self._executor().submit(describe),control)
+        control.check()
+        return result
 
     def forget(self, task_id: str) -> None:
         with self._lock:

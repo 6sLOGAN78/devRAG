@@ -205,6 +205,10 @@ describe("model service writes (plan 03-21)", () => {
       models: models.map(([name, type]) => ({ id: `${name}@P`, name, provider: "P", type, dimension: null, maxTokens: 0, instance: "default", usedTokens: 0 })),
     });
 
+    it("keeps vision capability when re-testing a vision-only provider key", () => {
+      expect(registeredModelFor(provider([["v1","vision"]]))).toEqual([{name:"v1",type:"vision"}]);
+    });
+
     it("takes the first chat model, name and type only", () => {
       expect(registeredModelFor(provider([["e1", "embedding"], ["c1", "chat"], ["c2", "chat"]]))).toEqual([{ name: "c1", type: "chat" }]);
     });

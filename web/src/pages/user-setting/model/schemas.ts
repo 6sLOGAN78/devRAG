@@ -25,7 +25,7 @@ export interface ProviderFormValues {
 
 export interface AddModelValues {
   modelId: string;
-  type: "chat" | "embedding";
+  type: "chat" | "embedding" | "vision";
 }
 
 const ABSOLUTE_HTTP_URL = /^https?:\/\/\S+$/i;
@@ -137,7 +137,7 @@ export function providerSchema(spec: ProviderSpec, mode: ProviderMode, current?:
 export const addModelSchema = z
   .object({
     modelId: z.string(),
-    type: z.enum(["chat", "embedding"]),
+    type: z.enum(["chat", "embedding", "vision"]),
   })
   .superRefine((values, ctx) => {
     const message = modelIdIssue(values.modelId);

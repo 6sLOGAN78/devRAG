@@ -139,7 +139,7 @@ export function ProviderRow({ spec, provider, defaults, elevated, onAction }: Pr
       {models.length > 0 ? (
         <ul className="flex flex-col gap-1">
           {models.map((model) => (
-            <ModelRow key={model.id} model={model} defaults={defaults} />
+            <ModelRow key={`${model.id}:${model.type}`} model={model} defaults={defaults} />
           ))}
         </ul>
       ) : null}

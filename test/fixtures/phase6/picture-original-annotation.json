@@ -1,0 +1,13 @@
+{
+  "authorship": "Original synthetic raster drawing authored for Phase6-15 before model selection",
+  "sha256": "c0804a0fd7593a763e081a0b98c176e12f7780aa983efc5457a541df310382bc",
+  "width": 640,
+  "height": 480,
+  "facts": [
+    "lighthouse",
+    "red roof",
+    "52 metres",
+    "73 units"
+  ],
+  "expected_source": "picture-original.png"
+}

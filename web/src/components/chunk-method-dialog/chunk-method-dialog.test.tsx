@@ -81,15 +81,15 @@ describe("Chunking method dialog, document mode (UI-13, UI-14)", () => {
     expect(within(dialog).getByTestId("field-overlap")).toHaveValue(10);
   });
 
-  it("lists fourteen methods in documentation order with five disabled radios and the badge", async () => {
+  it("lists fourteen methods in documentation order with four disabled radios and the badge", async () => {
     const { dialog } = await openFirst();
     const radios = within(dialog).getAllByRole("radio");
     expect(radios).toHaveLength(14);
-    expect(radios.filter((radio) => radio.hasAttribute("disabled"))).toHaveLength(5);
+    expect(radios.filter((radio) => radio.hasAttribute("disabled"))).toHaveLength(4);
     expect(radios.map((radio) => radio.getAttribute("data-testid"))).toEqual(CHUNK_METHODS.map((id) => `chunk-method-option-${id}`));
     expect(screen.getByTestId(`chunk-method-option-${GENERAL_METHOD}`)).toBeChecked();
     const group = within(dialog).getByTestId("chunk-method-group");
-    expect(within(group).getAllByText("Available in a later release")).toHaveLength(5);
+    expect(within(group).getAllByText("Available in a later release")).toHaveLength(4);
     expect(within(group).getByText("Choose an available method for the next parse.")).toBeInTheDocument();
     for (const title of ["General", "Q&A", "Paper", "Book", "Laws", "Presentation", "Tables", "Manual"]) expect(within(group).getByText(title)).toBeInTheDocument();
     expect(radios.find((radio) => radio.hasAttribute("disabled"))).toHaveAccessibleDescription("Available in a later release");
@@ -556,5 +556,21 @@ describe("Table section controls", () => {
     await user.click(within(dialog).getByTestId("chunk-method-submit"));
     await waitFor(() => expect(sent(detailUrl(1), "PATCH")).toHaveLength(1));
     expect(sent(detailUrl(1), "PATCH")[0]).toEqual({ parser_id: "table" });
+  });
+});
+
+
+describe("Picture controls", () => {
+  it("saves an explicit OCR-only Picture choice and explains the vision alternative", async () => {
+    const {user,dialog} = await openFirst();
+    const option = within(dialog).getByTestId("chunk-method-option-picture");
+    expect(option).not.toBeDisabled();
+    await user.click(option);
+    expect(within(dialog).getByTestId("picture-settings-note")).toHaveTextContent("vision model");
+    await user.click(within(dialog).getByTestId("field-picture-ocr-only"));
+    expect(within(dialog).getByTestId("field-image-model")).toBeDisabled();
+    await user.click(within(dialog).getByTestId("chunk-method-submit"));
+    await waitFor(()=>expect(sent(detailUrl(1),"PATCH")).toHaveLength(1));
+    expect(sent(detailUrl(1),"PATCH")[0]).toEqual({parser_id:"picture",parser_config:{picture_ocr_only:true}});
   });
 });

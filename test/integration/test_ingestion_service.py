@@ -42,7 +42,6 @@ item = base.item
 upload = base.upload
 refused = base.refused
 
-PNG = b"\x89PNG\r\n\x1a\n" + b"x" * 64
 
 
 @pytest.fixture
@@ -256,9 +255,10 @@ def test_a_running_document_is_already_running(settings, space, storage):
     assert (err.kind, err.reason) == (Kind.CONFLICT, "already_running") and unchanged(settings, doc["id"]) == before
 
 
-def test_an_image_is_parse_unavailable(settings, space, storage):
+def test_an_unknown_parser_is_parse_unavailable(settings, space, storage):
     owner, dataset = space
-    doc = one_doc(settings, owner, dataset, storage, "p.png", PNG)
+    doc = one_doc(settings, owner, dataset, storage)
+    sql("UPDATE `document` SET `suffix` = 'unbuilt-fixture' WHERE `id` = %s", (doc["id"],))
     err = refused(lambda: start(settings, owner, dataset, [doc["id"]]))
     assert (err.kind, err.reason) == (Kind.INVALID, "parse_unavailable") and doc_state(doc["id"])[0] == "0"
 

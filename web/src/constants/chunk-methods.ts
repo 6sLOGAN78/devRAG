@@ -8,7 +8,7 @@ export type ChunkMethod = (typeof CHUNK_METHODS)[number];
 
 export const GENERAL_METHOD: ChunkMethod = "naive";
 
-export const IMPLEMENTED: readonly ChunkMethod[] = [GENERAL_METHOD, "one", "manual", "qa", "book", "paper", "laws", "presentation", "table"];
+export const IMPLEMENTED: readonly ChunkMethod[] = [GENERAL_METHOD, "one", "manual", "qa", "book", "paper", "laws", "presentation", "table", "picture"];
 
 /** The locale stem of a method: `datasets.chunking.method.<stem>` has `.title` and `.body`. */
 export const METHOD_STEMS: Readonly<Record<ChunkMethod, string>> = {

@@ -1,0 +1,6 @@
+{
+  "models": {
+    "type": { "vision": "Vision" },
+    "defaults": { "vision": "Default vision model" }
+  }
+}

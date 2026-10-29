@@ -305,6 +305,10 @@
             "default": null,
             "title": "Delimiter"
           },
+          "image_model": {
+            "default": null,
+            "title": "Image Model"
+          },
           "layout_recognize": {
             "default": null,
             "title": "Layout Recognize"
@@ -316,6 +320,10 @@
           "pages": {
             "default": null,
             "title": "Pages"
+          },
+          "picture_ocr_only": {
+            "default": null,
+            "title": "Picture Ocr Only"
           }
         },
         "title": "ChunkingValues",
@@ -526,11 +534,16 @@
           "embedding": {
             "title": "Embedding",
             "type": "string"
+          },
+          "vision": {
+            "title": "Vision",
+            "type": "string"
           }
         },
         "required": [
           "chat",
-          "embedding"
+          "embedding",
+          "vision"
         ],
         "title": "DefaultsView",
         "type": "object"
@@ -699,6 +712,11 @@
             "title": "Id",
             "type": "string"
           },
+          "image_model": {
+            "default": "",
+            "title": "Image Model",
+            "type": "string"
+          },
           "last_log_id": {
             "anyOf": [
               {
@@ -776,6 +794,11 @@
           "parser_id": {
             "title": "Parser Id",
             "type": "string"
+          },
+          "picture_ocr_only": {
+            "default": false,
+            "title": "Picture Ocr Only",
+            "type": "boolean"
           },
           "preview": {
             "title": "Preview",
@@ -1520,7 +1543,8 @@
             "enum": [
               "chat",
               "embedding",
-              "rerank"
+              "rerank",
+              "vision"
             ],
             "title": "Type",
             "type": "string"
@@ -4914,6 +4938,18 @@
                     ],
                     "default": null,
                     "title": "Tenant Id"
+                  },
+                  "vision": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null,
+                    "title": "Vision"
                   }
                 },
                 "title": "DefaultsBody",

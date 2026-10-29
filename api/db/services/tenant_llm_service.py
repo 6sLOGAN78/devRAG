@@ -16,6 +16,7 @@ from api.db.database import DB
 from api.db.models import TenantLLM, TenantModel, TenantModelInstance, TenantModelProvider
 from api.db.services.service_errors import Kind, ServiceError
 from api.utils import reasons
+from common.model_capabilities import TYPE_BITS
 from common.model_ref import ModelRef
 from common.security import secretbox
 from common.settings import LlmSettings, Settings
@@ -106,11 +107,16 @@ def get_credential(llm: LlmSettings, tenant_id: str, ref: ModelRef, model_type: 
             TenantLLM.llm_factory == provider,
             TenantLLM.llm_name == ref.model,
             TenantLLM.status == _ACTIVE,
+            TenantModel.status == "active",
+            TenantModelInstance.status == "active",
             TenantModelInstance.instance_name == ref.instance,
         )
     )
     if model_type is not None:
-        query = query.where(TenantLLM.model_type == model_type)
+        bit = TYPE_BITS.get(model_type)
+        if bit is None:
+            return None
+        query = query.where(TenantModel.model_type.bin_and(bit) != 0)
     with DB.connection_context():
         row = query.dicts().first()
     if row is None:
@@ -120,7 +126,7 @@ def get_credential(llm: LlmSettings, tenant_id: str, ref: ModelRef, model_type: 
         provider=provider,
         instance=ref.instance,
         model=ref.model,
-        model_type=row["model_type"] or "",
+        model_type=model_type or row["model_type"] or "",
         api_key=open_key(llm, tenant_id, provider, ref.instance, envelope) if envelope else None,
         api_base=row["api_base"] or None,
         api_version=_loads(row["extra"]).get("api_version") or None,

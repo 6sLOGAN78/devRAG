@@ -28,8 +28,8 @@ MODEL_TYPES = {
     "OpenAI": ("chat", "embedding"),
     "Azure-OpenAI": ("chat", "embedding"),
     "Ollama": ("chat", "embedding"),
-    "OpenRouter": ("chat", "embedding", "rerank"),
-    "OpenAI-API-Compatible": ("chat", "embedding"),
+    "OpenRouter": ("chat", "embedding", "rerank", "vision"),
+    "OpenAI-API-Compatible": ("chat", "embedding", "vision"),
     "TEI": ("rerank",),
 }
 

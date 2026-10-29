@@ -40,7 +40,7 @@ from rag.llm.sync_loop import PrivateLoop
 logger = logging.getLogger(__name__)
 
 MAX_MODELS_PER_SAVE = 2
-MODEL_TYPES = ("chat", "embedding", "rerank")
+MODEL_TYPES = ("chat", "embedding", "rerank", "vision")
 _MODEL_NAME = re.compile(r"^[^\s@]{1,128}$")
 MAX_DIMENSION = 4096
 _TEST_MAX_COMPLETION_TOKENS = 16
@@ -89,7 +89,12 @@ def _invalid(reason: str, message: str) -> ServiceError:
 
 def check_model_names(spec: ProviderSpec, instance: str, models: Sequence[ModelRequest]) -> None:
     """Each id is 1..128 characters without whitespace or ``@``, and its composite id fits the 128-character columns."""
+    named_types: dict[str,set[str]] = {}
     for model in models:
+        kinds = named_types.setdefault(model.name,set())
+        if model.model_type in kinds or (kinds and not kinds | {model.model_type} <= {"chat","vision"}):
+            raise _invalid(reasons.MODELS_INVALID, "the model capability list is not valid")
+        kinds.add(model.model_type)
         if not isinstance(model.name, str) or not _MODEL_NAME.match(model.name):
             raise _invalid(reasons.MODELS_INVALID, "that model name is not valid")
         try:
@@ -227,6 +232,11 @@ def _test_model(settings: Settings, spec: ProviderSpec, model: ModelRequest, key
         "timeout": seconds,
     }
     try:
+        if model.model_type == "vision":
+            from rag.llm.vision_model import VisionBase
+            sample=bytes.fromhex("89504e470d0a1a0a0000000d49484452000000010000000108060000001f15c4890000000d49444154789c6360f8cfc00000030101009a6e37190000000049454e44ae426082")
+            VisionBase(spec,model.name,key,base_url,api_version,**common).describe(sample)
+            return None
         if model.model_type == "chat":
             driver = LiteLLMBase(spec, model.name, key, base_url, api_version, **common)
             driver.chat("", [{"role": "user", "content": _TEST_PROMPT}], {"max_completion_tokens": _TEST_MAX_COMPLETION_TOKENS, "temperature": 0})
@@ -312,7 +322,7 @@ def add_models(
     """Test new models with the instance's stored key and address, then append them."""
     spec = _spec(provider)
     try:
-        if not 1 <= len(models) <= MAX_MODELS_PER_SAVE or any(m.model_type not in MODEL_TYPES for m in models) or len({m.name for m in models}) != len(models):
+        if not 1 <= len(models) <= MAX_MODELS_PER_SAVE or any(m.model_type not in MODEL_TYPES for m in models) or len({(m.name,m.model_type) for m in models}) != len(models):
             raise _invalid(reasons.MODELS_INVALID, "add one or two models")
         check_model_names(spec, instance, models)
         _check_types_accepted(spec, [m.model_type for m in models])
@@ -320,7 +330,7 @@ def add_models(
         stored = _instance_of(info, instance)
         if stored is None:
             raise ServiceError(Kind.NOT_FOUND, reasons.PROVIDER_NOT_CONFIGURED, "that provider is not configured")
-        if {m.name for m in models} & {m.model for m in (info.models if info else ())}:
+        if {(m.name,m.model_type) for m in models} & {(m.model,m.model_type) for m in (info.models if info else ())}:
             raise ServiceError(Kind.CONFLICT, reasons.MODEL_EXISTS, "that model is already added")
         _ensure_key_store(settings.llm)
         _guard_address(settings, spec, stored.api_base)

@@ -50,7 +50,7 @@ from rag.llm.sync_loop import PrivateLoop
 
 logger = logging.getLogger(__name__)
 
-MODEL_TYPES = ("chat", "embedding", "rerank")
+MODEL_TYPES = ("chat", "embedding", "rerank", "vision")
 _REFUSAL_CODES = frozenset(
     {
         LLMErrorCode.ERROR_AUTHENTICATION,
@@ -141,7 +141,7 @@ class LLMBundle:
         sleep: Callable[[float], Awaitable[None]] | None = None,
     ) -> None:
         if model_type not in MODEL_TYPES:
-            raise ValueError("model_type must be 'chat', 'embedding' or 'rerank'")
+            raise ValueError("model_type must be 'chat', 'embedding', 'rerank' or 'vision'")
         try:
             ref = parse_model_ref(model_id)
         except InvalidModelRef:
@@ -168,6 +168,9 @@ class LLMBundle:
             "allow_private": llm.allow_private_base_urls,
             "deny_hosts": tenant_llm_service.internal_hosts(self._settings),
         }
+        if self.model_type == "vision":
+            from rag.llm.vision_model import VisionBase
+            return VisionBase(self._spec,self.ref.model,api_key,api_base,api_version,sleep=self._sleep or asyncio.sleep,**common)
         if self.model_type == "chat":
             return LiteLLMBase(self._spec, self.ref.model, api_key, api_base, api_version, sleep=self._sleep or asyncio.sleep, **common)
         if self.model_type == "rerank":
@@ -247,6 +250,20 @@ class LLMBundle:
             raise ServiceError(Kind.INVALID, reasons.DIMENSION_MISMATCH, "the model returned vectors of a different size")
 
     # ------------------------------------------------------------------------- chat
+
+    def describe(self, image: bytes) -> str:
+        from rag.llm.vision_model import VisionBase
+        driver = self._driver
+        if not isinstance(driver, VisionBase):
+            raise TypeError("this bundle was not built for vision")
+        self._reset_last_usage()
+        try:
+            text, _ = driver.describe(image)
+        except ModelException as exc:
+            raise self._failure(exc) from None
+        finally:
+            self._report_usage(driver.last_usage)
+        return self._scrub(text)
 
     def chat(self, system: str, history: list[dict[str, Any]], gen_conf: Mapping[str, Any] | None = None) -> str:
         driver = self._chat_driver()

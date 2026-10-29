@@ -96,6 +96,7 @@ function AddModelForm({ spec, pendingRef, close }: { spec: ProviderSpec; pending
                 <NativeSelect {...field} data-testid="field-model-type" disabled={busy}>
                   <option value="chat">{t("models.type.chat")}</option>
                   <option value="embedding">{t("models.type.embedding")}</option>
+                  {spec.slug === "openrouter" || spec.slug === "openai-compatible" ? <option value="vision">{t("models.type.vision")}</option> : null}
                 </NativeSelect>
               </FormControl>
               <FormMessage />

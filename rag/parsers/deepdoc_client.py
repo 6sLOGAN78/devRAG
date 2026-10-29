@@ -84,6 +84,16 @@ class DeepDocClient:
                 raise NativeUnavailable()
         return data
 
+    def ocr_image(self, content: bytes) -> dict:
+        from deepdoc.ocr_result import validate_result
+        from deepdoc.model_runtime import NativeError
+        data = self._request("/v1/ocr", content, None)
+        try:
+            validate_result(data)
+        except (NativeError,TypeError,KeyError):
+            raise NativeUnavailable() from None
+        return data
+
     def normalize_image(self, content: bytes) -> ParsedAsset:
         if len(content) > 16 * 1024 * 1024:
             raise FileTooLarge()
