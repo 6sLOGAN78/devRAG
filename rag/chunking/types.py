@@ -8,6 +8,7 @@ from dataclasses import dataclass
 from rag.parsers.types import PageBox
 from rag.parsers.tables import Table
 from rag.parsers.sections import Section
+from rag.parsers.slides import Slide
 
 
 @dataclass(frozen=True)
@@ -22,3 +23,4 @@ class Chunk:
     source_lines: tuple[tuple[int, int], ...] = ()
     question: str = ""
     sections: tuple[Section, ...] = ()
+    slide: Slide | None = None

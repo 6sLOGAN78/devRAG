@@ -1,0 +1,119 @@
+{
+  "recorded_at": "2026-10-29T00:22:43.382774+00:00",
+  "plan": "06-13",
+  "paid_calls": 0,
+  "new_packages": 0,
+  "new_models": 0,
+  "python_existing_skips": 8,
+  "human_uat_approved": false,
+  "phase_gate_complete": false,
+  "evidence": {
+    "python_unit": {
+      "log": "ragflow-logs/phase6-13-unit-final.log",
+      "sha256": "d5c427ab61b477d463b96f914aab96d5f4a072ac8c9d519e663f6ad8b9b6caf8",
+      "passed": 2639
+    },
+    "focused": {
+      "log": "ragflow-logs/phase6-13-focused-complete.log",
+      "sha256": "34c0ca24b3ca4e085fa40e9fa33fe46b163baeea087335fd831b1a6e3f0dd2dc",
+      "passed": 35
+    },
+    "after_api": {
+      "log": "ragflow-logs/phase6-13-unit-after-api.log",
+      "sha256": "527eae11608ef3240897382a51637d07395a572177c4871be1967d5bfe5b42bb",
+      "passed": 31
+    },
+    "frontend": {
+      "log": "ragflow-logs/phase6-13-web-final.log",
+      "sha256": "941af9d843981569016a932c35c27243811aadad3404abb04aa3f08af77911cb",
+      "passed": 2169
+    },
+    "go": {
+      "log": "ragflow-logs/phase6-13-go.log",
+      "sha256": "4a2278ff87ac3ac40fa18e51a1d92024a770444bab489b4b1f23661cd2c7182b",
+      "passed": null
+    },
+    "worker_api": {
+      "log": "ragflow-logs/phase6-13-api-green.log",
+      "sha256": "d3b8e6295fc4d6379d643d60dfc5c904b64367a4a1f3a502535b0ea5a6bff175",
+      "passed": 26
+    },
+    "browser": {
+      "log": "ragflow-logs/phase6-13-browser-final.log",
+      "sha256": "22d921447c7a70e25137e9bbb9d26eb493ee73f89b9b584164518e8971290cb8",
+      "passed": 1
+    },
+    "stack_regressions": {
+      "log": "ragflow-logs/phase6-13-stack-regressions.log",
+      "sha256": "e9af3ce29fa6eec268e9f43f62768531bdb310aec0535542d233e920607a9566",
+      "passed": 43
+    },
+    "services": {
+      "log": "ragflow-logs/phase6-13-services.log",
+      "sha256": "33d3fbee42c5f872223966ec5135b72cbb38ed7704df0af067fe9387c331016f",
+      "passed": 85
+    },
+    "routes_leaks": {
+      "log": "ragflow-logs/phase6-13-routes-leaks.log",
+      "sha256": "3322f3185e3a8df5e9372b09cb97e977809520905c65585b15e578b347c1171d",
+      "passed": 172
+    },
+    "ci": {
+      "log": "ragflow-logs/phase6-13-ci-final.log",
+      "sha256": "1b893e7af91a43715558e0c0191826e5887b43a489013d4399837141716c7c8e",
+      "passed": 7
+    },
+    "security": {
+      "log": "ragflow-logs/phase6-13-security-current.log",
+      "sha256": "35ae83fb2d63969e1665d88aa247f8dce682613fa2d31b941cd34d7628ee0b44",
+      "passed": null
+    },
+    "openapi": {
+      "log": "ragflow-logs/phase6-13-openapi.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "passed": null
+    },
+    "admission": {
+      "log": "ragflow-logs/phase6-13-admission.log",
+      "sha256": "920b07e40447627f9d1bae1d17fe957b7152d5d9afe5fb5be2998a4eadad947d",
+      "passed": null
+    },
+    "health": {
+      "log": "ragflow-logs/phase6-13-health-api.log",
+      "sha256": "dafbc61308f1b634ab2b7661060fda84684fc4f7765f0cef827fdae1fe10e130",
+      "passed": null
+    },
+    "records": {
+      "log": "ragflow-logs/phase6-13-records-final.log",
+      "sha256": "7306c451bb513ed5c35eb40b157366cc9a9a182e30217ba341db4d06d3380787",
+      "passed": 13
+    }
+  },
+  "containers": [
+    {
+      "name": "devrag-stack-app-1",
+      "image": "sha256:b6db84d125eafdce2c41b646d82b73e04c034d0286044e8d896cd33557f0d5bf",
+      "health": "healthy",
+      "started_at": "2026-10-29T00:18:38.854568699Z"
+    },
+    {
+      "name": "devrag-stack-task-executor-3",
+      "image": "sha256:b6db84d125eafdce2c41b646d82b73e04c034d0286044e8d896cd33557f0d5bf",
+      "health": "healthy",
+      "started_at": "2026-10-29T00:18:39.057140923Z"
+    },
+    {
+      "name": "devrag-stack-deepdoc-1",
+      "image": "sha256:33d440bd2117d2321fe1c8c8330fbfeb5c2cd0d37439b5b56ead2166f10018b0",
+      "health": "healthy",
+      "started_at": "2026-10-29T00:17:34.250631793Z"
+    }
+  ],
+  "screenshot": {
+    "path": "output/playwright/phase6-review/presentation-slide-source.png",
+    "sha256": "8089b792c04e5a16b9798f71fdecdfe1d74bc453bbf404957033f8b0073887b9",
+    "reviewer": "assistant, actual Chrome"
+  },
+  "dependency_base": "06-12-ACQUISITION.json",
+  "unit_note": "Full unit2639 collected before final merged-cell supplemental test; focused35 and after-api31 cover all final tests."
+}

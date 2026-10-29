@@ -81,6 +81,9 @@ def build_row(
     boxes = chunk.positions
     pages = sorted({int(box.page) for box in boxes})
     features = {}
+    if chunk.slide:
+        features["slide_number_int"] = chunk.slide.number
+        features["slide_title_kwd"] = chunk.slide.title
     if chunk.sections:
         features["section_paths_kwd"] = list(dict.fromkeys(" / ".join(s.path) for s in chunk.sections))
         features["source_paths_kwd"] = list(dict.fromkeys(s.source_path for s in chunk.sections if s.source_path))

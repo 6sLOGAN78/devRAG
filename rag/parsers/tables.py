@@ -98,6 +98,4 @@ class Table:
         if any(not isinstance(c, dict) or set(c) != {"row", "column", "text", "rowspan", "colspan", "header"} for c in raw["cells"]):
             raise ValueError("invalid table view")
         made = cls(raw["rows"], raw["columns"], tuple(TableCell(**c) for c in raw["cells"]), raw["caption"], raw["asset_id"])
-        if not made.asset_id:
-            raise ValueError("missing table asset")
         return made

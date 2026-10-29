@@ -260,6 +260,17 @@
             "title": "Positions",
             "type": "array"
           },
+          "slide": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SlideView"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
           "tables": {
             "items": {
               "$ref": "#/components/schemas/TableView"
@@ -1926,6 +1937,24 @@
           "update_time"
         ],
         "title": "SessionView",
+        "type": "object"
+      },
+      "SlideView": {
+        "properties": {
+          "number": {
+            "title": "Number",
+            "type": "integer"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "number",
+          "title"
+        ],
+        "title": "SlideView",
         "type": "object"
       },
       "StartedDocument": {

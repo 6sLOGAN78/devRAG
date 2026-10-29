@@ -1,0 +1,22 @@
+{
+  "authorship": "Original synthetic fixture authored for devRAG Phase6-13",
+  "sha256": "44fe8b794f21fc2e8f783ea80939936fecb14999296b52f945f1ddf1a36c5d75",
+  "source_slides": 4,
+  "nonempty_slide_numbers": [
+    1,
+    3,
+    4
+  ],
+  "titles": [
+    "Lighthouse overview",
+    "Closing title only",
+    "Orchard review"
+  ],
+  "facts": [
+    "LIGHTHOUSE FACT: tower height is 52 metres.",
+    "SPEAKER NOTE: calibration offset is 73 units.",
+    "ORCHARD FACT: harvest is 9100 apples.",
+    "FINAL NOTE: orchard code is O9100."
+  ],
+  "blank_slide": 2
+}

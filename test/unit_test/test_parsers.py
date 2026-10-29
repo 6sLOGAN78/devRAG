@@ -72,10 +72,10 @@ def test_pptx_slides(tmp_path):
         ]
     )
     blocks, report = _run(pptx_parser, _src(tmp_path, data, "pptx"))
-    assert [b.kind for b in blocks] == ["slide", "slide"]
-    first = blocks[0].text
+    assert sorted({b.slide.number for b in blocks}) == [1, 2]
+    first = "\n".join(b.text for b in blocks if b.slide.number == 1)
     assert first.index("Alpha") < first.index("first body") and "speaker words" in first
-    assert "c1" in blocks[1].text and "c2" in blocks[1].text
+    assert any(b.table and "c1" in b.text and "c2" in b.text for b in blocks if b.slide.number == 2)
     assert report.images_skipped == 1
 
 

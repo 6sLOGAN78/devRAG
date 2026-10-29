@@ -64,7 +64,13 @@ class TableView(BaseModel):
     asset_id: str
 
 
+class SlideView(BaseModel):
+    number: int
+    title: str
+
+
 class ChunkView(BaseModel):
+    slide: SlideView | None = None
     tables: list[TableView] = Field(default_factory=list)
     id: str
     text: str

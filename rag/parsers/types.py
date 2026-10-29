@@ -14,6 +14,7 @@ from rag.parsers.assets import ParsedAsset
 from rag.parsers.tables import Table
 from rag.parsers.records import Record
 from rag.parsers.sections import Section
+from rag.parsers.slides import Slide
 
 BLOCK_KINDS = frozenset({"text", "heading", "table", "slide", "sheet", "code", "list", "image"})
 LayoutLabel = Literal["_background_", "Text", "Title", "Figure", "Figure caption", "Table", "Table caption", "Header", "Footer", "Reference", "Equation"]
@@ -47,6 +48,7 @@ class ParsedBlock:
     line_range: tuple[int, int] | None = None
     record: Record | None = None
     section: Section | None = None
+    slide: Slide | None = None
 
     def __post_init__(self) -> None:
         if type(self.heading_level) is not int or not 0 <= self.heading_level <= 6:

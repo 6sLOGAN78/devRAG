@@ -717,6 +717,8 @@ export interface components {
             origin: string;
             /** Positions */
             positions: components["schemas"]["PositionView"][];
+            /** @default null */
+            slide: components["schemas"]["SlideView"] | null;
             /** Tables */
             tables?: components["schemas"]["TableView"][];
             /** Text */
@@ -1323,6 +1325,13 @@ export interface components {
             name: string;
             /** Update Time */
             update_time: number;
+        };
+        /** SlideView */
+        SlideView: {
+            /** Number */
+            number: number;
+            /** Title */
+            title: string;
         };
         /** StartedDocument */
         StartedDocument: {

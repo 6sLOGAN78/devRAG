@@ -41,6 +41,8 @@ SELECT_FIELDS = [
     "page_dims_flt",
     "pagerank_fea",
     "table_features_with_weight",
+    "slide_number_int",
+    "slide_title_kwd",
 ]
 MAX_TOP_K = 10000
 FUSIONS = ("weighted_sum", "rrf")
@@ -91,6 +93,8 @@ class Hit:
     vector_similarity: float
     rerank_similarity: float | None = None
     table_features: str | None = None
+    slide_number: int | None = None
+    slide_title: str = ""
 
 
 @dataclass(frozen=True)
@@ -259,5 +263,7 @@ def _to_hit(candidate: _Candidate) -> Hit:
         term_similarity=candidate.tsim,
         vector_similarity=candidate.vsim,
         rerank_similarity=candidate.rerank,
+        slide_number=row.get("slide_number_int"),
+        slide_title=row.get("slide_title_kwd", ""),
         table_features=row.get("table_features_with_weight") if isinstance(row.get("table_features_with_weight"), str) else None,
     )

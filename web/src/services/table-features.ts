@@ -10,7 +10,7 @@ export function tableViewsOf(raw: unknown): TableView[] {
     const t = asRecord(value);
     if (!Number.isInteger(t.rows) || !Number.isInteger(t.columns)) return [];
     const rows = t.rows as number, columns = t.columns as number;
-    if (rows < 1 || rows > 256 || columns < 1 || columns > 128 || rows * columns > 4096 || !Array.isArray(t.cells) || t.cells.length > 4096 || typeof t.asset_id !== "string" || !/^[a-f0-9]{32}$/.test(t.asset_id) || typeof t.caption !== "string" || t.caption.length > 1024) return [];
+    if (rows < 1 || rows > 256 || columns < 1 || columns > 128 || rows * columns > 4096 || !Array.isArray(t.cells) || t.cells.length > 4096 || typeof t.asset_id !== "string" || (t.asset_id !== "" && !/^[a-f0-9]{32}$/.test(t.asset_id)) || typeof t.caption !== "string" || t.caption.length > 1024) return [];
     const seen = new Set<string>(), cells: TableCellView[] = [];
     let size = 0;
     for (const value of t.cells) {

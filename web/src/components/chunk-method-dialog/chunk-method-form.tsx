@@ -218,7 +218,7 @@ export function ChunkMethodForm({ target, settings, pendingRef, onClose }: Chunk
             </FormItem>
           )}
         />
-        <ParseConfiguration control={form.control} wholeDocument={form.watch("method") === "one"} questionAnswer={form.watch("method") === "qa"} book={form.watch("method") === "book"} paper={form.watch("method") === "paper"} laws={form.watch("method") === "laws"} disabled={busy} answers={answers} onEdit={(field) => clearAnswers(FIELD_NAMES.find((name) => name === field))} />
+        <ParseConfiguration control={form.control} wholeDocument={form.watch("method") === "one"} questionAnswer={form.watch("method") === "qa"} book={form.watch("method") === "book"} paper={form.watch("method") === "paper"} laws={form.watch("method") === "laws"} presentation={form.watch("method") === "presentation"} disabled={busy} answers={answers} onEdit={(field) => clearAnswers(FIELD_NAMES.find((name) => name === field))} />
         <DialogFooter>
           <DialogClose asChild>
             <Button type="button" variant="ghost">

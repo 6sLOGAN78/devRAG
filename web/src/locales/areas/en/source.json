@@ -13,6 +13,7 @@
     "figureUnavailable": "This figure is unavailable.",
     "retry": "Try again",
     "tables": "Tables",
-    "crop": "Source crop"
+    "crop": "Source crop",
+    "slide": "Slide {{number}}"
   }
 }

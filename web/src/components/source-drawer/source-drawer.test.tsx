@@ -121,6 +121,18 @@ describe("source drawer", () => {
     expect(server.callsTo("GET", url)).toHaveLength(1);
   });
 
+  it("shows typed slide identity and safe office tables without a crop", async () => {
+    setFileExtra(server, DOC, { preview: "none", assets: [] });
+    const table = { rows: 1, columns: 1, caption: "Slide facts", asset_id: "", cells: [{row:0,column:0,text:"<script>73</script>",rowspan:1,colspan:1,header:false}] };
+    show(sourceFromHit(toSourceHit(raw({doc_name:"slides.pptx", positions:[],slide:{number:3,title:"Closing"},tables:[table]})),1));
+    expect(screen.getByTestId("source-slide")).toHaveTextContent("Slide 3 · Closing");
+    await waitUntil(() => screen.queryByTestId("source-structured-table"));
+    expect(screen.getByRole("cell",{name:"<script>73</script>"})).toBeInTheDocument();
+    expect(screen.queryByTestId("source-asset-image")).toBeNull();
+    expect(screen.queryByTestId("source-preview")).toBeNull();
+    expect(document.querySelector('[data-testid="source-drawer"] script')).toBeNull();
+  });
+
   it("renders original Markdown source code and parameter tables without fetching diagrams", () => {
     show(source({ doc_name:"manual.md",positions:[],content:'# Setup\n\n````python\npayload = "```"\nprint(52)\n````\n\n| Parameter | Value |\n|---|---|\n| harvest | 9100 |\n\n![diagram 52](https://example.invalid/tracker.png)\n\n<script>window.manualExecuted=true</script>' }));
     const passage=screen.getByTestId("source-passage");

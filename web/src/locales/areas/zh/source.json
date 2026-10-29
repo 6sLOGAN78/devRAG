@@ -13,6 +13,7 @@
     "figureUnavailable": "此图片暂不可用。",
     "retry": "重试",
     "tables": "表格",
-    "crop": "原文截图"
+    "crop": "原文截图",
+    "slide": "幻灯片 {{number}}"
   }
 }

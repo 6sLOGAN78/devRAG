@@ -109,7 +109,8 @@
       "qaSettings": "Each question and answer stays in one chunk. Use Question and Answer columns, or Question:/Answer: text pairs. Split settings do not divide a pair.",
       "bookSettings": "Follows EPUB spine order and chapter headings. Large sections split within their parent chapter; chunk size applies. Delimiters and overlap do not apply.",
       "paperSettings": "Follows Abstract, Introduction, Methods and References, plus numbered sections. Chunk size applies within each section; delimiters and overlap do not apply.",
-      "lawsSettings": "Follows chapters, sections, articles and items. Chunk size applies within each article; delimiters and overlap do not apply. Original source characters are preserved."
+      "lawsSettings": "Follows chapters, sections, articles and items. Chunk size applies within each article; delimiters and overlap do not apply. Original source characters are preserved.",
+      "presentationSettings": "Keeps each slide separate, repeating its title on long chunks. Chunk size applies within a slide; delimiters and overlap do not apply."
     }
   },
   "errors": {

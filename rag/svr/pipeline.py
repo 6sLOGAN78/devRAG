@@ -123,7 +123,7 @@ def _parse_and_chunk(ctx: TaskContext, deps: PipelineDeps, control: TaskControl,
         for block in materialized:
             control.check()
             table = block.table
-            if table is not None:
+            if table is not None and table.asset_sha256:
                 table = replace(table, asset_id=asset_ids[("table", table.asset_sha256)])
             owned_ids = tuple(dict.fromkeys((*block.image_ids, *(asset_ids[(a.kind, a.sha256)] for a in block.assets))))
             yield replace(block, assets=(), table=table, image_ids=owned_ids)

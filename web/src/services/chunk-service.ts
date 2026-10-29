@@ -1,3 +1,4 @@
+import { slideOf, type SlideView } from "./slide-features";
 import { documentChunkPath, documentChunksPath } from "@/constants/api-paths";
 import { request } from "./http";
 import { tableViewsOf, type TableView } from "./table-features";
@@ -22,6 +23,7 @@ export interface ChunkPosition {
 
 export interface ChunkView {
   tables?: TableView[];
+  slide?: SlideView;
   id: string;
   text: string;
   positions: ChunkPosition[];
@@ -63,6 +65,7 @@ export function toChunk(raw: unknown): ChunkView {
   const origin = text(dto.origin);
   return {
     id: text(dto.id),
+    ...(slideOf(dto.slide) ? {slide:slideOf(dto.slide)} : {}),
     ...(dto.tables !== undefined ? { tables: tableViewsOf(dto.tables) } : {}),
     text: text(dto.text),
     positions: Array.isArray(dto.positions) ? dto.positions.map(toPosition).filter((p): p is ChunkPosition => p !== null) : [],

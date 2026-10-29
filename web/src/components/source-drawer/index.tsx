@@ -33,7 +33,7 @@ function Body({ source, onCloseAutoFocus }: { source: SourceView; onCloseAutoFoc
   const firstPage = source.positions[0]?.page, [page, setPage] = useState(firstPage ?? 1);
   const markdown = /\.(md|markdown)$/i.test(source.docName);
   const detail = useDocumentDetailRequest(source.datasetId, source.docId);
-  const tables = (source.tables ?? []).filter((table) => detail.data?.assets?.some((asset) => asset.kind === "table" && asset.id === table.assetId));
+  const tables = (source.tables ?? []).filter((table) => detail.data && (!table.assetId || detail.data.assets?.some((asset) => asset.kind === "table" && asset.id === table.assetId)));
   const tableIds = new Set(tables.map((table) => table.assetId));
   const figures = (detail.data?.assets ?? []).filter((asset) => !tableIds.has(asset.id));
   const gone = detail.error instanceof ApiError && detail.error.status === 404;
@@ -45,12 +45,13 @@ function Body({ source, onCloseAutoFocus }: { source: SourceView; onCloseAutoFoc
   return <SheetContent side="right" closeLabel={t("source.close")} data-testid="source-drawer" onCloseAutoFocus={onCloseAutoFocus} onOpenAutoFocus={(event) => { event.preventDefault(); passage.current?.focus(); }}>
     <SheetHeader><SheetTitle data-testid="source-title">{t(source.kind === "chat" ? "source.title" : "source.titleHit", { n: source.number })}</SheetTitle><SheetDescription data-testid="source-document" className="break-all">{source.docName}</SheetDescription></SheetHeader>
     <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto pr-1">
+      {source.slide ? <p data-testid="source-slide">{t("source.slide", {number:source.slide.number})} · {source.slide.title}</p> : null}
       <dl className="flex flex-wrap gap-4">
         {pages.length ? <div><dt className="text-xs font-semibold text-muted-foreground">{t("source.pages")}</dt><dd data-testid="source-pages" className="font-semibold tabular-nums">{pages.join(", ")}</dd></div> : null}
         {(["overall", "term", "vector", "rerank"] as const).map((key) => source.scores[key] !== null && Number.isFinite(source.scores[key]) ? <div key={key}><dt className="text-xs font-semibold text-muted-foreground">{t(`retrieval.score.${key}`)}</dt><dd data-testid={`source-score-${key}`} className="font-semibold tabular-nums">{number.format(source.scores[key]!)}</dd></div> : null)}
       </dl>
       <div className="grid gap-2"><h2 className="text-xs font-semibold">{t("source.passage")}</h2><div ref={passage} role="region" aria-label={t("source.passageLabel")} tabIndex={0} data-testid="source-passage" className={`${markdown ? "max-h-[65vh]" : "max-h-60"} overflow-auto whitespace-pre-wrap break-words rounded-md border bg-background p-4 text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring`}>{markdown ? <SourceMarkdown text={source.content} /> : source.content}</div></div>
-      {!gone && tables.length ? <section aria-label={t("source.tables")} className="grid gap-4">{tables.map((table, index) => <div key={`${table.assetId}:${index}`}><StructuredTable table={table} /><p className="mb-2 text-xs font-semibold">{t("source.crop")}</p><Figure asset={detail.data!.assets!.find((asset) => asset.id === table.assetId)!} source={source} showCaption={false} /></div>)}</section> : null}
+      {!gone && tables.length ? <section aria-label={t("source.tables")} className="grid gap-4">{tables.map((table, index) => <div key={`${table.assetId}:${index}`}><StructuredTable table={table} />{table.assetId ? <><p className="mb-2 text-xs font-semibold">{t("source.crop")}</p><Figure asset={detail.data!.assets!.find((asset) => asset.id === table.assetId)!} source={source} showCaption={false} /></> : null}</div>)}</section> : null}
       {!gone && figures.length ? <section aria-label={t("source.figures")} className="grid gap-3"><h2 className="text-xs font-semibold">{t("source.figures")}</h2>{figures.map((asset) => <Figure key={asset.id} asset={asset} source={source} />)}</section> : null}
       {gone ? <p data-testid="source-gone" className="text-sm text-muted-foreground">{t("source.gone")}</p> : null}
       {preview ? <div data-testid="source-preview"><PagePreview datasetId={source.datasetId} docId={source.docId} name={source.docName} pages={detail.data!.pagesTotal} page={page} onPageChange={setPage} selection={{ chunkId: source.chunkId, number: source.number, positions: source.positions }} pageSizes={source.pageSizes} /></div> : loadingPreview ? <div data-testid="source-preview" style={{ aspectRatio: aspect }}><Skeleton className="size-full" /></div> : null}
