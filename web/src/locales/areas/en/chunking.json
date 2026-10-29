@@ -115,7 +115,10 @@
       "tableSettings": "Keeps each data row with its table title and column headers. Chunk size limits a whole row; oversized rows are refused instead of split. Delimiters and overlap do not apply.",
       "pictureSettings": "Choose a configured vision model to describe the image, or select OCR only to read its text. The source image stays linked to the result.",
       "pictureOcrOnly": "Read text only (OCR)",
-      "imageModel": "Vision model"
+      "imageModel": "Vision model",
+      "resumeSettings": "Read labelled name, contact, work history, education and skills with their original source. Missing values stay absent. Enable model extraction only for unstructured résumés; it may send the résumé to your selected model. Delimiters and overlap do not apply.",
+      "resumeUseModel": "Use a model for unstructured résumés",
+      "resumeModel": "Résumé chat model (empty uses workspace default)"
     }
   },
   "errors": {

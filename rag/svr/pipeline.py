@@ -152,7 +152,7 @@ def _parse_and_chunk(ctx: TaskContext, deps: PipelineDeps, control: TaskControl,
                 options["table_title"] = ctx.doc_name.rsplit(".", 1)[0]
         if ctx.parser_id == "qa" and spec.name == "xlsx":
             options["structured_records"] = True
-        if ctx.parser_id in {"one", "paper", "laws"} and spec.name == "pdf":
+        if ctx.parser_id in {"one", "paper", "laws", "resume"} and spec.name == "pdf":
             from rag.parsers.page_selection import selected_ranges
             from rag.parsers.errors import FileTooLarge
 
@@ -177,7 +177,16 @@ def _parse_and_chunk(ctx: TaskContext, deps: PipelineDeps, control: TaskControl,
             blocks = selected_blocks()
         else:
             blocks = spec.load().parse(source, report, page_range=page_range, limits=limits, **options)
-        for chunk in chunker(text_blocks(blocks), get_chunker_config(ctx.parser_id, ctx.parser_config)):
+        cfg = get_chunker_config(ctx.parser_id, ctx.parser_config)
+        if ctx.parser_id == "resume" and ctx.parser_config.get("resume_use_model", False):
+            def infer_resume(texts):
+                from api.db.services.tenant_model_service import get_defaults
+                model_id = ctx.parser_config.get("resume_model") or get_defaults(ctx.tenant_id).chat
+                if not model_id:
+                    raise TaskFailure("parse", "model_unavailable")
+                return deps.embedder.extract_resume(texts, model_id, ctx, control)
+            cfg = replace(cfg, infer=infer_resume)
+        for chunk in chunker(text_blocks(blocks), cfg):
             control.check()
             if chunk.text.strip():
                 chunks.append(chunk)

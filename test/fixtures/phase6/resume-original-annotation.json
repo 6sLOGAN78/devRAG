@@ -1,0 +1,17 @@
+{
+  "provenance": "Original fictional résumé authored before06-18 product implementation. No real personal data.",
+  "sha256": "55545b57ced94553dce40d34b2e04c6be9a21d451d07609a6bdb4baabab1c8dd",
+  "name": "Mira Sen",
+  "email": "mira.sen@example.test",
+  "phone": null,
+  "work": "North Beacon Laboratory",
+  "education": "BEng Instrumentation",
+  "skills": [
+    "Python",
+    "optical calibration"
+  ],
+  "facts": {
+    "height_metres": 52,
+    "offset_units": 73
+  }
+}

@@ -32,6 +32,8 @@ class ParserConfig(BaseModel):
     table_context_size: StrictInt = Field(default=0, ge=0)
     asr_model: StrictStr = Field(default="", max_length=128)
     audio_language: StrictStr | None = Field(default=None, pattern=r"^[a-z]{2,3}$")
+    resume_model: StrictStr = Field(default="", max_length=128)
+    resume_use_model: StrictBool = False
     image_model: StrictStr = Field(default="",max_length=128)
     picture_ocr_only: StrictBool = False
     image_context_size: StrictInt = Field(default=0, ge=0)

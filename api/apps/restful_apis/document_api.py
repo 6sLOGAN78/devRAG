@@ -145,6 +145,8 @@ class DocumentDetailView(DocumentRowView):
     preview: str
     pages: list[tuple[int, int]] = Field(default_factory=list)
     layout_recognize: bool | str = True
+    resume_model: str = ""
+    resume_use_model: bool = False
     asr_model: str = ""
     audio_language: str | None = None
     image_model: str = ""
@@ -167,6 +169,8 @@ class ChunkingValues(BaseModel):
     overlapped_percent: Any = None
     pages: Any = None
     layout_recognize: Any = None
+    resume_model: Any = None
+    resume_use_model: Any = None
     asr_model: Any = None
     audio_language: Any = None
     image_model: Any = None

@@ -37,6 +37,8 @@ export interface UploadLimitsView {
 export interface DatasetParserConfig {
   pages?: [number, number][];
   layoutRecognize?: boolean | string;
+  resumeModel?: string;
+  resumeUseModel?: boolean;
   asrModel?: string;
   audioLanguage?: string;
   imageModel?: string;
@@ -131,6 +133,8 @@ function toParserConfig(raw: unknown): DatasetParserConfig {
     chunkTokenNum: tokens > 0 ? tokens : DEFAULT_CHUNK_TOKEN_NUM,
     delimiter: typeof dto.delimiter === "string" && dto.delimiter !== "" ? dto.delimiter : DEFAULT_DELIMITER,
     overlappedPercent: overlap > 0 ? overlap : DEFAULT_OVERLAPPED_PERCENT,
+    ...(dto.resume_model !== undefined ? {resumeModel:text(dto.resume_model)} : {}),
+    ...(dto.resume_use_model !== undefined ? {resumeUseModel:dto.resume_use_model===true} : {}),
     ...(dto.asr_model !== undefined ? {asrModel:text(dto.asr_model)} : {}),
     ...(dto.audio_language !== undefined ? {audioLanguage:text(dto.audio_language)} : {}),
     ...(dto.image_model !== undefined ? {imageModel:text(dto.image_model)} : {}),
@@ -211,6 +215,8 @@ export async function deleteDatasets(ids: string[], tenantId: string): Promise<s
 export type DatasetChunkingInput = Partial<{
   pages: [number, number][];
   layoutRecognize: boolean | string;
+  resumeModel?: string;
+  resumeUseModel?: boolean;
   asrModel?: string;
   audioLanguage?: string;
   imageModel: string;
@@ -233,6 +239,8 @@ export async function updateDatasetChunking(id: string, input: DatasetChunkingIn
   if (input.chunkTokenNum !== undefined) config.chunk_token_num = input.chunkTokenNum;
   if (input.delimiter !== undefined) config.delimiter = input.delimiter;
   if (input.overlappedPercent !== undefined) config.overlapped_percent = input.overlappedPercent;
+  if (input.resumeModel !== undefined) config.resume_model = input.resumeModel;
+  if (input.resumeUseModel !== undefined) config.resume_use_model = input.resumeUseModel;
   if (input.asrModel !== undefined) config.asr_model = input.asrModel;
   if (input.audioLanguage !== undefined) config.audio_language = input.audioLanguage || null;
   if (input.imageModel !== undefined) config.image_model = input.imageModel;

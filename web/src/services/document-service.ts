@@ -237,6 +237,8 @@ export interface DocumentDetailView extends DocumentView {
   assets?: DocumentAssetView[];
   pages?: [number, number][];
   layoutRecognize?: boolean | string;
+  resumeModel?: string;
+  resumeUseModel?: boolean;
   asrModel?: string;
   audioLanguage?: string;
   imageModel?: string;
@@ -260,6 +262,8 @@ export async function getDocument(datasetId: string, docId: string): Promise<Doc
     delimiter: text(dto.delimiter),
     overlappedPercent: count(dto.overlapped_percent),
     preview: dto.preview === "pages" ? "pages" : "none",
+    ...(dto.resume_model !== undefined ? {resumeModel:text(dto.resume_model)} : {}),
+    ...(dto.resume_use_model !== undefined ? {resumeUseModel:dto.resume_use_model===true} : {}),
     ...(dto.asr_model !== undefined ? {asrModel:text(dto.asr_model)} : {}),
     ...(dto.audio_language !== undefined ? {audioLanguage:text(dto.audio_language)} : {}),
     ...(dto.image_model !== undefined ? {imageModel:text(dto.image_model)} : {}),
@@ -272,6 +276,8 @@ export async function getDocument(datasetId: string, docId: string): Promise<Doc
 export interface DocumentSettingsChanges {
   pages?: [number, number][];
   layoutRecognize?: boolean | string;
+  resumeModel?: string;
+  resumeUseModel?: boolean;
   asrModel?: string;
   audioLanguage?: string;
   imageModel?: string;
@@ -293,6 +299,8 @@ export async function updateDocumentSettings(datasetId: string, docId: string, c
   if (changes.chunkTokenNum !== undefined) config.chunk_token_num = changes.chunkTokenNum;
   if (changes.delimiter !== undefined) config.delimiter = changes.delimiter;
   if (changes.overlappedPercent !== undefined) config.overlapped_percent = changes.overlappedPercent;
+  if (changes.resumeModel !== undefined) config.resume_model = changes.resumeModel;
+  if (changes.resumeUseModel !== undefined) config.resume_use_model = changes.resumeUseModel;
   if (changes.asrModel !== undefined) config.asr_model = changes.asrModel;
   if (changes.audioLanguage !== undefined) config.audio_language = changes.audioLanguage || null;
   if (changes.imageModel !== undefined) config.image_model = changes.imageModel;
@@ -309,6 +317,8 @@ export async function updateDocumentSettings(datasetId: string, docId: string, c
     delimiter: text(dto.delimiter),
     overlappedPercent: count(dto.overlapped_percent),
     preview: dto.preview === "pages" ? "pages" : "none",
+    ...(dto.resume_model !== undefined ? {resumeModel:text(dto.resume_model)} : {}),
+    ...(dto.resume_use_model !== undefined ? {resumeUseModel:dto.resume_use_model===true} : {}),
     ...(dto.asr_model !== undefined ? {asrModel:text(dto.asr_model)} : {}),
     ...(dto.audio_language !== undefined ? {audioLanguage:text(dto.audio_language)} : {}),
     ...(dto.image_model !== undefined ? {imageModel:text(dto.image_model)} : {}),

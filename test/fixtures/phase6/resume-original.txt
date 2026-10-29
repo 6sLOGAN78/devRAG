@@ -1,0 +1,12 @@
+Name: Mira Sen
+Email: mira.sen@example.test
+
+Work History
+North Beacon Laboratory, Instrument Engineer, 2022–2025.
+Measured lighthouse height 52 metres and calibration offset 73 units.
+
+Education
+BEng Instrumentation, Fictional Coastal Institute, 2021.
+
+Skills
+Python, optical calibration, multilingual field records.

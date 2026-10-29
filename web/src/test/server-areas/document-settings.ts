@@ -9,7 +9,7 @@ import { documentDetailOf, setDatasetDefaults, setFileExtra } from "./files";
  * the `files` area state, so the document detail and the dataset detail show them. Fake data only.
  */
 
-const IMPLEMENTED = ["naive", "one", "manual", "qa"];
+const IMPLEMENTED = ["naive", "one", "manual", "qa", "paper", "book", "laws", "presentation", "table", "picture", "audio", "email", "resume"];
 const DELIMITER_MAX = 64;
 
 export interface SettingsRefusal {
@@ -79,6 +79,8 @@ function checked(config: InternalAxiosRequestConfig, server: DatasetServer, sent
 function valuesOf(parserConfig: unknown) {
   const source = typeof parserConfig === "object" && parserConfig !== null ? (parserConfig as Record<string, unknown>) : {};
   return {
+    ...(typeof source.resume_model === "string" ? {resumeModel:source.resume_model} : {}),
+    ...(typeof source.resume_use_model === "boolean" ? {resumeUseModel:source.resume_use_model} : {}),
     ...(typeof source.layout_recognize === "boolean" || typeof source.layout_recognize === "string" ? { layoutRecognize: source.layout_recognize } : {}),
     ...(Array.isArray(source.pages) ? { pages: source.pages as [number, number][] } : {}),
     ...(typeof source.chunk_token_num === "number" ? { chunkTokenNum: source.chunk_token_num } : {}),

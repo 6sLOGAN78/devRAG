@@ -156,6 +156,7 @@ class LLMBundle:
         credential = tenant_llm_service.get_credential(self._settings.llm, tenant_id, ref, model_type)
         if credential is None:
             raise _unavailable()
+        self.context_tokens = credential.max_tokens
         self._spec: ProviderSpec = resolve_provider(credential.provider)
         self.ref = ModelRef(credential.model, credential.instance, self._spec.name)
         self._scrub = _scrubber(credential.api_key)

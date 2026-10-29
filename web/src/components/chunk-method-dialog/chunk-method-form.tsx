@@ -30,6 +30,8 @@ export type ChunkTarget =
 export interface ChunkSettings {
   pages?: [number, number][];
   layoutRecognize?: boolean | string;
+  resumeModel?: string;
+  resumeUseModel?: boolean;
   asrModel?: string;
   audioLanguage?: string;
   imageModel?: string;
@@ -52,11 +54,13 @@ export interface ChunkMethodFormProps {
   onClose: () => void;
 }
 
-type Changes = {asrModel?:string;audioLanguage?:string;imageModel?:string;pictureOcrOnly?:boolean; parserId?: string; chunkTokenNum?: number; delimiter?: string; overlappedPercent?: number; pages?: [number, number][]; layoutRecognize?: boolean | string };
+type Changes = {resumeModel?:string;resumeUseModel?:boolean;asrModel?:string;audioLanguage?:string;imageModel?:string;pictureOcrOnly?:boolean; parserId?: string; chunkTokenNum?: number; delimiter?: string; overlappedPercent?: number; pages?: [number, number][]; layoutRecognize?: boolean | string };
 
 /** The keys whose value differs from the stored one: exactly what the request carries. Layout and keywords are never among them. */
-function changesOf(settings: ChunkSettings, method: string, values: { chunkSize: number; delimiters: string; overlap: number; pageRanges: [number, number][]; layoutRecognize: boolean | string; asrModel?:string;audioLanguage?:string;imageModel?:string;pictureOcrOnly?:boolean }): Changes {
+function changesOf(settings: ChunkSettings, method: string, values: { chunkSize: number; delimiters: string; overlap: number; pageRanges: [number, number][]; layoutRecognize: boolean | string; resumeModel?:string;resumeUseModel?:boolean;asrModel?:string;audioLanguage?:string;imageModel?:string;pictureOcrOnly?:boolean }): Changes {
   const changes: Changes = {};
+  if ((values.resumeModel ?? "") !== (settings.resumeModel ?? "")) changes.resumeModel=values.resumeModel ?? "";
+  if ((values.resumeUseModel ?? false) !== (settings.resumeUseModel ?? false)) changes.resumeUseModel=values.resumeUseModel ?? false;
   if ((values.asrModel ?? "") !== (settings.asrModel ?? "")) changes.asrModel=values.asrModel ?? "";
   if ((values.audioLanguage ?? "") !== (settings.audioLanguage ?? "")) changes.audioLanguage=values.audioLanguage ?? "";
   if ((values.imageModel ?? "") !== (settings.imageModel ?? "")) changes.imageModel=values.imageModel ?? "";
@@ -70,7 +74,7 @@ function changesOf(settings: ChunkSettings, method: string, values: { chunkSize:
   return changes;
 }
 
-const FIELD_NAMES = ["chunkSize", "delimiters", "overlap", "pageRanges", "layoutRecognize", "imageModel", "pictureOcrOnly", "asrModel", "audioLanguage"] as const satisfies readonly ParseConfigField[];
+const FIELD_NAMES = ["chunkSize", "delimiters", "overlap", "pageRanges", "layoutRecognize", "imageModel", "pictureOcrOnly", "asrModel", "audioLanguage", "resumeModel", "resumeUseModel"] as const satisfies readonly ParseConfigField[];
 
 /**
  * The form of the chunking dialog: the method group (only General can be chosen), the settings of General and the
@@ -95,6 +99,8 @@ export function ChunkMethodForm({ target, settings, pendingRef, onClose }: Chunk
       delimiters: toEscaped(settings.delimiter),
       overlap: String(settings.overlappedPercent),
       layoutRecognize: settings.layoutRecognize ?? true,
+      resumeModel:settings.resumeModel ?? "",
+      resumeUseModel:settings.resumeUseModel ?? false,
       asrModel:settings.asrModel ?? "",
       audioLanguage:settings.audioLanguage ?? "",
       imageModel:settings.imageModel ?? "",
@@ -230,7 +236,7 @@ export function ChunkMethodForm({ target, settings, pendingRef, onClose }: Chunk
             </FormItem>
           )}
         />
-        <ParseConfiguration control={form.control} wholeDocument={form.watch("method") === "one"} questionAnswer={form.watch("method") === "qa"} book={form.watch("method") === "book"} paper={form.watch("method") === "paper"} laws={form.watch("method") === "laws"} presentation={form.watch("method") === "presentation"} table={form.watch("method") === "table"} email={form.watch("method") === "email"} audio={form.watch("method") === "audio"} picture={form.watch("method") === "picture"} disabled={busy} answers={answers} onEdit={(field) => clearAnswers(FIELD_NAMES.find((name) => name === field))} />
+        <ParseConfiguration control={form.control} resume={form.watch("method") === "resume"} wholeDocument={form.watch("method") === "one"} questionAnswer={form.watch("method") === "qa"} book={form.watch("method") === "book"} paper={form.watch("method") === "paper"} laws={form.watch("method") === "laws"} presentation={form.watch("method") === "presentation"} table={form.watch("method") === "table"} email={form.watch("method") === "email"} audio={form.watch("method") === "audio"} picture={form.watch("method") === "picture"} disabled={busy} answers={answers} onEdit={(field) => clearAnswers(FIELD_NAMES.find((name) => name === field))} />
         <DialogFooter>
           <DialogClose asChild>
             <Button type="button" variant="ghost">

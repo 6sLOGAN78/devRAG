@@ -81,7 +81,7 @@ def test_an_unbuilt_method_is_refused_and_nothing_changes(settings, space, stora
     owner, dataset = space
     doc = one_doc(settings, owner, dataset, storage)
     before = row_of(doc["id"])
-    err = refused(lambda: change(settings, owner, dataset, doc["id"], "resume", {"chunk_token_num": 64}))
+    err = refused(lambda: change(settings, owner, dataset, doc["id"], "tag", {"chunk_token_num": 64}))
     assert (err.kind, err.reason) == (Kind.INVALID, "chunker_unavailable")
     assert row_of(doc["id"]) == before
 
@@ -140,6 +140,6 @@ def test_who_may_change_follows_uploader_creator_owner_and_the_token_subject(set
 def test_dataset_update_refuses_an_unbuilt_method(settings, space):
     owner, dataset = space
     visible = kbsvc.load_visible_dataset(principal_of(owner), dataset.id)
-    err = refused(lambda: kbsvc.update_dataset(settings, visible, owner.user_id, {"parser_id": "resume"}))
+    err = refused(lambda: kbsvc.update_dataset(settings, visible, owner.user_id, {"parser_id": "tag"}))
     assert (err.kind, err.reason) == (Kind.INVALID, "chunker_unavailable")
     assert kbsvc.load_visible_dataset(principal_of(owner), dataset.id).dataset.parser_id == dataset.parser_id

@@ -26,6 +26,8 @@ export interface FileExtra {
   refuseConfirmOnce?: boolean;
   /** The document's own chunking values (the chunking dialog saves them). */
   pages?: [number, number][];
+  resumeModel?: string;
+  resumeUseModel?: boolean;
   layoutRecognize?: boolean | string;
   chunkTokenNum?: number;
   delimiter?: string;
@@ -41,6 +43,8 @@ export interface LogRow {
 /** A document's chunking values or a dataset's default (R-167: the `document-settings` area writes them). */
 export interface ChunkingValues {
   pages?: [number, number][];
+  resumeModel?: string;
+  resumeUseModel?: boolean;
   layoutRecognize?: boolean | string;
   chunkTokenNum: number;
   delimiter: string;
@@ -79,6 +83,8 @@ export function setDatasetDefaults(server: DatasetServer, datasetId: string, pat
 export function documentValuesOf(server: DatasetServer, docId: string): ChunkingValues {
   const extra = stateOf(server).extras[docId] ?? {};
   return {
+    ...(extra.resumeModel === undefined ? {} : {resumeModel:extra.resumeModel}),
+    ...(extra.resumeUseModel === undefined ? {} : {resumeUseModel:extra.resumeUseModel}),
     ...(extra.layoutRecognize === undefined ? {} : { layoutRecognize: extra.layoutRecognize }),
     ...(extra.pages === undefined ? {} : { pages: extra.pages }),
     chunkTokenNum: extra.chunkTokenNum ?? BUILT_IN_VALUES.chunkTokenNum,
@@ -164,6 +170,8 @@ export function documentDetailOf(server: DatasetServer, row: DocumentRow) {
   const values = documentValuesOf(server, row.id);
   return {
     ...viewOf(row, stateOf(server)),
+    resume_model: values.resumeModel ?? "",
+    resume_use_model: values.resumeUseModel ?? false,
     ...(values.layoutRecognize === undefined ? {} : { layout_recognize: values.layoutRecognize }),
     ...(values.pages === undefined ? {} : { pages: values.pages }),
     chunk_token_num: values.chunkTokenNum,

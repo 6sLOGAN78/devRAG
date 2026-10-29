@@ -361,6 +361,14 @@
           "picture_ocr_only": {
             "default": null,
             "title": "Picture Ocr Only"
+          },
+          "resume_model": {
+            "default": null,
+            "title": "Resume Model"
+          },
+          "resume_use_model": {
+            "default": null,
+            "title": "Resume Use Model"
           }
         },
         "title": "ChunkingValues",
@@ -870,6 +878,16 @@
           "progress_message": {
             "title": "Progress Message",
             "type": "string"
+          },
+          "resume_model": {
+            "default": "",
+            "title": "Resume Model",
+            "type": "string"
+          },
+          "resume_use_model": {
+            "default": false,
+            "title": "Resume Use Model",
+            "type": "boolean"
           },
           "run": {
             "title": "Run",

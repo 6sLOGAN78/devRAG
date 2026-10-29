@@ -15,6 +15,8 @@ function whole(min: number, max: number, message: string) {
  * server's `ParserConfig`. The delimiters are typed escaped and leave the schema as the real characters.
  */
 export const parseConfigSchema = z.object({
+  resumeModel:z.string().max(128).optional(),
+  resumeUseModel:z.boolean().optional(),
   asrModel:z.string().max(128).optional(),
   audioLanguage:z.string().regex(/^$|^[a-z]{2,3}$/).optional(),
   imageModel:z.string().max(128).optional(),

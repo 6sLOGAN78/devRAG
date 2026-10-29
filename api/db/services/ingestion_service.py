@@ -181,7 +181,7 @@ def _page_ranges(settings: Settings, storage: Storage, doc: Document) -> list[tu
     """Page ranges of one document. The count comes from ``pdf_page_count`` (cached); a damaged or unreadable PDF yields the single full range (the worker fails it, D-25)."""
     total = pdf_page_count(settings, doc.id, doc.location or "", doc.content_hash or "", doc.suffix or "", storage=storage)
     selected = (doc.parser_config or {}).get("pages") if (doc.suffix or "").lower() == "pdf" else None
-    if getattr(doc, "parser_id", "naive") in {"one", "paper", "laws"}:
+    if getattr(doc, "parser_id", "naive") in {"one", "paper", "laws", "resume"}:
         from rag.parsers.page_selection import selected_ranges
 
         bounds = (0, total if total is not None else 1_000_000)

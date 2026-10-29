@@ -1,0 +1,175 @@
+{
+  "recorded_at": "2026-10-29T18:59:17.261046+00:00",
+  "plan": "06-18",
+  "new_packages": 0,
+  "new_models": 0,
+  "paid_external_calls": 0,
+  "local_asr_submissions_this_plan": 0,
+  "local_asr_remaining": 0,
+  "human_uat_approved": false,
+  "phase_gate_complete": false,
+  "evidence": {
+    "initial_red": {
+      "log": "ragflow-logs/phase6-18-red.log",
+      "sha256": "8a5e64aacc2ace8729021ae34cdad47971fbbec6f65bc4921629e1a4191d97ac",
+      "result": "8 failed"
+    },
+    "caller_red": {
+      "log": "ragflow-logs/phase6-18-caller-red.log",
+      "sha256": "82c61c69ddc84d9b9bc33dc5f4577efe8bb78ed283e97381c002345d4f8bb0e8",
+      "result": "1 failed, 10 passed"
+    },
+    "unknown_red": {
+      "log": "ragflow-logs/phase6-18-unknown-contact-red.log",
+      "sha256": "44dbc14d5cd0e39ffe022d5539122f9080f2930e0b22d975f6c28c9b82146845",
+      "result": "1 failed, 11 passed"
+    },
+    "pages_red": {
+      "log": "ragflow-logs/phase6-18-pages-red.log",
+      "sha256": "0578df8293d26c29d1d700676c41540396e6103b41796ef7a8d6a3bdd0ac335b",
+      "result": "2 failed, 12 passed"
+    },
+    "marked_unit": {
+      "log": "ragflow-logs/phase6-18-unit-all.log",
+      "sha256": "237815151cdff1890431c0e29c0f11e620315a13563cdbea919726cdb808eb7b",
+      "result": "2576 passed, 8 skipped"
+    },
+    "review": {
+      "log": "ragflow-logs/phase6-18-review-pages-green.log",
+      "sha256": "5648b7b67a9a0b4569f10a671f166289bc2940cb898f6645bc8a8f2153c8a751",
+      "result": "108 passed"
+    },
+    "unmarked_unit": {
+      "log": "ragflow-logs/phase6-18-unmarked-unit.log",
+      "sha256": "c31ab355c9d6966c7c7e38d64b80b94b583f9fac7124c20160fafd00804aa108",
+      "result": "51 passed"
+    },
+    "frontend": {
+      "log": "ragflow-logs/phase6-18-web-all.log",
+      "sha256": "6ca6c0d4af5ef03aaa44ec3bc52710078f3d351b09a45c04ee947103e22f0596",
+      "result": "2180 passed"
+    },
+    "frontend_focused": {
+      "log": "ragflow-logs/phase6-18-web-focused-green.log",
+      "sha256": "1fa1febe14dc29a8180c967fb41665cb2ccff7c900827ebf71cfe421dd341f08",
+      "result": "69 passed"
+    },
+    "go": {
+      "log": "ragflow-logs/phase6-18-go.log",
+      "sha256": "6d27d1536ba05fca07a4fe6101f47172504ea9e3db54ff758e0ba515ecd93a59",
+      "result": "ok  "
+    },
+    "browser": {
+      "log": "ragflow-logs/phase6-18-browser-pages.log",
+      "sha256": "67ab787db676356aacd797ce753cfe7914017bb622fcc06d0a7f8a1bb87c0379",
+      "result": "1 passed"
+    },
+    "services": {
+      "log": "ragflow-logs/phase6-18-services-pages.log",
+      "sha256": "6b0e896bb8a855674cfaf6302e3507af7ac86996f265a365b549620bed4861db",
+      "result": "54 passed"
+    },
+    "ci": {
+      "log": "ragflow-logs/phase6-18-ci-reviewed.log",
+      "sha256": "dcda937dee7e2f477da1d3f32a9c591b1f52902a645e8e2aadd2613f34a4994d",
+      "result": "7/7 gates passed"
+    },
+    "security": {
+      "log": "ragflow-logs/phase6-18-security-final.log",
+      "sha256": "b367c16ffbb73dfdcc3c1aeae396f76fca403b16dd14131d796f57bfdd669a84",
+      "result": "All checks passed!"
+    },
+    "openapi": {
+      "log": "ragflow-logs/phase6-18-generated.log",
+      "sha256": "9ced52903c5f49dc098b68b9f9f5af8a59c137ea3be0fadf34b7db918656d612",
+      "result": "exit0 verified"
+    },
+    "admission": {
+      "log": "ragflow-logs/phase6-18-admission.log",
+      "sha256": "4c252837496ecc81e6a3983922a33c8ab1831da0e1cbbe0e62baf321c8b05dcb",
+      "result": "local_asr_live"
+    },
+    "health": {
+      "log": "ragflow-logs/phase6-18-health-pages.log",
+      "sha256": "dafbc61308f1b634ab2b7661060fda84684fc4f7765f0cef827fdae1fe10e130",
+      "result": "stack ready:"
+    },
+    "app_build": {
+      "log": "ragflow-logs/phase6-18-app-build-pages.log",
+      "sha256": "a875678d08e6e46e1682d72f56676cbf9efdf5fa0f2f771bd4fb269813692735",
+      "result": "Image devrag-app:local Built"
+    },
+    "native_build": {
+      "log": "ragflow-logs/phase6-18-native-build-pages.log",
+      "sha256": "bfe59524e3847616e39f54e6a5a3d19443148439fbf442ad8001ab1bcf70a22d",
+      "result": "Image devrag-deepdoc:local Built"
+    },
+    "cache": {
+      "log": "ragflow-logs/phase6-18-cache-exec-preservation.json",
+      "sha256": "1092ddf7cfec3a86451f1cf781a05e58103d329cc7e339227ffd8aec2e83eff0",
+      "result": "image_inventory_identical"
+    },
+    "records": {
+      "log": "ragflow-logs/phase6-18-records.log",
+      "sha256": "3375654b478fc3474ac0442fcefcb2b3c1f954bf088404b32b19f902f291271d",
+      "result": "11 passed, 2 skipped"
+    },
+    "ci_after_records": {
+      "log": "ragflow-logs/phase6-18-ci-records.log",
+      "sha256": "9b7ab082642ef9f908253117412f6b352eff03499ff06b8472cd06bfb69ecba5",
+      "result": "7/7 gates passed"
+    },
+    "types_generated": {
+      "log": "ragflow-logs/phase6-18-types-generated.log",
+      "sha256": "2d7e3cf8745a403a0c66b4711a660875050dd5201849b99b8270642b3341d4e0",
+      "result": "openapi-typescript"
+    },
+    "types_check": {
+      "log": "ragflow-logs/phase6-18-types-check.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "result": "exit0 verified"
+    },
+    "ci_after_types": {
+      "log": "ragflow-logs/phase6-18-ci-types.log",
+      "sha256": "9b7ab082642ef9f908253117412f6b352eff03499ff06b8472cd06bfb69ecba5",
+      "result": "7/7 gates passed"
+    }
+  },
+  "containers": [
+    {
+      "name": "devrag-stack-app-1",
+      "image": "sha256:ba113f340c02b388be8c1d9da15ca4f7f9b16665349a2a01f0407b0aa9a05ae4",
+      "health": "healthy",
+      "started_at": "2026-10-29T18:56:50.523907737Z"
+    },
+    {
+      "name": "devrag-stack-task-executor-3",
+      "image": "sha256:ba113f340c02b388be8c1d9da15ca4f7f9b16665349a2a01f0407b0aa9a05ae4",
+      "health": "healthy",
+      "started_at": "2026-10-29T18:56:50.302350872Z"
+    },
+    {
+      "name": "devrag-stack-deepdoc-1",
+      "image": "sha256:7d3bcc379ac23a5d288ce39cc8654f44503bef72eb72a5336899254d9aa165d5",
+      "health": "healthy",
+      "started_at": "2026-10-29T18:56:50.880038244Z"
+    }
+  ],
+  "runtime_code_sha256": {
+    "rag/chunking/resume.py": "40778b4b3fb59ef8d2efe9cb2c50a551acecbd3cf90b6f317209f63c7451d0c7",
+    "rag/svr/pipeline.py": "92aaac388819e05e17615034810be85b2753272c6aafd9bc4b5cf68c0a69b437",
+    "rag/svr/enrichment.py": "fdab49e2088a23b16a0830be98bbd6da74d4c3766ce41b1a775bc2db86b2bd3c",
+    "rag/svr/embedding.py": "2accbbe2c99f64422c299ee4b67842baa07aa8bebec7f44d3d5e85f59e064a97",
+    "rag/prompts/enrichment.py": "c2917b361f8a14d5752a44ab666c2cbbd08b39644981b44cf9ef659edb0093d3",
+    "api/db/services/ingestion_service.py": "8ecffe196af29854b3c35529247e50feee7fd3463943e7eab5d308899c73c6d2",
+    "api/db/services/parser_config.py": "8ba5feed6bf1143fafbbfe373dd200f8086b2eb58dcd72ad16d924d4d15baee5",
+    "api/apps/restful_apis/document_api.py": "d8bf8f5896ab654368a8fe28e3b13710990a3c2f884b60f661edb9dcae8eabb5"
+  },
+  "screenshot": {
+    "path": "output/playwright/phase6-review/resume-work-source.png",
+    "sha256": "6fe38c4633a581fea57866c627ff608fb010b2299191ef09a1c2925a26716120",
+    "reviewer": "assistant, actual Chrome"
+  },
+  "source_sha256": "55545b57ced94553dce40d34b2e04c6be9a21d451d07609a6bdb4baabab1c8dd",
+  "regression_note": "Marked unit2576/8existing skips precedes4 review cases/fixes; final108 covers all14Resume cases and affected page/model/config paths. Web2180 complete. Earlier services-final was disrupted by overlapping recreation:1failed/28passed/7errors retained, never relabelled; final sequential stable-health services54 and browser1 pass. No paid model request."
+}

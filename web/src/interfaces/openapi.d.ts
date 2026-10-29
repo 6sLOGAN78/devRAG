@@ -783,6 +783,16 @@ export interface components {
              * @default null
              */
             picture_ocr_only: unknown;
+            /**
+             * Resume Model
+             * @default null
+             */
+            resume_model: unknown;
+            /**
+             * Resume Use Model
+             * @default null
+             */
+            resume_use_model: unknown;
         };
         /** CompletionView */
         CompletionView: {
@@ -983,6 +993,16 @@ export interface components {
             progress: number;
             /** Progress Message */
             progress_message: string;
+            /**
+             * Resume Model
+             * @default
+             */
+            resume_model: string;
+            /**
+             * Resume Use Model
+             * @default false
+             */
+            resume_use_model: boolean;
             /** Run */
             run: string;
             /** Size */

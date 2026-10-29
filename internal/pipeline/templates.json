@@ -75,7 +75,7 @@
     "description": "Extract validated resume entities.",
     "parser_id": "resume",
     "parser_config": {},
-    "available": false
+    "available": true
   },
   {
     "id": "picture",

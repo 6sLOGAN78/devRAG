@@ -587,7 +587,7 @@ Scope notes: this is the PROJECT.md Core Value. No Phase 6, 7 or 8 work starts u
 
 **Planning status (2026-10-27):** Research and UI contract complete; structural checks30/30,90 task verifications,58/58 primary requirements plus RETR-13 producer handoff covered. No Phase6 native package/model acquisition or paid inference performed. Automatic entry completed the read-only audit/preparation and stops at the exact-candidate blocking-human approval in06-01 Task2.20 audit-tool tests pass; native acquisition/features have not started. Phase5 human UAT and Phase4 B36 remain pending.
 
-**Execution status (2026-10-30):** 17/30 plans complete. Email envelopes/body verified; markedunit2564/8existing skips plus review127/unmarked51,web2179,Go,services85,Chrome1,CI7/security/generated/admission. No new packages/models/paid/ASR calls. Next18 Resume; full phase gate and human validation pending.
+**Execution status (2026-10-30):** 18/30 plans complete. Resume source sections and explicit bounded inference verified; markedunit2576/8existing skips plus review108/unmarked51,web2180,Go,services54,Chrome1,CI7/security/generated/admission. No new packages/models/paid/ASR calls. Next19 Tag/PageRank producer; full phase gate and human validation pending.
 
 **Wave 1** *(admission audit and blocking-human acquisition checkpoint)*
 
@@ -642,7 +642,7 @@ Scope notes: this is the PROJECT.md Core Value. No Phase 6, 7 or 8 work starts u
 - [x] 06-17-PLAN.md — Read email envelopes and message bodies
 **Wave 18** *(blocked on Wave 17 completion and accepted06-01 snapshot)*
 
-- [ ] 06-18-PLAN.md — Read structured résumé sections
+- [x] 06-18-PLAN.md — Read structured résumé sections
 **Wave 19** *(blocked on Wave 18 completion and accepted06-01 snapshot)*
 
 - [ ] 06-19-PLAN.md — Manage tags and produce retrieval rank features
@@ -753,6 +753,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8. Ph
 | 3. Models, Knowledge Bases and Upload | 31/31 | Complete | 2026-10-10 |
 | 4. Ingestion Pipeline | 35/35 | Human verification pending (B-36 deferred) | 2026-10-19 |
 | 5. Retrieval and Cited Chat (Core Value Gate) | 28/28 | Automated gate passed; human review pending | 2026-10-27 |
-| 6. Deep Parsing and Chunking Breadth | 17/30 | Executing; Email passed | - |
+| 6. Deep Parsing and Chunking Breadth | 18/30 | Executing; Resume passed | - |
 | 7. Agents and Workflows | 0/TBD | Not started | - |
 | 8. Go Surface, CLI, Integrations, Billing and Production Deployment | 0/TBD | Not started | - |

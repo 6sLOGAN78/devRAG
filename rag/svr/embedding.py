@@ -8,6 +8,7 @@ closed before the provider call and is reopened by each short operation afterwar
 from __future__ import annotations
 
 import threading
+from dataclasses import replace
 from concurrent.futures import ThreadPoolExecutor
 
 from api.db.database import DB
@@ -53,7 +54,7 @@ class EmbedRunner:
         with self._limiters.embed_limiter:
             bundle = self._bundle(ctx, dimension)
             release_database_connection()
-            if ctx.parser_id in {"one", "manual", "qa", "book", "paper", "laws", "presentation", "table", "picture", "audio", "email"}:
+            if ctx.parser_id in {"one", "manual", "qa", "book", "paper", "laws", "presentation", "table", "picture", "audio", "email", "resume"}:
                 from rag.nlp.token_count import count_tokens
                 from rag.svr.failure import TaskFailure
 
@@ -90,6 +91,24 @@ class EmbedRunner:
                 return bundle.transcribe(content, language)
         control.check()
         result = wait_for(self._executor().submit(transcribe), control)
+        control.check()
+        return result
+
+    def extract_resume(self, texts: list[str], model_id: str, ctx: TaskContext, control: TaskControl) -> str:
+        from rag.svr.enrichment import resume_completion
+
+        def extract():
+            release_database_connection()
+            with self._limiters.embed_limiter:
+                control.check()
+                # One physical request: no automatic transport retry or JSON repair.
+                settings = replace(self._settings, llm=replace(self._settings.llm, max_retries=0))
+                bundle = LLMBundle(ctx.tenant_id, model_id, "chat", settings=settings)
+                control.check()
+                return resume_completion(bundle, texts)
+        control.check()
+        release_database_connection()
+        result = wait_for(self._executor().submit(extract), control)
         control.check()
         return result
 

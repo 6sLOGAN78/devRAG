@@ -83,9 +83,9 @@ def test_messages_do_not_echo_the_value():
 
 
 def test_require_buildable():
-    for parser_id in ("naive", "qa", "paper", "email"):
+    for parser_id in ("naive", "qa", "paper", "email", "resume"):
         require_buildable(parser_id)
-    for parser_id in ("resume", "tag", "bogus"):
+    for parser_id in ("tag", "bogus"):
         with pytest.raises(ServiceError) as err:
             require_buildable(parser_id)
         assert err.value.kind is Kind.INVALID and err.value.reason == "chunker_unavailable"
