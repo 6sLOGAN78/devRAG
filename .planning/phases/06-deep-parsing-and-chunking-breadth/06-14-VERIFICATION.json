@@ -1,0 +1,124 @@
+{
+  "recorded_at": "2026-10-29T00:33:48.022317+00:00",
+  "plan": "06-14",
+  "paid_calls": 0,
+  "new_packages": 0,
+  "new_models": 0,
+  "python_existing_skips": 8,
+  "human_uat_approved": false,
+  "phase_gate_complete": false,
+  "evidence": {
+    "python_unit": {
+      "log": "ragflow-logs/phase6-14-unit-title-final.log",
+      "sha256": "9a6c7b2880b0fd89cf50758bcdc89a3063fa495d2e8711d412a66be2004310d3",
+      "passed": 2647
+    },
+    "focused": {
+      "log": "ragflow-logs/phase6-14-focused-final.log",
+      "sha256": "c9e0b8f1a4760d4748b1da3919529fb4e8d89d2b42850bc4819c4e5c5fae829e",
+      "passed": 40
+    },
+    "slice": {
+      "log": "ragflow-logs/phase6-14-focused-slice.log",
+      "sha256": "6aa6bbe3c2a72553ab895d60d027b0b170747a8f0f8f472a110ae2d54698c152",
+      "passed": 7
+    },
+    "frontend": {
+      "log": "ragflow-logs/phase6-14-web-final.log",
+      "sha256": "3df1f3a423de620f0dd0d35dcb0a2f506eeec801c3ec7a1f832ddf42e639db42",
+      "passed": 2170
+    },
+    "go": {
+      "log": "ragflow-logs/phase6-14-go.log",
+      "sha256": "0a5c9a81bf309ba4934d3dae849727607ca68dbf08180d22c116ed1f9da00b78",
+      "passed": null
+    },
+    "worker_native": {
+      "log": "ragflow-logs/phase6-14-native-generation-final.log",
+      "sha256": "5c5da17432b8ea5a7bd75912295a0a041fffbbdbcb5477ce3e0429d882dccdc0",
+      "passed": 3
+    },
+    "csv_title": {
+      "log": "ragflow-logs/phase6-14-title-green.log",
+      "sha256": "3d8fc7e8bc81ad8d1314e469febe3b56503e9526c99f55a27850fb069e5e3dca",
+      "passed": 2
+    },
+    "browser": {
+      "log": "ragflow-logs/phase6-14-browser-title.log",
+      "sha256": "6d27526133951a284157f98a118d033e8a197abc9c29ee00f65f914294d56960",
+      "passed": 1
+    },
+    "stack_regressions": {
+      "log": "ragflow-logs/phase6-14-stack-regressions.log",
+      "sha256": "bb7f7500b7edbaac9ed6cd64d765eccd8a2d2d9fefc8b85d8f2cbf1a1047e160",
+      "passed": 47
+    },
+    "services": {
+      "log": "ragflow-logs/phase6-14-services.log",
+      "sha256": "2e2cffb3072757cf2af11e9c333e42ddb3fa80d22fdf186c291ea286e7035ab8",
+      "passed": 85
+    },
+    "routes_leaks": {
+      "log": "ragflow-logs/phase6-14-routes-leaks.log",
+      "sha256": "fd4248afdff9428d8ae5fee9b4374e24368f8672e99958fb9ea2dac1cf40faa4",
+      "passed": 172
+    },
+    "ci": {
+      "log": "ragflow-logs/phase6-14-ci-final.log",
+      "sha256": "881ce47c3923e72c98d8d6dc9714b2a3f043266d27111c1180f46865aff0c037",
+      "passed": 7
+    },
+    "security": {
+      "log": "ragflow-logs/phase6-14-security-final.log",
+      "sha256": "35ae83fb2d63969e1665d88aa247f8dce682613fa2d31b941cd34d7628ee0b44",
+      "passed": null
+    },
+    "openapi": {
+      "log": "ragflow-logs/phase6-14-openapi.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "passed": null
+    },
+    "admission": {
+      "log": "ragflow-logs/phase6-14-admission.log",
+      "sha256": "920b07e40447627f9d1bae1d17fe957b7152d5d9afe5fb5be2998a4eadad947d",
+      "passed": null
+    },
+    "health": {
+      "log": "ragflow-logs/phase6-14-health-title.log",
+      "sha256": "dafbc61308f1b634ab2b7661060fda84684fc4f7765f0cef827fdae1fe10e130",
+      "passed": null
+    },
+    "records": {
+      "log": "ragflow-logs/phase6-14-records-final.log",
+      "sha256": "bea8ed1ee123d92a389788a16caf76705214fbea0df32001373ed4fc6d365f94",
+      "passed": 12
+    }
+  },
+  "containers": [
+    {
+      "name": "devrag-stack-app-1",
+      "image": "sha256:6932cc14a82d08c759618e25bd318c5a665fb3a77a08d4b386b570f450241705",
+      "health": "healthy",
+      "started_at": "2026-10-29T00:31:46.990738052Z"
+    },
+    {
+      "name": "devrag-stack-task-executor-3",
+      "image": "sha256:6932cc14a82d08c759618e25bd318c5a665fb3a77a08d4b386b570f450241705",
+      "health": "healthy",
+      "started_at": "2026-10-29T00:31:46.833552271Z"
+    },
+    {
+      "name": "devrag-stack-deepdoc-1",
+      "image": "sha256:3a2e204dda72022f53edafacf740ae05c3822f67a369e553fe7c32f0a7451057",
+      "health": "healthy",
+      "started_at": "2026-10-29T00:28:49.679277488Z"
+    }
+  ],
+  "screenshot": {
+    "path": "output/playwright/phase6-review/table-row-context.png",
+    "sha256": "1492afc4a91bf25e0440e90d155ba0254b72e0eb3e0193f5e6689516f7593fbb",
+    "reviewer": "assistant, actual Chrome"
+  },
+  "dependency_base": "06-12-ACQUISITION.json",
+  "regression_note": "Stack47 followed core/native changes; later CSV-title fix separately covered by exact title index2, final root2647, rebuilt app/worker browser1 and services/routes."
+}

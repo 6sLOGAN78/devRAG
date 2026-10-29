@@ -57,7 +57,7 @@
     "description": "Repeat headers for each row.",
     "parser_id": "table",
     "parser_config": {},
-    "available": false
+    "available": true
   },
   {
     "id": "manual",

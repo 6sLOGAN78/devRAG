@@ -11,7 +11,7 @@ from rag.parsers.txt import _decode, _read
 from rag.parsers.types import ParsedBlock, ParseLimits
 
 
-def parse(source, report, *, page_range=None, limits=None):
+def parse(source, report, *, page_range=None, limits=None, structured_tables=False, table_title=None):
     del page_range
     limits = limits or ParseLimits()
     text = _decode(_read(source, limits.max_text_bytes))
@@ -28,7 +28,12 @@ def parse(source, report, *, page_range=None, limits=None):
             if len(blocks) >= MAX_RECORDS or previous > 1_000_000:
                 raise FileTooLarge()
             record = row_record(headers, values, "/" + str(len(blocks)), (start, previous))
-            blocks.append(ParsedBlock(record.text(), record=record, line_range=record.line_range))
+            if structured_tables:
+                from rag.parsers.tabletext import row_table
+                table = row_table(headers,values,table_title if table_title is not None else source.path.stem)
+                blocks.append(ParsedBlock(table.plain_text(),"table",table=table,line_range=record.line_range))
+            else:
+                blocks.append(ParsedBlock(record.text(), record=record, line_range=record.line_range))
     except StopIteration:
         raise NoReadableText() from None
     except (csv.Error, UnicodeError):

@@ -587,7 +587,7 @@ Scope notes: this is the PROJECT.md Core Value. No Phase 6, 7 or 8 work starts u
 
 **Planning status (2026-10-27):** Research and UI contract complete; structural checks30/30,90 task verifications,58/58 primary requirements plus RETR-13 producer handoff covered. No Phase6 native package/model acquisition or paid inference performed. Automatic entry completed the read-only audit/preparation and stops at the exact-candidate blocking-human approval in06-01 Task2.20 audit-tool tests pass; native acquisition/features have not started. Phase5 human UAT and Phase4 B36 remain pending.
 
-**Execution status (2026-10-29):** 13/30 plans complete. Presentation verified: unit2639/8existing skips plus focused35/after-api31,web2169,Go,worker/API26,browser1,stack43,services85,routes-leaks172,CI7/security/generated/admission. Zero new packages/models/paid calls. Next14 Table; full phase gate and human validation pending.
+**Execution status (2026-10-29):** 14/30 plans complete. Table verified: unit2647/8existing skips,focus40/slice7,web2170,Go,worker/native3,title2,browser1,stack47,services85,routes-leaks172,CI7/security/generated/admission. Zero new packages/models/paid calls. Next15 Picture/vision; full phase gate and human validation pending.
 
 **Wave 1** *(admission audit and blocking-human acquisition checkpoint)*
 
@@ -630,7 +630,7 @@ Scope notes: this is the PROJECT.md Core Value. No Phase 6, 7 or 8 work starts u
 - [x] 06-13-PLAN.md — Inspect presentation chunks per slide
 **Wave 14** *(blocked on Wave 13 completion and accepted06-01 snapshot)*
 
-- [ ] 06-14-PLAN.md — Retrieve table rows with their headers
+- [x] 06-14-PLAN.md — Retrieve table rows with their headers
 **Wave 15** *(blocked on Wave 14 completion and accepted06-01 snapshot)*
 
 - [ ] 06-15-PLAN.md — Caption pictures with a configured vision model
@@ -753,6 +753,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8. Ph
 | 3. Models, Knowledge Bases and Upload | 31/31 | Complete | 2026-10-10 |
 | 4. Ingestion Pipeline | 35/35 | Human verification pending (B-36 deferred) | 2026-10-19 |
 | 5. Retrieval and Cited Chat (Core Value Gate) | 28/28 | Automated gate passed; human review pending | 2026-10-27 |
-| 6. Deep Parsing and Chunking Breadth | 13/30 | Executing; Presentation passed | - |
+| 6. Deep Parsing and Chunking Breadth | 14/30 | Executing; Table passed | - |
 | 7. Agents and Workflows | 0/TBD | Not started | - |
 | 8. Go Surface, CLI, Integrations, Billing and Production Deployment | 0/TBD | Not started | - |

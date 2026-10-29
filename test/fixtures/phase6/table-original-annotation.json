@@ -1,0 +1,39 @@
+{
+  "authorship": "Original synthetic table fixtures authored for Phase6-14",
+  "sha256": {
+    "table-original.csv": "e9009c337abbf374860bca3e30ba562e9913072a3536492758fe6ae3a5f57dac",
+    "table-original.xlsx": "04626bd8d51240c2bd881d9d25fb3c50c0af40ded3aa83b96c48d9596a4a463e"
+  },
+  "rows": 2,
+  "csv_lines": [
+    [
+      2,
+      2
+    ],
+    [
+      3,
+      3
+    ]
+  ],
+  "xlsx_rows": [
+    [
+      3,
+      3
+    ],
+    [
+      4,
+      4
+    ]
+  ],
+  "facts": [
+    "Lighthouse",
+    "Orchard",
+    "52",
+    "calibration73",
+    "orchard9100"
+  ],
+  "distinct_52_headers": [
+    "Height metres",
+    "Harvest apples"
+  ]
+}

@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Phase6 plan13 verified; continuing14
-last_updated: "2026-10-29T00:22:43.382774+00:00"
-last_activity: 2026-10-29 -- Presentation verified; continuing14
+stopped_at: Phase6 plan14 verified; continuing15
+last_updated: "2026-10-29T00:33:48.022317+00:00"
+last_activity: 2026-10-29 -- Table verified; continuing15
 progress:
   total_phases: 8
   completed_phases: 4
   total_plans: 176
-  completed_plans: 159
-  percent: 90
+  completed_plans: 160
+  percent: 91
 ---
 
 # Project State
@@ -21,18 +21,18 @@ progress:
 See: .planning/PROJECT.md (updated 2026-10-05)
 
 **Core value:** A user can upload a document into a knowledge base and get an accurate, cited answer to a question about it, end-to-end through the real pipeline (parse, chunk, embed, index, hybrid retrieve, rerank, generate), with no mocked stages.
-**Current focus:** Phase 6 execution — 06-14 table rows and headers
+**Current focus:** Phase 6 execution — 06-15 Picture and tenant vision models
 
 ## Current Position
 
 Phase: 6 (deep-parsing-and-chunking-breadth) — EXECUTING
-Plan: 14 of 30; plans01–13 complete; Table next
-Status: Plans01–13 complete; R232..244 recorded. Unit2639/8existing skips plus focused35/after-api31,web2169,Go,worker/API26,browser1,stack43,services85,routes-leaks172,CI7/security/generated/admission green. Zero paid calls.
+Plan: 15 of 30; plans01–14 complete; Picture/vision next
+Status: Plans01–14 complete; R232..245 recorded. Unit2647/8existing skips,focus40/slice7,web2170,Go,worker/native3,title2,browser1,stack47,services85,routes-leaks172,CI7/security/generated/admission green. Zero paid calls.
 Prior checks: Phase5 UAT5/6 passed (two user answer judgments and delegated screenshot/Chinese/footprint review). Final Phase5 acceptance remains pending; Phase4 B36 remains separately deferred. Prior paid evidence retained.
-Current checkpoint:13 verified; Presentation slide identity, notes and table source. Continue14; existing acquisition/publication approvals persist.
+Current checkpoint:14 verified; Table row/header context and real sources. Continue15; existing acquisition/publication approvals persist.
 Last activity: 2026-10-29
 
-Progress: 159/176 currently planned execution plans complete (90%); Phase6 13/30 complete.
+Progress: 160/176 currently planned execution plans complete (91%); Phase6 14/30 complete.
 
 ## Performance Metrics
 

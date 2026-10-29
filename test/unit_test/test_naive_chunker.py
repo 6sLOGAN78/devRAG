@@ -81,7 +81,8 @@ def test_factory_returns_implemented_methods_and_refuses_the_rest():
     assert callable(get_chunker("book")) and get_chunker("book") is not get_chunker("naive")
     assert callable(get_chunker("one")) and get_chunker("one") is not get_chunker("naive")
     assert callable(get_chunker("laws")) and get_chunker("laws") is not get_chunker("naive")
-    for method in ( "table", "unknown", ""):
+    assert callable(get_chunker("table")) and get_chunker("table") is not get_chunker("naive")
+    for method in ( "unknown", ""):
         with pytest.raises(ChunkerUnavailable) as info:
             get_chunker(method)
         assert info.value.code == "chunker_unavailable"

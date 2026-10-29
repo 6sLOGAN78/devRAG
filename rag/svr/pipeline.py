@@ -130,6 +130,10 @@ def _parse_and_chunk(ctx: TaskContext, deps: PipelineDeps, control: TaskControl,
 
     with deps.limiters.chunk_limiter:
         options = {"settings": deps.settings, "parser_config": ctx.parser_config} if spec.name == "pdf" else ({"settings": deps.settings} if spec.name in {"docx", "pptx"} else {})
+        if ctx.parser_id == "table" and spec.name in {"csv", "xlsx"}:
+            options["structured_tables"] = True
+            if spec.name == "csv":
+                options["table_title"] = ctx.doc_name.rsplit(".", 1)[0]
         if ctx.parser_id == "qa" and spec.name == "xlsx":
             options["structured_records"] = True
         if ctx.parser_id in {"one", "paper", "laws"} and spec.name == "pdf":
