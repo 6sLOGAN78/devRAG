@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Phase6 plan16 verified with explicit spelling acceptance; continuing17 Email
-last_updated: "2026-10-29T16:55:48.661959+00:00"
-last_activity: 2026-10-29 -- Audio verified; continuing17
+stopped_at: Phase6 plan17 Email verified; continuing18 Resume
+last_updated: "2026-10-29T18:42:00.808001+00:00"
+last_activity: 2026-10-30 -- Email verified; continuing18
 progress:
   total_phases: 8
   completed_phases: 4
   total_plans: 176
-  completed_plans: 162
-  percent: 92
+  completed_plans: 163
+  percent: 93
 ---
 
 # Project State
@@ -21,18 +21,18 @@ progress:
 See: .planning/PROJECT.md (updated 2026-10-05)
 
 **Core value:** A user can upload a document into a knowledge base and get an accurate, cited answer to a question about it, end-to-end through the real pipeline (parse, chunk, embed, index, hybrid retrieve, rerank, generate), with no mocked stages.
-**Current focus:** Phase 6 execution — 06-17 Email envelopes and message bodies
+**Current focus:** Phase 6 execution — 06-18 structured résumé sections
 
 ## Current Position
 
 Phase: 6 (deep-parsing-and-chunking-breadth) — EXECUTING
-Plan: 17 of 30; plans01–16 complete; Email next
-Status: Plans01–16 complete; R232..247 recorded. Unit2665/8existing skips plus reviewed19,web2178,Go,stack62,services89,routes-leaks186,provider/native65,modelroutes20,Chromechoice1,CI7/security/generated/admission. LocalASR3/3 retained with explicit spelling acceptance; zero external paid calls.
+Plan: 18 of 30; plans01–17 complete; Resume next
+Status: Plans01–17 complete; R232..248 recorded. Email unit12/glue307/marked2564 plus127review/51legacy,web2179,Go,services85,Chrome1,CI7/security/generated/admission. LocalASR3/3 retained; zero external paid calls.
 Prior checks: Phase5 UAT5/6 passed (two user answer judgments and delegated screenshot/Chinese/footprint review). Final Phase5 acceptance remains pending; Phase4 B36 remains separately deferred. Prior paid evidence retained.
-Current checkpoint:16 verified; actual ASR timestamps and approved spelling equivalence. Continue17; existing acquisition/publication approvals persist.
-Last activity: 2026-10-29
+Current checkpoint:17 verified; Email actual source inspected. Continue18; existing acquisition/publication approvals persist; no ASR replay.
+Last activity: 2026-10-30
 
-Progress: 162/176 currently planned execution plans complete (92%); Phase6 16/30 complete.
+Progress: 163/176 currently planned execution plans complete (93%); Phase6 17/30 complete.
 
 ## Performance Metrics
 

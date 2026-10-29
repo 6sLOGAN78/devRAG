@@ -88,7 +88,7 @@ def test_static_catalog_matches_python_implementation_availability(repo_root):
 
     templates = json.loads((repo_root / "internal/pipeline/templates.json").read_text())
     assert [t["id"] for t in templates] == list(factory.METHODS)
-    assert {t["id"] for t in templates if t["available"]} == {"naive", "one", "manual", "qa", "book", "paper", "laws", "presentation", "table", "picture", "audio"}
+    assert {t["id"] for t in templates if t["available"]} == {"naive", "one", "manual", "qa", "book", "paper", "laws", "presentation", "table", "picture", "audio", "email"}
     assert all(t["available"] == factory.available(t["parser_id"]) for t in templates)
     assert all(set(t) == {"id", "name", "description", "parser_id", "parser_config", "available"} for t in templates)
 

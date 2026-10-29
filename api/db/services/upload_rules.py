@@ -73,9 +73,10 @@ ALLOWED_MIME_BY_EXT: dict[str, frozenset[str]] = {
     "png": _mimes("image/png"),
     "mp3": _mimes("audio/mpeg", "audio/mp3"),
     "wav": _mimes("audio/wav", "audio/x-wav", "audio/wave"),
+    "eml": _mimes("message/rfc822"),
 }
 
-_TEXT_EXTENSIONS = frozenset({"txt", "md", "markdown", "csv", "json", "html", "htm"})
+_TEXT_EXTENSIONS = frozenset({"txt", "md", "markdown", "csv", "json", "html", "htm", "eml"})
 _ZIP_EXTENSIONS = frozenset({"docx", "pptx", "xlsx", "epub"})
 _DOC_EXTENSIONS = _TEXT_EXTENSIONS | _ZIP_EXTENSIONS
 _VISUAL_EXTENSIONS = frozenset({"jpg", "jpeg", "png"})

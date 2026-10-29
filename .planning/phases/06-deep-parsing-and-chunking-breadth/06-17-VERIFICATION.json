@@ -1,0 +1,145 @@
+{
+  "recorded_at": "2026-10-29T18:42:00.808001+00:00",
+  "plan": "06-17",
+  "new_packages": 0,
+  "new_models": 0,
+  "paid_external_calls": 0,
+  "local_asr_submissions_this_plan": 0,
+  "local_asr_remaining": 0,
+  "human_uat_approved": false,
+  "phase_gate_complete": false,
+  "evidence": {
+    "focused": {
+      "log": "ragflow-logs/phase6-17-review-unit.log",
+      "sha256": "0710efbb0c22facae59ffbe23cb70e94ceba66f1becd9ea42d66189a3b7b3457",
+      "result": "12 passed"
+    },
+    "marked_unit": {
+      "log": "ragflow-logs/phase6-17-unit-all.log",
+      "sha256": "6d898a096240b97886fca46c9ff74aeb87affbfc6a7dd5a02b9c373b116ad481",
+      "result": "2564 passed, 8 skipped"
+    },
+    "review_ci_unit": {
+      "log": "ragflow-logs/phase6-17-review-ci-unit.log",
+      "sha256": "f0d9304ff59f8514674d5fafd3a62ceb9bb53e605821a43d6f55d7d4b843d373",
+      "result": "127 passed"
+    },
+    "unmarked_unit": {
+      "log": "ragflow-logs/phase6-17-unmarked-unit-green.log",
+      "sha256": "760822302262e3102fe78ae0362dc1f5664d42973efc5a600f796a3b7702fa51",
+      "result": "51 passed"
+    },
+    "shared_glue": {
+      "log": "ragflow-logs/phase6-17-glue-green.log",
+      "sha256": "8c78f57487417aa148cd287632f5fb5f2dd240d3d15c5eb1254a8647d539bf9f",
+      "result": "307 passed"
+    },
+    "frontend": {
+      "log": "ragflow-logs/phase6-17-web-final.log",
+      "sha256": "018a5f04d5d1ef4c47ac62b1a078e99e11239a96c31fcdfae7be37322e76fb9c",
+      "result": "2179 passed"
+    },
+    "frontend_focused": {
+      "log": "ragflow-logs/phase6-17-web-focused.log",
+      "sha256": "f4548b0f421f084b90a1f4896e5248dd41f79cb83cb1aa45b53ed4db8ea33fb4",
+      "result": "81 passed"
+    },
+    "services": {
+      "log": "ragflow-logs/phase6-17-services-final.log",
+      "sha256": "8f111dcfdc8ffe591c68fcfe06af2910290deb305708d8ef991cc6d11ebac253",
+      "result": "85 passed"
+    },
+    "browser": {
+      "log": "ragflow-logs/phase6-17-browser.log",
+      "sha256": "22a9b9160cb822902f44485087cc7d1333f9de69ef602ec16e7d8a6f76f64d09",
+      "result": "1 passed"
+    },
+    "ci": {
+      "log": "ragflow-logs/phase6-17-ci-reviewed.log",
+      "sha256": "245157d3cd25df7624582509cf8097abf38f8a5ea84f4746bb42be845a6bfde1",
+      "result": "7/7 gates passed"
+    },
+    "security": {
+      "log": "ragflow-logs/phase6-17-security-reviewed.log",
+      "sha256": "b367c16ffbb73dfdcc3c1aeae396f76fca403b16dd14131d796f57bfdd669a84",
+      "result": "All checks passed!"
+    },
+    "health": {
+      "log": "ragflow-logs/phase6-17-health.log",
+      "sha256": "dafbc61308f1b634ab2b7661060fda84684fc4f7765f0cef827fdae1fe10e130",
+      "result": "stack ready:"
+    },
+    "go": {
+      "log": "ragflow-logs/phase6-17-go.log",
+      "sha256": "9a02f3f72bd4c52f937e65977ee123499206fa30d4e6330aaf8a8855c07a5bea",
+      "result": "ok  "
+    },
+    "app_build": {
+      "log": "ragflow-logs/phase6-17-app-build-resume.log",
+      "sha256": "045b8559d6bbf89fe83ff0cefd5bf9471be335064b25a6a82f1394e935911ac4",
+      "result": "Image devrag-app:local Built"
+    },
+    "native_build": {
+      "log": "ragflow-logs/phase6-17-native-build.log",
+      "sha256": "dbfb5f174548e6dbd34cbcd66951735de434dbc52ce7493be04a6d90c5247996",
+      "result": "Image devrag-deepdoc:local Built"
+    },
+    "openapi": {
+      "log": "ragflow-logs/phase6-17-generated.log",
+      "sha256": "9ced52903c5f49dc098b68b9f9f5af8a59c137ea3be0fadf34b7db918656d612",
+      "result": "exit0 verified"
+    },
+    "admission": {
+      "log": "ragflow-logs/phase6-17-admission.log",
+      "sha256": "4c252837496ecc81e6a3983922a33c8ab1831da0e1cbbe0e62baf321c8b05dcb",
+      "result": "local_asr_live"
+    },
+    "runtime_code": {
+      "log": "ragflow-logs/phase6-17-runtime-code.json",
+      "sha256": "1daf89475868384b74bffd3ca8fda9a4f688da0ee4088a97be15a5047e20523d",
+      "result": "containers_match_local"
+    },
+    "cache_preservation": {
+      "log": "ragflow-logs/phase6-17-cache-preservation.json",
+      "sha256": "f45f21b53cd7d5fdbea8c971b211e5fddb2e744c08b1d3b80cf8476d2cc8ad85",
+      "result": "image_inventory_identical"
+    },
+    "records": {
+      "log": "ragflow-logs/phase6-17-records.log",
+      "sha256": "3161859855b777dc643749384705d2d94cb81fab3a89a034405b9c6e7daf0a0c",
+      "result": "11 passed, 2 skipped"
+    },
+    "ci_after_records": {
+      "log": "ragflow-logs/phase6-17-ci-records.log",
+      "sha256": "dcda937dee7e2f477da1d3f32a9c591b1f52902a645e8e2aadd2613f34a4994d",
+      "result": "7/7 gates passed"
+    }
+  },
+  "containers": [
+    {
+      "name": "devrag-stack-app-1",
+      "image": "sha256:d385a45cde18b6f89c3d7eabbaf7d5251ee5504c9e7a558e6328d3d32b66f167",
+      "health": "healthy",
+      "started_at": "2026-10-29T18:36:41.314922681Z"
+    },
+    {
+      "name": "devrag-stack-task-executor-3",
+      "image": "sha256:d385a45cde18b6f89c3d7eabbaf7d5251ee5504c9e7a558e6328d3d32b66f167",
+      "health": "healthy",
+      "started_at": "2026-10-29T18:36:41.660060589Z"
+    },
+    {
+      "name": "devrag-stack-deepdoc-1",
+      "image": "sha256:609a19329fadcc59201d26b8ffae190b6d0856e433e884c241a4f19150bf35cb",
+      "health": "healthy",
+      "started_at": "2026-10-29T18:36:41.135871253Z"
+    }
+  ],
+  "screenshot": {
+    "path": "output/playwright/phase6-review/email-envelope-source.png",
+    "sha256": "c59cee8bd6a94ccf970084eacf999ffed33636754ea2588e2b87b1e713a443b7",
+    "reviewer": "assistant, actual Chrome"
+  },
+  "source": "70071acaf11246b51da23c336fca6a3d9ed226be0e3113834ab473f8b1c7b36e",
+  "regression_note": "Marked unit tier2564/8existing skips collected before2 added review tests; reviewed127 includes all12 Email cases and CI tooling; legacy unmarked51 pass. Original fullweb2178/1 stale helper expectation corrected; final fullweb2179 passes. Original services84/1 stale PNG availability assertion corrected; final85 passes. No failing log relabeled green."
+}

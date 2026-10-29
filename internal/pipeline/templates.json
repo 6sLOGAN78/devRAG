@@ -91,7 +91,7 @@
     "description": "Keep email records.",
     "parser_id": "email",
     "parser_config": {},
-    "available": false
+    "available": true
   },
   {
     "id": "tag",

@@ -193,7 +193,7 @@ describe("Empty, no-match and error states", () => {
     const onEmptyChange = vi.fn();
     renderTable({ onUpload, onEmptyChange });
     expect(await screen.findByRole("heading", { level: 2, name: "No documents yet" })).toBeInTheDocument();
-    expect(screen.getByText("Upload PDF, Word, PowerPoint, Excel, text, Markdown, HTML, CSV, JSON, EPUB, JPG, PNG, MP3 or WAV files, up to 100 MB each.")).toBeInTheDocument();
+    expect(screen.getByText("Upload PDF, Word, PowerPoint, Excel, text, Markdown, HTML, CSV, JSON, EPUB, EML, JPG, PNG, MP3 or WAV files, up to 100 MB each.")).toBeInTheDocument();
     expect(screen.queryByRole("searchbox")).toBeNull();
     await userEvent.click(screen.getByRole("button", { name: "Upload files" }));
     expect(onUpload).toHaveBeenCalledTimes(1);

@@ -74,7 +74,7 @@ def test_a_never_parsed_text_file_and_an_image_and_a_disabled_document(settings,
     assert total == 3
     assert rows[txt["id"]] == {**rows[txt["id"]], "run": "0", "progress": 0.0, "progress_message": "", "chunk_count": 0, "parseable": True, "enabled": True,
                                "thumbnail": None, "last_log_id": None, "pages_total": None, "pages_without_text": None, "error": None}  # fmt: skip
-    assert rows[png["id"]]["parseable"] is False
+    assert rows[png["id"]]["parseable"] is True  # Image parsing is implemented (06-15); this flag reports suffix support.
     assert rows[off["id"]]["enabled"] is False
     assert set(rows[txt["id"]]) == set(view.ROW_KEYS)
 

@@ -201,7 +201,7 @@ def test_repr_masks_secret_key_superuser_and_smtp_passwords(tmp_path, monkeypatc
 import base64  # noqa: E402
 import dataclasses  # noqa: E402
 
-BUILT_IN_EXTENSIONS = ("pdf", "docx", "pptx", "xlsx", "txt", "md", "markdown", "csv", "json", "html", "htm", "epub", "jpg", "jpeg", "png", "mp3", "wav")
+BUILT_IN_EXTENSIONS = ("pdf", "docx", "pptx", "xlsx", "txt", "md", "markdown", "csv", "json", "html", "htm", "epub", "jpg", "jpeg", "png", "mp3", "wav", "eml")
 FAKE_ENC_KEY = base64.urlsafe_b64encode(b"fake-llm-key-for-tests-0123456789"[:32].ljust(32, b"0")).decode()
 
 

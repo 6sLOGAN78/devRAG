@@ -606,7 +606,7 @@
   },
   "upload": {
     "title": "上传文件到 {{dataset}}",
-    "description": "PDF、Word、PowerPoint、Excel、文本、Markdown、HTML、CSV、JSON、EPUB、JPG、PNG、MP3 或 WAV。每个文件最大 {{size}},一次最多 {{maxFiles}} 个文件。",
+    "description": "PDF、Word、PowerPoint、Excel、文本、Markdown、HTML、CSV、JSON、EPUB、EML、JPG、PNG、MP3 或 WAV。每个文件最大 {{size}},一次最多 {{maxFiles}} 个文件。",
     "drop": {
       "idle": "将文件拖到此处,或",
       "active": "松开以添加文件"
@@ -793,7 +793,7 @@
       "deleteLabel": "删除 {{name}}",
       "empty": {
         "heading": "还没有文档",
-        "body": "上传 PDF、Word、PowerPoint、Excel、文本、Markdown、HTML、CSV、JSON、EPUB、JPG、PNG、MP3 或 WAV 文件，每个最大 {{size}}。"
+        "body": "上传 PDF、Word、PowerPoint、Excel、文本、Markdown、HTML、CSV、JSON、EPUB、EML、JPG、PNG、MP3 或 WAV 文件，每个最大 {{size}}。"
       },
       "noMatch": {
         "heading": "没有与“{{keywords}}”匹配的文档",

@@ -81,15 +81,15 @@ describe("Chunking method dialog, document mode (UI-13, UI-14)", () => {
     expect(within(dialog).getByTestId("field-overlap")).toHaveValue(10);
   });
 
-  it("lists fourteen methods in documentation order with three disabled radios and the badge", async () => {
+  it("lists fourteen methods in documentation order with two disabled radios and the badge", async () => {
     const { dialog } = await openFirst();
     const radios = within(dialog).getAllByRole("radio");
     expect(radios).toHaveLength(14);
-    expect(radios.filter((radio) => radio.hasAttribute("disabled"))).toHaveLength(3);
+    expect(radios.filter((radio) => radio.hasAttribute("disabled"))).toHaveLength(2);
     expect(radios.map((radio) => radio.getAttribute("data-testid"))).toEqual(CHUNK_METHODS.map((id) => `chunk-method-option-${id}`));
     expect(screen.getByTestId(`chunk-method-option-${GENERAL_METHOD}`)).toBeChecked();
     const group = within(dialog).getByTestId("chunk-method-group");
-    expect(within(group).getAllByText("Available in a later release")).toHaveLength(3);
+    expect(within(group).getAllByText("Available in a later release")).toHaveLength(2);
     expect(within(group).getByText("Choose an available method for the next parse.")).toBeInTheDocument();
     for (const title of ["General", "Q&A", "Paper", "Book", "Laws", "Presentation", "Tables", "Manual"]) expect(within(group).getByText(title)).toBeInTheDocument();
     expect(radios.find((radio) => radio.hasAttribute("disabled"))).toHaveAccessibleDescription("Available in a later release");
@@ -573,4 +573,16 @@ describe("Picture controls", () => {
     await waitFor(()=>expect(sent(detailUrl(1),"PATCH")).toHaveLength(1));
     expect(sent(detailUrl(1),"PATCH")[0]).toEqual({parser_id:"picture",parser_config:{picture_ocr_only:true}});
   });
+});
+
+it("saves Email with envelope guidance and an effective body budget", async () => {
+  const user=userEvent.setup();const {dialog}=await openFirst();
+  await user.click(within(dialog).getByTestId("chunk-method-option-email"));
+  expect(within(dialog).getByTestId("email-settings-note")).toHaveTextContent("From, To, Subject and Date");
+  expect(within(dialog).getByTestId("field-delimiters")).toBeDisabled();
+  expect(within(dialog).getByTestId("field-overlap")).toBeDisabled();
+  expect(within(dialog).getByTestId("field-chunk-size")).not.toBeDisabled();
+  await user.click(within(dialog).getByTestId("chunk-method-submit"));
+  await waitFor(()=>expect(sent(detailUrl(1),"PATCH")).toHaveLength(1));
+  expect(sent(detailUrl(1),"PATCH")[0]).toEqual({parser_id:"email"});
 });

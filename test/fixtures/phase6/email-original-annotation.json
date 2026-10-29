@@ -1,0 +1,30 @@
+{
+  "provenance": "Original authored MIME fixture, fixed before parser implementation; no downloaded attachment or external source.",
+  "sha256": "70071acaf11246b51da23c336fca6a3d9ed226be0e3113834ab473f8b1c7b36e",
+  "bytes": 6069,
+  "subject": "灯塔 calibration facts",
+  "from_address": "alice@example.test",
+  "to_addresses": [
+    "bob@example.test",
+    "chen@example.test"
+  ],
+  "date": "Thu, 29 Oct 2026 10:15:00 +0530",
+  "message_id": "<phase6-original-email@example.test>",
+  "body": "Lighthouse height: 52 metres. Calibration offset: 73 units.\n灯塔高度52米，校准偏移73单位。\n\nThe original field record keeps its envelope and provenance. The original field record keeps its envelope and provenance. The original field record keeps its envelope and provenance. The original field record keeps its envelope and provenance. The original field record keeps its envelope and provenance. The original field record keeps its envelope and provenance. The original field record keeps its envelope and provenance. The original field record keeps its envelope and provenance. The original field record keeps its envelope and provenance. The original field record keeps its envelope and provenance. The original field record keeps its envelope and provenance. The original field record keeps its envelope and provenance. The original field record keeps its envelope and provenance. The original field record keeps its envelope and provenance. The original field record keeps its envelope and provenance. The original field record keeps its envelope and provenance. The original field record keeps its envelope and provenance. The original field record keeps its envelope and provenance. The original field record keeps its envelope and provenance. The original field record keeps its envelope and provenance. The original field record keeps its envelope and provenance. The original field record keeps its envelope and provenance. The original field record keeps its envelope and provenance. The original field record keeps its envelope and provenance. The original field record keeps its envelope and provenance. The original field record keeps its envelope and provenance. The original field record keeps its envelope and provenance. The original field record keeps its envelope and provenance. The original field record keeps its envelope and provenance. The original field record keeps its envelope and provenance. The original field record keeps its envelope and provenance. The original field record keeps its envelope and provenance. The original field record keeps its envelope and provenance. The original field record keeps its envelope and provenance. The original field record keeps its envelope and provenance. The original field record keeps its envelope and provenance. The original field record keeps its envelope and provenance. The original field record keeps its envelope and provenance. The original field record keeps its envelope and provenance. The original field record keeps its envelope and provenance. The original field record keeps its envelope and provenance. The original field record keeps its envelope and provenance. The original field record keeps its envelope and provenance. The original field record keeps its envelope and provenance. The original field record keeps its envelope and provenance. The original field record keeps its envelope and provenance. The original field record keeps its envelope and provenance. The original field record keeps its envelope and provenance. The original field record keeps its envelope and provenance. The original field record keeps its envelope and provenance. The original field record keeps its envelope and provenance. The original field record keeps its envelope and provenance. The original field record keeps its envelope and provenance. The original field record keeps its envelope and provenance. The original field record keeps its envelope and provenance. The original field record keeps its envelope and provenance. The original field record keeps its envelope and provenance. The original field record keeps its envelope and provenance. The original field record keeps its envelope and provenance. The original field record keeps its envelope and provenance. The original field record keeps its envelope and provenance. The original field record keeps its envelope and provenance. The original field record keeps its envelope and provenance. The original field record keeps its envelope and provenance. The original field record keeps its envelope and provenance. The original field record keeps its envelope and provenance. The original field record keeps its envelope and provenance. The original field record keeps its envelope and provenance. The original field record keeps its envelope and provenance. The original field record keeps its envelope and provenance.\n\nEnd of the original calibration message.\n",
+  "facts": {
+    "lighthouse_height_metres": 52,
+    "calibration_offset_units": 73
+  },
+  "body_policy": "Prefer first supported nonattachment text/plain in each multipart alternative; HTML only if no supported plain body. Never execute/fetch attachments or URLs.",
+  "ignored_attachments": [
+    "../calibration-secret.txt",
+    "inline-picture.png"
+  ],
+  "must_not_index": [
+    "ALTERNATIVE_TRAP",
+    "offset9100",
+    "EXECUTION_TRAP",
+    "ATTACHMENT_TRAP9999",
+    "NOT_AN_IMAGE"
+  ]
+}

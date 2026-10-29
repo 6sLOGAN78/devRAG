@@ -1,0 +1,9 @@
+{
+  "app_base": "06-15-BUILD-BASES.json",
+  "native_vendor": "sha256:125a1211bed8b4ac8ecba49d284aea7a0a4c1183f71385508a3260c7c58d6c7b",
+  "new_dependencies": 0,
+  "new_models": 0,
+  "native_copy": "Immutable vendor copied with --link, preserving the exact source bytes across app-base changes.",
+  "pyproject_sha256": "a8eb4d8d2050b765a501d8737d64993fc67b97d5e446ffd980942ca315cb831c",
+  "uv_lock_sha256": "eb2d16cae34e3d893b2f1261be215a18d3a3c0f276e4b0aef3ae8e9ace2ea016"
+}

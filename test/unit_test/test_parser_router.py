@@ -47,7 +47,7 @@ def test_every_router_suffix_is_an_allowed_upload_extension():
 
 
 def test_loaders_are_dotted_module_paths_and_importing_router_is_light():
-    assert {spec.loader for spec in router.PARSERS} == {f"rag.parsers.{n}" for n in ("pdf", "docx", "xlsx", "pptx", "html", "txt", "markdown", "json", "csv", "epub", "image", "audio")}
+    assert {spec.loader for spec in router.PARSERS} == {f"rag.parsers.{n}" for n in ("pdf", "docx", "xlsx", "pptx", "html", "txt", "markdown", "json", "csv", "epub", "image", "audio", "email")}
 
 
 def test_types_are_frozen_and_report_caps_notes():

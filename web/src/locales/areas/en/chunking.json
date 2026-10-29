@@ -111,6 +111,7 @@
       "paperSettings": "Follows Abstract, Introduction, Methods and References, plus numbered sections. Chunk size applies within each section; delimiters and overlap do not apply.",
       "lawsSettings": "Follows chapters, sections, articles and items. Chunk size applies within each article; delimiters and overlap do not apply. Original source characters are preserved.",
       "presentationSettings": "Keeps each slide separate, repeating its title on long chunks. Chunk size applies within a slide; delimiters and overlap do not apply.",
+      "emailSettings": "Reads the decoded From, To, Subject and Date with the message body. Plain text is preferred over HTML alternatives. Attachments are listed as ignored and never executed. Chunk size includes the repeated envelope; delimiters and overlap do not apply.",
       "tableSettings": "Keeps each data row with its table title and column headers. Chunk size limits a whole row; oversized rows are refused instead of split. Delimiters and overlap do not apply.",
       "pictureSettings": "Choose a configured vision model to describe the image, or select OCR only to read its text. The source image stays linked to the result.",
       "pictureOcrOnly": "Read text only (OCR)",

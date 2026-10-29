@@ -1,0 +1,106 @@
+From: =?utf-8?b?56CU56m25ZGY?= <alice@example.test>
+To: Bob <bob@example.test>, Bob <bob@example.test>,
+ =?utf-8?b?6ZmI?= <chen@example.test>
+Subject: =?utf-8?b?54Gv5aGU?= calibration facts
+Date: Thu, 29 Oct 2026 10:15:00 +0530
+Message-ID: <phase6-original-email@example.test>
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="phase6-original-mixed"
+
+--phase6-original-mixed
+Content-Type: multipart/alternative; boundary="phase6-original-alternative"
+
+--phase6-original-alternative
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+
+Lighthouse height: 52 metres. Calibration offset: 73 units.
+=E7=81=AF=E5=A1=94=E9=AB=98=E5=BA=A652=E7=B1=B3=EF=BC=8C=E6=A0=A1=E5=87=86=E5=
+=81=8F=E7=A7=BB73=E5=8D=95=E4=BD=8D=E3=80=82
+
+The original field record keeps its envelope and provenance. The original fie=
+ld record keeps its envelope and provenance. The original field record keeps =
+its envelope and provenance. The original field record keeps its envelope and=
+ provenance. The original field record keeps its envelope and provenance. The=
+ original field record keeps its envelope and provenance. The original field =
+record keeps its envelope and provenance. The original field record keeps its=
+ envelope and provenance. The original field record keeps its envelope and pr=
+ovenance. The original field record keeps its envelope and provenance. The or=
+iginal field record keeps its envelope and provenance. The original field rec=
+ord keeps its envelope and provenance. The original field record keeps its en=
+velope and provenance. The original field record keeps its envelope and prove=
+nance. The original field record keeps its envelope and provenance. The origi=
+nal field record keeps its envelope and provenance. The original field record=
+ keeps its envelope and provenance. The original field record keeps its envel=
+ope and provenance. The original field record keeps its envelope and provenan=
+ce. The original field record keeps its envelope and provenance. The original=
+ field record keeps its envelope and provenance. The original field record ke=
+eps its envelope and provenance. The original field record keeps its envelope=
+ and provenance. The original field record keeps its envelope and provenance.=
+ The original field record keeps its envelope and provenance. The original fi=
+eld record keeps its envelope and provenance. The original field record keeps=
+ its envelope and provenance. The original field record keeps its envelope an=
+d provenance. The original field record keeps its envelope and provenance. Th=
+e original field record keeps its envelope and provenance. The original field=
+ record keeps its envelope and provenance. The original field record keeps it=
+s envelope and provenance. The original field record keeps its envelope and p=
+rovenance. The original field record keeps its envelope and provenance. The o=
+riginal field record keeps its envelope and provenance. The original field re=
+cord keeps its envelope and provenance. The original field record keeps its e=
+nvelope and provenance. The original field record keeps its envelope and prov=
+enance. The original field record keeps its envelope and provenance. The orig=
+inal field record keeps its envelope and provenance. The original field recor=
+d keeps its envelope and provenance. The original field record keeps its enve=
+lope and provenance. The original field record keeps its envelope and provena=
+nce. The original field record keeps its envelope and provenance. The origina=
+l field record keeps its envelope and provenance. The original field record k=
+eeps its envelope and provenance. The original field record keeps its envelop=
+e and provenance. The original field record keeps its envelope and provenance=
+. The original field record keeps its envelope and provenance. The original f=
+ield record keeps its envelope and provenance. The original field record keep=
+s its envelope and provenance. The original field record keeps its envelope a=
+nd provenance. The original field record keeps its envelope and provenance. T=
+he original field record keeps its envelope and provenance. The original fiel=
+d record keeps its envelope and provenance. The original field record keeps i=
+ts envelope and provenance. The original field record keeps its envelope and =
+provenance. The original field record keeps its envelope and provenance. The =
+original field record keeps its envelope and provenance. The original field r=
+ecord keeps its envelope and provenance. The original field record keeps its =
+envelope and provenance. The original field record keeps its envelope and pro=
+venance. The original field record keeps its envelope and provenance. The ori=
+ginal field record keeps its envelope and provenance. The original field reco=
+rd keeps its envelope and provenance. The original field record keeps its env=
+elope and provenance. The original field record keeps its envelope and proven=
+ance. The original field record keeps its envelope and provenance. The origin=
+al field record keeps its envelope and provenance. The original field record =
+keeps its envelope and provenance.
+
+End of the original calibration message.
+
+--phase6-original-alternative
+Content-Type: text/html; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+
+<html><head><script>EXECUTION_TRAP</script></head><body><p>ALTERNATIVE_TRAP o=
+ffset9100</p><img src=3D"https://untrusted.invalid/pixel"/></body></html>
+
+--phase6-original-alternative--
+
+--phase6-original-mixed
+Content-Type: application/octet-stream
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="../calibration-secret.txt"
+MIME-Version: 1.0
+
+QVRUQUNITUVOVF9UUkFQOTk5OSBtdXN0IG5ldmVyIGJlY29tZSBib2R5IHRleHQu
+
+--phase6-original-mixed
+Content-Type: image/png
+Content-Transfer-Encoding: base64
+Content-Disposition: inline; filename="inline-picture.png"
+MIME-Version: 1.0
+
+Tk9UX0FOX0lNQUdF
+
+--phase6-original-mixed--

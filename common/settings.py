@@ -152,7 +152,7 @@ class ModelsSettings:
 
 LLM_KEY_BYTES = 32
 MAX_UPLOAD_FILE_BYTES = 104857600  # 100 MiB: the generated Nginx cap of 101m must never be exceeded by configuration
-DEFAULT_UPLOAD_EXTENSIONS = ("pdf", "docx", "pptx", "xlsx", "txt", "md", "markdown", "csv", "json", "html", "htm", "epub", "jpg", "jpeg", "png", "mp3", "wav")  # D-28
+DEFAULT_UPLOAD_EXTENSIONS = ("pdf", "docx", "pptx", "xlsx", "txt", "md", "markdown", "csv", "json", "html", "htm", "epub", "jpg", "jpeg", "png", "mp3", "wav", "eml")  # D-28
 _EXTENSION = re.compile(r"^[a-z0-9]{1,10}$")
 _STORAGE_IMPLS = ("MINIO", "LOCAL")
 

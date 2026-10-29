@@ -22,6 +22,7 @@ export interface ParseConfigurationProps {
   table?: boolean;
   picture?: boolean;
   audio?: boolean;
+  email?: boolean;
   /** A refusal placed by the server under one field: the finished sentence, shown as a text node. */
   answers?: Partial<Record<ParseConfigField, string>>;
   /** Called when the reader edits a field, so its server answer can be cleared. */
@@ -82,7 +83,7 @@ function AudioFields({control,disabled}:{control:Control<ChunkFormInput>;disable
  * The settings of the General method: chunk size, delimiters and overlap, then the read-only "Not available yet" rows.
  * The delimiter field shows and takes `\n` and `\t` as typed text; the schema turns them into real characters.
  */
-export function ParseConfiguration({ control, disabled = false, wholeDocument = false, questionAnswer = false, book = false, paper = false, laws = false, presentation = false, table = false, picture = false, audio = false, answers = {}, onEdit }: ParseConfigurationProps) {
+export function ParseConfiguration({ control, disabled = false, wholeDocument = false, questionAnswer = false, book = false, paper = false, laws = false, presentation = false, table = false, picture = false, audio = false, email = false, answers = {}, onEdit }: ParseConfigurationProps) {
   const { t } = useTranslation();
   return (
     <div className="flex flex-col gap-4">
@@ -109,6 +110,7 @@ export function ParseConfiguration({ control, disabled = false, wholeDocument = 
           <FormMessage /><ServerFieldError text={answers.pageRanges ?? null} />
         </FormItem>
       )} />
+      {email ? <p data-testid="email-settings-note" className="text-sm text-muted-foreground">{t("datasets.chunking.emailSettings")}</p> : null}
       {audio ? <AudioFields control={control} disabled={disabled}/> : null}
       {picture ? <PictureFields control={control} disabled={disabled}/> : null}
       {table ? <p data-testid="table-settings-note" className="text-sm text-muted-foreground">{t("datasets.chunking.tableSettings")}</p> : null}
@@ -157,7 +159,7 @@ export function ParseConfiguration({ control, disabled = false, wholeDocument = 
                 {...field}
                 autoComplete="off"
                 spellCheck={false}
-                disabled={disabled || wholeDocument || questionAnswer || book || paper || laws || presentation || table || picture || audio}
+                disabled={disabled || wholeDocument || questionAnswer || book || paper || laws || presentation || table || picture || audio || email}
                 data-testid="field-delimiters"
                 className="font-mono"
                 onChange={(event) => {
@@ -186,7 +188,7 @@ export function ParseConfiguration({ control, disabled = false, wholeDocument = 
                 min={OVERLAP_MIN}
                 max={OVERLAP_MAX}
                 step={1}
-                disabled={disabled || wholeDocument || questionAnswer || book || paper || laws || presentation || table || picture || audio}
+                disabled={disabled || wholeDocument || questionAnswer || book || paper || laws || presentation || table || picture || audio || email}
                 data-testid="field-overlap"
                 onChange={(event) => {
                   onEdit?.("overlap");

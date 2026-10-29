@@ -606,7 +606,7 @@
   },
   "upload": {
     "title": "Upload files to {{dataset}}",
-    "description": "PDF, Word, PowerPoint, Excel, text, Markdown, HTML, CSV, JSON, EPUB, JPG, PNG, MP3 or WAV. Up to {{size}} per file, {{maxFiles}} files at a time.",
+    "description": "PDF, Word, PowerPoint, Excel, text, Markdown, HTML, CSV, JSON, EPUB, EML, JPG, PNG, MP3 or WAV. Up to {{size}} per file, {{maxFiles}} files at a time.",
     "drop": {
       "idle": "Drag files here, or",
       "active": "Drop to add files"
@@ -793,7 +793,7 @@
       "deleteLabel": "Delete {{name}}",
       "empty": {
         "heading": "No documents yet",
-        "body": "Upload PDF, Word, PowerPoint, Excel, text, Markdown, HTML, CSV, JSON, EPUB, JPG, PNG, MP3 or WAV files, up to {{size}} each."
+        "body": "Upload PDF, Word, PowerPoint, Excel, text, Markdown, HTML, CSV, JSON, EPUB, EML, JPG, PNG, MP3 or WAV files, up to {{size}} each."
       },
       "noMatch": {
         "heading": "No documents match \"{{keywords}}\"",

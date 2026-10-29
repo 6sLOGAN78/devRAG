@@ -53,7 +53,7 @@ class EmbedRunner:
         with self._limiters.embed_limiter:
             bundle = self._bundle(ctx, dimension)
             release_database_connection()
-            if ctx.parser_id in {"one", "manual", "qa", "book", "paper", "laws", "presentation", "table", "picture", "audio"}:
+            if ctx.parser_id in {"one", "manual", "qa", "book", "paper", "laws", "presentation", "table", "picture", "audio", "email"}:
                 from rag.nlp.token_count import count_tokens
                 from rag.svr.failure import TaskFailure
 
