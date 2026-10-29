@@ -81,6 +81,9 @@ def build_row(
     boxes = chunk.positions
     pages = sorted({int(box.page) for box in boxes})
     features = {}
+    if chunk.audio:
+        features["audio_start_flt"] = chunk.audio.start
+        features["audio_end_flt"] = chunk.audio.end
     if chunk.slide:
         features["slide_number_int"] = chunk.slide.number
         features["slide_title_kwd"] = chunk.slide.title

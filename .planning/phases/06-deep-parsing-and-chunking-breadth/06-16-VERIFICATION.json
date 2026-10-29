@@ -1,0 +1,166 @@
+{
+  "recorded_at": "2026-10-29T16:55:48.661959+00:00",
+  "plan": "06-16",
+  "paid_external_calls": 0,
+  "local_asr_submissions": 3,
+  "local_asr_remaining": 0,
+  "native_asr_closure_pins": 27,
+  "additional_native_vendor_pins": 18,
+  "root_new_dependencies": 0,
+  "new_models": 1,
+  "python_existing_skips": 8,
+  "human_uat_approved": false,
+  "phase_gate_complete": false,
+  "evidence": {
+    "python_unit": {
+      "log": "ragflow-logs/phase6-16-unit-accepted-final.log",
+      "sha256": "f68b60c41a971770da7d91f810dad836c6f67fcda02ac955c5b0364d0b3db13c",
+      "result": "2665 passed"
+    },
+    "review_boundary": {
+      "log": "ragflow-logs/phase6-16-review-green.log",
+      "sha256": "458e7bf9eee29c6aa9db808c343568820297f5affe381fe4f89ebee5ddec1e79",
+      "result": "19 passed"
+    },
+    "accepted_recordings": {
+      "log": "ragflow-logs/phase6-16-acceptance-unit-final.log",
+      "sha256": "37645ba98e29b08be2e245ab6cc01eab018dda9937c4db1d3c762c37cf83ff1a",
+      "result": "10 passed"
+    },
+    "frontend": {
+      "log": "ragflow-logs/phase6-16-web-full.log",
+      "sha256": "d507c0d518a30c0f49ce5bafee8c6acb49a52bff87e9591d496f0299f5f5bebe",
+      "result": "2178 passed"
+    },
+    "frontend_added": {
+      "log": "ragflow-logs/phase6-16-web-new-flows.log",
+      "sha256": "1e86def09fdb96f27a2cc70dd1a46510c78ae604f83254ac1ef7f53dfc0c7080",
+      "result": "96 passed"
+    },
+    "go": {
+      "log": "ragflow-logs/phase6-16-go.log",
+      "sha256": "c82ce319169a0628d689655a2a87f9fd7e7f37d8cecc8ca54b280946c511d67a",
+      "result": "ok "
+    },
+    "browser_config": {
+      "log": "ragflow-logs/phase6-16-browser-config-final.log",
+      "sha256": "6edbf06970bad03d4959d5bfdf44cf5108a5bdbaa9da5e278a4af8ee71f1487f",
+      "result": "1 passed"
+    },
+    "stack_regressions": {
+      "log": "ragflow-logs/phase6-16-stack-regressions.log",
+      "sha256": "42ca8e66c443dc654cfa3167ddbf9e4d7918d0fe1ec3fabcceb419e6a5aa5af7",
+      "result": "62 passed"
+    },
+    "services": {
+      "log": "ragflow-logs/phase6-16-services-restored-final.log",
+      "sha256": "ea00f764142139cec8c0fa22d8bcae6d02b9d8aecf75924b845d4e35efb67ad6",
+      "result": "89 passed"
+    },
+    "routes_leaks": {
+      "log": "ragflow-logs/phase6-16-routes-leaks.log",
+      "sha256": "f46ce5f7b17c76f3c79be49d0bbefe578dc02a0c54bd5f9c34655550690f80e0",
+      "result": "186 passed"
+    },
+    "model_routes": {
+      "log": "ragflow-logs/phase6-16-model-routes-final.log",
+      "sha256": "edd987d55a169a926a966686476b7993dcf92d6a413df1b7278f65ae2f60fe41",
+      "result": "20 passed"
+    },
+    "provider_native": {
+      "log": "ragflow-logs/phase6-16-provider-native-final.log",
+      "sha256": "806ad415d7829752c6830f5d482cd848eb3ac4c71c00ffbcebca8e8079419009",
+      "result": "65 passed"
+    },
+    "recorded_replay": {
+      "log": "ragflow-logs/phase6-16-recorded-acceptance.log",
+      "sha256": "7224f5a253d91e50520ae7b4b1f19a8b8b1604396f5a30f14c545169e2485ce6",
+      "result": "13 passed"
+    },
+    "ci": {
+      "log": "ragflow-logs/phase6-16-ci-final.log",
+      "sha256": "2864cd96912108c505fe8ca7d2f974cd33f36df05b1b95d3eaf5781e9e7416cb",
+      "result": "7/7 gates passed"
+    },
+    "security": {
+      "log": "ragflow-logs/phase6-16-security-final.log",
+      "sha256": "35ae83fb2d63969e1665d88aa247f8dce682613fa2d31b941cd34d7628ee0b44",
+      "result": "All checks passed!"
+    },
+    "openapi": {
+      "log": "ragflow-logs/phase6-16-openapi-check.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "result": "exit0 recorded"
+    },
+    "admission": {
+      "log": "ragflow-logs/phase6-16-admission.log",
+      "sha256": "920b07e40447627f9d1bae1d17fe957b7152d5d9afe5fb5be2998a4eadad947d",
+      "result": "exit0 recorded"
+    },
+    "health": {
+      "log": "ragflow-logs/phase6-16-review-health.log",
+      "sha256": "dafbc61308f1b634ab2b7661060fda84684fc4f7765f0cef827fdae1fe10e130",
+      "result": "stack ready:"
+    },
+    "provision": {
+      "log": "ragflow-logs/phase6-16-provision-cached-module.log",
+      "sha256": "df177b94ee77d8c31d2598db578228414f117cd968038881a81eafd3154d9625",
+      "result": "verified cached model: vocabulary.txt"
+    },
+    "native_boundary": {
+      "log": "ragflow-logs/phase6-16-native-boundary-final.log",
+      "sha256": "a9249df86bc6c4801652b8aa9ab3eef386b5f7a3248cc2bfa19936079317aa4a",
+      "result": "native boundary verified"
+    },
+    "original_wav_gate": {
+      "log": "ragflow-logs/phase6-16-wav-live.log",
+      "sha256": "dce920230898be6d7015c0b32060520120dd8142dbe6afe6674601ddfe39a4e4",
+      "result": "Original exact-spelling assertion failed; retained outputs accepted explicitly and evaluated offline. Not rerun."
+    },
+    "original_mp3_gate": {
+      "log": "ragflow-logs/phase6-16-mp3-live.log",
+      "sha256": "5456b32d3ec6b7e12356213716b62191982c33ff2447b6dcd731a0b6dabe9689",
+      "result": "Original exact-spelling assertion failed; retained outputs accepted explicitly and evaluated offline. Not rerun."
+    },
+    "records": {
+      "log": "ragflow-logs/phase6-16-records-final.log",
+      "sha256": "bd5201fad773316bbfda2cfee7833ff2d8db356db81550c537f47ba44de0ed2d"
+    },
+    "ci_after_records": {
+      "log": "ragflow-logs/phase6-16-ci-records.log",
+      "sha256": "db6556d41b4f4b6c78578dc607c031cfe1382733fb5d85a5024abcd2695068ea"
+    }
+  },
+  "containers": [
+    {
+      "name": "devrag-stack-app-1",
+      "image": "sha256:c3520d6fda5bc60230fbe4770ff40fff6b957ce3476e3cb51faa278d77ff8687",
+      "health": "healthy",
+      "started_at": "2026-10-29T16:36:21.83857394Z"
+    },
+    {
+      "name": "devrag-stack-task-executor-3",
+      "image": "sha256:c3520d6fda5bc60230fbe4770ff40fff6b957ce3476e3cb51faa278d77ff8687",
+      "health": "healthy",
+      "started_at": "2026-10-29T16:36:22.025292859Z"
+    },
+    {
+      "name": "devrag-stack-deepdoc-1",
+      "image": "sha256:bfbfbbff88f8bc537ba2d8f9b6dfae970b0066f9ca56597db3c120fd9976ca05",
+      "health": "healthy",
+      "started_at": "2026-10-29T16:36:21.669863951Z"
+    }
+  ],
+  "screenshot": {
+    "path": "output/playwright/phase6-review/audio-timestamp-source.png",
+    "sha256": "14cb230f2a045f66072bf816f3c71b2e3020025e8c7f384ae5d35b7b2bdcbf2c",
+    "reviewer": "assistant, actual Chrome"
+  },
+  "acquisition": "06-16-ACQUISITION.json",
+  "build_bases": "06-16-BUILD-BASES.json",
+  "spelling_acceptance": "06-16-SPELLING-ACCEPTANCE.json",
+  "observed_asr": "06-16-ASR-OBSERVED.json",
+  "accuracy_measurement": "06-16-ASR-QUALITY.json",
+  "quality_note": "Both recordings preserve numeric facts52/73. Exact lighthouse spelling assertions originally failed; user approved only light house/lighthouse equivalence. Original WAV also says calibration of set; raw transcript retained. Bounded beam5 MP3 says calibration offset. Unit evaluation and actual index replay of captured WAV verify accepted facts/timestamps without additional inference. Original live pytest logs are not relabeled green.",
+  "regression_note": "Root2665 before final malformed-refusal branch correction; final reviewed boundary19 and rebuilt services89/browser1 cover that correction. Stack62 precedes it and includes all prior feature browsers."
+}

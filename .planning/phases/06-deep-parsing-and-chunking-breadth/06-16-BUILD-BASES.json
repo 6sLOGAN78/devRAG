@@ -1,0 +1,6 @@
+{
+  "native_dependency_image": "sha256:125a1211bed8b4ac8ecba49d284aea7a0a4c1183f71385508a3260c7c58d6c7b",
+  "native_dependency_tag": "devrag-deepdoc-runtime-p6-16:local",
+  "app_base": "06-15-BUILD-BASES.json",
+  "wheel_acquisition": "06-16-ACQUISITION.json"
+}

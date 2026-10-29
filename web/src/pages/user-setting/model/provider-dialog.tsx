@@ -68,7 +68,8 @@ function ProviderField({ name, label, testId, busy, help, secret = false, url = 
 }
 
 /** The models a set up sends: whichever of the chat and embedding fields were filled. */
-function setupModels(values: ProviderFormValues): RegisteredModel[] {
+function setupModels(values: ProviderFormValues, spec: ProviderSpec): RegisteredModel[] {
+  if(spec.slug === "deepdoc") return [{name:"faster-whisper-tiny",type:"asr"}];
   const models: RegisteredModel[] = [];
   if (values.chatModel.trim() !== "") models.push({ name: values.chatModel.trim(), type: "chat" });
   if (values.embeddingModel.trim() !== "") models.push({ name: values.embeddingModel.trim(), type: "embedding" });
@@ -131,7 +132,7 @@ function ProviderForm({ spec, mode, current, pendingRef, close }: FormProps) {
 
   async function onSubmit(values: ProviderFormValues): Promise<void> {
     if (inFlight.current || tenantId === null) return;
-    const models = mode === "setup" ? setupModels(values) : registeredModelFor(current);
+    const models = mode === "setup" ? setupModels(values, spec) : registeredModelFor(current);
     setFailure(null);
     if (models.length === 0) {
       setFailure({ key: "models.refused.generic", refusal: false });
@@ -197,7 +198,7 @@ function ProviderForm({ spec, mode, current, pendingRef, close }: FormProps) {
         ) : null}
         {spec.fields.apiVersion ? <ProviderField name="apiVersion" label={t("models.field.apiVersion")} testId="field-api-version" busy={busy} /> : null}
         {spec.fields.key === "none" ? null : <ProviderField name="apiKey" label={t("models.field.key")} testId="field-provider-key" busy={busy} secret help={keyHelp()} />}
-        {mode === "setup" ? (
+        {mode === "setup" && spec.slug !== "deepdoc" ? (
           <>
             <ProviderField
               name="chatModel"

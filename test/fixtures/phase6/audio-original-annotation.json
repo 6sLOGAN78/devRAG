@@ -1,0 +1,19 @@
+{
+  "provenance": "Original ground-truth sentence synthesized locally with preinstalled FFmpeg/libflite slt, before ASR model acquisition/inference. No external recording.",
+  "transcript": "The lighthouse height is fifty two meters. The calibration offset is seventy three units.",
+  "facts": {
+    "lighthouse_height_meters": 52,
+    "calibration_offset_units": 73
+  },
+  "duration_seconds": 5.38,
+  "files": {
+    "wav": {
+      "sha256": "8c7fcfc53be668937a314d24d8e62c4d62c53eb3e80df60123f439fde8808e91",
+      "bytes": 172238
+    },
+    "mp3": {
+      "sha256": "570912231aa0d646b7951002f952ec1059a84ee230bceae5ee22b737573e90da",
+      "bytes": 44109
+    }
+  }
+}

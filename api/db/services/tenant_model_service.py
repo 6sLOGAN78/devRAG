@@ -41,7 +41,7 @@ MAX_EXTRA = 512  # tenant_model_instance.extra is VARCHAR(512)
 _ENVELOPE_PREFIX = "v1:"
 _ACTIVE_LLM = "1"
 _ACTIVE = "active"
-_DEFAULT_FIELDS = {"chat": ("llm_id", "tenant_llm_id"), "embedding": ("embd_id", "tenant_embd_id"), "rerank": ("rerank_id", "tenant_rerank_id"),"vision":("img2txt_id","tenant_img2txt_id")}
+_DEFAULT_FIELDS = {"chat": ("llm_id", "tenant_llm_id"), "embedding": ("embd_id", "tenant_embd_id"), "rerank": ("rerank_id", "tenant_rerank_id"),"vision":("img2txt_id","tenant_img2txt_id"),"asr":("asr_id","tenant_asr_id")}
 
 
 @dataclass(frozen=True)
@@ -88,6 +88,7 @@ class Defaults:
     chat: str
     embedding: str
     vision: str = ""
+    asr: str = ""
 
 
 class Unset:
@@ -501,16 +502,16 @@ def delete_provider(tenant_id: str, provider: str) -> bool:
 def get_defaults(tenant_id: str) -> Defaults:
     with DB.connection_context():
         tenant = Tenant.get_or_none(Tenant.id == tenant_id)
-    return Defaults(chat=(tenant.llm_id or "") if tenant else "", embedding=(tenant.embd_id or "") if tenant else "",vision=(tenant.img2txt_id or "") if tenant else "")
+    return Defaults(chat=(tenant.llm_id or "") if tenant else "", embedding=(tenant.embd_id or "") if tenant else "",vision=(tenant.img2txt_id or "") if tenant else "",asr=(tenant.asr_id or "") if tenant else "")
 
 
-def set_defaults(tenant_id: str, *, chat: ModelRef | None | Unset = UNSET, embedding: ModelRef | None | Unset = UNSET, vision: ModelRef | None | Unset = UNSET) -> Defaults:
+def set_defaults(tenant_id: str, *, chat: ModelRef | None | Unset = UNSET, embedding: ModelRef | None | Unset = UNSET, vision: ModelRef | None | Unset = UNSET, asr: ModelRef | None | Unset = UNSET) -> Defaults:
     """Store workspace defaults as composite ids plus the ``tenant_model`` ids. ``UNSET`` keeps, ``None`` clears."""
     with DB.connection_context():
         if Tenant.get_or_none(Tenant.id == tenant_id) is None:
             raise ServiceError(Kind.NOT_FOUND, "workspace_not_found", "that workspace does not exist")
         updates: dict[str, Any] = {}
-        for kind, ref in (("chat", chat), ("embedding", embedding), ("vision", vision)):
+        for kind, ref in (("chat", chat), ("embedding", embedding), ("vision", vision), ("asr", asr)):
             if isinstance(ref, Unset):
                 continue
             field, id_field = _DEFAULT_FIELDS[kind]

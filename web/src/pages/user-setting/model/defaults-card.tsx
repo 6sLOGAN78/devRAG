@@ -20,6 +20,7 @@ interface DefaultsValues {
   chat: string;
   embedding: string;
   vision:string;
+  asr:string;
 }
 
 function DefaultsSkeleton() {
@@ -57,6 +58,7 @@ interface FormProps {
   chatModels: readonly ModelView[];
   embeddingModels: readonly ModelView[];
   visionModels: readonly ModelView[];
+  asrModels: readonly ModelView[];
   saved: DefaultsView;
 }
 
@@ -65,10 +67,10 @@ interface FormProps {
  * nothing is preselected or guessed (D-18). The parent remounts the form (by `key`) whenever the effective saved values
  * change, so a successful save, a deleted provider or another admin's change all reset the dirty state.
  */
-function DefaultsForm({ tenantId, chatModels, embeddingModels, visionModels, saved }: FormProps) {
+function DefaultsForm({ tenantId, chatModels, embeddingModels, visionModels, asrModels, saved }: FormProps) {
   const { t } = useTranslation();
   const save = useSaveDefaultsRequest();
-  const baseline = useRef<DefaultsValues>({ chat: existing(saved.chat, chatModels), embedding: existing(saved.embedding, embeddingModels),vision:existing(saved.vision ?? "",visionModels) });
+  const baseline = useRef<DefaultsValues>({ chat: existing(saved.chat, chatModels), embedding: existing(saved.embedding, embeddingModels),vision:existing(saved.vision ?? "",visionModels),asr:existing(saved.asr ?? "",asrModels) });
   const form = useForm<DefaultsValues>({ mode: "onSubmit", defaultValues: baseline.current });
   const inFlight = useRef(false);
   const [busy, setBusy] = useState(false);
@@ -80,6 +82,7 @@ function DefaultsForm({ tenantId, chatModels, embeddingModels, visionModels, sav
     const changes: DefaultsChanges = {};
     if (values.chat !== baseline.current.chat) changes.chat = values.chat === "" ? null : values.chat;
     if (values.embedding !== baseline.current.embedding) changes.embedding = values.embedding === "" ? null : values.embedding;
+    if(values.asr !== baseline.current.asr) changes.asr=values.asr === "" ? null : values.asr;
     if(values.vision !== baseline.current.vision) changes.vision=values.vision === "" ? null : values.vision;
     if (Object.keys(changes).length === 0) return;
     inFlight.current = true;
@@ -148,6 +151,7 @@ function DefaultsForm({ tenantId, chatModels, embeddingModels, visionModels, sav
             </FormItem>
           )}
         />
+        {asrModels.length > 0 ? <FormField control={form.control} name="asr" render={({field})=><FormItem><FormLabel>{t("models.defaults.asr")}</FormLabel><FormControl><LlmSelect models={asrModels} type="asr" value={field.value} disabled={busy} data-testid="default-asr" onChange={value=>{setError(null);field.onChange(value);}}/></FormControl></FormItem>}/> : null}
         {visionModels.length > 0 ? <FormField control={form.control} name="vision" render={({field})=><FormItem><FormLabel>{t("models.defaults.vision")}</FormLabel><FormControl><LlmSelect models={visionModels} type="vision" value={field.value} disabled={busy} data-testid="default-vision" onChange={value=>{setError(null);field.onChange(value);}}/></FormControl></FormItem>}/> : null}
         <div>
           <Button
@@ -172,28 +176,31 @@ function DefaultsEditor({ saved }: { saved: DefaultsView }) {
   const tenantId = useModelTenantId();
   const chat = useModelsRequest("chat");
   const embedding = useModelsRequest("embedding");
+  const asr = useModelsRequest("asr",saved.asr !== undefined);
   const vision = useModelsRequest("vision",saved.vision !== undefined);
-  if (chat.isPending || embedding.isPending || (saved.vision !== undefined && vision.isPending)) return <DefaultsSkeleton />;
-  if (chat.isError || embedding.isError || (saved.vision !== undefined && vision.isError) || chat.data === undefined || embedding.data === undefined || tenantId === null) {
+  if (chat.isPending || embedding.isPending || (saved.asr !== undefined && asr.isPending) || (saved.vision !== undefined && vision.isPending)) return <DefaultsSkeleton />;
+  if (chat.isError || embedding.isError || (saved.asr !== undefined && asr.isError) || (saved.vision !== undefined && vision.isError) || chat.data === undefined || embedding.data === undefined || tenantId === null) {
     return (
       <ErrorState
         noun={t("models.errorNoun.defaults")}
         onAction={() => {
           void chat.refetch();
           void embedding.refetch();
+          if(saved.asr !== undefined) void asr.refetch();
           if(saved.vision !== undefined) void vision.refetch();
         }}
       />
     );
   }
-  const formKey = `${tenantId}|${existing(saved.chat, chat.data)}|${existing(saved.embedding, embedding.data)}|${existing(saved.vision ?? "",vision.data ?? [])}`;
-  return <DefaultsForm key={formKey} tenantId={tenantId} chatModels={chat.data} embeddingModels={embedding.data} visionModels={vision.data ?? []} saved={saved} />;
+  const formKey = `${tenantId}|${existing(saved.chat, chat.data)}|${existing(saved.embedding, embedding.data)}|${existing(saved.vision ?? "",vision.data ?? [])}|${existing(saved.asr ?? "",asr.data ?? [])}`;
+  return <DefaultsForm key={formKey} tenantId={tenantId} chatModels={chat.data} embeddingModels={embedding.data} visionModels={vision.data ?? []} asrModels={asr.data ?? []} saved={saved} />;
 }
 
 /** Members read the defaults as plain text: a definition list, no select and no button (D-07). */
 function DefaultsReadOnly({ saved }: { saved: DefaultsView }) {
   const { t } = useTranslation();
   const rows = [
+    ...(saved.asr ? [{label:t("models.defaults.asr"),value:saved.asr}] : []),
     ...(saved.vision ? [{label:t("models.defaults.vision"),value:saved.vision}] : []),
     { label: t("models.defaults.chat"), value: saved.chat },
     { label: t("models.defaults.embedding"), value: saved.embedding },

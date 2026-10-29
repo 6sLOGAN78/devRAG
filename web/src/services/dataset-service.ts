@@ -37,6 +37,8 @@ export interface UploadLimitsView {
 export interface DatasetParserConfig {
   pages?: [number, number][];
   layoutRecognize?: boolean | string;
+  asrModel?: string;
+  audioLanguage?: string;
   imageModel?: string;
   pictureOcrOnly?: boolean;
   chunkTokenNum: number;
@@ -129,6 +131,8 @@ function toParserConfig(raw: unknown): DatasetParserConfig {
     chunkTokenNum: tokens > 0 ? tokens : DEFAULT_CHUNK_TOKEN_NUM,
     delimiter: typeof dto.delimiter === "string" && dto.delimiter !== "" ? dto.delimiter : DEFAULT_DELIMITER,
     overlappedPercent: overlap > 0 ? overlap : DEFAULT_OVERLAPPED_PERCENT,
+    ...(dto.asr_model !== undefined ? {asrModel:text(dto.asr_model)} : {}),
+    ...(dto.audio_language !== undefined ? {audioLanguage:text(dto.audio_language)} : {}),
     ...(dto.image_model !== undefined ? {imageModel:text(dto.image_model)} : {}),
     ...(dto.picture_ocr_only !== undefined ? {pictureOcrOnly:dto.picture_ocr_only===true} : {}),
     ...(typeof dto.layout_recognize === "boolean" || typeof dto.layout_recognize === "string" ? { layoutRecognize: dto.layout_recognize } : {}),
@@ -207,6 +211,8 @@ export async function deleteDatasets(ids: string[], tenantId: string): Promise<s
 export type DatasetChunkingInput = Partial<{
   pages: [number, number][];
   layoutRecognize: boolean | string;
+  asrModel?: string;
+  audioLanguage?: string;
   imageModel: string;
   pictureOcrOnly: boolean;
   parserId: string;
@@ -227,6 +233,8 @@ export async function updateDatasetChunking(id: string, input: DatasetChunkingIn
   if (input.chunkTokenNum !== undefined) config.chunk_token_num = input.chunkTokenNum;
   if (input.delimiter !== undefined) config.delimiter = input.delimiter;
   if (input.overlappedPercent !== undefined) config.overlapped_percent = input.overlappedPercent;
+  if (input.asrModel !== undefined) config.asr_model = input.asrModel;
+  if (input.audioLanguage !== undefined) config.audio_language = input.audioLanguage || null;
   if (input.imageModel !== undefined) config.image_model = input.imageModel;
   if (input.pictureOcrOnly !== undefined) config.picture_ocr_only = input.pictureOcrOnly;
   if (input.layoutRecognize !== undefined) config.layout_recognize = input.layoutRecognize;

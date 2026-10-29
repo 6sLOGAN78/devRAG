@@ -40,7 +40,7 @@ from rag.llm.sync_loop import PrivateLoop
 logger = logging.getLogger(__name__)
 
 MAX_MODELS_PER_SAVE = 2
-MODEL_TYPES = ("chat", "embedding", "rerank", "vision")
+MODEL_TYPES = ("chat", "embedding", "rerank", "vision", "asr")
 _MODEL_NAME = re.compile(r"^[^\s@]{1,128}$")
 MAX_DIMENSION = 4096
 _TEST_MAX_COMPLETION_TOKENS = 16
@@ -232,6 +232,15 @@ def _test_model(settings: Settings, spec: ProviderSpec, model: ModelRequest, key
         "timeout": seconds,
     }
     try:
+        if model.model_type == "asr":
+            from rag.llm.asr_model import AsrModel
+            from rag.parsers.errors import ParserError
+            try:
+                probe_settings = dataclasses.replace(settings, deepdoc=dataclasses.replace(settings.deepdoc, timeout_seconds=seconds))
+                AsrModel(probe_settings, model.name, base_url).probe()
+            except ParserError:
+                raise ServiceError(Kind.UNAVAILABLE, reasons.MODEL_UNAVAILABLE, "the local speech model is not available") from None
+            return None
         if model.model_type == "vision":
             from rag.llm.vision_model import VisionBase
             sample=bytes.fromhex("89504e470d0a1a0a0000000d49484452000000010000000108060000001f15c4890000000d49444154789c6360f8cfc00000030101009a6e37190000000049454e44ae426082")

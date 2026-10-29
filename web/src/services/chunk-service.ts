@@ -1,3 +1,4 @@
+import { audioOf, type AudioView } from "./audio-features";
 import { slideOf, type SlideView } from "./slide-features";
 import { documentChunkPath, documentChunksPath } from "@/constants/api-paths";
 import { request } from "./http";
@@ -24,6 +25,7 @@ export interface ChunkPosition {
 export interface ChunkView {
   tables?: TableView[];
   slide?: SlideView;
+  audio?: AudioView;
   id: string;
   text: string;
   positions: ChunkPosition[];
@@ -65,6 +67,7 @@ export function toChunk(raw: unknown): ChunkView {
   const origin = text(dto.origin);
   return {
     id: text(dto.id),
+    ...(audioOf(dto.audio) ? {audio:audioOf(dto.audio)} : {}),
     ...(slideOf(dto.slide) ? {slide:slideOf(dto.slide)} : {}),
     ...(dto.tables !== undefined ? { tables: tableViewsOf(dto.tables) } : {}),
     text: text(dto.text),

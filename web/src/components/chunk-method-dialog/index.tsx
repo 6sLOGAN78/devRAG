@@ -49,6 +49,8 @@ function Body({ target, pendingRef, onClose }: { target: ChunkTarget; pendingRef
       run: detail.run,
       pages: detail.pages,
       layoutRecognize: detail.layoutRecognize,
+      asrModel:detail.asrModel,
+      audioLanguage:detail.audioLanguage,
       imageModel:detail.imageModel,
       pictureOcrOnly:detail.pictureOcrOnly,
     };
@@ -63,6 +65,8 @@ function Body({ target, pendingRef, onClose }: { target: ChunkTarget; pendingRef
       run: "0",
       pages: detail.parserConfig.pages,
       layoutRecognize: detail.parserConfig.layoutRecognize,
+      asrModel:detail.parserConfig.asrModel,
+      audioLanguage:detail.parserConfig.audioLanguage,
       imageModel:detail.parserConfig.imageModel,
       pictureOcrOnly:detail.parserConfig.pictureOcrOnly,
     };

@@ -59,6 +59,7 @@ export function ChunkCard({ chunk, number, total, selected, showPages, canChange
           <Button type="button" variant="ghost" size="sm" data-testid="chunk-select" aria-pressed={selected} onClick={onSelect}>
             {t("inspector.card.select", { n: number, total })}
           </Button>
+          {chunk.audio ? <Badge variant="outline" data-testid="chunk-audio">{t("source.audio", {start:chunk.audio.start.toFixed(2),end:chunk.audio.end.toFixed(2)})}</Badge> : null}
           {chunk.slide ? <Badge variant="outline" data-testid="chunk-slide">{t("source.slide", {number:chunk.slide.number})}</Badge> : null}
           {pages.map((page) => (
             <button

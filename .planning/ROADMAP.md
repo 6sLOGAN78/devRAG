@@ -587,7 +587,7 @@ Scope notes: this is the PROJECT.md Core Value. No Phase 6, 7 or 8 work starts u
 
 **Planning status (2026-10-27):** Research and UI contract complete; structural checks30/30,90 task verifications,58/58 primary requirements plus RETR-13 producer handoff covered. No Phase6 native package/model acquisition or paid inference performed. Automatic entry completed the read-only audit/preparation and stops at the exact-candidate blocking-human approval in06-01 Task2.20 audit-tool tests pass; native acquisition/features have not started. Phase5 human UAT and Phase4 B36 remain pending.
 
-**Execution status (2026-10-29):** 15/30 plans complete. Picture/vision verified: unit2655/8existing skips,web2173 plus label34,Go,Chrome1,stack57,services85,routes-leaks186,modelroutes20,providerkeys71,activecredentials33,CI7/security/generated/admission. Zero new packages/models/paid calls. Next16 Audio/ASR; full phase gate and human validation pending.
+**Execution status (2026-10-29):** 16/30 plans complete. Audio/ASR verified with explicit user spelling equivalence and retained3/3 local calls; no external paid calls. Unit2665/8existing skips plus reviewed19,web2178,Go,stack62,services89,routes-leaks186,provider/native65,modelroutes20,Chromechoice1,CI7/security/generated/admission. Next17 Email; full phase gate and human validation pending.
 
 **Wave 1** *(admission audit and blocking-human acquisition checkpoint)*
 
@@ -636,7 +636,7 @@ Scope notes: this is the PROJECT.md Core Value. No Phase 6, 7 or 8 work starts u
 - [x] 06-15-PLAN.md — Caption pictures with a configured vision model
 **Wave 16** *(blocked on Wave 15 completion and accepted06-01 snapshot)*
 
-- [ ] 06-16-PLAN.md — Transcribe audio into timestamped chunks
+- [x] 06-16-PLAN.md — Transcribe audio into timestamped chunks
 **Wave 17** *(blocked on Wave 16 completion and accepted06-01 snapshot)*
 
 - [ ] 06-17-PLAN.md — Read email envelopes and message bodies
@@ -753,6 +753,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8. Ph
 | 3. Models, Knowledge Bases and Upload | 31/31 | Complete | 2026-10-10 |
 | 4. Ingestion Pipeline | 35/35 | Human verification pending (B-36 deferred) | 2026-10-19 |
 | 5. Retrieval and Cited Chat (Core Value Gate) | 28/28 | Automated gate passed; human review pending | 2026-10-27 |
-| 6. Deep Parsing and Chunking Breadth | 15/30 | Executing; Picture passed | - |
+| 6. Deep Parsing and Chunking Breadth | 16/30 | Executing; Audio passed | - |
 | 7. Agents and Workflows | 0/TBD | Not started | - |
 | 8. Go Surface, CLI, Integrations, Billing and Production Deployment | 0/TBD | Not started | - |

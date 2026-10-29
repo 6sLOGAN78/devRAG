@@ -60,7 +60,7 @@ function ModelRow({ model, defaults }: { model: ModelView; defaults: DefaultsVie
   return (
     <li data-testid="model-row" className="flex flex-wrap items-center gap-2 text-sm">
       <span className="break-all font-mono">{model.name}</span>
-      <Badge>{model.type === "embedding" ? t("models.type.embedding") : t("models.type.chat")}</Badge>
+      <Badge>{t(`models.type.${model.type}`)}</Badge>
       {model.type === "embedding" && model.dimension !== null ? <span className="text-xs font-normal tabular-nums text-muted-foreground">{t("models.dimensions", { count: model.dimension })}</span> : null}
       {chosen !== null ? <Badge variant="outline">{chosen === "chat" ? t("models.badge.defaultChat") : t("models.badge.defaultEmbedding")}</Badge> : null}
     </li>

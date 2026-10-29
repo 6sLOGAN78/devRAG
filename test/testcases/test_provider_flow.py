@@ -389,7 +389,7 @@ def test_a_tei_rerank_model_is_saved_keyless_tested_once_and_listed_by_type(ingr
     assert [(m["name"], m["provider"], m["type"]) for m in listed] == [("tei-rerank", "TEI", "rerank")]
     assert ok(api(ingress, "GET", "/api/v1/models", owner.token, params={"type": "chat"})) == []
     assert next(p for p in ok(api(ingress, "GET", PROVIDERS, owner.token)) if p["name"] == "TEI")["configured"] is True
-    assert [p["name"] for p in ok(api(ingress, "GET", PROVIDERS, owner.token))][-1] == "TEI"
+    assert [p["name"] for p in ok(api(ingress, "GET", PROVIDERS, owner.token))][-2:] == ["TEI", "DeepDoc"]
 
 
 def test_a_tei_provider_without_an_address_uses_the_default_one_and_is_not_refused_by_the_address_guard(ingress: httpx.Client, registry: AccountRegistry, fake_provider_stack: FakeProvider) -> None:  # noqa: F811

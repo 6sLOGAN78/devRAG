@@ -27,6 +27,11 @@ describe("source drawer", () => {
   });
   afterEach(() => { client.clear(); vi.restoreAllMocks(); vi.unstubAllGlobals(); });
   const show = (value = source(), open = true) => render(<MemoryRouter><QueryClientProvider client={client}><SourceDrawer source={value} open={open} onOpenChange={vi.fn()} /></QueryClientProvider></MemoryRouter>);
+  it("shows original audio seconds without creating page geometry", () => {
+    show(source({doc_name:"speech.wav",positions:[],page_sizes:{},audio:{start:1.25,end:5.38}}));
+    expect(screen.getByTestId("source-audio")).toHaveTextContent("Audio 1.25–5.38 seconds");
+    expect(screen.queryByTestId("source-page-chip")).toBeNull();
+  });
   it("finds a sparse reference by index and uses a one-based label", () => { expect(source()).toMatchObject({ kind: "chat", number: 4, content: "A saved passage." }); expect(sourceFromReference(toReference({ chunks: [raw()] }), 0)).toBeNull(); });
   it("does not normalize an unavailable reference into an openable source", () => expect(sourceFromReference(toReference({ chunks: [{ index: 3, unavailable: true }] }), 3)).toBeNull());
   it("normalizes a retrieval hit with the supplied rank", () => expect(sourceFromHit(toSourceHit(raw()), 7)).toMatchObject({ kind: "hit", number: 7, docName: "report.pdf" }));

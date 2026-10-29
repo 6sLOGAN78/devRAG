@@ -17,7 +17,7 @@ from api.utils import reasons
 from common.model_ref import InvalidModelRef, ModelRef, parse_model_ref
 
 MODEL_TYPES = frozenset(tenant_model_service.TYPE_BITS)
-DEFAULT_SLOTS = ("chat", "embedding", "vision")
+DEFAULT_SLOTS = ("chat", "embedding", "vision", "asr")
 
 
 def model_dto(info: ModelInfo) -> dict[str, Any]:
@@ -36,14 +36,14 @@ def model_dto(info: ModelInfo) -> dict[str, Any]:
 
 def list_model_dtos(tenant_id: str, model_type: str | None) -> list[dict[str, Any]]:
     if model_type is not None and model_type not in MODEL_TYPES:
-        raise ServiceError(Kind.INVALID, reasons.MODELS_INVALID, "type must be chat, embedding, rerank or vision")
+        raise ServiceError(Kind.INVALID, reasons.MODELS_INVALID, "type must be chat, embedding, rerank, vision or asr")
     return [model_dto(m) for m in tenant_model_service.list_models(tenant_id, model_type)]
 
 
 def defaults_dto(tenant_id: str) -> dict[str, str]:
     """The workspace defaults as composite ids; an empty string means not set."""
     current = tenant_model_service.get_defaults(tenant_id)
-    return {"chat": current.chat, "embedding": current.embedding, "vision":current.vision}
+    return {"chat": current.chat, "embedding": current.embedding, "vision":current.vision,"asr":current.asr}
 
 
 def _ref(value: str) -> ModelRef:
@@ -59,7 +59,7 @@ def update_defaults(tenant_id: str, changes: Mapping[str, str | None]) -> dict[s
     if not changes:
         raise ServiceError(Kind.INVALID, reasons.MODELS_INVALID, "name at least one default to change")
     if not set(changes) <= set(DEFAULT_SLOTS):
-        raise ServiceError(Kind.INVALID, reasons.MODELS_INVALID, "only chat, embedding and vision defaults exist")
+        raise ServiceError(Kind.INVALID, reasons.MODELS_INVALID, "only chat, embedding, vision and asr defaults exist")
     resolved: dict[str, ModelRef | None | Unset] = {}
     for slot in DEFAULT_SLOTS:
         if slot not in changes:
@@ -67,5 +67,5 @@ def update_defaults(tenant_id: str, changes: Mapping[str, str | None]) -> dict[s
             continue
         value = changes[slot]
         resolved[slot] = None if value is None else _ref(value)
-    tenant_model_service.set_defaults(tenant_id, chat=resolved["chat"], embedding=resolved["embedding"],vision=resolved["vision"])
+    tenant_model_service.set_defaults(tenant_id, chat=resolved["chat"], embedding=resolved["embedding"],vision=resolved["vision"],asr=resolved["asr"])
     return defaults_dto(tenant_id)

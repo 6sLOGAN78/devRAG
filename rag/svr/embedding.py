@@ -53,7 +53,7 @@ class EmbedRunner:
         with self._limiters.embed_limiter:
             bundle = self._bundle(ctx, dimension)
             release_database_connection()
-            if ctx.parser_id in {"one", "manual", "qa", "book", "paper", "laws", "presentation", "table", "picture"}:
+            if ctx.parser_id in {"one", "manual", "qa", "book", "paper", "laws", "presentation", "table", "picture", "audio"}:
                 from rag.nlp.token_count import count_tokens
                 from rag.svr.failure import TaskFailure
 
@@ -77,6 +77,19 @@ class EmbedRunner:
                 return bundle.describe(image)
         control.check()
         result = wait_for(self._executor().submit(describe),control)
+        control.check()
+        return result
+
+    def transcribe_audio(self, content: bytes, model_id: str, ctx: TaskContext, control: TaskControl, language: str | None = None):
+        def transcribe():
+            release_database_connection()
+            with self._limiters.embed_limiter:
+                control.check()
+                bundle = LLMBundle(ctx.tenant_id, model_id, "asr", settings=self._settings)
+                control.check()
+                return bundle.transcribe(content, language)
+        control.check()
+        result = wait_for(self._executor().submit(transcribe), control)
         control.check()
         return result
 

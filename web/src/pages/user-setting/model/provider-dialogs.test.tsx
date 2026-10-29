@@ -69,6 +69,7 @@ interface Provider {
 }
 
 const SLUGS = [
+  ["DeepDoc", "deepdoc"],
   ["OpenAI", "openai"],
   ["Azure-OpenAI", "azure-openai"],
   ["Ollama", "ollama"],
@@ -299,7 +300,7 @@ describe("row actions (UI-37, D-07)", () => {
     useWorkspaceStore.getState().initialise("u1", "t1", stored(memberships));
     renderPage();
     await screen.findByTestId("provider-row-openai");
-    expect(screen.getAllByTestId("provider-setup")).toHaveLength(4);
+    expect(screen.getAllByTestId("provider-setup")).toHaveLength(5);
     expect(screen.getAllByTestId("provider-delete")).toHaveLength(1);
   });
 
@@ -863,3 +864,14 @@ function expectNoLongServerText(): void {
   // The over-long reason is replaced by the fallback sentence, so none of its characters can reach the page.
   expect(document.body.innerHTML).not.toContain("x".repeat(100));
 }
+
+it("sets up approved local speech recognition without a credential or arbitrary URL", async () => {
+  providers=build({});
+  const user=await openFrom("deepdoc","Set up DeepDoc");
+  expect(screen.queryByTestId("field-provider-key")).toBeNull();
+  expect(screen.queryByTestId("field-base-url")).toBeNull();
+  expect(screen.queryByTestId("field-chat-model")).toBeNull();
+  await user.click(screen.getByTestId("provider-submit"));
+  await waitFor(()=>expect(writes("put")).toHaveLength(1));
+  expect(bodyOf(writes("put")[0]!)).toEqual({tenant_id:"t1",provider:"deepdoc",instance_name:"default",models:[{name:"faster-whisper-tiny",type:"asr"}]});
+});

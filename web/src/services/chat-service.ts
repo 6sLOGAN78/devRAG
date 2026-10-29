@@ -1,3 +1,4 @@
+import { audioOf, type AudioView } from "./audio-features";
 import { slideOf, type SlideView } from "./slide-features";
 import { chatPath, chatsPath, chatSessionPath, chatSessionsPath, messageFeedbackPath } from "@/constants/api-paths";
 import { toPosition, type ChunkPosition } from "./chunk-service";
@@ -16,6 +17,7 @@ export interface SessionView { id: string; chatId: string; name: string; createT
 export interface SourceHit {
   tables?: TableView[];
   slide?: SlideView;
+  audio?: AudioView;
   chunkId: string; docId: string; docName: string; datasetId: string; content: string;
   positions: ChunkPosition[]; pageSizes: Record<string, [number, number]>;
   similarity: number | null; termSimilarity: number | null; vectorSimilarity: number | null; rerankSimilarity: number | null;
@@ -69,6 +71,7 @@ export function toSourceHit(raw: unknown): SourceHit {
   const d = asRecord(raw);
   const sizes = Object.entries(asRecord(d.page_sizes)).filter(([, v]) => Array.isArray(v) && v.length === 2 && v.every((n) => typeof n === "number" && Number.isFinite(n)));
   return {
+    ...(audioOf(d.audio) ? {audio:audioOf(d.audio)} : {}),
     ...(slideOf(d.slide) ? {slide:slideOf(d.slide)} : {}),
     ...(d.tables !== undefined ? { tables: tableViewsOf(d.tables) } : {}),
     chunkId: text(d.chunk_id), docId: text(d.doc_id), docName: text(d.doc_name), datasetId: text(d.dataset_id), content: text(d.content),

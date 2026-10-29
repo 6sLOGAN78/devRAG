@@ -30,7 +30,7 @@ def test_suffix_is_case_insensitive_and_tolerates_a_dot():
     assert router.parser_for_suffix(".Md").name == "markdown"
 
 
-@pytest.mark.parametrize("suffix", ["gif", "bmp", "mp3", "wav", "exe", ""])
+@pytest.mark.parametrize("suffix", ["gif", "bmp", "exe", ""])
 def test_unparseable_suffixes_raise(suffix):
     assert router.parseable(suffix) is False
     with pytest.raises(UnsupportedType) as info:
@@ -47,7 +47,7 @@ def test_every_router_suffix_is_an_allowed_upload_extension():
 
 
 def test_loaders_are_dotted_module_paths_and_importing_router_is_light():
-    assert {spec.loader for spec in router.PARSERS} == {f"rag.parsers.{n}" for n in ("pdf", "docx", "xlsx", "pptx", "html", "txt", "markdown", "json", "csv", "epub", "image")}
+    assert {spec.loader for spec in router.PARSERS} == {f"rag.parsers.{n}" for n in ("pdf", "docx", "xlsx", "pptx", "html", "txt", "markdown", "json", "csv", "epub", "image", "audio")}
 
 
 def test_types_are_frozen_and_report_caps_notes():

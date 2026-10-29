@@ -237,6 +237,8 @@ export interface DocumentDetailView extends DocumentView {
   assets?: DocumentAssetView[];
   pages?: [number, number][];
   layoutRecognize?: boolean | string;
+  asrModel?: string;
+  audioLanguage?: string;
   imageModel?: string;
   pictureOcrOnly?: boolean;
   chunkTokenNum: number;
@@ -258,6 +260,8 @@ export async function getDocument(datasetId: string, docId: string): Promise<Doc
     delimiter: text(dto.delimiter),
     overlappedPercent: count(dto.overlapped_percent),
     preview: dto.preview === "pages" ? "pages" : "none",
+    ...(dto.asr_model !== undefined ? {asrModel:text(dto.asr_model)} : {}),
+    ...(dto.audio_language !== undefined ? {audioLanguage:text(dto.audio_language)} : {}),
     ...(dto.image_model !== undefined ? {imageModel:text(dto.image_model)} : {}),
     ...(dto.picture_ocr_only !== undefined ? {pictureOcrOnly:dto.picture_ocr_only===true} : {}),
     ...(typeof dto.layout_recognize === "boolean" || typeof dto.layout_recognize === "string" ? { layoutRecognize: dto.layout_recognize } : {}),
@@ -268,6 +272,8 @@ export async function getDocument(datasetId: string, docId: string): Promise<Doc
 export interface DocumentSettingsChanges {
   pages?: [number, number][];
   layoutRecognize?: boolean | string;
+  asrModel?: string;
+  audioLanguage?: string;
   imageModel?: string;
   pictureOcrOnly?: boolean;
   parserId?: string;
@@ -287,6 +293,8 @@ export async function updateDocumentSettings(datasetId: string, docId: string, c
   if (changes.chunkTokenNum !== undefined) config.chunk_token_num = changes.chunkTokenNum;
   if (changes.delimiter !== undefined) config.delimiter = changes.delimiter;
   if (changes.overlappedPercent !== undefined) config.overlapped_percent = changes.overlappedPercent;
+  if (changes.asrModel !== undefined) config.asr_model = changes.asrModel;
+  if (changes.audioLanguage !== undefined) config.audio_language = changes.audioLanguage || null;
   if (changes.imageModel !== undefined) config.image_model = changes.imageModel;
   if (changes.pictureOcrOnly !== undefined) config.picture_ocr_only = changes.pictureOcrOnly;
   if (changes.layoutRecognize !== undefined) config.layout_recognize = changes.layoutRecognize;
@@ -301,6 +309,8 @@ export async function updateDocumentSettings(datasetId: string, docId: string, c
     delimiter: text(dto.delimiter),
     overlappedPercent: count(dto.overlapped_percent),
     preview: dto.preview === "pages" ? "pages" : "none",
+    ...(dto.asr_model !== undefined ? {asrModel:text(dto.asr_model)} : {}),
+    ...(dto.audio_language !== undefined ? {audioLanguage:text(dto.audio_language)} : {}),
     ...(dto.image_model !== undefined ? {imageModel:text(dto.image_model)} : {}),
     ...(dto.picture_ocr_only !== undefined ? {pictureOcrOnly:dto.picture_ocr_only===true} : {}),
     ...(typeof dto.layout_recognize === "boolean" || typeof dto.layout_recognize === "string" ? { layoutRecognize: dto.layout_recognize } : {}),

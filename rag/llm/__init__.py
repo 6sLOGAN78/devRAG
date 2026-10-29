@@ -21,6 +21,7 @@ class Provider(StrEnum):
     OPENROUTER = "OpenRouter"
     OPENAI_COMPATIBLE = "OpenAI-API-Compatible"
     TEI = "TEI"
+    DEEPDOC = "DeepDoc"
 
 
 class UnknownProvider(ValueError):
@@ -49,6 +50,7 @@ PROVIDER_SPECS: tuple[ProviderSpec, ...] = (
     ProviderSpec(Provider.OPENAI_COMPATIBLE, "openai-compatible", "openai/", None, "optional", "required", False, False, ("chat", "embedding", "vision")),
     # Rerank only, no key, the compose service address (D-01, R-206). The exact default address skips the SSRF guard.
     ProviderSpec(Provider.TEI, "tei", "", "http://tei:80", "none", "default", False, False, ("rerank",)),
+    ProviderSpec(Provider.DEEPDOC, "deepdoc", "", "http://deepdoc:9390", "none", "default", False, False, ("asr",)),
 )
 
 # Names kept after the reference implementation (rag/llm/__init__.py) so docs and code read alike.

@@ -30,6 +30,8 @@ class ParserConfig(BaseModel):
     layout_recognize: StrictBool | StrictStr = True
     auto_keywords: StrictInt = Field(default=0, ge=0, le=32)
     table_context_size: StrictInt = Field(default=0, ge=0)
+    asr_model: StrictStr = Field(default="", max_length=128)
+    audio_language: StrictStr | None = Field(default=None, pattern=r"^[a-z]{2,3}$")
     image_model: StrictStr = Field(default="",max_length=128)
     picture_ocr_only: StrictBool = False
     image_context_size: StrictInt = Field(default=0, ge=0)

@@ -3,7 +3,7 @@
  * read. Provider names are product names and are not translated, except the one the UI-SPEC gives a key
  * (`models.provider.compatible.name`). Slugs match the API (`rag/llm/__init__.py`).
  */
-export type ProviderSlug = "openai" | "azure-openai" | "ollama" | "openrouter" | "openai-compatible";
+export type ProviderSlug = "openai" | "azure-openai" | "ollama" | "openrouter" | "openai-compatible" | "deepdoc";
 
 export interface ProviderSpec {
   slug: ProviderSlug;
@@ -32,6 +32,7 @@ const DEFAULT_FIELDS = {
 } as const;
 
 export const PROVIDERS: readonly ProviderSpec[] = [
+  {slug:"deepdoc",name:"DeepDoc",descriptionKey:"models.provider.deepdoc.description",fields:{...DEFAULT_FIELDS,baseUrl:"none",apiVersion:false,key:"none"},modelExamples:["faster-whisper-tiny",""]},
   {
     slug: "openai",
     name: "OpenAI",

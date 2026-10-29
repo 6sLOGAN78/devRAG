@@ -140,6 +140,12 @@ def _parse_and_chunk(ctx: TaskContext, deps: PipelineDeps, control: TaskControl,
 
     with deps.limiters.chunk_limiter:
         options = {"settings": deps.settings, "parser_config": ctx.parser_config} if spec.name in {"pdf","image"} else ({"settings": deps.settings} if spec.name in {"docx", "pptx"} else {})
+        if spec.name == "audio":
+            from api.db.services.tenant_model_service import get_defaults
+            model_id = ctx.parser_config.get("asr_model") or get_defaults(ctx.tenant_id).asr
+            if not model_id:
+                raise TaskFailure("parse", "model_unavailable")
+            options = {"transcribe": lambda content: deps.embedder.transcribe_audio(content, model_id, ctx, control, ctx.parser_config.get("audio_language"))}
         if ctx.parser_id == "table" and spec.name in {"csv", "xlsx"}:
             options["structured_tables"] = True
             if spec.name == "csv":

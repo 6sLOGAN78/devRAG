@@ -670,6 +670,13 @@ export interface components {
             /** Vector Similarity Weight */
             vector_similarity_weight: number;
         };
+        /** AudioView */
+        AudioView: {
+            /** End */
+            end: number;
+            /** Start */
+            start: number;
+        };
         BuiltinPipelineTemplate: {
             available: boolean;
             description: string;
@@ -709,6 +716,8 @@ export interface components {
         };
         /** ChunkView */
         ChunkView: {
+            /** @default null */
+            audio: components["schemas"]["AudioView"] | null;
             /** Enabled */
             enabled: boolean;
             /** Id */
@@ -729,6 +738,16 @@ export interface components {
          * @description The three chunking values one document may change. A bad value is a typed 400 ``parser_config_invalid`` from the service, so the types are open here.
          */
         ChunkingValues: {
+            /**
+             * Asr Model
+             * @default null
+             */
+            asr_model: unknown;
+            /**
+             * Audio Language
+             * @default null
+             */
+            audio_language: unknown;
             /**
              * Chunk Token Num
              * @default null
@@ -844,6 +863,8 @@ export interface components {
         };
         /** DefaultsView */
         DefaultsView: {
+            /** Asr */
+            asr: string;
             /** Chat */
             chat: string;
             /** Embedding */
@@ -893,8 +914,18 @@ export interface components {
         };
         /** DocumentDetailView */
         DocumentDetailView: {
+            /**
+             * Asr Model
+             * @default
+             */
+            asr_model: string;
             /** Assets */
             assets?: components["schemas"]["DocumentAssetView"][];
+            /**
+             * Audio Language
+             * @default null
+             */
+            audio_language: string | null;
             /** Chunk Count */
             chunk_count: number;
             /** Chunk Token Num */
@@ -1197,7 +1228,7 @@ export interface components {
              * Type
              * @enum {string}
              */
-            type: "chat" | "embedding" | "rerank" | "vision";
+            type: "chat" | "embedding" | "rerank" | "vision" | "asr";
         };
         /** ModelDescription */
         ModelDescription: {
@@ -2841,6 +2872,11 @@ export interface operations {
         requestBody?: {
             content: {
                 "application/json": {
+                    /**
+                     * Asr
+                     * @default null
+                     */
+                    asr?: string | null;
                     /**
                      * Chat
                      * @default null

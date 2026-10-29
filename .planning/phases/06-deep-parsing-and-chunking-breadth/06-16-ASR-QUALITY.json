@@ -1,0 +1,29 @@
+{
+  "scope": "Descriptive accuracy measurements only; no post hoc WER pass threshold. Case/punctuation tokenization; canonical form also maps written numbers to digits and only the user-approved light house/lighthouse spelling equivalence. Original source transcripts retained unchanged.",
+  "source_duration_seconds": 5.38,
+  "observations_sha256": "23c5b247c47bea8774bfef63d1b55d87e5223d320309cc26d209c5357a107c38",
+  "results": {
+    "wav": {
+      "numeric_facts_correct": 2,
+      "numeric_facts_total": 2,
+      "raw_token_edits": 8,
+      "raw_reference_words": 14,
+      "raw_word_error_rate": 0.5714285714285714,
+      "canonical_token_edits": 2,
+      "canonical_reference_words": 12,
+      "canonical_word_error_rate": 0.16666666666666666
+    },
+    "mp3": {
+      "numeric_facts_correct": 2,
+      "numeric_facts_total": 2,
+      "raw_token_edits": 6,
+      "raw_reference_words": 14,
+      "raw_word_error_rate": 0.42857142857142855,
+      "canonical_token_edits": 0,
+      "canonical_reference_words": 12,
+      "canonical_word_error_rate": 0.0
+    }
+  },
+  "wav_native_seconds": 0.597517919999973,
+  "mp3_pipeline_seconds": 6.147155214999884
+}

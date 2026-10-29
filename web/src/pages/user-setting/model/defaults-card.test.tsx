@@ -35,13 +35,13 @@ interface Model {
   id: string;
   name: string;
   provider: string;
-  type: "chat" | "embedding" | "vision";
+  type: "chat" | "embedding" | "vision" | "asr";
   dimension: number | null;
   max_tokens: number;
   instance: string;
   used_tokens: number;
 }
-const model = (id: string, type: "chat" | "embedding" | "vision"): Model => {
+const model = (id: string, type: "chat" | "embedding" | "vision" | "asr"): Model => {
   const [name, provider] = id.split("@") as [string, string];
   return { id, name, provider, type, dimension: type === "embedding" ? 8 : null, max_tokens: 8192, instance: "default", used_tokens: 0 };
 };
@@ -56,7 +56,7 @@ interface Forced {
 const originalAdapter = http.defaults.adapter;
 let calls: InternalAxiosRequestConfig[] = [];
 let models: Model[] = [];
-let saved: { chat: string; embedding: string; vision?:string } = { chat: "", embedding: "" };
+let saved: { chat: string; embedding: string; vision?:string;asr?:string } = { chat: "", embedding: "" };
 let forced: Record<string, Forced> = {};
 
 const ok = (config: InternalAxiosRequestConfig, data: unknown) =>
@@ -78,8 +78,8 @@ function serve(config: InternalAxiosRequestConfig): unknown {
   }
   if (key === "GET /api/v1/models/default") return ok(config, saved);
   if (key === "PATCH /api/v1/models/default") {
-    const body = JSON.parse(String(config.data)) as { chat?: string | null; embedding?: string | null;vision?:string|null };
-    saved = { chat: body.chat === undefined ? saved.chat : (body.chat ?? ""), embedding: body.embedding === undefined ? saved.embedding : (body.embedding ?? ""), ...(body.vision !== undefined ? {vision:body.vision ?? ""} : saved.vision !== undefined ? {vision:saved.vision} : {}) };
+    const body = JSON.parse(String(config.data)) as { chat?: string | null; embedding?: string | null;vision?:string|null;asr?:string|null };
+    saved = { ...(body.asr !== undefined ? {asr:body.asr ?? ""} : saved.asr !== undefined ? {asr:saved.asr} : {}), chat: body.chat === undefined ? saved.chat : (body.chat ?? ""), embedding: body.embedding === undefined ? saved.embedding : (body.embedding ?? ""), ...(body.vision !== undefined ? {vision:body.vision ?? ""} : saved.vision !== undefined ? {vision:saved.vision} : {}) };
     return ok(config, saved);
   }
   return failure(config, { status: 404, message: "not found" });
@@ -356,4 +356,15 @@ it("saves a configured vision default without changing chat or embedding", async
   await user.click(screen.getByTestId("defaults-submit"));
   await waitFor(()=>expect(patches()).toHaveLength(1));
   expect(JSON.parse(String(patches()[0]!.data))).toEqual({tenant_id:"t1",vision});
+});
+
+it("saves the configured local speech default without changing existing slots", async () => {
+  const asr="faster-whisper-tiny@DeepDoc";
+  models=[...ALL,model(asr,"asr")];saved={chat:CHAT_A,embedding:EMBED_A,asr:""};
+  const user=userEvent.setup();renderCard();
+  const select=await screen.findByLabelText("Default speech model");
+  await user.selectOptions(select,asr);await user.click(screen.getByTestId("defaults-submit"));
+  await waitFor(()=>expect(patches()).toHaveLength(1));
+  expect(JSON.parse(String(patches()[0]!.data))).toEqual({tenant_id:"t1",asr});
+  await waitFor(()=>expect(saved.asr).toBe(asr));
 });

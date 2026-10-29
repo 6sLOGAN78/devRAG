@@ -127,6 +127,24 @@
         "title": "AssistantView",
         "type": "object"
       },
+      "AudioView": {
+        "properties": {
+          "end": {
+            "title": "End",
+            "type": "number"
+          },
+          "start": {
+            "title": "Start",
+            "type": "number"
+          }
+        },
+        "required": [
+          "start",
+          "end"
+        ],
+        "title": "AudioView",
+        "type": "object"
+      },
       "BuiltinPipelineTemplate": {
         "additionalProperties": false,
         "properties": {
@@ -241,6 +259,17 @@
       },
       "ChunkView": {
         "properties": {
+          "audio": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AudioView"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
           "enabled": {
             "title": "Enabled",
             "type": "boolean"
@@ -297,6 +326,14 @@
         "additionalProperties": false,
         "description": "The three chunking values one document may change. A bad value is a typed 400 ``parser_config_invalid`` from the service, so the types are open here.",
         "properties": {
+          "asr_model": {
+            "default": null,
+            "title": "Asr Model"
+          },
+          "audio_language": {
+            "default": null,
+            "title": "Audio Language"
+          },
           "chunk_token_num": {
             "default": null,
             "title": "Chunk Token Num"
@@ -527,6 +564,10 @@
       },
       "DefaultsView": {
         "properties": {
+          "asr": {
+            "title": "Asr",
+            "type": "string"
+          },
           "chat": {
             "title": "Chat",
             "type": "string"
@@ -543,7 +584,8 @@
         "required": [
           "chat",
           "embedding",
-          "vision"
+          "vision",
+          "asr"
         ],
         "title": "DefaultsView",
         "type": "object"
@@ -663,12 +705,29 @@
       },
       "DocumentDetailView": {
         "properties": {
+          "asr_model": {
+            "default": "",
+            "title": "Asr Model",
+            "type": "string"
+          },
           "assets": {
             "items": {
               "$ref": "#/components/schemas/DocumentAssetView"
             },
             "title": "Assets",
             "type": "array"
+          },
+          "audio_language": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Audio Language"
           },
           "chunk_count": {
             "title": "Chunk Count",
@@ -1544,7 +1603,8 @@
               "chat",
               "embedding",
               "rerank",
-              "vision"
+              "vision",
+              "asr"
             ],
             "title": "Type",
             "type": "string"
@@ -4902,6 +4962,18 @@
                 "additionalProperties": false,
                 "description": "No length bound on the ids on purpose: an over-long id is a typed ``model_unavailable`` from the service, like any other bad id.",
                 "properties": {
+                  "asr": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null,
+                    "title": "Asr"
+                  },
                   "chat": {
                     "anyOf": [
                       {

@@ -1,0 +1,14 @@
+{
+  "models": {
+    "type": { "asr": "Speech recognition", "rerank": "Reranking" },
+    "defaults": { "asr": "Default speech model" },
+    "provider": { "deepdoc": { "description": "Local speech recognition using the configured service and approved tiny model." } }
+  },
+  "datasets": { "chunking": {
+    "audioSettings": "Transcribes WAV or MP3 up to 60 seconds into timestamped speech segments. Choose a configured speech model. Empty selection uses your workspace default.",
+    "asrModel": "Speech model",
+    "audioLanguage": "Expected language code (optional)",
+    "audioLanguageHelp": "For example en or zh. A detected language mismatch stops parsing."
+  } },
+  "source": { "audio": "Audio {{start}}–{{end}} seconds" }
+}

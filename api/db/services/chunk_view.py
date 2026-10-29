@@ -10,6 +10,7 @@ from collections.abc import Iterable, Mapping
 from typing import Any
 
 from rag.parsers.slides import slide_of
+from rag.parsers.audio_segments import audio_of
 from rag.parsers.table_features import TABLE_FIELD, tables_of
 
 POSITION_STRIDE = 5
@@ -50,4 +51,5 @@ def merge_page_sizes(parts: Iterable[Mapping[str, list[float]]]) -> dict[str, li
 def chunk_view_fields(row: Mapping[str, Any]) -> dict[str, Any]:
     """The two location keys of one chunk view."""
     slide = slide_of(row)
-    return {**({"slide": slide} if slide else {}), "positions": positions_of(row), "page_sizes": page_sizes_of(row), **({"tables": tables_of(row)} if row.get(TABLE_FIELD) else {})}
+    audio = audio_of(row)
+    return {**({"audio": audio} if audio else {}), **({"slide": slide} if slide else {}), "positions": positions_of(row), "page_sizes": page_sizes_of(row), **({"tables": tables_of(row)} if row.get(TABLE_FIELD) else {})}

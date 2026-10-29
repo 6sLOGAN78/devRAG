@@ -1,0 +1,22 @@
+---
+phase: 06-deep-parsing-and-chunking-breadth
+plan: "16"
+subsystem: audio-asr
+requirements-completed: []
+---
+
+# Plan06-16: Transcribe audio into timestamped chunks
+
+WAV/MP3 bytes are decoded only in isolated DeepDoc, bounded to16MiB/60seconds/mono16kHz samples. The exact approved tiny snapshot is hash verified and loaded CPU int8/local-only,2threads/1worker, no VAD/model fetch. Authenticated ASR shares the one-slot native executor/deadline. Corrupt, silent, oversize, language mismatch and invalid result/refusal cases fail with fixed errors. Source audio remains owned by its document, with real monotonic segment seconds and no PDF boxes.
+
+DeepDoc is a credential-free ASR provider using only the operator-configured service and fixed model. Typebit4/composite IDs and existing Tenant ASR default columns preserve old capabilities/defaults/keys. LLMBundle and named provider executor check cancellation before queued work and after results. Audio is a distinct chunker; typed timestamps survive index/search/chunkAPI/retrieval/reference/service mappers, source drawer and chunk inspector. Saved model/language choices and explicit workspace default selectors use existing forms, with EN/ZH copy; generated schema/types and Python/Go/frontend availability agree.
+
+Acquisition:27 approved closure wheels verified against frozen hashes,18 additional native vendor pins; root dependencies unchanged. Exact tiny bundle78207087bytes/revd90ca5fe260221311c53c58e660288d3deb8d356 verified, including Git blob identities for small files. Native production recipe includes the exact hash lock; reusable vendor image and current build bases recorded. Existing provisioning module gains explicit --asr; cached verification acquires nothing. No new package/model outside approved packet, no system/npm package or external paid call.
+
+Verification: root2665passed/8existing skips plus final reviewed19 (includes malformed-refusal RED->fixed). Frontend2178passed110files plus96focused,Go,CI7/security/generated/OpenAPI/admission. Prior feature native/browser stack62passed; current rebuilt services89passed; ownership/schema/leaks186; provider/native65; modelroutes20. Chrome choice/save/reopen1passes without automatic transcription. Actual MP3 worker/retrieval/source shows0–5s and recorded fact52/73; screenshot inspected.
+
+Accuracy gate exception is explicit: all3 approved local submissions were used (WAV,saveprobe,MP3), and original WAV/MP3 pytest runs failed the literal lighthouse spelling after recovering numeric facts. User answered “Accept spelling equivalence,” permitting only light house/lighthouse equivalence without changing source text or numeric/ownership/timestamp guards. Raw output/logs and exact acceptance are retained. Accepted recorded outputs validate offline; captured real WAV transcript replays through real worker/index to verify geometry/identity without a fourth inference. Wrong values, missing labels and swapped subjects still refuse. No original failure log is relabeled green. WAV native call0.5975s with beam1 says calibration of set; final bounded beam5 MP3 says calibration offset, end-to-end6.147s. Both numeric facts match on each original5.38s fixture. Descriptive canonical word error is2/12 for the original beam1 WAV and0/12 for beam5 MP3 after number/spelling equivalence; raw token measurements are retained in06-16-ASR-QUALITY.json, with no post hoc WER pass threshold. This is not a word-perfect transcription claim. Phase30 must preserve the3-call evidence, never replay it automatically.
+
+Review: inline self-review. Missing native route/type/timestamp behavior was RED first. Invalid native refusal shape was later RED and fixed in client. Reboot reset hostmap65530 and stopped services; user restored262144 and all services recovered. Early prerequisite/cleanup errors are superseded by restored runs. Low disk caused four MinIO write refusals; authorized exact160 unused/unshared immutable regular cache IDs reclaimed3.383GB with identical Docker image inventory, and storage checks passed after cleanup. Unbuilt-method fixtures now use Resume, retaining refusal assertions. Existing images, service containers, volumes, networks and project files were preserved. No requirements checkbox changes or broad paid replay.
+
+R247 accepted automatically, not user-reviewed; the narrow spelling decision is separately user-approved. Phase5 final human acceptance,Phase4B36/fullPhase6gate/UAT remain pending. Continue17 Email.

@@ -31,7 +31,7 @@ VIEW = "view_models"
 SET_DEFAULT = "set_default_models"
 LOOKUP_TIMEOUT_SECONDS = 10.0
 _TENANT_ID_PATTERN = r"^[0-9a-f]{32}$"
-_SLOTS = ("chat", "embedding", "vision")
+_SLOTS = ("chat", "embedding", "vision", "asr")
 
 
 class DefaultsBody(BaseModel):
@@ -42,6 +42,7 @@ class DefaultsBody(BaseModel):
     chat: str | None = None
     embedding: str | None = None
     vision: str | None = None
+    asr: str | None = None
     tenant_id: str | None = Field(default=None, pattern=_TENANT_ID_PATTERN)
 
 
@@ -66,6 +67,7 @@ class DefaultsView(BaseModel):
     chat: str
     embedding: str
     vision: str
+    asr: str
 
 
 class DefaultsEnvelope(BaseModel):

@@ -48,9 +48,10 @@ export interface DefaultsView {
   chat: string;
   embedding: string;
   vision?: string;
+  asr?: string;
 }
 
-export type ModelType = "chat" | "embedding" | "rerank" | "vision";
+export type ModelType = "chat" | "embedding" | "rerank" | "vision" | "asr";
 
 interface ModelDto {
   id: string;
@@ -84,6 +85,7 @@ interface DefaultsDto {
   chat: string;
   embedding: string;
   vision?: string;
+  asr?: string;
 }
 
 const text = (value: unknown): string => (typeof value === "string" ? value : "");
@@ -147,7 +149,7 @@ export async function listModels(tenantId: string, type?: ModelType): Promise<Mo
 export async function getDefaults(tenantId: string): Promise<DefaultsView> {
   const dto = await request<unknown>({ url: modelsDefaultPath, method: "GET", params: { tenant_id: tenantId } }, { silent: true });
   const record = asRecord(dto) as Partial<DefaultsDto>;
-  return { chat: text(record.chat), embedding: text(record.embedding), ...(record.vision !== undefined ? {vision:text(record.vision)} : {}) };
+  return { chat: text(record.chat), embedding: text(record.embedding), ...(record.vision !== undefined ? {vision:text(record.vision)} : {}), ...(record.asr !== undefined ? {asr:text(record.asr)} : {}) };
 }
 
 /** A request that tests a provider with real calls can take two server tests of 20 seconds each (Pitfall 8). */
@@ -192,8 +194,8 @@ function present(value: string | undefined): string | undefined {
  */
 export function registeredModelFor(provider: ProviderView | undefined): RegisteredModel[] {
   const models = provider?.models ?? [];
-  const chosen = models.find((m) => m.type === "chat") ?? models.find((m) => m.type === "embedding") ?? models.find((m) => m.type === "vision");
-  return chosen === undefined ? [] : [{ name: chosen.name, type: chosen.type === "embedding" ? "embedding" : chosen.type === "vision" ? "vision" : "chat" }];
+  const chosen = models.find((m) => m.type === "chat") ?? models.find((m) => m.type === "embedding") ?? models.find((m) => m.type === "vision") ?? models.find((m) => m.type === "asr");
+  return chosen === undefined ? [] : [{ name: chosen.name, type: chosen.type === "embedding" ? "embedding" : chosen.type === "vision" ? "vision" : chosen.type === "asr" ? "asr" : "chat" }];
 }
 
 /**
@@ -232,6 +234,7 @@ export interface DefaultsChanges {
   chat?: string | null;
   embedding?: string | null;
   vision?: string | null;
+  asr?: string | null;
 }
 
 /**
@@ -243,7 +246,8 @@ export async function saveDefaults(tenantId: string, changes: DefaultsChanges): 
   if (changes.chat !== undefined) data.chat = changes.chat;
   if (changes.embedding !== undefined) data.embedding = changes.embedding;
   if (changes.vision !== undefined) data.vision = changes.vision;
+  if (changes.asr !== undefined) data.asr = changes.asr;
   const raw = await request<unknown>({ url: modelsDefaultPath, method: "PATCH", data }, { silent: true });
   const record = asRecord(raw) as Partial<DefaultsDto>;
-  return { chat: text(record.chat), embedding: text(record.embedding), ...(record.vision !== undefined ? {vision:text(record.vision)} : {}) };
+  return { chat: text(record.chat), embedding: text(record.embedding), ...(record.vision !== undefined ? {vision:text(record.vision)} : {}), ...(record.asr !== undefined ? {asr:text(record.asr)} : {}) };
 }

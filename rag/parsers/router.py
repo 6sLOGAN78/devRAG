@@ -23,6 +23,7 @@ class ParserSpec:
 
 
 PARSERS: tuple[ParserSpec, ...] = (
+    ParserSpec("audio", frozenset({"wav", "mp3"}), "rag.parsers.audio"),
     ParserSpec("image",frozenset({"png","jpg","jpeg"}),"rag.parsers.image"),
     ParserSpec("pdf", frozenset({"pdf"}), "rag.parsers.pdf"),
     ParserSpec("docx", frozenset({"docx"}), "rag.parsers.docx"),

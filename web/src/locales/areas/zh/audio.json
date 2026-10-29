@@ -1,0 +1,14 @@
+{
+  "models": {
+    "type": { "asr": "语音识别", "rerank": "重排序" },
+    "defaults": { "asr": "默认语音模型" },
+    "provider": { "deepdoc": { "description": "使用已配置的本地服务和已批准的 tiny 模型识别语音。" } }
+  },
+  "datasets": { "chunking": {
+    "audioSettings": "将最长 60 秒的 WAV 或 MP3 转为带时间戳的语音片段。请选择已配置的语音模型；留空将使用工作区默认模型。",
+    "asrModel": "语音模型",
+    "audioLanguage": "预期语言代码（可选）",
+    "audioLanguageHelp": "例如 en 或 zh。检测到的语言不符时会停止解析。"
+  } },
+  "source": { "audio": "音频 {{start}}–{{end}} 秒" }
+}

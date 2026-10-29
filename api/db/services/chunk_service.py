@@ -56,9 +56,10 @@ WRITE_DEADLINE_SECONDS = 40.0
 _RUNNING = "1"
 _ENABLED = "1"
 from rag.parsers.slides import slide_of
+from rag.parsers.audio_segments import audio_of
 from rag.parsers.table_features import TABLE_FIELD, tables_of
 
-_LIST_FIELDS = ["content_with_weight", "position_int", "origin_kwd", "available_int", "page_dims_flt", "order_int", TABLE_FIELD, "slide_number_int", "slide_title_kwd"]
+_LIST_FIELDS = ["content_with_weight", "position_int", "origin_kwd", "available_int", "page_dims_flt", "order_int", TABLE_FIELD, "slide_number_int", "slide_title_kwd", "audio_start_flt", "audio_end_flt"]
 
 
 def _not_found() -> ServiceError:
@@ -83,7 +84,9 @@ def valid_chunk_id(chunk_id: object) -> bool:
 def chunk_dto(source: dict[str, Any]) -> dict[str, Any]:
     """The response body for a chunk. Keys are listed here, so a field added to the index never reaches a client unreviewed."""
     slide = slide_of(source)
+    audio = audio_of(source)
     return {
+        **({"audio": audio} if audio else {}),
         **({"slide": slide} if slide else {}),
         "id": str(source.get("id", "")),
         "text": str(source.get("content_with_weight") or ""),

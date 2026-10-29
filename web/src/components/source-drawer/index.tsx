@@ -45,6 +45,7 @@ function Body({ source, onCloseAutoFocus }: { source: SourceView; onCloseAutoFoc
   return <SheetContent side="right" closeLabel={t("source.close")} data-testid="source-drawer" onCloseAutoFocus={onCloseAutoFocus} onOpenAutoFocus={(event) => { event.preventDefault(); passage.current?.focus(); }}>
     <SheetHeader><SheetTitle data-testid="source-title">{t(source.kind === "chat" ? "source.title" : "source.titleHit", { n: source.number })}</SheetTitle><SheetDescription data-testid="source-document" className="break-all">{source.docName}</SheetDescription></SheetHeader>
     <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto pr-1">
+      {source.audio ? <p data-testid="source-audio">{t("source.audio", {start:source.audio.start.toFixed(2),end:source.audio.end.toFixed(2)})}</p> : null}
       {source.slide ? <p data-testid="source-slide">{t("source.slide", {number:source.slide.number})} · {source.slide.title}</p> : null}
       <dl className="flex flex-wrap gap-4">
         {pages.length ? <div><dt className="text-xs font-semibold text-muted-foreground">{t("source.pages")}</dt><dd data-testid="source-pages" className="font-semibold tabular-nums">{pages.join(", ")}</dd></div> : null}

@@ -15,18 +15,21 @@ from scripts.probe.phase6_admission import PHASE, audit_packet, validate_approva
 ROOT = Path(__file__).resolve().parents[1]
 
 
-def provision(directory: Path) -> None:
+def provision(directory: Path, *, asr: bool = False) -> None:
     report = audit_packet(PHASE)
     validate_approval(json.loads((PHASE / "06-APPROVAL.json").read_text()), report)
-    manifest = json.loads((ROOT / "deepdoc/models.json").read_text())
-    if manifest["revision"] != report["models"]["deepdoc"]:
+    manifest = json.loads((ROOT / ("deepdoc/asr-model.json" if asr else "deepdoc/models.json")).read_text())
+    if manifest["revision"] != report["models"]["asr" if asr else "deepdoc"]:
         raise ValueError("model revision differs from approved evidence")
-    evidence = json.loads((PHASE / "06-SOURCE-EVIDENCE.json").read_text())["deepdoc"]
+    evidence = json.loads((PHASE / "06-SOURCE-EVIDENCE.json").read_text())["asr_model" if asr else "deepdoc"]
     approved = {item["rfilename"]: item for item in evidence["files"]}
+    if asr and set(manifest["files"]) != set(approved):
+        raise ValueError("model file list differs from approved evidence")
     directory.mkdir(parents=True, exist_ok=True)
     for name, spec in manifest["files"].items():
         source = approved[name]
-        digest = source["lfs"]["sha256"] if "lfs" in source else evidence["ocr_dictionary"]["sha256"]
+        digest = source["lfs"]["sha256"] if "lfs" in source else spec["sha256"] if asr else evidence["ocr_dictionary"]["sha256"]
+        blob = source["blobId"] if asr and "lfs" not in source else None
         if spec != {"sha256": digest, "bytes": source["size"]}:
             raise ValueError("model manifest differs from approved evidence")
         target = directory / name
@@ -35,10 +38,14 @@ def provision(directory: Path) -> None:
         if target.is_file() and target.stat().st_size == spec["bytes"]:
             with target.open("rb") as cached:
                 matches = hashlib.file_digest(cached, "sha256").hexdigest() == digest
+            if blob:
+                # Git object identity is additional to the pinned SHA-256 integrity check.
+                matches = matches and hashlib.sha1(f"blob {spec['bytes']}\0".encode() + target.read_bytes(), usedforsecurity=False).hexdigest() == blob
             if matches:
                 print(f"verified cached model: {name}", flush=True)
                 continue
-        url = f"https://huggingface.co/InfiniFlow/deepdoc/resolve/{manifest['revision']}/{name}"
+        repository = "Systran/faster-whisper-tiny" if asr else "InfiniFlow/deepdoc"
+        url = f"https://huggingface.co/{repository}/resolve/{manifest['revision']}/{name}"
         temporary = None
         try:
             with tempfile.NamedTemporaryFile(dir=directory, delete=False) as output:
@@ -55,6 +62,8 @@ def provision(directory: Path) -> None:
                     raise ValueError("download differs from approved model")
                 output.flush()
                 os.fsync(output.fileno())
+            if blob and hashlib.sha1(f"blob {count}\0".encode() + temporary.read_bytes(), usedforsecurity=False).hexdigest() != blob:
+                raise ValueError("download differs from approved git blob")
             temporary.chmod(0o644)
             temporary.replace(target)
             print(f"acquired and hash-verified model: {name} ({count} bytes)", flush=True)
@@ -66,7 +75,9 @@ def provision(directory: Path) -> None:
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output-dir", type=Path, default=ROOT / "ragflow-logs/deepdoc-models")
-    provision(parser.parse_args().output_dir)
+    parser.add_argument("--asr", action="store_true", help="Provision the approved local speech snapshot in output-dir/asr")
+    args = parser.parse_args()
+    provision(args.output_dir / "asr" if args.asr else args.output_dir, asr=args.asr)
 
 
 if __name__ == "__main__":

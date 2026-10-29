@@ -1,0 +1,8 @@
+{
+  "status": "approved",
+  "decision_source": "user",
+  "human_response": "Accept spelling equivalence",
+  "recorded_at": "2026-10-29T16:28:29.349607+00:00",
+  "scope": "Accuracy assertions may treat lighthouse and light house as equivalent spellings. Source transcripts stay unchanged; numeric, ownership and timestamp checks remain strict. Verify recorded results without further ASR calls.",
+  "local_asr_cap": 3
+}

@@ -91,10 +91,15 @@ def create_app(runtime: OCRRuntime, token: str, *, max_bytes: int = 100 * 1024 *
                     raise ValueError
             except (ValueError, RecursionError):
                 return jsonify(schema_version=1, error="invalid_options"), 400
-            call = getattr(runtime, "process_pdf", None)
+            if operation == "asr":
+                if set(options) - {"language", "probe"}:
+                    return jsonify(schema_version=1, error="invalid_options"), 400
+                call = getattr(runtime, "process_asr", None)
+            else:
+                call = getattr(runtime, "process_pdf", None)
             if call is None:
                 return jsonify(schema_version=1, error="capability_unavailable"), 503
-            args = (operation, content, options)
+            args = (content, options) if operation == "asr" else (operation, content, options)
         inflight = asyncio.get_running_loop().run_in_executor(executor, call, *args)
         # Retrieving exceptions prevents unhandled-future logs if the client goes away.
         inflight.add_done_callback(lambda future: future.exception() if not future.cancelled() else None)
@@ -102,6 +107,12 @@ def create_app(runtime: OCRRuntime, token: str, *, max_bytes: int = 100 * 1024 *
             result = await asyncio.wait_for(asyncio.shield(inflight), timeout=deadline)
             if operation == "ocr":
                 validate_result(result)
+            elif operation == "asr" and not options.get("probe"):
+                from rag.parsers.audio_segments import transcript_of
+                try:
+                    transcript_of(result)
+                except ValueError:
+                    raise NativeError("invalid_native_result", 502) from None
             elif isinstance(result, bytes):
                 if operation != "page-image" or len(result) > max_result_bytes:
                     raise NativeError("output_too_large", 413)
@@ -121,6 +132,10 @@ def create_app(runtime: OCRRuntime, token: str, *, max_bytes: int = 100 * 1024 *
     @app.post("/v1/ocr")
     async def ocr():
         return await execute("ocr")
+
+    @app.post("/v1/asr")
+    async def asr():
+        return await execute("asr")
 
     @app.post("/v1/parse")
     async def parse_pdf():

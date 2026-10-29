@@ -168,11 +168,11 @@ describe("Models page structure (UI-37, D-15)", () => {
     await screen.findByTestId("provider-row-openai");
   });
 
-  it("lists the five providers in the fixed order with a status badge and a description each", async () => {
+  it("lists the six providers in the fixed order with a status badge and a description each", async () => {
     renderPage();
     await screen.findByTestId("provider-row-openai");
     const ids = screen.getAllByTestId(/^provider-row-/).map((el) => el.getAttribute("data-testid"));
-    expect(ids).toEqual(["provider-row-openai", "provider-row-azure-openai", "provider-row-ollama", "provider-row-openrouter", "provider-row-openai-compatible"]);
+    expect(ids).toEqual(["provider-row-deepdoc", "provider-row-openai", "provider-row-azure-openai", "provider-row-ollama", "provider-row-openrouter", "provider-row-openai-compatible"]);
     expect(within(rowOf("openai")).getByText("OpenAI")).toBeInTheDocument();
     expect(within(rowOf("azure-openai")).getByText("Azure OpenAI")).toBeInTheDocument();
     expect(within(rowOf("openai-compatible")).getByText("OpenAI-compatible")).toBeInTheDocument();
@@ -187,6 +187,7 @@ describe("Models page structure (UI-37, D-15)", () => {
     renderPage();
     await screen.findByTestId("provider-row-openai");
     expect(screen.getAllByRole("button").map((button) => button.getAttribute("aria-label"))).toEqual([
+      "Set up DeepDoc",
       "Set up OpenAI",
       "Set up Azure OpenAI",
       "Set up Ollama",

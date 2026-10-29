@@ -1,6 +1,6 @@
 """Bounded capability codecs shared by structure flags and legacy credential rows."""
 
-TYPE_BITS = {"chat": 1, "embedding": 2, "vision": 8, "rerank": 16}
+TYPE_BITS = {"chat": 1, "embedding": 2, "asr": 4, "vision": 8, "rerank": 16}
 
 
 def types_for_bits(flags):

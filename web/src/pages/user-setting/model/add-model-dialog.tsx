@@ -30,7 +30,7 @@ function AddModelForm({ spec, pendingRef, close }: { spec: ProviderSpec; pending
     resolver: zodResolver(addModelSchema),
     mode: "onSubmit",
     reValidateMode: "onChange",
-    defaultValues: { modelId: "", type: "chat" },
+    defaultValues: { modelId: spec.slug === "deepdoc" ? "faster-whisper-tiny" : "", type: spec.slug === "deepdoc" ? "asr" : "chat" },
   });
   const [busy, setBusy] = useState(false);
   const [failure, setFailure] = useState<ProviderFailure | null>(null);
@@ -94,8 +94,9 @@ function AddModelForm({ spec, pendingRef, close }: { spec: ProviderSpec; pending
               <FormLabel>{t("models.field.modelType")}</FormLabel>
               <FormControl>
                 <NativeSelect {...field} data-testid="field-model-type" disabled={busy}>
-                  <option value="chat">{t("models.type.chat")}</option>
-                  <option value="embedding">{t("models.type.embedding")}</option>
+                  {spec.slug === "deepdoc" ? <option value="asr">{t("models.type.asr")}</option> : null}
+                  <option value="chat" disabled={spec.slug === "deepdoc"}>{t("models.type.chat")}</option>
+                  <option value="embedding" disabled={spec.slug === "deepdoc"}>{t("models.type.embedding")}</option>
                   {spec.slug === "openrouter" || spec.slug === "openai-compatible" ? <option value="vision">{t("models.type.vision")}</option> : null}
                 </NativeSelect>
               </FormControl>

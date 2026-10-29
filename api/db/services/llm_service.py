@@ -50,7 +50,7 @@ from rag.llm.sync_loop import PrivateLoop
 
 logger = logging.getLogger(__name__)
 
-MODEL_TYPES = ("chat", "embedding", "rerank", "vision")
+MODEL_TYPES = ("chat", "embedding", "rerank", "vision", "asr")
 _REFUSAL_CODES = frozenset(
     {
         LLMErrorCode.ERROR_AUTHENTICATION,
@@ -141,7 +141,7 @@ class LLMBundle:
         sleep: Callable[[float], Awaitable[None]] | None = None,
     ) -> None:
         if model_type not in MODEL_TYPES:
-            raise ValueError("model_type must be 'chat', 'embedding', 'rerank' or 'vision'")
+            raise ValueError("model_type must be 'chat', 'embedding', 'rerank', 'vision' or 'asr'")
         try:
             ref = parse_model_ref(model_id)
         except InvalidModelRef:
@@ -168,6 +168,11 @@ class LLMBundle:
             "allow_private": llm.allow_private_base_urls,
             "deny_hosts": tenant_llm_service.internal_hosts(self._settings),
         }
+        if self.model_type == "asr":
+            if self._spec.name != "DeepDoc":
+                raise _unavailable()
+            from rag.llm.asr_model import AsrModel
+            return AsrModel(self._settings, self.ref.model, api_base)
         if self.model_type == "vision":
             from rag.llm.vision_model import VisionBase
             return VisionBase(self._spec,self.ref.model,api_key,api_base,api_version,sleep=self._sleep or asyncio.sleep,**common)
@@ -250,6 +255,12 @@ class LLMBundle:
             raise ServiceError(Kind.INVALID, reasons.DIMENSION_MISMATCH, "the model returned vectors of a different size")
 
     # ------------------------------------------------------------------------- chat
+
+    def transcribe(self, content: bytes, language: str | None = None):
+        from rag.llm.asr_model import AsrModel
+        if not isinstance(self._driver, AsrModel):
+            raise TypeError("this bundle was not built for ASR")
+        return self._driver.transcribe(content, language)
 
     def describe(self, image: bytes) -> str:
         from rag.llm.vision_model import VisionBase

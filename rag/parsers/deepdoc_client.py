@@ -12,7 +12,7 @@ import httpx
 
 from common.settings import DeepDocSettings
 from rag.parsers.assets import InvalidAsset, ParsedAsset, decode_asset
-from rag.parsers.errors import FileDamaged, FileTooLarge, ParserError
+from rag.parsers.errors import FileDamaged, FileTooLarge, NoReadableText, ParserError
 from rag.parsers.tables import Table
 from rag.parsers.types import BLOCK_KINDS, LAYOUT_LABELS, PageBox, ParsedBlock, ParseLimits, ParseReport, SourceFile
 
@@ -54,6 +54,17 @@ class DeepDocClient:
                     if response.status_code == 413:
                         raise FileTooLarge()
                     if response.status_code == 400:
+                        if endpoint == "/v1/asr":
+                            refusal = bytearray()
+                            for part in response.iter_bytes():
+                                refusal.extend(part)
+                                if len(refusal) > 4096:
+                                    raise NativeUnavailable()
+                            refused = json.loads(refusal)
+                            if not isinstance(refused, dict):
+                                raise NativeUnavailable()
+                            if refused.get("error") == "no_readable_text":
+                                raise NoReadableText()
                         raise FileDamaged()
                     if response.status_code != 200:
                         raise NativeUnavailable()

@@ -1,0 +1,64 @@
+{
+  "model_repository": "Systran/faster-whisper-tiny",
+  "model_revision": "d90ca5fe260221311c53c58e660288d3deb8d356",
+  "original_annotation_sha256": "432bf7435a4c4111b61ca67cbe14c66551859b9790e1be990c500bd925ccf58f",
+  "calls": [
+    {
+      "label": "wav-worker",
+      "submitted_at": "2026-10-29T16:21:43.543521+00:00"
+    },
+    {
+      "label": "save-probe",
+      "submitted_at": "2026-10-29T16:25:06.577304+00:00"
+    },
+    {
+      "label": "mp3-worker-browser",
+      "submitted_at": "2026-10-29T16:25:14.738920+00:00"
+    }
+  ],
+  "wav": {
+    "native_seconds": 0.597517919999973,
+    "transcript": {
+      "schema_version": 1,
+      "duration": 5.38,
+      "language": "en",
+      "segments": [
+        {
+          "start": 0.0,
+          "end": 5.0,
+          "text": "The light house height is 52 meters, the calibration of set is 73 units."
+        }
+      ]
+    }
+  },
+  "mp3": {
+    "elapsed_seconds": 6.147155214999884,
+    "chunks": {
+      "items": [
+        {
+          "audio": {
+            "start": 0.0,
+            "end": 5.0
+          },
+          "id": "5aa95ba8791840a8a31ad8aebd845f5b_0",
+          "text": "The light house height is 52 meters, the calibration offset is 73 units.",
+          "positions": [],
+          "origin": "parsed",
+          "enabled": true
+        }
+      ],
+      "total": 1,
+      "page_sizes": {}
+    }
+  },
+  "initial_pytest_results": {
+    "wav": "failed exact lighthouse spelling; native output and indexed chunk count captured",
+    "mp3": "failed only final exact lighthouse spelling assertion; actual source drawer and screenshot reached"
+  },
+  "decoding": {
+    "wav_beam_size": 1,
+    "mp3_beam_size": 5,
+    "current_beam_size": 5
+  },
+  "paid_external_calls": 0
+}

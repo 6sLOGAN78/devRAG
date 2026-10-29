@@ -3,8 +3,9 @@
 ARG DEVRAG_BASE_IMAGE=devrag-app:local
 FROM ${DEVRAG_BASE_IMAGE} AS native-dependencies
 COPY deepdoc/requirements.lock /tmp/deepdoc-requirements.lock
+COPY deepdoc/asr-requirements.lock /tmp/asr-requirements.lock
 RUN /usr/local/bin/python -m pip install --no-cache-dir --require-hashes --only-binary=:all: \
-    --no-deps --target=/opt/deepdoc/vendor -r /tmp/deepdoc-requirements.lock
+    --no-deps --target=/opt/deepdoc/vendor -r /tmp/deepdoc-requirements.lock -r /tmp/asr-requirements.lock
 
 FROM ${DEVRAG_BASE_IMAGE} AS native-runtime
 ENV PYTHONPATH=/opt/deepdoc/vendor:/ragflow \

@@ -23,6 +23,7 @@ EXPECTED = [
     ("OpenRouter", "openrouter", "openai/", "https://openrouter.ai/api/v1", "required", "default", False, False),
     ("OpenAI-API-Compatible", "openai-compatible", "openai/", None, "optional", "required", False, False),
     ("TEI", "tei", "", "http://tei:80", "none", "default", False, False),
+    ("DeepDoc", "deepdoc", "", "http://deepdoc:9390", "none", "default", False, False),
 ]
 MODEL_TYPES = {
     "OpenAI": ("chat", "embedding"),
@@ -31,10 +32,11 @@ MODEL_TYPES = {
     "OpenRouter": ("chat", "embedding", "rerank", "vision"),
     "OpenAI-API-Compatible": ("chat", "embedding", "vision"),
     "TEI": ("rerank",),
+    "DeepDoc": ("asr",),
 }
 
 
-def test_six_providers_in_settings_page_order():
+def test_supported_providers_in_settings_page_order():
     assert [s.name for s in PROVIDER_SPECS] == [row[0] for row in EXPECTED]
     assert [p.value for p in Provider] == [row[0] for row in EXPECTED]
 

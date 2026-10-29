@@ -115,6 +115,6 @@
     "description": "Keep transcript timestamps.",
     "parser_id": "audio",
     "parser_config": {},
-    "available": false
+    "available": true
   }
 ]

@@ -25,7 +25,7 @@ export interface ProviderFormValues {
 
 export interface AddModelValues {
   modelId: string;
-  type: "chat" | "embedding" | "vision";
+  type: "chat" | "embedding" | "vision" | "asr";
 }
 
 const ABSOLUTE_HTTP_URL = /^https?:\/\/\S+$/i;
@@ -118,7 +118,7 @@ export function providerSchema(spec: ProviderSpec, mode: ProviderMode, current?:
       if (moved) issue("apiKey", "errors.provider.keyNewAddress");
     }
 
-    if (mode === "setup") {
+    if (mode === "setup" && spec.slug !== "deepdoc") {
       const chat = values.chatModel.trim();
       const embedding = values.embeddingModel.trim();
       if (chat !== "") {
@@ -137,7 +137,7 @@ export function providerSchema(spec: ProviderSpec, mode: ProviderMode, current?:
 export const addModelSchema = z
   .object({
     modelId: z.string(),
-    type: z.enum(["chat", "embedding", "vision"]),
+    type: z.enum(["chat", "embedding", "vision", "asr"]),
   })
   .superRefine((values, ctx) => {
     const message = modelIdIssue(values.modelId);

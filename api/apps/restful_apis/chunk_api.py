@@ -69,7 +69,13 @@ class SlideView(BaseModel):
     title: str
 
 
+class AudioView(BaseModel):
+    start: float
+    end: float
+
+
 class ChunkView(BaseModel):
+    audio: AudioView | None = None
     slide: SlideView | None = None
     tables: list[TableView] = Field(default_factory=list)
     id: str

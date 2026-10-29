@@ -11,6 +11,18 @@ class NativeRuntime(OCR):
         # Load the implemented backend before advertising readiness.
         runtime.session("layout.onnx")
         runtime.session("tsr.onnx")
+        self.asr = None
+        directory = runtime.directory / "asr"
+        if directory.is_dir():
+            from deepdoc.asr import ASR
+            self.asr = ASR(directory)
+            self.capabilities = [*self.capabilities, "asr"]
+
+    def process_asr(self, content, options):
+        from deepdoc.model_runtime import NativeError
+        if self.asr is None:
+            raise NativeError("model_unavailable", 503)
+        return self.asr.process(content, options)
 
     def layout_image(self, content):
         from dataclasses import asdict
