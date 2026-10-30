@@ -40,6 +40,8 @@ const isWhole = (value: unknown, min: number, max: number): value is number => t
 
 /** The first bad key of a `parser_config` object, or null. */
 function badField(config: Record<string, unknown>): string | null {
+  if ("auto_keywords" in config && !isWhole(config.auto_keywords, 0, 32)) return "auto_keywords";
+  if ("auto_questions" in config && !isWhole(config.auto_questions, 0, 16)) return "auto_questions";
   if ("chunk_token_num" in config && !isWhole(config.chunk_token_num, 1, 8192)) return "chunk_token_num";
   if ("delimiter" in config && !(typeof config.delimiter === "string" && [...config.delimiter].length >= 1 && [...config.delimiter].length <= DELIMITER_MAX)) return "delimiter";
   if ("overlapped_percent" in config && !isWhole(config.overlapped_percent, 0, 50)) return "overlapped_percent";
@@ -79,6 +81,8 @@ function checked(config: InternalAxiosRequestConfig, server: DatasetServer, sent
 function valuesOf(parserConfig: unknown) {
   const source = typeof parserConfig === "object" && parserConfig !== null ? (parserConfig as Record<string, unknown>) : {};
   return {
+    ...(typeof source.auto_keywords === "number" ? {autoKeywords:source.auto_keywords} : {}),
+    ...(typeof source.auto_questions === "number" ? {autoQuestions:source.auto_questions} : {}),
     ...(typeof source.resume_model === "string" ? {resumeModel:source.resume_model} : {}),
     ...(typeof source.resume_use_model === "boolean" ? {resumeUseModel:source.resume_use_model} : {}),
     ...(typeof source.layout_recognize === "boolean" || typeof source.layout_recognize === "string" ? { layoutRecognize: source.layout_recognize } : {}),

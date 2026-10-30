@@ -15,6 +15,8 @@ function whole(min: number, max: number, message: string) {
  * server's `ParserConfig`. The delimiters are typed escaped and leave the schema as the real characters.
  */
 export const parseConfigSchema = z.object({
+  autoKeywords: whole(0, 32, "errors.chunking.keywordRange").optional().default(0),
+  autoQuestions: whole(0, 16, "errors.chunking.questionRange").optional().default(0),
   resumeModel:z.string().max(128).optional(),
   resumeUseModel:z.boolean().optional(),
   asrModel:z.string().max(128).optional(),

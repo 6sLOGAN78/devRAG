@@ -108,6 +108,15 @@ def test_stage_one_expression_order_condition_and_fusion_weights():
     assert isinstance(out, RetrievalResult) and [h.chunk_id for h in out.hits] == ["c1"]
 
 
+def test_generated_only_terms_contribute_to_product_text_score():
+    row = {**hit("generated", text="lighthouse measurements"), "important_tks": "beacon altitude", "question_tks": "how tall is the beacon"}
+    store = RecordingStore([result(row), result(hit("generated", score=1.0))])
+    out = retriever(store).retrieve(request(question="beacon altitude", vector_similarity_weight=0.0, similarity_threshold=0.5))
+    assert [item.chunk_id for item in out.hits] == ["generated"]
+    assert out.hits[0].term_similarity == 1.0
+    assert "important_tks" in store.calls[0]["select"] and "question_tks" in store.calls[0]["select"]
+
+
 def test_stage_two_is_a_knn_only_search_over_the_candidate_ids():
     store = RecordingStore([result(hit("c1"), hit("c2")), result(hit("c2", score=1.0), hit("c1", score=0.75))])
     out = retriever(store).retrieve(request(vector_similarity_weight=1.0))

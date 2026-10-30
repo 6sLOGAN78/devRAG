@@ -247,6 +247,8 @@ function assetsOf(raw: unknown): DocumentAssetView[] {
 }
 
 export interface DocumentDetailView extends DocumentView {
+  autoKeywords?: number;
+  autoQuestions?: number;
   assets?: DocumentAssetView[];
   pages?: [number, number][];
   layoutRecognize?: boolean | string;
@@ -276,6 +278,8 @@ export async function getDocument(datasetId: string, docId: string): Promise<Doc
     overlappedPercent: count(dto.overlapped_percent),
     preview: dto.preview === "pages" ? "pages" : "none",
     ...(dto.resume_model !== undefined ? {resumeModel:text(dto.resume_model)} : {}),
+    autoKeywords:count(dto.auto_keywords),
+    autoQuestions:count(dto.auto_questions),
     ...(dto.resume_use_model !== undefined ? {resumeUseModel:dto.resume_use_model===true} : {}),
     ...(dto.asr_model !== undefined ? {asrModel:text(dto.asr_model)} : {}),
     ...(dto.audio_language !== undefined ? {audioLanguage:text(dto.audio_language)} : {}),
@@ -287,6 +291,8 @@ export async function getDocument(datasetId: string, docId: string): Promise<Doc
 }
 
 export interface DocumentSettingsChanges {
+  autoKeywords?: number;
+  autoQuestions?: number;
   pages?: [number, number][];
   layoutRecognize?: boolean | string;
   resumeModel?: string;
@@ -312,6 +318,8 @@ export async function updateDocumentSettings(datasetId: string, docId: string, c
   if (changes.chunkTokenNum !== undefined) config.chunk_token_num = changes.chunkTokenNum;
   if (changes.delimiter !== undefined) config.delimiter = changes.delimiter;
   if (changes.overlappedPercent !== undefined) config.overlapped_percent = changes.overlappedPercent;
+  if (changes.autoKeywords !== undefined) config.auto_keywords = changes.autoKeywords;
+  if (changes.autoQuestions !== undefined) config.auto_questions = changes.autoQuestions;
   if (changes.resumeModel !== undefined) config.resume_model = changes.resumeModel;
   if (changes.resumeUseModel !== undefined) config.resume_use_model = changes.resumeUseModel;
   if (changes.asrModel !== undefined) config.asr_model = changes.asrModel;
@@ -331,6 +339,8 @@ export async function updateDocumentSettings(datasetId: string, docId: string, c
     overlappedPercent: count(dto.overlapped_percent),
     preview: dto.preview === "pages" ? "pages" : "none",
     ...(dto.resume_model !== undefined ? {resumeModel:text(dto.resume_model)} : {}),
+    autoKeywords:count(dto.auto_keywords),
+    autoQuestions:count(dto.auto_questions),
     ...(dto.resume_use_model !== undefined ? {resumeUseModel:dto.resume_use_model===true} : {}),
     ...(dto.asr_model !== undefined ? {asrModel:text(dto.asr_model)} : {}),
     ...(dto.audio_language !== undefined ? {audioLanguage:text(dto.audio_language)} : {}),

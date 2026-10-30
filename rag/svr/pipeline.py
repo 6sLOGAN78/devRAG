@@ -29,6 +29,7 @@ from rag.parsers.types import ParseLimits, ParseReport, SourceFile
 from rag.svr.chunk_doc import build_row, l2_normalize, parsed_chunk_id
 from rag.svr.control import LockLost, TaskCancelled, TaskControl
 from rag.svr.embedding import EmbedRunner, release_database_connection
+from rag.svr.enrichment import ENRICHMENT_BATCH, MAX_ENRICHED_CHUNKS, EnrichedFeatures
 from rag.svr.failure import TaskFailure, classify
 from rag.svr.limiters import Limiters
 from rag.utils.storage_base import Storage
@@ -225,7 +226,7 @@ def _embed_batch(ctx: TaskContext, deps: PipelineDeps, control: TaskControl, chu
     return [l2_normalize(v) for v in vectors]
 
 
-def _index_batches(ctx: TaskContext, deps: PipelineDeps, control: TaskControl, chunks: list[Chunk], dimension: int, index: str) -> list[str]:
+def _index_batches(ctx: TaskContext, deps: PipelineDeps, control: TaskControl, chunks: list[Chunk], dimension: int, index: str, enriched: list[EnrichedFeatures]) -> list[str]:
     ids: list[str] = []
     size = deps.settings.ingest.batch_size
     total = len(chunks)
@@ -251,6 +252,8 @@ def _index_batches(ctx: TaskContext, deps: PipelineDeps, control: TaskControl, c
                     enabled=switch.enabled,
                     pagerank=getattr(ctx, "pagerank", 0),
                     meta_fields=getattr(ctx, "meta_fields", {}),
+                    keywords=enriched[start + k].keywords,
+                    questions=enriched[start + k].questions,
                 )
                 for k, (c, v) in enumerate(zip(batch, vectors, strict=True))
             ]
@@ -296,12 +299,33 @@ def run_pipeline(ctx: TaskContext, control: TaskControl, deps: PipelineDeps) -> 
         raise TaskFailure("chunk", "no_readable_text")
     with _step("chunk", ctx):
         _check_cap(ctx, len(chunks))
+    enriched = [EnrichedFeatures() for _ in chunks]
+    keyword_count = ctx.parser_config.get("auto_keywords", 0)
+    question_count = ctx.parser_config.get("auto_questions", 0)
+    if chunks and (keyword_count or question_count):
+        with _step("embed", ctx):
+            if type(keyword_count) is not int or not 0 <= keyword_count <= 32 or type(question_count) is not int or not 0 <= question_count <= 16:
+                raise TaskFailure("embed", "provider_refused")
+            if len(chunks) > MAX_ENRICHED_CHUNKS:
+                raise TaskFailure("embed", "file_too_large")
+            from api.db.services.tenant_model_service import get_defaults
+            model_id = get_defaults(ctx.tenant_id).chat
+            if not model_id:
+                raise TaskFailure("embed", "model_unavailable")
+            release_database_connection()
+            for start in range(0, len(chunks), ENRICHMENT_BATCH):
+                control.check()
+                batch = chunks[start:start + ENRICHMENT_BATCH]
+                generated = deps.embedder.enrich([chunk.text for chunk in batch], model_id, keyword_count, question_count, ctx, control)
+                if len(generated) != len(batch):
+                    raise TaskFailure("embed", "provider_refused")
+                enriched[start:start + len(batch)] = generated
     with _step("index", ctx):
         deps.doc_store.delete({"doc_id": [ctx.doc_id], "task_id": [ctx.task_id]}, index, ctx.dataset_id)
     pages_total = int(report.pages_total or 0)
     if report.pages_without_text:
         task_service.set_progress(ctx.task_id, PARSED_PROGRESS, f"{report.pages_without_text} of {pages_total} pages in this range had no readable text.")
-    ids = _index_batches(ctx, deps, control, chunks, dimension, index) if chunks else []
+    ids = _index_batches(ctx, deps, control, chunks, dimension, index, enriched) if chunks else []
     deps.embedder.forget(ctx.task_id)
     # Single machine lines the roll-up reads back (the latest of each wins when a task is retried).
     task_service.set_progress(ctx.task_id, 1.0, f"[pages] total={pages_total} without_text={report.pages_without_text}")

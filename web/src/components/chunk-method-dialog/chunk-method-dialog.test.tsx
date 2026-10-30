@@ -95,15 +95,14 @@ describe("Chunking method dialog, document mode (UI-13, UI-14)", () => {
     expect(within(group).getByText("Tag")).toBeInTheDocument();
   });
 
-  it("keeps auto-keywords unavailable and omits unchanged layout settings", async () => {
+  it("offers off-by-default enrichment controls and omits unchanged values", async () => {
     const { dialog, user } = await openFirst();
-    const group = within(dialog).getByTestId("parse-config-unavailable");
-    expect(within(group).getByText("Not available yet")).toBeInTheDocument();
-    expect(group.querySelectorAll("input, select, textarea, button")).toHaveLength(0);
+    expect(within(dialog).getByTestId("field-auto-keywords")).toHaveValue(0);
+    expect(within(dialog).getByTestId("field-auto-questions")).toHaveValue(0);
     await replace(user, within(dialog).getByTestId("field-chunk-size"), "300");
     await user.click(within(dialog).getByTestId("chunk-method-submit"));
     await waitFor(() => expect(sent(detailUrl(1), "PATCH")).toHaveLength(1));
-    expect(JSON.stringify(sent(detailUrl(1), "PATCH")[0])).not.toMatch(/layout|keyword/);
+    expect(JSON.stringify(sent(detailUrl(1), "PATCH")[0])).not.toMatch(/layout|keyword|question/);
   });
 
   it("keeps Save settings aria-disabled until something changed", async () => {
@@ -112,6 +111,18 @@ describe("Chunking method dialog, document mode (UI-13, UI-14)", () => {
     expect(submit).toHaveAttribute("aria-disabled", "true");
     await replace(user, within(dialog).getByTestId("field-overlap"), "5");
     expect(submit).not.toHaveAttribute("aria-disabled");
+  });
+
+  it("saves bounded generation counts and reopens them", async () => {
+    const { dialog, user } = await openFirst();
+    await replace(user, within(dialog).getByTestId("field-auto-keywords"), "3");
+    await replace(user, within(dialog).getByTestId("field-auto-questions"), "2");
+    await user.click(within(dialog).getByTestId("chunk-method-submit"));
+    await waitFor(() => expect(sent(detailUrl(1), "PATCH")).toEqual([{parser_config:{auto_keywords:3,auto_questions:2}}]));
+    await waitFor(() => expect(screen.queryByTestId("chunk-method-dialog")).toBeNull());
+    const {dialog:reopened} = await openDialog(1);
+    expect(within(reopened).getByTestId("field-auto-keywords")).toHaveValue(3);
+    expect(within(reopened).getByTestId("field-auto-questions")).toHaveValue(2);
   });
 
   it("sends only the changed keys, toasts, closes and returns focus to the row's menu button", async () => {

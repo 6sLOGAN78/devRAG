@@ -116,6 +116,8 @@ export function ChunkCard({ chunk, number, total, selected, showPages, canChange
             {chunk.text}
           </p>
         )}
+        {chunk.generatedKeywords?.length ? <p data-testid="chunk-generated-keywords" className="break-words text-xs text-muted-foreground">{t("inspector.card.generatedKeywords")}: {chunk.generatedKeywords.join(", ")}</p> : null}
+        {chunk.generatedQuestions?.length ? <p data-testid="chunk-generated-questions" className="break-words text-xs text-muted-foreground">{t("inspector.card.generatedQuestions")}: {chunk.generatedQuestions.join(" · ")}</p> : null}
       </Card>
     </li>
   );

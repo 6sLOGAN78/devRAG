@@ -228,9 +228,9 @@ describe("deleteDatasets (KB-07, D-10)", () => {
 describe("dataset chunking values (UI-15)", () => {
   it("reads the parser config of a detail with defaults for what the server did not send", async () => {
     body = success({ ...datasetDto, parser_config: { chunk_token_num: 256, delimiter: "|", overlapped_percent: 10, layout_recognize: true } });
-    expect((await getDataset("kb1")).parserConfig).toEqual({ chunkTokenNum: 256, delimiter: "|", overlappedPercent: 10, layoutRecognize: true });
+    expect((await getDataset("kb1")).parserConfig).toEqual({ chunkTokenNum: 256, delimiter: "|", overlappedPercent: 10, layoutRecognize: true, autoKeywords: 0, autoQuestions: 0 });
     body = success({ ...datasetDto, parser_config: {} });
-    expect((await getDataset("kb1")).parserConfig).toEqual({ chunkTokenNum: 512, delimiter: "\n!?;。；！？", overlappedPercent: 0 });
+    expect((await getDataset("kb1")).parserConfig).toEqual({ chunkTokenNum: 512, delimiter: "\n!?;。；！？", overlappedPercent: 0, autoKeywords: 0, autoQuestions: 0 });
     body = success({ ...datasetDto, parser_config: null });
     expect((await getDataset("kb1")).parserConfig.chunkTokenNum).toBe(512);
   });

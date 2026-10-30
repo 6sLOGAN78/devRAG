@@ -67,6 +67,7 @@ DEFAULT_PARSER_CONFIG: dict[str, Any] = {
     "image_context_size": 0,
     "layout_recognize": True,
     "auto_keywords": 0,
+    "auto_questions": 0,
 }
 PERMISSIONS = (PERMISSION_ME, PERMISSION_TEAM)
 DEFAULT_LANGUAGE = "English"

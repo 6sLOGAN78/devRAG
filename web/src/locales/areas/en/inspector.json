@@ -45,6 +45,8 @@
       "page": "Page {{page}}",
       "edited": "Edited",
       "manual": "Added by hand",
+      "generatedKeywords": "Generated keywords",
+      "generatedQuestions": "Generated questions",
       "switchLabel": "Include chunk {{n}} in search"
     },
     "empty": {

@@ -183,5 +183,7 @@ def document_detail(settings: Settings, visible: VisibleDataset, doc_id: str, *,
         audio_language=config.get("audio_language"),
         image_model=config.get("image_model", ""),
         picture_ocr_only=config.get("picture_ocr_only", False),
+        auto_keywords=config.get("auto_keywords", 0),
+        auto_questions=config.get("auto_questions", 0),
     )
     return body

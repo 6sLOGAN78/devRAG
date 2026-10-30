@@ -88,7 +88,11 @@
         "pages": "PDF 页码",
         "pagesHelp": "留空表示全部页，也可输入包含首尾页的范围，例如 2-4, 13-30。其他文件类型忽略此设置。",
         "layout": "使用版面分析",
-        "layoutHelp": "识别标题、表格和图片，按分栏顺序读取，并移除页眉和页脚。"
+        "layoutHelp": "识别标题、表格和图片，按分栏顺序读取，并移除页眉和页脚。",
+        "autoKeywords": "每个分块的生成关键词",
+        "autoKeywordsHelp": "设为 0 可关闭。解析时可使用工作区聊天模型生成最多 32 个关键词。",
+        "autoQuestions": "每个分块的生成问题",
+        "autoQuestionsHelp": "设为 0 可关闭。解析时可使用工作区聊天模型生成最多 16 个问题。"
       },
       "notYet": {
         "heading": "暂不可用",
@@ -124,6 +128,8 @@
   "errors": {
     "chunking": {
       "sizeRange": "请输入 1 到 8192 之间的整数。",
+      "keywordRange": "请输入 0 到 32 之间的整数。",
+      "questionRange": "请输入 0 到 16 之间的整数。",
       "delimitersRequired": "请至少输入一个分隔符。",
       "delimitersMax": "最多使用 64 个字符。",
       "overlapRange": "请输入 0 到 50 之间的整数。",

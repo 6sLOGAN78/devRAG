@@ -88,7 +88,11 @@
         "pages": "PDF pages",
         "pagesHelp": "Leave blank for all pages, or enter inclusive ranges such as 2-4, 13-30. Other file types ignore this setting.",
         "layout": "Use layout analysis",
-        "layoutHelp": "Detect headings, tables and figures, follow columns, and remove page headers and footers."
+        "layoutHelp": "Detect headings, tables and figures, follow columns, and remove page headers and footers.",
+        "autoKeywords": "Generated keywords per chunk",
+        "autoKeywordsHelp": "0 turns this off. Up to 32 keywords use your workspace chat model during parsing.",
+        "autoQuestions": "Generated questions per chunk",
+        "autoQuestionsHelp": "0 turns this off. Up to 16 questions use your workspace chat model during parsing."
       },
       "notYet": {
         "heading": "Not available yet",
@@ -124,6 +128,8 @@
   "errors": {
     "chunking": {
       "sizeRange": "Enter a whole number from 1 to 8192.",
+      "keywordRange": "Enter a whole number from 0 to 32.",
+      "questionRange": "Enter a whole number from 0 to 16.",
       "delimitersRequired": "Enter at least one delimiter.",
       "delimitersMax": "Use 64 characters or fewer.",
       "overlapRange": "Enter a whole number from 0 to 50.",

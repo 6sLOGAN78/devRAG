@@ -23,6 +23,8 @@ export interface ChunkPosition {
 }
 
 export interface ChunkView {
+  generatedKeywords?: string[];
+  generatedQuestions?: string[];
   tables?: TableView[];
   slide?: SlideView;
   audio?: AudioView;
@@ -66,6 +68,8 @@ export function toChunk(raw: unknown): ChunkView {
   const dto = asRecord(raw);
   const origin = text(dto.origin);
   return {
+    ...(Array.isArray(dto.generated_keywords) ? {generatedKeywords:dto.generated_keywords.filter((item):item is string=>typeof item==="string").slice(0,32)} : {}),
+    ...(Array.isArray(dto.generated_questions) ? {generatedQuestions:dto.generated_questions.filter((item):item is string=>typeof item==="string").slice(0,16)} : {}),
     id: text(dto.id),
     ...(audioOf(dto.audio) ? {audio:audioOf(dto.audio)} : {}),
     ...(slideOf(dto.slide) ? {slide:slideOf(dto.slide)} : {}),

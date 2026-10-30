@@ -100,7 +100,7 @@ export function settingsFailureOf(error: unknown, mode: SettingsMode): Placed {
 }
 
 /** The form field a `parser_config_invalid` answer names in `data.field`, or null when it names none that the form has. */
-export function invalidFieldOf(error: unknown): "chunkSize" | "delimiters" | "overlap" | "pageRanges" | "layoutRecognize" | null {
+export function invalidFieldOf(error: unknown): "chunkSize" | "delimiters" | "overlap" | "pageRanges" | "layoutRecognize" | "autoKeywords" | "autoQuestions" | null {
   if (!(error instanceof ApiError) || error.status !== 400 || reasonOf(error) !== "parser_config_invalid") return null;
   const data = error.data;
   const field = typeof data === "object" && data !== null ? (data as Record<string, unknown>).field : undefined;
@@ -109,6 +109,8 @@ export function invalidFieldOf(error: unknown): "chunkSize" | "delimiters" | "ov
   if (field === "overlapped_percent") return "overlap";
   if (field === "layout_recognize") return "layoutRecognize";
   if (field === "pages") return "pageRanges";
+  if (field === "auto_keywords") return "autoKeywords";
+  if (field === "auto_questions") return "autoQuestions";
   return null;
 }
 

@@ -3,7 +3,6 @@ import {useWatch} from "react-hook-form";
 import {LlmSelect} from "@/components/llm-select";
 import type { Control } from "react-hook-form";
 import { useTranslation } from "react-i18next";
-import { Badge } from "@/components/ui/badge";
 import { FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { ServerFieldError } from "@/components/create-dataset-dialog/server-field-error";
@@ -29,33 +28,6 @@ export interface ParseConfigurationProps {
   answers?: Partial<Record<ParseConfigField, string>>;
   /** Called when the reader edits a field, so its server answer can be cleared. */
   onEdit?: (field: ParseConfigField) => void;
-}
-
-const NOT_YET = ["keywords"] as const;
-
-/** Two settings that exist in a later release: text only, never a control, never sent (UI-14 in part, D-27). */
-function NotYetRows() {
-  const { t } = useTranslation();
-  return (
-    <div data-testid="parse-config-unavailable" role="group" aria-labelledby="parse-config-unavailable-heading" className="flex flex-col gap-2">
-      <p id="parse-config-unavailable-heading" className="text-sm font-semibold text-foreground">
-        {t("datasets.chunking.notYet.heading")}
-      </p>
-      <ul className="m-0 flex list-none flex-col gap-2 p-0">
-        {NOT_YET.map((row) => (
-          <li key={row} className="flex items-start gap-3 rounded-md border border-input p-3">
-            <div className="grid gap-1">
-              <span className="text-sm font-semibold text-foreground">{t(`datasets.chunking.notYet.${row}.title`)}</span>
-              <span className="text-xs font-normal text-muted-foreground">{t(`datasets.chunking.notYet.${row}.body`)}</span>
-            </div>
-            <Badge variant="outline" className="ml-auto shrink-0 font-normal">
-              {t("datasets.chunking.later")}
-            </Badge>
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
 }
 
 function PictureFields({control,disabled}:{control:Control<ChunkFormInput>;disabled:boolean}) {
@@ -217,7 +189,16 @@ export function ParseConfiguration({ control, disabled = false, wholeDocument = 
           </FormItem>
         )}
       />
-      <NotYetRows />
+      <FormField control={control} name="autoKeywords" render={({field}) => <FormItem>
+        <FormLabel>{t("datasets.chunking.field.autoKeywords")}</FormLabel>
+        <FormControl><Input {...field} value={field.value ?? 0} type="number" inputMode="numeric" min={0} max={32} step={1} disabled={disabled} data-testid="field-auto-keywords" onChange={event=>{onEdit?.("autoKeywords");field.onChange(event);}} /></FormControl>
+        <FormDescription>{t("datasets.chunking.field.autoKeywordsHelp")}</FormDescription><FormMessage/><ServerFieldError text={answers.autoKeywords ?? null}/>
+      </FormItem>}/>
+      <FormField control={control} name="autoQuestions" render={({field}) => <FormItem>
+        <FormLabel>{t("datasets.chunking.field.autoQuestions")}</FormLabel>
+        <FormControl><Input {...field} value={field.value ?? 0} type="number" inputMode="numeric" min={0} max={16} step={1} disabled={disabled} data-testid="field-auto-questions" onChange={event=>{onEdit?.("autoQuestions");field.onChange(event);}} /></FormControl>
+        <FormDescription>{t("datasets.chunking.field.autoQuestionsHelp")}</FormDescription><FormMessage/><ServerFieldError text={answers.autoQuestions ?? null}/>
+      </FormItem>}/>
     </div>
   );
 }

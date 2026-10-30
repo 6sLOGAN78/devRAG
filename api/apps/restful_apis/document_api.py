@@ -152,6 +152,8 @@ class DocumentDetailView(DocumentRowView):
     audio_language: str | None = None
     image_model: str = ""
     picture_ocr_only: bool = False
+    auto_keywords: int = 0
+    auto_questions: int = 0
 
 
 class DocumentDetailEnvelope(BaseModel):
@@ -176,6 +178,8 @@ class ChunkingValues(BaseModel):
     audio_language: Any = None
     image_model: Any = None
     picture_ocr_only: Any = None
+    auto_keywords: Any = None
+    auto_questions: Any = None
 
 
 class UpdateDocumentBody(BaseModel):

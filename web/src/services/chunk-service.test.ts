@@ -52,6 +52,12 @@ describe("listChunks (UI-16)", () => {
     expect(items[0]?.positions).toEqual([position]);
     expect(items[0]?.origin).toBe("parsed");
   });
+
+  it("maps only bounded generated hint text", async () => {
+    body = success({items:[{...chunk,generated_keywords:["beacon altitude",42],generated_questions:["How high?",null]}],total:1,page_sizes:{}});
+    const page = await listChunks({datasetId:D,docId:"d1",page:1,size:20,keywords:""});
+    expect(page.items[0]).toMatchObject({generatedKeywords:["beacon altitude"],generatedQuestions:["How high?"]});
+  });
 });
 
 describe("createChunk and updateChunk (UI-17)", () => {

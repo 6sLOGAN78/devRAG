@@ -30,6 +30,7 @@ class ParserConfig(BaseModel):
     pages: list[tuple[StrictInt, StrictInt]] = Field(default_factory=list, max_length=128)
     layout_recognize: StrictBool | StrictStr = True
     auto_keywords: StrictInt = Field(default=0, ge=0, le=32)
+    auto_questions: StrictInt = Field(default=0, ge=0, le=16)
     table_context_size: StrictInt = Field(default=0, ge=0)
     asr_model: StrictStr = Field(default="", max_length=128)
     audio_language: StrictStr | None = Field(default=None, pattern=r"^[a-z]{2,3}$")

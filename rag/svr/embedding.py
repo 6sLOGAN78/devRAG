@@ -112,6 +112,25 @@ class EmbedRunner:
         control.check()
         return result
 
+    def enrich(self, texts: list[str], model_id: str, keywords: int, questions: int, ctx: TaskContext, control: TaskControl):
+        from rag.svr.enrichment import enrichment_completion
+
+        def run():
+            release_database_connection()
+            with self._limiters.embed_limiter:
+                control.check()
+                # One physical request per bounded batch; the transport cannot replay a paid call.
+                llm = replace(self._settings.llm, max_retries=0, chat_timeout_seconds=min(self._settings.llm.chat_timeout_seconds, 30))
+                bundle = LLMBundle(ctx.tenant_id, model_id, "chat", settings=replace(self._settings, llm=llm))
+                control.check()
+                return enrichment_completion(bundle, texts, keywords, questions)
+
+        control.check()
+        release_database_connection()
+        result = wait_for(self._executor().submit(run), control)
+        control.check()
+        return result
+
     def forget(self, task_id: str) -> None:
         with self._lock:
             self._bundles.pop(task_id, None)

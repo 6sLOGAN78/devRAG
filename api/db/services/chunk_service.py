@@ -61,7 +61,7 @@ from rag.parsers.slides import slide_of
 from rag.parsers.audio_segments import audio_of
 from rag.parsers.table_features import TABLE_FIELD, tables_of
 
-_LIST_FIELDS = ["content_with_weight", "position_int", "origin_kwd", "available_int", "page_dims_flt", "order_int", TABLE_FIELD, "slide_number_int", "slide_title_kwd", "audio_start_flt", "audio_end_flt"]
+_LIST_FIELDS = ["content_with_weight", "position_int", "origin_kwd", "available_int", "page_dims_flt", "order_int", TABLE_FIELD, "slide_number_int", "slide_title_kwd", "audio_start_flt", "audio_end_flt", "important_kwd", "generated_questions_kwd"]
 
 
 def _not_found() -> ServiceError:
@@ -95,6 +95,8 @@ def chunk_dto(source: dict[str, Any]) -> dict[str, Any]:
         "positions": positions_of(source),
         "origin": str(source.get("origin_kwd") or ORIGIN_PARSED),
         "enabled": int(source.get("available_int", 1)) == 1,
+        **({"generated_keywords": source["important_kwd"]} if isinstance(source.get("important_kwd"), list) else {}),
+        **({"generated_questions": source["generated_questions_kwd"]} if isinstance(source.get("generated_questions_kwd"), list) else {}),
         **({"tables": tables_of(source)} if source.get(TABLE_FIELD) else {}),
     }
 
@@ -327,6 +329,11 @@ def update_chunk(
         vector = _embed(settings, visible, clean)  # any failure ends here: nothing has been written
         _check_deadline(started)
         features = text_features(clean)
+        if stored.get("important_kwd") or stored.get("generated_questions_kwd"):
+            # Hints describe the previous source text and must not survive an edit.
+            features.update({"important_kwd": [], "important_tks": "", "generated_questions_kwd": []})
+            if stored.get("generated_questions_kwd"):
+                features["question_tks"] = ""
         if doc.parser_id == "tag" or stored.get(TAG_FIELD):
             weights = tag_weights(clean,(doc.parser_config or {}).get("tag_top_n",8)) if doc.parser_id == "tag" else {}
             features.update({TAG_FIELD:weights,TAG_LABEL_FIELD:list(weights)})

@@ -12,4 +12,11 @@ describe("slide chunk card",()=>{
     expect(screen.getByTestId("chunk-slide")).toHaveTextContent("Slide 3");
     expect(screen.queryByTestId("chunk-page-chip")).toBeNull();
   });
+  it("renders generated hints as text without interpreting markup",()=>{
+    render(<ChunkCard chunk={{id:"hint-1",text:"52 metres",positions:[],origin:"parsed",enabled:true,generatedKeywords:["<img src=x onerror=alert(1)>","beacon altitude"],generatedQuestions:["How high is it?"]}} number={1} total={1} selected={false} showPages={false} canChange={false} busy={false} onSelect={vi.fn()} onChip={vi.fn()} onToggle={vi.fn()}/>);
+    expect(screen.getByTestId("chunk-generated-keywords")).toHaveTextContent("beacon altitude");
+    expect(screen.getByTestId("chunk-generated-keywords")).toHaveTextContent("<img src=x onerror=alert(1)>");
+    expect(screen.getByTestId("chunk-generated-questions")).toHaveTextContent("How high is it?");
+    expect(screen.queryByRole("img")).toBeNull();
+  });
 });

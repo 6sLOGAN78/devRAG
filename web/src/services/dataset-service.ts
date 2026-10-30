@@ -36,6 +36,8 @@ export interface UploadLimitsView {
 
 /** The dataset's default chunking values (the document dialog and the default chunking dialog load them). */
 export interface DatasetParserConfig {
+  autoKeywords?: number;
+  autoQuestions?: number;
   pages?: [number, number][];
   layoutRecognize?: boolean | string;
   resumeModel?: string;
@@ -133,6 +135,8 @@ function toParserConfig(raw: unknown): DatasetParserConfig {
   const tokens = count(dto.chunk_token_num);
   const overlap = count(dto.overlapped_percent);
   return {
+    autoKeywords: count(dto.auto_keywords),
+    autoQuestions: count(dto.auto_questions),
     chunkTokenNum: tokens > 0 ? tokens : DEFAULT_CHUNK_TOKEN_NUM,
     delimiter: typeof dto.delimiter === "string" && dto.delimiter !== "" ? dto.delimiter : DEFAULT_DELIMITER,
     overlappedPercent: overlap > 0 ? overlap : DEFAULT_OVERLAPPED_PERCENT,
@@ -217,6 +221,8 @@ export async function deleteDatasets(ids: string[], tenantId: string): Promise<s
 
 /** The default chunking method and values a save may change. An absent key is no change (the server merges). */
 export type DatasetChunkingInput = Partial<{
+  autoKeywords: number;
+  autoQuestions: number;
   pages: [number, number][];
   layoutRecognize: boolean | string;
   resumeModel?: string;
@@ -243,6 +249,8 @@ export async function updateDatasetChunking(id: string, input: DatasetChunkingIn
   if (input.chunkTokenNum !== undefined) config.chunk_token_num = input.chunkTokenNum;
   if (input.delimiter !== undefined) config.delimiter = input.delimiter;
   if (input.overlappedPercent !== undefined) config.overlapped_percent = input.overlappedPercent;
+  if (input.autoKeywords !== undefined) config.auto_keywords = input.autoKeywords;
+  if (input.autoQuestions !== undefined) config.auto_questions = input.autoQuestions;
   if (input.resumeModel !== undefined) config.resume_model = input.resumeModel;
   if (input.resumeUseModel !== undefined) config.resume_use_model = input.resumeUseModel;
   if (input.asrModel !== undefined) config.asr_model = input.asrModel;

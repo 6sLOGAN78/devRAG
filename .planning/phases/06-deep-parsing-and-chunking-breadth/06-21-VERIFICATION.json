@@ -1,0 +1,121 @@
+{
+  "recorded_at": "2026-10-30T16:55:14.776124+00:00",
+  "plan": "06-21",
+  "requirements": [
+    "CHUNK-22",
+    "CHUNK-23",
+    "LLM-32",
+    "UI-14"
+  ],
+  "new_packages": 0,
+  "new_models": 0,
+  "paid_external_calls": 0,
+  "local_asr_submissions_this_plan": 0,
+  "local_asr_remaining": 0,
+  "human_uat_approved": false,
+  "phase_gate_complete": false,
+  "evidence": {
+    "initial_red": {
+      "log": "ragflow-logs/phase6-21-red.log",
+      "sha256": "0bdbb6f678255b33aa9a503c2c651df7fc6905ee4572574e9aea90cfb318a0ea",
+      "result": "1 behavioral failure: auto_questions absent"
+    },
+    "marked_unit": {
+      "log": "ragflow-logs/phase6-21-unit-all-reviewed.log",
+      "sha256": "1f7cd0fbab5c0ea93f2898985df8569a4aa222df057aa6a2a736add9bc7d3abd",
+      "result": "2609 passed, 8 existing skipped, 51 deselected"
+    },
+    "frontend": {
+      "log": "ragflow-logs/phase6-21-web-all-final.log",
+      "sha256": "57b178d9d267676e106c0560622160ec6c81b90c3bb649ca7719329b779b0c21",
+      "result": "2189 passed; 113 files"
+    },
+    "services": {
+      "log": "ragflow-logs/phase6-21-services-first.log",
+      "sha256": "4c9180ef84c57c68322fd2f0a6cc63054942e3512d89b8946a2babb063c6d965",
+      "result": "97 passed"
+    },
+    "integration_product": {
+      "log": "ragflow-logs/phase6-21-integration-product.log",
+      "sha256": "5790b8d8d725d8c31e9e7ffe098f1a1a0eb6f2b4efc14b9dae9a777ae9290934",
+      "result": "3 passed"
+    },
+    "retrieval_es": {
+      "log": "ragflow-logs/phase6-21-retrieval-es.log",
+      "sha256": "661c3d0c7b7bfd926ada4b99515349fd098cd6a982cecd47fcfc1de58565835f",
+      "result": "18 passed"
+    },
+    "browser_final": {
+      "log": "ragflow-logs/phase6-21-browser-reviewed.log",
+      "sha256": "41ae39e003c327397087de842185ccf1612b0d7defd30041b6727a6b15b61fe9",
+      "result": "1 passed"
+    },
+    "browser_regression": {
+      "log": "ragflow-logs/phase6-21-browser-regression.log",
+      "sha256": "7966129aeedaf73233795b93b915f23264915492effc8a78c4a84c3ac134f6ea",
+      "result": "51 passed"
+    },
+    "leaks": {
+      "log": "ragflow-logs/phase6-21-leaks.log",
+      "sha256": "d7750a6ec17e2daee2b25f78cfd634db348624935c5f85c13611890e262e3470",
+      "result": "6 passed"
+    },
+    "ci_final": {
+      "log": "ragflow-logs/phase6-21-ci-final.log",
+      "sha256": "65caeb2b760fae7d6f9e28fd9d7fd91af5ffacdcd0010bfee2dfbceadbc450da",
+      "result": "7/7 passed"
+    },
+    "records": {
+      "log": "ragflow-logs/phase6-21-records.log",
+      "sha256": "dc73d5669fe02105037ac272969a74c0e92d8e4eda11ab9f36efd14f0fd1c648",
+      "result": "5 passed"
+    },
+    "app_build": {
+      "log": "ragflow-logs/phase6-21-app-build-score.log",
+      "sha256": "c073cc858adcf1cc3c134aac6691cde9a8bf4337ea9b2a642a37d559766f0b7f",
+      "result": "exit 0"
+    },
+    "health": {
+      "log": "ragflow-logs/phase6-21-health-score.log",
+      "sha256": "dafbc61308f1b634ab2b7661060fda84684fc4f7765f0cef827fdae1fe10e130",
+      "result": "healthy"
+    }
+  },
+  "original_fixture": {
+    "path": "test/fixtures/phase6/enrichment-original.txt",
+    "sha256": "b0e8a2665a742640abb238f5f4732793b7474349aa68ff3445aca0e9b1099596",
+    "annotation": "test/fixtures/phase6/enrichment-original-annotation.json",
+    "annotation_sha256": "04d3baf8a56a0bdfaab068cf1b2b8ed8086297432236ed667920afb74b92a59b"
+  },
+  "screenshots": [
+    {
+      "path": "output/playwright/phase6-review/enrichment-inspector.png",
+      "sha256": "8fb45f83e0f4c9315a3ecd85d66b587da0eb56fe850d2bc66353185e5adb5105",
+      "reviewer": "assistant, actual Chrome"
+    },
+    {
+      "path": "output/playwright/phase6-review/enrichment-retrieval.png",
+      "sha256": "e69033d0358fc240e9213f7a560f1470071d4b07d1ccae7f974a2b0a45c785c2",
+      "reviewer": "assistant, actual Chrome"
+    }
+  ],
+  "images": {
+    "app_worker": "sha256:6510ef743079c773c171fa5e511e0e7822802d3d3caeaae67767226708fbd372",
+    "deepdoc": "sha256:48a42906583236c5994225cf7b0bf520c7c7c570d33caca00f936dbc98240ddf",
+    "containers_match_images": true,
+    "health": "healthy"
+  },
+  "source_sha256": {
+    "rag/prompts/enrichment.py": "141fb8a607f476516cb47f1a00b4d07a47a1a5be92fdc1a9cbbe6d312c3358c9",
+    "rag/svr/enrichment.py": "e63a4e3e04d77cd4b0b2d32a197472c7a1d444946d5ebd4fe8307f515d7d5fc8",
+    "rag/svr/embedding.py": "7d04422e262870ee7c38011f910c6a8a96201308b962511f754e416da5c1abfb",
+    "rag/svr/pipeline.py": "05f67a718a66ecae9740281a3fb2163bbc63e9019198dd6786b2e0b7b3140cf4",
+    "rag/svr/chunk_doc.py": "9af0de063dc97abe15d0edcaa318be64a9280ada7d3cdb900a07ba54da92dd71",
+    "rag/nlp/search.py": "1f5b46495e4ed71ad6fbb19c553402a4266e0876e7a923959aca6783fd50ef88",
+    "api/db/services/parser_config.py": "794a44ddb0fcd2359f5db1ee4a60816a2339fa747fca0dd78af5f381343e42bc",
+    "api/db/services/chunk_service.py": "6436ffb8b24e6ffa12d32c7293922cdefb8bc66d510ac7cfe9d5c752c1dc5633",
+    "web/src/components/parse-configuration/index.tsx": "de88d1e219d55a0c345f2e22179aef426911e0c58ccaa71ffd3216c9a6ce94ec",
+    "web/src/pages/chunk/chunk-card.tsx": "76f732ba6846ccd1cea43ca539b23f210587d3907bfd013fdf52c41ef7a1f8da"
+  },
+  "notes": "Original 52 metres/73 units source; generated-only beacon altitude finds it with term similarity 1.00 without raw-source rewrite. Model calls off=0, on=1 in local provider; malformed output, missing chat default, context/input caps and cancellation refuse. Text edit clears stale hints. Prior failed Chrome logs retained; product score gap corrected and verified. R252 automatic only. Phase5 human acceptance, Phase4 B36 and final Phase6 gate/UAT pending. Prior three ASR submissions exhausted; no replay."
+}

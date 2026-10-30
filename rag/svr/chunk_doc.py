@@ -77,6 +77,8 @@ def build_row(
     now: datetime.datetime | None = None,
     pagerank: int = 0,
     meta_fields: dict[str, Any] | None = None,
+    keywords: tuple[str, ...] = (),
+    questions: tuple[str, ...] = (),
 ) -> dict[str, Any]:
     chunk_id = parsed_chunk_id(doc_id, from_page, index, to_page)
     moment = now or datetime.datetime.now()
@@ -111,6 +113,12 @@ def build_row(
         features["source_paths_kwd"] = list(dict.fromkeys(s.source_path for s in chunk.sections if s.source_path))
     if chunk.question:
         features["question_tks"] = " ".join(tokenize(chunk.question))
+    if keywords:
+        features["important_kwd"] = list(keywords)
+        features["important_tks"] = " ".join(tokenize(" ".join(keywords)))
+    if questions:
+        features["question_tks"] = " ".join(tokenize(" ".join((*((chunk.question,) if chunk.question else ()), *questions))))
+        features["generated_questions_kwd"] = list(questions)
     if chunk.source_lines:
         features["source_lines_int"] = [list(bounds) for bounds in chunk.source_lines]
     if chunk.image_ids:

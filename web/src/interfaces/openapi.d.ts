@@ -800,6 +800,10 @@ export interface components {
             audio: components["schemas"]["AudioView"] | null;
             /** Enabled */
             enabled: boolean;
+            /** Generated Keywords */
+            generated_keywords?: string[];
+            /** Generated Questions */
+            generated_questions?: string[];
             /** Id */
             id: string;
             /** Origin */
@@ -828,6 +832,16 @@ export interface components {
              * @default null
              */
             audio_language: unknown;
+            /**
+             * Auto Keywords
+             * @default null
+             */
+            auto_keywords: unknown;
+            /**
+             * Auto Questions
+             * @default null
+             */
+            auto_questions: unknown;
             /**
              * Chunk Token Num
              * @default null
@@ -1028,6 +1042,16 @@ export interface components {
              * @default null
              */
             audio_language: string | null;
+            /**
+             * Auto Keywords
+             * @default 0
+             */
+            auto_keywords: number;
+            /**
+             * Auto Questions
+             * @default 0
+             */
+            auto_questions: number;
             /** Chunk Count */
             chunk_count: number;
             /** Chunk Token Num */

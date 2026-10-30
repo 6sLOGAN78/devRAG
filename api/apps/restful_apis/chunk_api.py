@@ -83,6 +83,8 @@ class ChunkView(BaseModel):
     positions: list[PositionView]
     origin: str
     enabled: bool
+    generated_keywords: list[str] = Field(default_factory=list)
+    generated_questions: list[str] = Field(default_factory=list)
 
 
 class ChunkPage(BaseModel):

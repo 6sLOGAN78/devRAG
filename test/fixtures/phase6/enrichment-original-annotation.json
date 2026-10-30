@@ -1,0 +1,8 @@
+{
+  "origin": "Original fictional source written for Phase 6 Plan 21 before model selection",
+  "source": "enrichment-original.txt",
+  "facts": ["east lighthouse", "52 metres", "optical calibration", "73 units"],
+  "generated_query_term": "beacon altitude",
+  "generated_query_term_in_source": false,
+  "expected_preservation": "The indexed content_with_weight remains the original source; generated terms appear only in retrieval feature fields."
+}

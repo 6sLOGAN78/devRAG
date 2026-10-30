@@ -28,6 +28,8 @@ export type ChunkTarget =
 
 /** The stored method and values the form starts from, whichever mode loaded them. */
 export interface ChunkSettings {
+  autoKeywords?: number;
+  autoQuestions?: number;
   pages?: [number, number][];
   layoutRecognize?: boolean | string;
   resumeModel?: string;
@@ -54,11 +56,13 @@ export interface ChunkMethodFormProps {
   onClose: () => void;
 }
 
-type Changes = {resumeModel?:string;resumeUseModel?:boolean;asrModel?:string;audioLanguage?:string;imageModel?:string;pictureOcrOnly?:boolean; parserId?: string; chunkTokenNum?: number; delimiter?: string; overlappedPercent?: number; pages?: [number, number][]; layoutRecognize?: boolean | string };
+type Changes = {autoKeywords?:number;autoQuestions?:number;resumeModel?:string;resumeUseModel?:boolean;asrModel?:string;audioLanguage?:string;imageModel?:string;pictureOcrOnly?:boolean; parserId?: string; chunkTokenNum?: number; delimiter?: string; overlappedPercent?: number; pages?: [number, number][]; layoutRecognize?: boolean | string };
 
 /** The keys whose value differs from the stored one: exactly what the request carries. Layout and keywords are never among them. */
-function changesOf(settings: ChunkSettings, method: string, values: { chunkSize: number; delimiters: string; overlap: number; pageRanges: [number, number][]; layoutRecognize: boolean | string; resumeModel?:string;resumeUseModel?:boolean;asrModel?:string;audioLanguage?:string;imageModel?:string;pictureOcrOnly?:boolean }): Changes {
+function changesOf(settings: ChunkSettings, method: string, values: { chunkSize: number; delimiters: string; overlap: number; pageRanges: [number, number][]; layoutRecognize: boolean | string; autoKeywords:number;autoQuestions:number;resumeModel?:string;resumeUseModel?:boolean;asrModel?:string;audioLanguage?:string;imageModel?:string;pictureOcrOnly?:boolean }): Changes {
   const changes: Changes = {};
+  if (values.autoKeywords !== (settings.autoKeywords ?? 0)) changes.autoKeywords=values.autoKeywords;
+  if (values.autoQuestions !== (settings.autoQuestions ?? 0)) changes.autoQuestions=values.autoQuestions;
   if ((values.resumeModel ?? "") !== (settings.resumeModel ?? "")) changes.resumeModel=values.resumeModel ?? "";
   if ((values.resumeUseModel ?? false) !== (settings.resumeUseModel ?? false)) changes.resumeUseModel=values.resumeUseModel ?? false;
   if ((values.asrModel ?? "") !== (settings.asrModel ?? "")) changes.asrModel=values.asrModel ?? "";
@@ -74,7 +78,7 @@ function changesOf(settings: ChunkSettings, method: string, values: { chunkSize:
   return changes;
 }
 
-const FIELD_NAMES = ["chunkSize", "delimiters", "overlap", "pageRanges", "layoutRecognize", "imageModel", "pictureOcrOnly", "asrModel", "audioLanguage", "resumeModel", "resumeUseModel"] as const satisfies readonly ParseConfigField[];
+const FIELD_NAMES = ["chunkSize", "delimiters", "overlap", "pageRanges", "layoutRecognize", "autoKeywords", "autoQuestions", "imageModel", "pictureOcrOnly", "asrModel", "audioLanguage", "resumeModel", "resumeUseModel"] as const satisfies readonly ParseConfigField[];
 
 /**
  * The form of the chunking dialog: the method group (only General can be chosen), the settings of General and the
@@ -101,6 +105,8 @@ export function ChunkMethodForm({ target, settings, pendingRef, onClose }: Chunk
       layoutRecognize: settings.layoutRecognize ?? true,
       resumeModel:settings.resumeModel ?? "",
       resumeUseModel:settings.resumeUseModel ?? false,
+      autoKeywords:String(settings.autoKeywords ?? 0),
+      autoQuestions:String(settings.autoQuestions ?? 0),
       asrModel:settings.asrModel ?? "",
       audioLanguage:settings.audioLanguage ?? "",
       imageModel:settings.imageModel ?? "",
@@ -138,6 +144,8 @@ export function ChunkMethodForm({ target, settings, pendingRef, onClose }: Chunk
     if (field === "layoutRecognize") return t("errors.chunking.layout");
     if (field === "pageRanges") return t("errors.chunking.pagesRange");
     if (field === "chunkSize") return t("errors.chunking.sizeRange");
+    if (field === "autoKeywords") return t("errors.chunking.keywordRange");
+    if (field === "autoQuestions") return t("errors.chunking.questionRange");
     if (field === "overlap") return t("errors.chunking.overlapRange");
     return [...fromEscaped(form.getValues("delimiters"))].length === 0 ? t("errors.chunking.delimitersRequired") : t("errors.chunking.delimitersMax");
   }

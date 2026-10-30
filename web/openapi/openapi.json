@@ -274,6 +274,20 @@
             "title": "Enabled",
             "type": "boolean"
           },
+          "generated_keywords": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Generated Keywords",
+            "type": "array"
+          },
+          "generated_questions": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Generated Questions",
+            "type": "array"
+          },
           "id": {
             "title": "Id",
             "type": "string"
@@ -333,6 +347,14 @@
           "audio_language": {
             "default": null,
             "title": "Audio Language"
+          },
+          "auto_keywords": {
+            "default": null,
+            "title": "Auto Keywords"
+          },
+          "auto_questions": {
+            "default": null,
+            "title": "Auto Questions"
           },
           "chunk_token_num": {
             "default": null,
@@ -762,6 +784,16 @@
             ],
             "default": null,
             "title": "Audio Language"
+          },
+          "auto_keywords": {
+            "default": 0,
+            "title": "Auto Keywords",
+            "type": "integer"
+          },
+          "auto_questions": {
+            "default": 0,
+            "title": "Auto Questions",
+            "type": "integer"
           },
           "chunk_count": {
             "title": "Chunk Count",

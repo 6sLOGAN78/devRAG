@@ -28,6 +28,8 @@ export interface FileExtra {
   pages?: [number, number][];
   resumeModel?: string;
   resumeUseModel?: boolean;
+  autoKeywords?: number;
+  autoQuestions?: number;
   layoutRecognize?: boolean | string;
   chunkTokenNum?: number;
   delimiter?: string;
@@ -42,6 +44,8 @@ export interface LogRow {
 
 /** A document's chunking values or a dataset's default (R-167: the `document-settings` area writes them). */
 export interface ChunkingValues {
+  autoKeywords?: number;
+  autoQuestions?: number;
   pages?: [number, number][];
   resumeModel?: string;
   resumeUseModel?: boolean;
@@ -85,6 +89,8 @@ export function documentValuesOf(server: DatasetServer, docId: string): Chunking
   return {
     ...(extra.resumeModel === undefined ? {} : {resumeModel:extra.resumeModel}),
     ...(extra.resumeUseModel === undefined ? {} : {resumeUseModel:extra.resumeUseModel}),
+    ...(extra.autoKeywords === undefined ? {} : {autoKeywords:extra.autoKeywords}),
+    ...(extra.autoQuestions === undefined ? {} : {autoQuestions:extra.autoQuestions}),
     ...(extra.layoutRecognize === undefined ? {} : { layoutRecognize: extra.layoutRecognize }),
     ...(extra.pages === undefined ? {} : { pages: extra.pages }),
     chunkTokenNum: extra.chunkTokenNum ?? BUILT_IN_VALUES.chunkTokenNum,
@@ -172,6 +178,8 @@ export function documentDetailOf(server: DatasetServer, row: DocumentRow) {
     ...viewOf(row, stateOf(server)),
     resume_model: values.resumeModel ?? "",
     resume_use_model: values.resumeUseModel ?? false,
+    auto_keywords: values.autoKeywords ?? 0,
+    auto_questions: values.autoQuestions ?? 0,
     ...(values.layoutRecognize === undefined ? {} : { layout_recognize: values.layoutRecognize }),
     ...(values.pages === undefined ? {} : { pages: values.pages }),
     chunk_token_num: values.chunkTokenNum,
@@ -210,6 +218,8 @@ export const handle: AreaHandler = ({ server, config, method, url, params, ok })
       language: "English",
       parser_id: datasetDefaultsOf(server, row.id).parserId,
       parser_config: {
+        auto_keywords: datasetDefaultsOf(server, row.id).autoKeywords ?? 0,
+        auto_questions: datasetDefaultsOf(server, row.id).autoQuestions ?? 0,
         ...(datasetDefaultsOf(server, row.id).layoutRecognize === undefined ? {} : { layout_recognize: datasetDefaultsOf(server, row.id).layoutRecognize }),
         ...(datasetDefaultsOf(server, row.id).pages === undefined ? {} : { pages: datasetDefaultsOf(server, row.id).pages }),
         chunk_token_num: datasetDefaultsOf(server, row.id).chunkTokenNum,

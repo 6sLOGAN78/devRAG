@@ -34,6 +34,8 @@ logger = logging.getLogger(__name__)
 SELECT_FIELDS = [
     "content_with_weight",
     "content_ltks",
+    "important_tks",
+    "question_tks",
     "title_tks",
     "docnm_kwd",
     "doc_id",
@@ -235,7 +237,7 @@ class Retriever:
         weight = request.vector_similarity_weight
         for candidate in pool:
             row = candidate.row
-            text = f"{row.get('content_ltks') or ''} {row.get('title_tks') or ''}"
+            text = f"{row.get('content_ltks') or ''} {row.get('title_tks') or ''} {row.get('important_tks') or ''} {row.get('question_tks') or ''}"
             candidate.tsim = token_overlap(plan.tokens, tokenize(text))
             candidate.vsim = cosine.get(str(row["id"]), 0.0)
             candidate.sim = fuse(candidate.tsim, candidate.vsim, weight, self._rank_tags(request.question, row))

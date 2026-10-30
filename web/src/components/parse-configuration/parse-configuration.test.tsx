@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { render, screen, within } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { useForm } from "react-hook-form";
 import { describe, expect, it } from "vitest";
@@ -126,14 +126,13 @@ describe("ParseConfiguration", () => {
     expect(screen.getByTestId("field-chunk-size")).toHaveAttribute("inputmode", "numeric");
   });
 
-  it("keeps only future auto-keywords as text with a badge and no form control", () => {
+  it("offers bounded keyword and question counts with off defaults", () => {
     render(<Probe />);
-    const group = screen.getByTestId("parse-config-unavailable");
-    expect(within(group).getByText("Not available yet")).toBeInTheDocument();
-    expect(within(group).queryByText("Layout recognition")).toBeNull();
-    expect(within(group).getByText("Auto-keywords")).toBeInTheDocument();
-    expect(within(group).getAllByText("Available in a later release")).toHaveLength(1);
-    expect(group.querySelectorAll("input, select, textarea, button")).toHaveLength(0);
+    expect(screen.getByTestId("field-auto-keywords")).toHaveValue(0);
+    expect(screen.getByTestId("field-auto-keywords")).toHaveAttribute("max", "32");
+    expect(screen.getByTestId("field-auto-questions")).toHaveValue(0);
+    expect(screen.getByTestId("field-auto-questions")).toHaveAttribute("max", "16");
+    expect(screen.queryByTestId("parse-config-unavailable")).toBeNull();
   });
 
   it("shows a range message under the field after an invalid entry", async () => {
