@@ -57,6 +57,7 @@ export interface DocumentRow {
   dataset_id: string;
   created_by: string;
   parser_id: string;
+  metadata?: Record<string, string | number | boolean | null | string[]>;
   chunk_num: number;
   update_time: number;
   create_time: number;

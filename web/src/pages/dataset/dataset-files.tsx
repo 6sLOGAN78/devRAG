@@ -23,6 +23,7 @@ import { MAX_DOCUMENT_KEYWORDS_LENGTH, type DocumentView } from "@/services/docu
 import type { IngestionLogDetail } from "@/services/ingestion-service";
 import { DocumentRow } from "./document-row";
 import { IngestionSummary } from "./ingestion-summary";
+import { DatasetMetadata } from "./metadata";
 import { useParseActions, useParseAnnouncements } from "./parse-actions";
 import { ParsingDetailsSheet } from "./parsing-details-sheet";
 import { ReparseDialog } from "./reparse-dialog";
@@ -92,6 +93,8 @@ export function DatasetFiles({ dataset, limits, page, keywords, onPageChange, on
   const [focusCaption, setFocusCaption] = useState(false);
   const [seenDocuments, setSeenDocuments] = useState(false);
   const [selected, setSelected] = useState<ReadonlySet<string>>(new Set());
+  const [metadataOpen, setMetadataOpen] = useState(false);
+  useEffect(() => setMetadataOpen(false), [dataset.id, dataset.tenantId]);
   const reparseIds = useRef<string[]>([]);
   // The details sheet keeps its entry after closing so it can slide out with its content; the body mounts only while open.
   const detailsOpener = useRef<HTMLElement | null>(null);
@@ -347,6 +350,7 @@ export function DatasetFiles({ dataset, limits, page, keywords, onPageChange, on
               onParse={() => void actions.parse(parseIds, afterBulk)}
               onCancel={() => void actions.cancel(cancelIds, afterBulk)}
               onClear={() => setSelected(new Set())}
+              onMetadata={() => setMetadataOpen(true)}
             />
           ) : null}
         </div>
@@ -362,6 +366,7 @@ export function DatasetFiles({ dataset, limits, page, keywords, onPageChange, on
         </Alert>
       ) : null}
       <Card className="overflow-x-auto">{body}</Card>
+      <DatasetMetadata key={`${dataset.tenantId}:${dataset.id}`} datasetId={dataset.id} tenantId={dataset.tenantId} selected={selectedItems} open={metadataOpen} onOpenChange={setMetadataOpen} />
       {!documents.isPending && !documents.isError && !pastEnd && items.length > 0 ? (
         <Pagination
           page={page}

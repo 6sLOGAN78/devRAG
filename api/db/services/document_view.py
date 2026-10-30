@@ -33,6 +33,7 @@ ROW_KEYS: tuple[str, ...] = (
     "id", "name", "size", "type", "suffix", "dataset_id", "created_by", "parser_id", "create_time", "update_time",
     "run", "progress", "progress_message", "chunk_count", "token_num", "parseable", "enabled", "thumbnail", "last_log_id",
     "pages_total", "pages_without_text", "error",
+    "metadata",
 )  # fmt: skip
 MAX_MESSAGE = 300
 MESSAGE_TAIL = 2000
@@ -46,7 +47,7 @@ def _columns() -> tuple[Any, ...]:
     return (
         Document.id, Document.name, Document.size, Document.type, Document.suffix, Document.run, Document.progress, Document.kb_id,
         Document.created_by, Document.parser_id, Document.chunk_num, Document.token_num, Document.create_time, Document.update_time,
-        Document.status, thumb,
+        Document.status, Document.meta_fields, thumb,
     )  # fmt: skip
 
 
@@ -91,6 +92,7 @@ def row_dto(doc: Document, latest_log: Mapping[str, Any] | None, progress_messag
         "dataset_id": doc.kb_id,
         "created_by": doc.created_by,
         "parser_id": doc.parser_id,
+        "metadata": {key: value for key, value in (doc.meta_fields or {}).items() if isinstance(key, str) and not key.startswith("_")},
         "create_time": int(doc.create_time or 0),
         "update_time": int(doc.update_time or 0),
         "run": doc.run,

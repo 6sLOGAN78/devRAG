@@ -84,6 +84,7 @@ class Document(BaseModel):
     pipeline_id = peewee.CharField(max_length=32, null=True, help_text="pipeline ID", index=True)
     parser_config = JSONField(null=False, default=default_parser_config)
     source_type = peewee.CharField(max_length=128, null=False, default="local", constraints=db_default("local"), help_text="where dose this document come from", index=True)
+    meta_fields = JSONField(null=False, default=dict)
     type = peewee.CharField(max_length=32, null=False, help_text="file extension", index=True)
     created_by = peewee.CharField(max_length=32, null=False, help_text="who created it", index=True)
     name = peewee.CharField(max_length=255, null=True, help_text="file name", index=True)

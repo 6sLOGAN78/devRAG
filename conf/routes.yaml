@@ -170,6 +170,12 @@ endpoints:
      note: "plan 06-19 bounded weighted tags from current authorized document sources"}
   - {method: DELETE, path: "/api/v1/datasets/{dataset_id}/tags", owner: python, auth: api, roles: [owner, admin, normal], scope: tenant, implemented: true,
      note: "plan 06-19 explicit selected tag deletion; dataset manage rights and parse fence required"}
+  - {method: GET, path: "/api/v1/datasets/metadata/flattened", owner: python, auth: api, roles: [owner, admin, normal], scope: tenant, implemented: true,
+     note: "plan 06-20 flattened metadata from all explicitly selected authorized datasets"}
+  - {method: GET, path: "/api/v1/datasets/{dataset_id}/metadata/config", owner: python, auth: api, roles: [owner, admin, normal], scope: tenant, implemented: true,
+     note: "plan 06-20 bounded auto-metadata configuration for one visible dataset"}
+  - {method: PATCH, path: "/api/v1/datasets/{dataset_id}/documents/metadatas", owner: python, auth: api, roles: [owner, admin, normal], scope: tenant, implemented: true,
+     note: "plan 06-20 selected-document metadata update with full batch authorization and checked index writes"}
   - {method: GET, path: "/api/v1/datasets/{dataset_id}", owner: python, auth: api, roles: [owner, admin, normal], scope: tenant, implemented: true,
      note: "plan 03-14 reads a dataset; invisible and foreign ids answer the one 404 (D-20)"}
   - {method: PUT, path: "/api/v1/datasets/{dataset_id}", owner: python, auth: api, roles: [owner, admin, normal], scope: tenant, implemented: true,

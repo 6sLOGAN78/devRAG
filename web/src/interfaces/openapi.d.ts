@@ -116,6 +116,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/datasets/metadata/flattened": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["get_flattened_metadata"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/datasets/search": {
         parameters: {
             query?: never;
@@ -194,6 +210,22 @@ export interface paths {
         options?: never;
         head?: never;
         patch?: never;
+        trace?: never;
+    };
+    "/api/v1/datasets/{dataset_id}/documents/metadatas": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["patch_edit_metadata"];
         trace?: never;
     };
     "/api/v1/datasets/{dataset_id}/documents/parse": {
@@ -348,6 +380,22 @@ export interface paths {
             cookie?: never;
         };
         get: operations["get_get_log"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/datasets/{dataset_id}/metadata/config": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["get_metadata_config"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1009,6 +1057,10 @@ export interface components {
              * @default true
              */
             layout_recognize: boolean | string;
+            /** Metadata */
+            metadata?: {
+                [key: string]: unknown;
+            };
             /** Name */
             name: string;
             /** Overlapped Percent */
@@ -1098,6 +1150,10 @@ export interface components {
             id: string;
             /** Last Log Id */
             last_log_id: string | null;
+            /** Metadata */
+            metadata?: {
+                [key: string]: unknown;
+            };
             /** Name */
             name: string;
             /** Pages Total */
@@ -1161,6 +1217,13 @@ export interface components {
             /** Update Time */
             update_time: number;
         };
+        /** EditedMetadata */
+        EditedMetadata: {
+            /** Count */
+            count: number;
+            /** Document Ids */
+            document_ids: string[];
+        };
         /** ErrorView */
         ErrorView: {
             /** Code */
@@ -1181,6 +1244,17 @@ export interface components {
             feedback: ("up" | "down") | null;
             /** Message Id */
             message_id: string;
+        };
+        /** FlattenedMetadata */
+        FlattenedMetadata: {
+            /** Fields */
+            fields: components["schemas"]["MetadataField"][];
+            /** Has More */
+            has_more: boolean;
+            /** Page */
+            page: number;
+            /** Page Size */
+            page_size: number;
         };
         /** HealthData */
         HealthData: {
@@ -1283,6 +1357,35 @@ export interface components {
             retried: boolean;
             /** Started At */
             started_at: number;
+        };
+        /** MetadataConfig */
+        MetadataConfig: {
+            /** Enabled */
+            enabled: boolean;
+            /** Model Id */
+            model_id: string;
+            /** Schema */
+            schema: components["schemas"]["MetadataSchemaField"][];
+        };
+        /** MetadataField */
+        MetadataField: {
+            /** Name */
+            name: string;
+            /** Total */
+            total: number;
+            /** Type */
+            type: string;
+            /** Values */
+            values: unknown[];
+        };
+        /** MetadataSchemaField */
+        MetadataSchemaField: {
+            /** Name */
+            name: string;
+            /** Required */
+            required: boolean;
+            /** Type */
+            type: string;
         };
         /** ModelBody */
         ModelBody: {
@@ -2175,6 +2278,31 @@ export interface operations {
             };
         };
     };
+    get_flattened_metadata: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Code */
+                        code: number;
+                        data: components["schemas"]["FlattenedMetadata"];
+                        /** Message */
+                        message: string;
+                    };
+                };
+            };
+        };
+    };
     post_search_datasets: {
         parameters: {
             query?: never;
@@ -2486,6 +2614,50 @@ export interface operations {
                         /** Code */
                         code: number;
                         data: components["schemas"]["StatusChange"];
+                        /** Message */
+                        message: string;
+                    };
+                };
+            };
+        };
+    };
+    patch_edit_metadata: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                dataset_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": {
+                    /** Document Ids */
+                    document_ids: string[];
+                    /** Metadata */
+                    metadata: {
+                        [key: string]: unknown;
+                    };
+                    /**
+                     * Mode
+                     * @default merge
+                     * @enum {string}
+                     */
+                    mode?: "merge" | "replace";
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Code */
+                        code: number;
+                        data: components["schemas"]["EditedMetadata"];
                         /** Message */
                         message: string;
                     };
@@ -2851,6 +3023,33 @@ export interface operations {
                         /** Code */
                         code: number;
                         data: components["schemas"]["LogDetailView"];
+                        /** Message */
+                        message: string;
+                    };
+                };
+            };
+        };
+    };
+    get_metadata_config: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                dataset_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Code */
+                        code: number;
+                        data: components["schemas"]["MetadataConfig"];
                         /** Message */
                         message: string;
                     };

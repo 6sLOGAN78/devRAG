@@ -165,6 +165,19 @@ def _inv_aggregate_dataset_tags(w: World, who: Account | None, token: str, as_te
     return call(w.client,"GET",DATASETS+"/tags/aggregation",token,{},query={"dataset_ids":_team_id(w)})
 
 
+def _inv_flattened_metadata(w: World, who: Account | None, token: str, as_tenant: str | None) -> httpx.Response:
+    return call(w.client, "GET", DATASETS + "/metadata/flattened", token, {}, query={"dataset_ids": _team_id(w)})
+
+
+def _inv_metadata_config(w: World, who: Account | None, token: str, as_tenant: str | None) -> httpx.Response:
+    return call(w.client, "GET", f"{DATASETS}/{_team_id(w)}/metadata/config", token, {})
+
+
+def _inv_edit_metadata(w: World, who: Account | None, token: str, as_tenant: str | None) -> httpx.Response:
+    body = {"document_ids": [str(w.a_team_documents[0]["id"])], "metadata": {"isolation_note": "bounded"}, "mode": "merge"}
+    return call(w.client, "PATCH", f"{DATASETS}/{_team_id(w)}/documents/metadatas", token, {}, body=body)
+
+
 def _inv_update_dataset(w: World, who: Account | None, token: str, as_tenant: str | None) -> httpx.Response:
     return call(w.client, "PUT", f"{DATASETS}/{_team_id(w)}", token, {}, body={"description": "isolation-table"})
 
@@ -324,6 +337,9 @@ def _inv_completion(w: World, who: Account | None, token: str, as_tenant: str | 
 
 
 INVOKERS: dict[str, Invoker] = {
+    "GET /api/v1/datasets/metadata/flattened": _inv_flattened_metadata,
+    "GET /api/v1/datasets/{dataset_id}/metadata/config": _inv_metadata_config,
+    "PATCH /api/v1/datasets/{dataset_id}/documents/metadatas": _inv_edit_metadata,
     "GET /api/v1/datasets/tags/aggregation": _inv_aggregate_dataset_tags,
     "GET /api/v1/datasets/{dataset_id}/tags": _inv_dataset_tags,
     "DELETE /api/v1/datasets/{dataset_id}/tags": _inv_delete_dataset_tags,
@@ -402,8 +418,11 @@ PRIVATE_SESSION_ROWS = frozenset({
 ID_ROWS = frozenset(
     {
         "GET /api/v1/datasets/tags/aggregation",
+        "GET /api/v1/datasets/metadata/flattened",
         "GET /api/v1/datasets/{dataset_id}/tags",
         "DELETE /api/v1/datasets/{dataset_id}/tags",
+        "GET /api/v1/datasets/{dataset_id}/metadata/config",
+        "PATCH /api/v1/datasets/{dataset_id}/documents/metadatas",
         "GET /api/v1/datasets/{dataset_id}",
         "PUT /api/v1/datasets/{dataset_id}",
         "DELETE /api/v1/datasets",

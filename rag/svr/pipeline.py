@@ -250,6 +250,7 @@ def _index_batches(ctx: TaskContext, deps: PipelineDeps, control: TaskControl, c
                     vector=v,
                     enabled=switch.enabled,
                     pagerank=getattr(ctx, "pagerank", 0),
+                    meta_fields=getattr(ctx, "meta_fields", {}),
                 )
                 for k, (c, v) in enumerate(zip(batch, vectors, strict=True))
             ]

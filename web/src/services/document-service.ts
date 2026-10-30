@@ -21,6 +21,7 @@ export interface DocumentView {
   datasetId: string;
   createdBy: string;
   parserId: string;
+  metadata: Record<string, string | number | boolean | null | string[]>;
   chunkNum: number;
   updateTime: number;
   createTime: number;
@@ -85,6 +86,17 @@ function toError(raw: unknown): DocumentErrorView | null {
   return { step: text(dto.step), code: text(dto.code), message: text(dto.message).slice(0, MAX_PROGRESS_MESSAGE_LENGTH + 1) };
 }
 
+function toMetadata(raw: unknown): DocumentView["metadata"] {
+  if (typeof raw !== "object" || raw === null || Array.isArray(raw)) return {};
+  const result: DocumentView["metadata"] = {};
+  for (const [key, value] of Object.entries(raw).slice(0, 32)) {
+    if (!/^[A-Za-z][A-Za-z0-9_-]{0,63}$/.test(key)) continue;
+    if (value === null || typeof value === "string" && value.length <= 4096 || typeof value === "boolean" || typeof value === "number" && Number.isFinite(value)) result[key] = value;
+    else if (Array.isArray(value) && value.length <= 32 && value.every(item => typeof item === "string" && item.length <= 4096)) result[key] = value;
+  }
+  return result;
+}
+
 export function toDocument(raw: unknown): DocumentView {
   const dto = asRecord(raw);
   const chunks = count(dto.chunk_count !== undefined ? dto.chunk_count : dto.chunk_num);
@@ -99,6 +111,7 @@ export function toDocument(raw: unknown): DocumentView {
     datasetId: text(dto.dataset_id),
     createdBy: text(dto.created_by),
     parserId: text(dto.parser_id),
+    metadata: toMetadata(dto.metadata),
     chunkNum: chunks,
     updateTime: count(dto.update_time),
     createTime: count(dto.create_time),

@@ -587,7 +587,7 @@ Scope notes: this is the PROJECT.md Core Value. No Phase 6, 7 or 8 work starts u
 
 **Planning status (2026-10-27):** Research and UI contract complete; structural checks30/30,90 task verifications,58/58 primary requirements plus RETR-13 producer handoff covered. No Phase6 native package/model acquisition or paid inference performed. Automatic entry completed the read-only audit/preparation and stops at the exact-candidate blocking-human approval in06-01 Task2.20 audit-tool tests pass; native acquisition/features have not started. Phase5 human UAT and Phase4 B36 remain pending.
 
-**Execution status (2026-10-30):** 19/30 plans complete. Tag/PageRank weights, authorized tag management, ranking and source verified; markedunit2588/8existing skips,web2183,Go,services193,Chrome/dataset51,matrix17,leaks6,CI7. No new packages/models/paid/ASR calls. Next20 bounded document metadata; full phase gate and human validation pending.
+**Execution status (2026-10-30):** 20/30 plans complete. Bounded document metadata batch edit, flattened inventory and config verified on migrated MySQL and rebuilt app; marked unit2597/8 existing skips, web2186, Go, services98, integration2, Chrome1, document flow23, matrix17 and CI7. No new packages/models/paid/ASR calls. Next21 generated keywords/questions; full phase gate and human validation pending.
 
 **Wave 1** *(admission audit and blocking-human acquisition checkpoint)*
 
@@ -648,7 +648,7 @@ Scope notes: this is the PROJECT.md Core Value. No Phase 6, 7 or 8 work starts u
 - [x] 06-19-PLAN.md — Manage tags and produce retrieval rank features
 **Wave 20** *(blocked on Wave 19 completion and accepted06-01 snapshot)*
 
-- [ ] 06-20-PLAN.md — Edit and inspect bounded document metadata
+- [x] 06-20-PLAN.md — Edit and inspect bounded document metadata
 **Wave 21** *(blocked on Wave 20 completion and accepted06-01 snapshot)*
 
 - [ ] 06-21-PLAN.md — Generate keywords and questions when requested
@@ -753,6 +753,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8. Ph
 | 3. Models, Knowledge Bases and Upload | 31/31 | Complete | 2026-10-10 |
 | 4. Ingestion Pipeline | 35/35 | Human verification pending (B-36 deferred) | 2026-10-19 |
 | 5. Retrieval and Cited Chat (Core Value Gate) | 28/28 | Automated gate passed; human review pending | 2026-10-27 |
-| 6. Deep Parsing and Chunking Breadth | 19/30 | Executing; Tag/PageRank passed | - |
+| 6. Deep Parsing and Chunking Breadth | 20/30 | Executing; document metadata passed | - |
 | 7. Agents and Workflows | 0/TBD | Not started | - |
 | 8. Go Surface, CLI, Integrations, Billing and Production Deployment | 0/TBD | Not started | - |

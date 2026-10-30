@@ -14,6 +14,7 @@ type Document struct {
 	ID              string     `gorm:"column:id;primaryKey;autoIncrement:false;not null" json:"id"`
 	KBID            string     `gorm:"column:kb_id;not null" json:"kb_id"`
 	Location        *string    `gorm:"column:location" json:"location"`
+	MetaFields      string     `gorm:"column:meta_fields;not null" json:"meta_fields"`
 	Name            *string    `gorm:"column:name" json:"name"`
 	ParserConfig    string     `gorm:"column:parser_config;not null" json:"parser_config"`
 	ParserID        string     `gorm:"column:parser_id;not null" json:"parser_id"`

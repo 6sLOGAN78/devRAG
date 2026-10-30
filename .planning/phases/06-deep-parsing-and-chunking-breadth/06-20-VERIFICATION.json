@@ -1,0 +1,110 @@
+{
+  "recorded_at": "2026-10-30T16:31:03.549414+00:00",
+  "plan": "06-20",
+  "requirements": [
+    "DOC-17",
+    "KB-12",
+    "KB-13"
+  ],
+  "new_packages": 0,
+  "new_models": 0,
+  "paid_external_calls": 0,
+  "local_asr_submissions_this_plan": 0,
+  "local_asr_remaining": 0,
+  "human_uat_approved": false,
+  "phase_gate_complete": false,
+  "evidence": {
+    "initial_red": {
+      "log": "ragflow-logs/phase6-20-red.log",
+      "sha256": "deae991973e95b53a056c957ab00fcb946997c4fb17a004d3c42ea31a5a31cf6",
+      "result": "1 behavioral failure: Document.meta_fields absent"
+    },
+    "schema_migration": {
+      "log": "ragflow-logs/phase6-20-schema.log",
+      "sha256": "9bb0ec0c11adc37e464495f6c61f24fe6189ae66642d2560a5e31b2b852fcdd1",
+      "result": "14 passed"
+    },
+    "marked_unit": {
+      "log": "ragflow-logs/phase6-20-unit-all.log",
+      "sha256": "c22d00486c9e5aef343db1d0552d4bb1857713b3583f8e19e832630341aa29a1",
+      "result": "2597 passed, 8 existing skipped, 51 deselected"
+    },
+    "frontend": {
+      "log": "ragflow-logs/phase6-20-web-all-final.log",
+      "sha256": "869102d99c75bc145aab8be6b0d95a49c35eae0e65bcb89b95c1a23f569946da",
+      "result": "2186 passed; 113 files"
+    },
+    "services": {
+      "log": "ragflow-logs/phase6-20-services-all.log",
+      "sha256": "2ec03e42b8e8d61538609580332e57ceff5adc832e0ddf93445edbefd7e8f8d9",
+      "result": "98 passed"
+    },
+    "integration_final": {
+      "log": "ragflow-logs/phase6-20-final-integration.log",
+      "sha256": "02c06b8354e47cb43796a196b797729b55d7e406ec4601df0efb3e99867b7cbc",
+      "result": "2 passed"
+    },
+    "browser_final": {
+      "log": "ragflow-logs/phase6-20-browser-final.log",
+      "sha256": "bdb6ea0f8f61a360671aa8f42cb7b0311328a20df85121a2450cb2cd948d61a2",
+      "result": "1 passed"
+    },
+    "tenant_matrix": {
+      "log": "ragflow-logs/phase6-20-matrix-final.log",
+      "sha256": "cfe8d9898f8bd3525090eb0af859d9f244d0d3c3e3bb0110a69f7f4633f3508c",
+      "result": "17 passed"
+    },
+    "go": {
+      "log": "ragflow-logs/phase6-20-go.log",
+      "sha256": "e8c5d4c9536683aad4abb232a376662f7d1babae6feb8605a1de1e4191fb08d7",
+      "result": "exit 0"
+    },
+    "ci_final": {
+      "log": "ragflow-logs/phase6-20-ci-final.log",
+      "sha256": "ef62a58e7162ef268bb9d41afd53793ea5a3b65917115c4f6b4c968809292e21",
+      "result": "7/7 passed"
+    },
+    "records": {
+      "log": "ragflow-logs/phase6-20-records.log",
+      "sha256": "d1978c1eb0cd573d5cf5e8ee23d605b25cb10239a5f893264096c00592fc2bbf",
+      "result": "5 passed"
+    },
+    "app_build": {
+      "log": "ragflow-logs/phase6-20-app-build-reviewed.log",
+      "sha256": "e6427d2f3541045095c0371896b6b1665259273f62480ce615d4ec062fbcf05f",
+      "result": "exit 0"
+    },
+    "health": {
+      "log": "ragflow-logs/phase6-20-final-health.log",
+      "sha256": "dafbc61308f1b634ab2b7661060fda84684fc4f7765f0cef827fdae1fe10e130",
+      "result": "healthy"
+    }
+  },
+  "original_fixture": {
+    "path": "test/fixtures/phase6/tags-original.txt",
+    "sha256": "368c39a723d1d5848bdb9aaf57ecf5f64f44ac07675bf492a1115bb48537d7df",
+    "annotation": "test/fixtures/phase6/metadata-original-annotation.json",
+    "annotation_sha256": "8f037e886bc99e1f92ecd962256a39d9a1ffcaa46bb499108ee4c1653e502d46"
+  },
+  "screenshots": [
+    {
+      "path": "output/playwright/phase6-review/metadata-manager.png",
+      "sha256": "2cf16756f238486d97bd61e82e32d56cc6b021d3df5e57276cdd8c6064f395b7",
+      "reviewer": "assistant, actual Chrome"
+    }
+  ],
+  "images": {
+    "app_worker": "sha256:33cf7ec3efa4f626b11ab4224c57ccc617f58203ee98879c405bd0ebafb5cad5",
+    "deepdoc": "sha256:48a42906583236c5994225cf7b0bf520c7c7c570d33caca00f936dbc98240ddf",
+    "containers_match_images": true,
+    "health": "healthy"
+  },
+  "source_sha256": {
+    "api/db/services/document_metadata_service.py": "655c6091330eae97106064959301e6710baed319e050cd0842da9c7c19baddba",
+    "api/apps/restful_apis/document_metadata_api.py": "31beff5528688d629d5932e98767c619feb2f2f59bc15305d9c48bc556a6979b",
+    "api/db/migrations/0005_document_metadata.py": "34888cb193568b397f797e5f065c1b29cfd2251933a5fe7546b65bda5470b661",
+    "rag/svr/chunk_doc.py": "2c9daaf9410d4bedfeee9f2ccaa1b3cd498376817640aeae598705c8ca67f1fa",
+    "web/src/pages/dataset/metadata.tsx": "dc392c635e1eddc1d408c5b36e8ff8658527af3c2db7a66d04080e2344b30b48"
+  },
+  "notes": "Rebuilt Chrome verified selected edit and flattened/config read. Affected document E2E 23 passed. Index and SQL writes are checked but cannot form one cross-store transaction; partial index failure reports unavailable and retry is safe. R251 automatic only. Phase5 human acceptance, Phase4 B36, final Phase6 gate/UAT pending. Prior 3 ASR submissions exhausted; no replay."
+}

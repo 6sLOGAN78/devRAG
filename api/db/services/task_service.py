@@ -11,7 +11,7 @@ import datetime
 import json
 import logging
 from collections.abc import Sequence
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Any
 
 import peewee
@@ -64,6 +64,7 @@ class TaskContext:
     embd_id: str
     created_by: str
     pagerank: int = 0
+    meta_fields: dict[str, Any] = field(default_factory=dict)
 
 
 def split_pages(total_pages: int | None, page_size: int) -> list[tuple[int, int]]:
@@ -132,6 +133,7 @@ def load_task_context(task_id: str) -> TaskContext | None:
         embd_id=kb.embd_id,
         created_by=doc.created_by,
         pagerank=int(kb.pagerank or 0),
+        meta_fields=dict(doc.meta_fields or {}),
     )
 
 

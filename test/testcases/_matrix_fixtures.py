@@ -573,6 +573,15 @@ def _delete_dataset_tags(w: World) -> Target:
     return Target({"dataset_id": str(w.a_team_dataset["id"])}, _sender("DELETE", DATASETS + "/{dataset_id}/tags", {"tags": ["matrix-unused-tag"]}, extra_fields=set()), w.snapshot_datasets)
 
 
+def _metadata_config(w: World) -> Target:
+    return Target({"dataset_id": str(w.a_team_dataset["id"])}, _sender("GET", DATASETS + "/{dataset_id}/metadata/config", extra_fields=set()), w.snapshot_datasets)
+
+
+def _edit_document_metadata(w: World) -> Target:
+    body = {"document_ids": [str(w.a_team_documents[0]["id"])], "metadata": {"matrix_note": "private"}, "mode": "merge"}
+    return Target({"dataset_id": str(w.a_team_dataset["id"])}, _sender("PATCH", DATASETS + "/{dataset_id}/documents/metadatas", body, extra_fields=set()), w.snapshot_documents)
+
+
 def _list_documents(w: World) -> Target:
     return Target({"dataset_id": str(w.a_team_dataset["id"])}, _sender("GET", DATASETS + "/{dataset_id}/documents", extra_fields=set()), w.snapshot_documents)
 
@@ -708,6 +717,8 @@ def _task_status(w: World) -> Target:
 
 
 BUILDERS: dict[str, Builder] = {
+    "GET /api/v1/datasets/{dataset_id}/metadata/config": _metadata_config,
+    "PATCH /api/v1/datasets/{dataset_id}/documents/metadatas": _edit_document_metadata,
     "GET /api/v1/datasets/{dataset_id}/tags": _list_dataset_tags,
     "DELETE /api/v1/datasets/{dataset_id}/tags": _delete_dataset_tags,
     "GET /api/v1/documents/images/{image_id}": _document_image,
@@ -1226,7 +1237,21 @@ def check_dataset_tags_aggregation(w: World) -> None:
     assert w.snapshot()==before
 
 
+def check_dataset_metadata_flattened(w: World) -> None:
+    before = w.snapshot()
+    team = str(w.a_team_dataset["id"])
+    private = str(w.a_private_dataset["id"])
+    path = DATASETS + "/metadata/flattened"
+    for token in (w.b.token, w.b_api_token, w.pending.token):
+        assert triple(call(w.client, "GET", path, token, {}, query={"dataset_ids": team})) == NOT_FOUND
+    assert triple(call(w.client, "GET", path, w.normal.token, {}, query={"dataset_ids": f"{team},{private}"})) == NOT_FOUND
+    own = call(w.client, "GET", path, w.a.token, {}, query={"dataset_ids": team})
+    assert own.status_code == 200 and own.json()["code"] == 0
+    assert w.snapshot() == before
+
+
 NO_ID_CHECKS: dict[str, NoIdCheck] = {
+    "GET /api/v1/datasets/metadata/flattened": check_dataset_metadata_flattened,
     "GET /api/v1/datasets/tags/aggregation": check_dataset_tags_aggregation,
     "POST /api/v1/chat/completions": check_chat_completion,
     "GET /api/v1/chats": check_chats_list,

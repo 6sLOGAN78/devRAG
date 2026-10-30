@@ -76,6 +76,7 @@ def build_row(
     enabled: bool,
     now: datetime.datetime | None = None,
     pagerank: int = 0,
+    meta_fields: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     chunk_id = parsed_chunk_id(doc_id, from_page, index, to_page)
     moment = now or datetime.datetime.now()
@@ -87,6 +88,14 @@ def build_row(
         raise TaskFailure("index", "file_damaged")
     if pagerank:
         features["pagerank_fea"] = pagerank
+    if meta_fields:
+        try:
+            encoded = json.dumps(meta_fields, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+        except (TypeError, ValueError, OverflowError):
+            raise TaskFailure("index", "file_damaged") from None
+        if len(encoded.encode("utf-8")) > 16 * 1024:
+            raise TaskFailure("index", "file_too_large")
+        features["meta_fields_list"] = encoded
     if chunk.tags:
         weights = normalize_tags({item.label:item.weight for item in chunk.tags})
         features[TAG_FIELD] = weights
@@ -149,10 +158,11 @@ def manual_row(
     now: datetime.datetime | None = None,
     pagerank: int = 0,
     tags: tuple[TagFeature, ...] = (),
+    meta_fields: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """The stored row of a hand-added chunk: no geometry, ``origin_kwd`` manual, ``order_int`` last, a ``{doc_id}_m_{uuid}`` id (R-155)."""
     chunk = Chunk(text=text, positions=(), page_sizes={}, token_num=token_num, index=0, tags=tags)
-    row = build_row(chunk, index=0, doc_id=doc_id, kb_id=kb_id, doc_name=doc_name, task_id="", from_page=0, to_page=1, vector=vector, enabled=enabled, now=now, pagerank=pagerank)
+    row = build_row(chunk, index=0, doc_id=doc_id, kb_id=kb_id, doc_name=doc_name, task_id="", from_page=0, to_page=1, vector=vector, enabled=enabled, now=now, pagerank=pagerank, meta_fields=meta_fields)
     row["id"] = manual_chunk_id(doc_id)
     row["order_int"] = MANUAL_ORDER
     row["origin_kwd"] = ORIGIN_MANUAL

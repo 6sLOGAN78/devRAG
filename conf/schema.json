@@ -1973,6 +1973,15 @@
           "auto_increment": false
         },
         {
+          "name": "meta_fields",
+          "type": "longtext",
+          "nullable": false,
+          "default": null,
+          "app_default": null,
+          "primary_key": false,
+          "auto_increment": false
+        },
+        {
           "name": "name",
           "type": "varchar(255)",
           "nullable": true,

@@ -1,0 +1,8 @@
+{
+  "source": "tags-original.txt",
+  "document_ids": ["11111111111111111111111111111111", "22222222222222222222222222222222"],
+  "facts": {"subject": "lighthouse", "height_metres": 52, "offset_units": 73},
+  "merge_result": {"subject": "lighthouse", "height_metres": 52, "offset_units": 73, "reviewed": true},
+  "replace_result": {"reviewed": true},
+  "source_positions_unchanged": true
+}

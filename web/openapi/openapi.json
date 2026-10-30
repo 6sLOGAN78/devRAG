@@ -833,6 +833,11 @@
             "default": true,
             "title": "Layout Recognize"
           },
+          "metadata": {
+            "additionalProperties": true,
+            "title": "Metadata",
+            "type": "object"
+          },
           "name": {
             "title": "Name",
             "type": "string"
@@ -1074,6 +1079,11 @@
             ],
             "title": "Last Log Id"
           },
+          "metadata": {
+            "additionalProperties": true,
+            "title": "Metadata",
+            "type": "object"
+          },
           "name": {
             "title": "Name",
             "type": "string"
@@ -1258,6 +1268,27 @@
         "title": "DocumentView",
         "type": "object"
       },
+      "EditedMetadata": {
+        "properties": {
+          "count": {
+            "title": "Count",
+            "type": "integer"
+          },
+          "document_ids": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Document Ids",
+            "type": "array"
+          }
+        },
+        "required": [
+          "document_ids",
+          "count"
+        ],
+        "title": "EditedMetadata",
+        "type": "object"
+      },
       "ErrorView": {
         "properties": {
           "code": {
@@ -1320,6 +1351,37 @@
           "feedback"
         ],
         "title": "FeedbackView",
+        "type": "object"
+      },
+      "FlattenedMetadata": {
+        "properties": {
+          "fields": {
+            "items": {
+              "$ref": "#/components/schemas/MetadataField"
+            },
+            "title": "Fields",
+            "type": "array"
+          },
+          "has_more": {
+            "title": "Has More",
+            "type": "boolean"
+          },
+          "page": {
+            "title": "Page",
+            "type": "integer"
+          },
+          "page_size": {
+            "title": "Page Size",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "fields",
+          "page",
+          "page_size",
+          "has_more"
+        ],
+        "title": "FlattenedMetadata",
         "type": "object"
       },
       "HealthData": {
@@ -1632,6 +1694,84 @@
           "error"
         ],
         "title": "LogView",
+        "type": "object"
+      },
+      "MetadataConfig": {
+        "properties": {
+          "enabled": {
+            "title": "Enabled",
+            "type": "boolean"
+          },
+          "model_id": {
+            "title": "Model Id",
+            "type": "string"
+          },
+          "schema": {
+            "items": {
+              "$ref": "#/components/schemas/MetadataSchemaField"
+            },
+            "title": "Schema",
+            "type": "array"
+          }
+        },
+        "required": [
+          "enabled",
+          "schema",
+          "model_id"
+        ],
+        "title": "MetadataConfig",
+        "type": "object"
+      },
+      "MetadataField": {
+        "properties": {
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          },
+          "type": {
+            "title": "Type",
+            "type": "string"
+          },
+          "values": {
+            "items": {},
+            "title": "Values",
+            "type": "array"
+          }
+        },
+        "required": [
+          "name",
+          "type",
+          "total",
+          "values"
+        ],
+        "title": "MetadataField",
+        "type": "object"
+      },
+      "MetadataSchemaField": {
+        "properties": {
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "required": {
+            "title": "Required",
+            "type": "boolean"
+          },
+          "type": {
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "type",
+          "required"
+        ],
+        "title": "MetadataSchemaField",
         "type": "object"
       },
       "ModelBody": {
@@ -3582,6 +3722,43 @@
         }
       }
     },
+    "/api/v1/datasets/metadata/flattened": {
+      "get": {
+        "operationId": "get_flattened_metadata",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "title": "Code",
+                      "type": "integer"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/FlattenedMetadata"
+                    },
+                    "message": {
+                      "title": "Message",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "message",
+                    "data"
+                  ],
+                  "title": "FlattenedMetadataEnvelope",
+                  "type": "object"
+                }
+              }
+            },
+            "description": ""
+          }
+        }
+      }
+    },
     "/api/v1/datasets/search": {
       "post": {
         "operationId": "post_search_datasets",
@@ -4176,6 +4353,92 @@
                     "data"
                   ],
                   "title": "StatusChangeEnvelope",
+                  "type": "object"
+                }
+              }
+            },
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v1/datasets/{dataset_id}/documents/metadatas": {
+      "patch": {
+        "operationId": "patch_edit_metadata",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "dataset_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "document_ids": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "maxItems": 100,
+                    "minItems": 1,
+                    "title": "Document Ids",
+                    "type": "array"
+                  },
+                  "metadata": {
+                    "additionalProperties": true,
+                    "title": "Metadata",
+                    "type": "object"
+                  },
+                  "mode": {
+                    "default": "merge",
+                    "enum": [
+                      "merge",
+                      "replace"
+                    ],
+                    "title": "Mode",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "document_ids",
+                  "metadata"
+                ],
+                "title": "MetadataEditBody",
+                "type": "object"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "title": "Code",
+                      "type": "integer"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/EditedMetadata"
+                    },
+                    "message": {
+                      "title": "Message",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "message",
+                    "data"
+                  ],
+                  "title": "EditedMetadataEnvelope",
                   "type": "object"
                 }
               }
@@ -4900,6 +5163,52 @@
                     "data"
                   ],
                   "title": "LogDetailEnvelope",
+                  "type": "object"
+                }
+              }
+            },
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v1/datasets/{dataset_id}/metadata/config": {
+      "get": {
+        "operationId": "get_metadata_config",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "dataset_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "title": "Code",
+                      "type": "integer"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/MetadataConfig"
+                    },
+                    "message": {
+                      "title": "Message",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "message",
+                    "data"
+                  ],
+                  "title": "MetadataConfigEnvelope",
                   "type": "object"
                 }
               }

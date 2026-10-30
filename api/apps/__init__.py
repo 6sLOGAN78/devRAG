@@ -54,6 +54,7 @@ def create_app(
     from api.apps.restful_apis.completion_api import completion_bp
     from api.apps.restful_apis.chunk_api import chunk_bp
     from api.apps.restful_apis.dataset_tag_api import tag_bp
+    from api.apps.restful_apis.document_metadata_api import metadata_bp
     from api.apps.restful_apis.dataset_api import dataset_bp
     from api.apps.restful_apis.document_api import document_bp
     from api.apps.restful_apis.ingestion_api import ingestion_bp
@@ -69,6 +70,7 @@ def create_app(
     app.register_blueprint(provider_bp)
     app.register_blueprint(models_bp)
     app.register_blueprint(tag_bp)
+    app.register_blueprint(metadata_bp)
     app.register_blueprint(dataset_bp)
     app.register_blueprint(document_bp)
     app.register_blueprint(parse_bp)

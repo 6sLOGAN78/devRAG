@@ -13,10 +13,11 @@ export interface SelectionBarProps {
   onParse: () => void;
   onCancel: () => void;
   onClear: () => void;
+  onMetadata?: () => void;
 }
 
 /** Appears above the table while documents are selected (D-01). Counts come from the selected rows, never the page. */
-export function SelectionBar({ count, parseCount, cancelCount, busy, onParse, onCancel, onClear }: SelectionBarProps) {
+export function SelectionBar({ count, parseCount, cancelCount, busy, onParse, onCancel, onClear, onMetadata }: SelectionBarProps) {
   const { t } = useTranslation();
   const guard = (action: () => void) => () => {
     if (!busy) action();
@@ -39,6 +40,7 @@ export function SelectionBar({ count, parseCount, cancelCount, busy, onParse, on
           {t("datasets.parse.selection.cancel", { count: cancelCount })}
         </Button>
       ) : null}
+      {onMetadata ? <Button type="button" variant="outline" data-testid="selection-metadata" onClick={guard(onMetadata)} {...busyProps}>{t("datasets.metadata.editSelected")}</Button> : null}
       <Button type="button" variant="ghost" data-testid="selection-clear" onClick={onClear}>
         {t("datasets.parse.selection.clear")}
       </Button>

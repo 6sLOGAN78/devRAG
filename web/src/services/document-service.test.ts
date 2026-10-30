@@ -56,6 +56,7 @@ const expectedView = {
   datasetId: DATASET,
   createdBy: "u1",
   parserId: "naive",
+  metadata: {},
   chunkNum: 0,
   updateTime: 1700000100000,
   createTime: 1700000000000,

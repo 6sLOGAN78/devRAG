@@ -112,6 +112,7 @@ class DocumentRowView(BaseModel):
     dataset_id: str
     created_by: str
     parser_id: str
+    metadata: dict[str, Any] = Field(default_factory=dict)
     create_time: int
     update_time: int
     run: str

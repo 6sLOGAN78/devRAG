@@ -570,6 +570,24 @@ def sweep_dataset_tag_rows(s: Sweep, w: World) -> None:
     s.req(row,"mixed private as member","GET",f"{DATASETS}/tags/aggregation?dataset_ids={w.a_team_dataset['id']},{w.a_private_dataset['id']}",member)
 
 
+def sweep_document_metadata_rows(s: Sweep, w: World) -> None:
+    team_id = w.a_team_dataset["id"]
+    private_id = w.a_private_dataset["id"]
+    team = f"{DATASETS}/{team_id}"
+    private = f"{DATASETS}/{private_id}"
+    owner, member = w.a.token, w.normal.token
+    row = f"GET {DATASETS}/metadata/flattened"
+    s.req(row, "authorized metadata", "GET", f"{DATASETS}/metadata/flattened?dataset_ids={team_id}", owner)
+    s.req(row, "mixed private metadata", "GET", f"{DATASETS}/metadata/flattened?dataset_ids={team_id},{private_id}", member)
+    row = f"GET {DATASETS}/{{dataset_id}}/metadata/config"
+    s.req(row, "authorized metadata config", "GET", f"{team}/metadata/config", owner)
+    s.req(row, "private metadata config", "GET", f"{private}/metadata/config", member)
+    row = f"PATCH {DATASETS}/{{dataset_id}}/documents/metadatas"
+    body = {"document_ids": [w.a_team_documents[0]["id"]], "metadata": {"sweep_note": "safe"}, "mode": "merge"}
+    s.req(row, "selected metadata", "PATCH", f"{team}/documents/metadatas", owner, body)
+    s.req(row, "private metadata", "PATCH", f"{private}/documents/metadatas", member, body)
+
+
 def sweep_parse_rows(s: Sweep, w: World) -> None:
     """``POST /api/v1/datasets/{dataset_id}/documents/parse`` on success and error paths (plan 04-14).
 
@@ -1172,6 +1190,7 @@ def sweep(ingress: httpx.Client) -> Iterator[Sweep]:
             sweep_document_rows(s, world)
             sweep_dataset_write_rows(s, world)
             sweep_dataset_tag_rows(s, world)
+            sweep_document_metadata_rows(s, world)
             sweep_parse_rows(s, world)
             sweep_detail_rows(s, world)
             sweep_status_rows(s, world)

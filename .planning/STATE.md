@@ -26,13 +26,13 @@ See: .planning/PROJECT.md (updated 2026-10-05)
 ## Current Position
 
 Phase: 6 (deep-parsing-and-chunking-breadth) — EXECUTING
-Plan: 20 of 30; plans01–19 complete; metadata next
-Status: Plans01–19 complete; R232..250 recorded. Tag/PageRank markedunit2588/8existing skips,web2183,Go,services193,Chrome/dataset51,matrix17,leaks6,CI7. LocalASR3/3 retained; zero external paid calls.
+Plan: 21 of 30; plans01–20 complete; generated keywords/questions next
+Status: Plans01–20 complete; R232..251 recorded. Metadata marked unit2597/8 existing skips, web2186, Go, services98, integration2, Chrome1, document flow23, matrix17, CI7. Local ASR3/3 retained; zero external paid calls.
 Prior checks: Phase5 UAT5/6 passed (two user answer judgments and delegated screenshot/Chinese/footprint review). Final Phase5 acceptance remains pending; Phase4 B36 remains separately deferred. Prior paid evidence retained.
-Current checkpoint:19 verified; Tag manager and ranked original source inspected. Continue20; existing acquisition/publication approvals persist; no ASR replay.
+Current checkpoint:20 verified; metadata manager and original source inspected. Continue21; existing acquisition/publication approvals persist; no ASR replay.
 Last activity: 2026-10-30
 
-Progress: 165/176 currently planned execution plans complete (94%); Phase6 19/30 complete.
+Progress: 166/176 currently planned execution plans complete (94%); Phase6 20/30 complete.
 
 ## Performance Metrics
 

@@ -274,6 +274,7 @@ def create_chunk(
         enabled=(doc.status or _ENABLED) == _ENABLED,
         token_num=count_tokens(clean),
         pagerank=visible.dataset.pagerank,
+        meta_fields=doc.meta_fields,
         tags=tuple(TagFeature(key,value) for key,value in tag_weights(clean,(doc.parser_config or {}).get("tag_top_n",8)).items()) if doc.parser_id=="tag" else (),
     )
     index = index_name(visible.scope.tenant_id)

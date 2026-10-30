@@ -23,7 +23,7 @@ pytestmark = pytest.mark.e2e
 
 DOC_KEYS = {
     "id", "name", "size", "type", "suffix", "dataset_id", "created_by", "parser_id", "create_time", "update_time", "run", "progress", "progress_message",
-    "chunk_count", "token_num", "parseable", "enabled", "thumbnail", "last_log_id", "pages_total", "pages_without_text", "error",
+    "chunk_count", "token_num", "parseable", "enabled", "thumbnail", "last_log_id", "pages_total", "pages_without_text", "error", "metadata",
 }  # the list rows of plan 04-15 (document_view.ROW_KEYS); the thumbnail is allowed here, in document rows only
 BANNED = {"status", "source", "location", "bucket", "key"}
 STORAGE_KEY = re.compile(r"[0-9a-f]{32}/[0-9a-f]{32}")

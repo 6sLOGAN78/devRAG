@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import json
 from collections.abc import Callable
-from typing import Any
+from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, StrictBool, StrictInt, StrictStr, ValidationError, field_validator
 
@@ -38,6 +38,9 @@ class ParserConfig(BaseModel):
     image_model: StrictStr = Field(default="",max_length=128)
     picture_ocr_only: StrictBool = False
     image_context_size: StrictInt = Field(default=0, ge=0)
+    auto_metadata: StrictBool = False
+    metadata_schema: list["MetadataSchemaField"] = Field(default_factory=list, max_length=32)
+    metadata_model_id: StrictStr = Field(default="", max_length=128)
 
     @field_validator("pages")
     @classmethod
@@ -45,6 +48,29 @@ class ParserConfig(BaseModel):
         if any(start < 1 or start > end for start, end in value):
             raise ValueError("page ranges must satisfy 0 < start <= end")
         return value
+
+    @field_validator("metadata_schema")
+    @classmethod
+    def _unique_metadata_names(cls, value: list["MetadataSchemaField"]) -> list["MetadataSchemaField"]:
+        names = [field.name.casefold() for field in value]
+        if len(names) != len(set(names)):
+            raise ValueError("duplicate metadata field")
+        return value
+
+
+class MetadataSchemaField(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    name: StrictStr = Field(pattern=r"^[A-Za-z][A-Za-z0-9_-]{0,63}$")
+    type: Literal["string", "number", "boolean", "string_array"]
+    required: StrictBool = False
+
+    @field_validator("name")
+    @classmethod
+    def _not_reserved(cls, value: str) -> str:
+        if value.casefold() in {"provenance", "source", "generation", "generated", "internal"} or value.casefold().startswith(("internal_", "generated_")):
+            raise ValueError("reserved metadata field")
+        return value.casefold()
 
 
 def _default_structural(message: str) -> ServiceError:

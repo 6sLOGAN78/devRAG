@@ -91,7 +91,7 @@ function valuesOf(parserConfig: unknown) {
 
 export const handle: AreaHandler = ({ server, config, method, url, ok }) => {
   const document = DOCUMENT_ROUTE.exec(url);
-  if (document && method === "PATCH") {
+  if (document && document[2] !== "metadatas" && method === "PATCH") {
     const list = server.documents[document[1] as string] ?? [];
     const row = list.find((candidate) => candidate.id === document[2]);
     if (!server.datasets[document[1] as string] || !row) return refuse(config, 404, "not_found");
