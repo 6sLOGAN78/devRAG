@@ -511,6 +511,11 @@
             "title": "Name",
             "type": "string"
           },
+          "pagerank": {
+            "default": 0,
+            "title": "Pagerank",
+            "type": "integer"
+          },
           "parser_config": {
             "additionalProperties": true,
             "title": "Parser Config",
@@ -651,6 +656,27 @@
           "deleted"
         ],
         "title": "DeletedSession",
+        "type": "object"
+      },
+      "DeletedTags": {
+        "properties": {
+          "count": {
+            "title": "Count",
+            "type": "integer"
+          },
+          "deleted": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Deleted",
+            "type": "array"
+          }
+        },
+        "required": [
+          "deleted",
+          "count"
+        ],
+        "title": "DeletedTags",
         "type": "object"
       },
       "DeletedView": {
@@ -2220,6 +2246,50 @@
         "title": "TableView",
         "type": "object"
       },
+      "TagItem": {
+        "properties": {
+          "count": {
+            "title": "Count",
+            "type": "integer"
+          },
+          "tag": {
+            "title": "Tag",
+            "type": "string"
+          },
+          "weight": {
+            "title": "Weight",
+            "type": "number"
+          }
+        },
+        "required": [
+          "tag",
+          "weight",
+          "count"
+        ],
+        "title": "TagItem",
+        "type": "object"
+      },
+      "TagPage": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/TagItem"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total"
+        ],
+        "title": "TagPage",
+        "type": "object"
+      },
       "TaskView": {
         "properties": {
           "attempts": {
@@ -3655,6 +3725,43 @@
         }
       }
     },
+    "/api/v1/datasets/tags/aggregation": {
+      "get": {
+        "operationId": "get_aggregate",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "title": "Code",
+                      "type": "integer"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/TagPage"
+                    },
+                    "message": {
+                      "title": "Message",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "message",
+                    "data"
+                  ],
+                  "title": "TagEnvelope",
+                  "type": "object"
+                }
+              }
+            },
+            "description": ""
+          }
+        }
+      }
+    },
     "/api/v1/datasets/{dataset_id}": {
       "get": {
         "operationId": "get_get_dataset",
@@ -3778,6 +3885,10 @@
                     ],
                     "default": null,
                     "title": "Name"
+                  },
+                  "pagerank": {
+                    "default": null,
+                    "title": "Pagerank"
                   },
                   "parser_config": {
                     "anyOf": [
@@ -4789,6 +4900,121 @@
                     "data"
                   ],
                   "title": "LogDetailEnvelope",
+                  "type": "object"
+                }
+              }
+            },
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v1/datasets/{dataset_id}/tags": {
+      "delete": {
+        "operationId": "delete_delete_tags",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "dataset_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "tags": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "maxItems": 128,
+                    "minItems": 1,
+                    "title": "Tags",
+                    "type": "array"
+                  }
+                },
+                "required": [
+                  "tags"
+                ],
+                "title": "DeleteTagsBody",
+                "type": "object"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "title": "Code",
+                      "type": "integer"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/DeletedTags"
+                    },
+                    "message": {
+                      "title": "Message",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "message",
+                    "data"
+                  ],
+                  "title": "DeletedTagsEnvelope",
+                  "type": "object"
+                }
+              }
+            },
+            "description": ""
+          }
+        }
+      },
+      "get": {
+        "operationId": "get_list_tags",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "dataset_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "title": "Code",
+                      "type": "integer"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/TagPage"
+                    },
+                    "message": {
+                      "title": "Message",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "message",
+                    "data"
+                  ],
+                  "title": "TagEnvelope",
                   "type": "object"
                 }
               }

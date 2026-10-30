@@ -17,6 +17,7 @@ from common.doc_store.doc_store_base import vector_field
 from rag.chunking.types import Chunk
 from rag.nlp.tokenizer import fine_grained_tokenize, has_chinese, tokenize, tokenize_with_offsets
 from rag.parsers.table_features import MAX_TABLE_FEATURE_BYTES, TABLE_FIELD
+from rag.parsers.tags import TAG_FIELD, TAG_LABEL_FIELD, TagFeature, normalize_tags
 from rag.svr.failure import TaskFailure
 
 PAGE_STRIDE = 1000
@@ -74,6 +75,7 @@ def build_row(
     vector: list[float],
     enabled: bool,
     now: datetime.datetime | None = None,
+    pagerank: int = 0,
 ) -> dict[str, Any]:
     chunk_id = parsed_chunk_id(doc_id, from_page, index, to_page)
     moment = now or datetime.datetime.now()
@@ -81,6 +83,14 @@ def build_row(
     boxes = chunk.positions
     pages = sorted({int(box.page) for box in boxes})
     features = {}
+    if type(pagerank) is not int or not 0 <= pagerank <= 100:
+        raise TaskFailure("index", "file_damaged")
+    if pagerank:
+        features["pagerank_fea"] = pagerank
+    if chunk.tags:
+        weights = normalize_tags({item.label:item.weight for item in chunk.tags})
+        features[TAG_FIELD] = weights
+        features[TAG_LABEL_FIELD] = list(weights)
     if chunk.audio:
         features["audio_start_flt"] = chunk.audio.start
         features["audio_end_flt"] = chunk.audio.end
@@ -137,10 +147,12 @@ def manual_row(
     enabled: bool,
     token_num: int,
     now: datetime.datetime | None = None,
+    pagerank: int = 0,
+    tags: tuple[TagFeature, ...] = (),
 ) -> dict[str, Any]:
     """The stored row of a hand-added chunk: no geometry, ``origin_kwd`` manual, ``order_int`` last, a ``{doc_id}_m_{uuid}`` id (R-155)."""
-    chunk = Chunk(text=text, positions=(), page_sizes={}, token_num=token_num, index=0)
-    row = build_row(chunk, index=0, doc_id=doc_id, kb_id=kb_id, doc_name=doc_name, task_id="", from_page=0, to_page=1, vector=vector, enabled=enabled, now=now)
+    chunk = Chunk(text=text, positions=(), page_sizes={}, token_num=token_num, index=0, tags=tags)
+    row = build_row(chunk, index=0, doc_id=doc_id, kb_id=kb_id, doc_name=doc_name, task_id="", from_page=0, to_page=1, vector=vector, enabled=enabled, now=now, pagerank=pagerank)
     row["id"] = manual_chunk_id(doc_id)
     row["order_int"] = MANUAL_ORDER
     row["origin_kwd"] = ORIGIN_MANUAL

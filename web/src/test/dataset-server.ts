@@ -39,6 +39,7 @@ export interface DatasetRow {
   permission: string;
   embd_id: string;
   embedding_dimension: number;
+  pagerank?: number;
   created_by: string;
   tenant_id: string;
   update_time: number;

@@ -10,6 +10,7 @@ from rag.parsers.tables import Table
 from rag.parsers.sections import Section
 from rag.parsers.slides import Slide
 from rag.parsers.audio_segments import AudioSpan
+from rag.parsers.tags import TagFeature
 
 
 @dataclass(frozen=True)
@@ -26,3 +27,4 @@ class Chunk:
     sections: tuple[Section, ...] = ()
     slide: Slide | None = None
     audio: AudioSpan | None = None
+    tags: tuple[TagFeature, ...] = ()

@@ -23,6 +23,7 @@ MAX_DELIMITER = 64
 class ParserConfig(BaseModel):
     model_config = ConfigDict(extra="allow")
 
+    tag_top_n: StrictInt = Field(default=8, ge=1, le=32)
     chunk_token_num: StrictInt = Field(default=512, ge=1, le=8192)
     delimiter: StrictStr = Field(default="\n", min_length=1, max_length=MAX_DELIMITER)
     overlapped_percent: StrictInt = Field(default=0, ge=0, le=50)

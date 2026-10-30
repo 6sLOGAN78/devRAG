@@ -81,7 +81,7 @@ UPLOAD_LOCK_PREFIX = "kb-upload:"  # uploads, document deletes, embedding change
 UPLOAD_LOCK_TIMEOUT_SECONDS = 30
 PERMISSION_AREA = "datasets"
 MANAGE_DATASET = "manage_dataset"
-EDITABLE_FIELDS = frozenset({"name", "description", "permission", "avatar", "language", "parser_id", "parser_config", "embd_id"})
+EDITABLE_FIELDS = frozenset({"name", "description", "permission", "avatar", "language", "parser_id", "parser_config", "embd_id", "pagerank"})
 NEVER_NULL_FIELDS = ("name", "permission", "language", "parser_id", "parser_config", "embd_id")  # description and avatar may be cleared with null
 MAX_DELETE_DATASETS = 20
 MAX_BATCH_MISSES = 3
@@ -124,6 +124,7 @@ class DatasetRecord:
     token_num: int
     create_time: int
     update_time: int
+    pagerank: int = 0
 
 
 @dataclass(frozen=True)
@@ -249,6 +250,7 @@ def _record(row: Knowledgebase) -> DatasetRecord:
         token_num=int(row.token_num or 0),
         create_time=int(row.create_time or 0),
         update_time=int(row.update_time or 0),
+        pagerank=int(row.pagerank or 0),
     )
 
 
@@ -370,6 +372,7 @@ def dataset_dto(record: DatasetRecord, *, embedding_dimension: int | None, inclu
         "embedding_dimension": embedding_dimension,
         "parser_id": record.parser_id,
         "parser_config": record.parser_config,
+        "pagerank": record.pagerank,
         "doc_num": record.doc_num,
         "chunk_num": record.chunk_num,
         "token_num": record.token_num,
@@ -475,6 +478,10 @@ def update_dataset(settings: Settings, visible: VisibleDataset, user_id: str, ch
     dataset, tenant_id = visible.dataset, visible.scope.tenant_id
     _require_manage(visible, user_id)
     fields = _validated_changes(dataset, changes)
+    rank_changed = "pagerank" in changes
+    pagerank = changes.get("pagerank", dataset.pagerank)
+    if rank_changed and (type(pagerank) is not int or not 0 <= pagerank <= 100):
+        raise _fields_invalid("PageRank must be a whole number from 0 to 100")
     if "parser_id" in changes and changes["parser_id"] != dataset.parser_id:
         require_buildable(fields.parser_id)
     renamed = "name" in changes and fields.name != dataset.name
@@ -485,7 +492,7 @@ def update_dataset(settings: Settings, visible: VisibleDataset, user_id: str, ch
         if not isinstance(wanted, str):
             raise _model_unavailable()
         model = _embedding_model(tenant_id, wanted)  # before our connection scope: the model services open and close their own
-    store = (doc_store if doc_store is not None else get_doc_store(settings)) if swap else None
+    store = (doc_store if doc_store is not None else get_doc_store(settings)) if swap or rank_changed else None
 
     values: dict[str, Any] = {}
     for key in ("name", "description", "permission", "language", "parser_id"):
@@ -499,7 +506,7 @@ def update_dataset(settings: Settings, visible: VisibleDataset, user_id: str, ch
     with ExitStack() as locks:
         if renamed:
             locks.enter_context(_named_lock(create_lock_name(tenant_id), LOCK_TIMEOUT_SECONDS, "another dataset is being changed, try again shortly"))
-        if swap:
+        if swap or rank_changed:
             locks.enter_context(_named_lock(upload_lock_name(dataset.id), UPLOAD_LOCK_TIMEOUT_SECONDS, "an upload to this dataset is running, try again shortly"))
         with DB.connection_context():
             current = Knowledgebase.get_or_none((Knowledgebase.id == dataset.id) & (Knowledgebase.status == _VALID))
@@ -513,6 +520,16 @@ def update_dataset(settings: Settings, visible: VisibleDataset, user_id: str, ch
                 _provision_index(store, tenant_id, dataset.id, int(model.dimension or 0), values.get("parser_id", current.parser_id))
                 values["embd_id"] = model.composite
                 values["tenant_embd_id"] = model.id
+            if rank_changed and store is not None:
+                if Document.select(Document.id).where((Document.kb_id == dataset.id) & (Document.run == "1")).exists():
+                    raise ServiceError(Kind.CONFLICT, reasons.PARSE_RUNNING, "wait for parsing to finish before changing PageRank")
+                try:
+                    done = store.update({"kb_id": [dataset.id]}, {"pagerank_fea": pagerank or None}, index_name(tenant_id), dataset.id)
+                except DocStoreError:
+                    done = False
+                if not done:
+                    raise ServiceError(Kind.UNAVAILABLE, reasons.INDEX_UNAVAILABLE, "the search index is not available, try again shortly")
+                values["pagerank"] = pagerank
             now = current_timestamp_ms()
             with transaction():
                 Knowledgebase.update(update_time=now, update_date=timestamp_to_date(now), **values).where(Knowledgebase.id == dataset.id).execute()

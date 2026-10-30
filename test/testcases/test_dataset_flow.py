@@ -40,7 +40,7 @@ EMBED_ID = f"fake-embed@{COMPAT}"
 BANNED_KEYS = {"status", "source", "location", "api_key", "last4", "base_url", "api_version", "token", "secret", "password"}
 DTO_KEYS = {
     "id", "name", "description", "avatar", "language", "permission", "embd_id", "embedding_dimension", "parser_id", "parser_config",
-    "doc_num", "chunk_num", "token_num", "tenant_id", "created_by", "create_time", "update_time",
+    "doc_num", "chunk_num", "token_num", "tenant_id", "created_by", "create_time", "update_time", "pagerank",
 }  # fmt: skip
 
 

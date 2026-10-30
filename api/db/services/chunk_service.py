@@ -55,6 +55,8 @@ MAX_CHUNK_CHARS = 32000
 WRITE_DEADLINE_SECONDS = 40.0
 _RUNNING = "1"
 _ENABLED = "1"
+from rag.chunking.tag import tag_weights
+from rag.parsers.tags import TAG_FIELD, TAG_LABEL_FIELD, TagFeature
 from rag.parsers.slides import slide_of
 from rag.parsers.audio_segments import audio_of
 from rag.parsers.table_features import TABLE_FIELD, tables_of
@@ -118,7 +120,7 @@ def _document(visible: VisibleDataset, doc_id: object) -> Document:
     if not isinstance(doc_id, str) or _ID.fullmatch(doc_id) is None:
         raise _not_found()
     with DB.connection_context():
-        doc = Document.select(Document.id, Document.name, Document.created_by, Document.run, Document.status).where((Document.id == doc_id) & (Document.kb_id == visible.dataset.id)).first()
+        doc = Document.select(Document.id, Document.name, Document.created_by, Document.run, Document.status, Document.parser_id, Document.parser_config).where((Document.id == doc_id) & (Document.kb_id == visible.dataset.id)).first()
     if doc is None:
         raise _not_found()
     return doc
@@ -271,6 +273,8 @@ def create_chunk(
         vector=vector,
         enabled=(doc.status or _ENABLED) == _ENABLED,
         token_num=count_tokens(clean),
+        pagerank=visible.dataset.pagerank,
+        tags=tuple(TagFeature(key,value) for key,value in tag_weights(clean,(doc.parser_config or {}).get("tag_top_n",8)).items()) if doc.parser_id=="tag" else (),
     )
     index = index_name(visible.scope.tenant_id)
     try:
@@ -322,6 +326,9 @@ def update_chunk(
         vector = _embed(settings, visible, clean)  # any failure ends here: nothing has been written
         _check_deadline(started)
         features = text_features(clean)
+        if doc.parser_id == "tag" or stored.get(TAG_FIELD):
+            weights = tag_weights(clean,(doc.parser_config or {}).get("tag_top_n",8)) if doc.parser_id == "tag" else {}
+            features.update({TAG_FIELD:weights,TAG_LABEL_FIELD:list(weights)})
         if stored.get("content_token_offsets_int") and "content_token_offsets_int" not in features:
             features["content_token_offsets_int"] = []
         values.update(

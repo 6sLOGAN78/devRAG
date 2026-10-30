@@ -9,10 +9,10 @@ from test.unit_test import test_phase5_records as phase5
 
 pytestmark = pytest.mark.unit
 FIRST_ROW = 232
-LAST_ROW = 249  # Extended by the plan that actually records each decision.
+LAST_ROW = 250  # Extended by the plan that actually records each decision.
 FINAL_ROW = 261
 STATUS = "accepted (auto, not user-reviewed)"
-REQUIRED_TITLES = ["Phase 6 acquisition and admission", "CPU OCR service and native boundary", "Read scanned PDFs through the existing document UI", "Preserve visual reading order and remove page furniture", "Open extracted images and office figures securely", "Inspect reconstructed PDF tables and crops", "Choose whole-document chunks and inspect public pipeline templates", "Ingest Markdown and technical manuals", "Ingest structured JSON, CSV and Q&A pairs", "Read EPUB books in chapter order", "Read academic papers by section", "Read legal structure and normalize Chinese text", "Inspect presentation chunks per slide", "Retrieve table rows with their headers", "Caption pictures with a configured vision model", "Transcribe audio into timestamped chunks", "Read email envelopes and message bodies", "Read structured résumé sections"]
+REQUIRED_TITLES = ["Phase 6 acquisition and admission", "CPU OCR service and native boundary", "Read scanned PDFs through the existing document UI", "Preserve visual reading order and remove page furniture", "Open extracted images and office figures securely", "Inspect reconstructed PDF tables and crops", "Choose whole-document chunks and inspect public pipeline templates", "Ingest Markdown and technical manuals", "Ingest structured JSON, CSV and Q&A pairs", "Read EPUB books in chapter order", "Read academic papers by section", "Read legal structure and normalize Chinese text", "Inspect presentation chunks per slide", "Retrieve table rows with their headers", "Caption pictures with a configured vision model", "Transcribe audio into timestamped chunks", "Read email envelopes and message bodies", "Read structured résumé sections", "Manage tags and produce retrieval rank features"]
 ROW = re.compile(r"^\| R-(\d+) \|")
 
 

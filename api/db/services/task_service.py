@@ -63,6 +63,7 @@ class TaskContext:
     parser_config: dict[str, Any]
     embd_id: str
     created_by: str
+    pagerank: int = 0
 
 
 def split_pages(total_pages: int | None, page_size: int) -> list[tuple[int, int]]:
@@ -130,6 +131,7 @@ def load_task_context(task_id: str) -> TaskContext | None:
         parser_config=dict(doc.parser_config or {}),
         embd_id=kb.embd_id,
         created_by=doc.created_by,
+        pagerank=int(kb.pagerank or 0),
     )
 
 

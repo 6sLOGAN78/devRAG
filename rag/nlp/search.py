@@ -11,6 +11,7 @@ from __future__ import annotations
 import logging
 import math
 import time
+from collections import Counter
 from collections.abc import Callable, Iterable
 from dataclasses import dataclass, field
 from typing import Any
@@ -23,9 +24,10 @@ from common.doc_store.doc_store_base import (
     vector_field,
 )
 from common.settings import RetrievalSettings
-from rag.nlp.fusion import apply_threshold, cosine_from_es_score, fuse, paginate, rank_feature, rrf, token_overlap
+from rag.nlp.fusion import apply_threshold, cosine_from_es_score, fuse, paginate, rank_feature, rrf, token_overlap, tag_cosine
 from rag.nlp.query import QueryBuilder, QueryPlan
 from rag.nlp.tokenizer import tokenize
+from rag.parsers.tags import TAG_FIELD
 
 logger = logging.getLogger(__name__)
 
@@ -40,6 +42,7 @@ SELECT_FIELDS = [
     "page_num_int",
     "page_dims_flt",
     "pagerank_fea",
+    TAG_FIELD,
     "table_features_with_weight",
     "slide_number_int",
     "slide_title_kwd",
@@ -216,6 +219,14 @@ class Retriever:
         return [c for c in pool if str(c.row.get("doc_id")) in alive]
 
     # --- stage 2 and scoring -------------------------------------------------------------------------------------
+    @staticmethod
+    def _rank_tags(question: str, row: dict[str, Any]) -> float:
+        try:
+            score = tag_cosine(dict(Counter(word for word in tokenize(question) if len(word)<=64)), row.get(TAG_FIELD) or {})
+        except (ValueError, TypeError):
+            score = 0.0  # Invalid stored features cannot poison a search score.
+        return rank_feature(score, _finite(row.get("pagerank_fea")))
+
     def _score(self, request: RetrievalRequest, plan: QueryPlan, pool: list[_Candidate]) -> None:
         ids = [str(c.row["id"]) for c in pool]
         condition = {"id": ids, "must_not": self._must_not()}
@@ -227,7 +238,7 @@ class Retriever:
             text = f"{row.get('content_ltks') or ''} {row.get('title_tks') or ''}"
             candidate.tsim = token_overlap(plan.tokens, tokenize(text))
             candidate.vsim = cosine.get(str(row["id"]), 0.0)
-            candidate.sim = fuse(candidate.tsim, candidate.vsim, weight, rank_feature(None, _finite(row.get("pagerank_fea"))))
+            candidate.sim = fuse(candidate.tsim, candidate.vsim, weight, self._rank_tags(request.question, row))
 
     def _rerank(self, request: RetrievalRequest, pool: list[_Candidate], reranker: Reranker) -> list[_Candidate]:
         best = sorted(pool, key=lambda c: c.sim, reverse=True)[: request.rerank_cap]
@@ -238,7 +249,7 @@ class Retriever:
             if isinstance(score, bool) or not isinstance(score, (int, float)) or not math.isfinite(score):
                 raise ValueError("the reranker returned a non-finite score")
             candidate.rerank = min(1.0, max(0.0, float(score)))
-            fea = rank_feature(None, _finite(candidate.row.get("pagerank_fea")))
+            fea = self._rank_tags(request.question, candidate.row)
             candidate.sim = fuse(candidate.tsim, candidate.rerank, request.vector_similarity_weight, fea)
         return best
 

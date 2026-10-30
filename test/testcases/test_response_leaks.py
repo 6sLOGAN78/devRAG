@@ -553,6 +553,23 @@ def sweep_dataset_write_rows(s: Sweep, w: World) -> None:
     s.req(row, "success with several ids", "DELETE", DATASETS, a.token, {"ids": [first, second, fifth], "tenant_id": a.tenant_id})
 
 
+def sweep_dataset_tag_rows(s: Sweep, w: World) -> None:
+    """Exercise authorized tag reads, selected deletion and mixed private refusal."""
+    team=f"{DATASETS}/{w.a_team_dataset['id']}/tags"
+    private=f"{DATASETS}/{w.a_private_dataset['id']}/tags"
+    owner=w.a.token
+    member=w.normal.token
+    row=f"GET {DATASETS}/{{dataset_id}}/tags"
+    s.req(row,"team tags","GET",team,owner)
+    s.req(row,"private tags as member","GET",private,member)
+    row=f"DELETE {DATASETS}/{{dataset_id}}/tags"
+    s.req(row,"selected tags","DELETE",team,owner,{"tags":["unused-leak-sweep-tag"]})
+    s.req(row,"private tags as member","DELETE",private,member,{"tags":["unused-leak-sweep-tag"]})
+    row=f"GET {DATASETS}/tags/aggregation"
+    s.req(row,"selected team","GET",f"{DATASETS}/tags/aggregation?dataset_ids={w.a_team_dataset['id']}",owner)
+    s.req(row,"mixed private as member","GET",f"{DATASETS}/tags/aggregation?dataset_ids={w.a_team_dataset['id']},{w.a_private_dataset['id']}",member)
+
+
 def sweep_parse_rows(s: Sweep, w: World) -> None:
     """``POST /api/v1/datasets/{dataset_id}/documents/parse`` on success and error paths (plan 04-14).
 
@@ -1154,6 +1171,7 @@ def sweep(ingress: httpx.Client) -> Iterator[Sweep]:
             sweep_upload_rows(s, world)
             sweep_document_rows(s, world)
             sweep_dataset_write_rows(s, world)
+            sweep_dataset_tag_rows(s, world)
             sweep_parse_rows(s, world)
             sweep_detail_rows(s, world)
             sweep_status_rows(s, world)

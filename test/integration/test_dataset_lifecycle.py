@@ -245,8 +245,7 @@ def test_every_editable_field_changes_and_the_rest_stays(settings, space):
         dataset,
         {"description": "d", "permission": "team", "avatar": "data:image/png;base64,AAAA", "language": "German"},
     )
-    # parser_id is not in the edit set: only "naive" has a built chunker in Phase 4 (IMPLEMENTED_PARSERS in common/ingest_codes.py, D-27), so there is no other
-    # value to change it to; refusing an unbuilt method is covered by test_an_unbuilt_chunking_method_cannot_be_set_on_a_dataset.
+    # This update deliberately leaves the parser unchanged; parser changes are covered separately below.
     assert (changed.description, changed.permission, changed.avatar, changed.language, changed.parser_id) == ("d", "team", "data:image/png;base64,AAAA", "German", dataset.parser_id)
     assert (changed.tenant_id, changed.created_by, changed.embd_id, changed.doc_num, changed.chunk_num, changed.token_num) == (
         dataset.tenant_id, dataset.created_by, dataset.embd_id, 0, 0, 0,
@@ -331,15 +330,16 @@ def test_a_bad_parser_setting_is_typed_with_its_field_and_changes_nothing(settin
     assert state_of(owner, dataset) == before
 
 
-def test_an_unbuilt_chunking_method_cannot_be_set_on_a_dataset(settings, space):
+def test_built_chunking_methods_can_be_set_and_unknown_method_is_refused(settings, space):
     owner, dataset = space
+    for method in ("qa", "book", "tag"):
+        changed = update(settings, owner, dataset, {"parser_id": method})
+        assert changed.parser_id == method
+        assert changed.doc_num == dataset.doc_num and changed.chunk_num == dataset.chunk_num
     before = state_of(owner, dataset)
-    for unbuilt in ("qa", "book"):
-        err = refused(lambda: update(settings, owner, dataset, {"parser_id": unbuilt}))
-        assert err.kind is Kind.INVALID and err.reason == "chunker_unavailable", unbuilt
-        assert state_of(owner, dataset) == before
     err = refused(lambda: update(settings, owner, dataset, {"parser_id": "bogus"}))
     assert err.reason == "dataset_invalid"
+    assert state_of(owner, dataset) == before
 
 
 def test_the_view_of_an_updated_dataset_never_carries_status_or_source(settings, space):
@@ -348,7 +348,7 @@ def test_the_view_of_an_updated_dataset_never_carries_status_or_source(settings,
     assert {"status", "source", "location"}.isdisjoint(view)
     assert set(view) == {
         "id", "name", "description", "avatar", "language", "permission", "embd_id", "embedding_dimension", "parser_id", "parser_config",
-        "doc_num", "chunk_num", "token_num", "tenant_id", "created_by", "create_time", "update_time",
+        "doc_num", "chunk_num", "token_num", "tenant_id", "created_by", "create_time", "update_time", "pagerank",
     }  # fmt: skip
 
 

@@ -77,13 +77,14 @@ def test_parser_id_can_be_set_to_a_built_method(settings, space, storage):
     assert row_of(doc["id"])[0] == "naive"
 
 
-def test_an_unbuilt_method_is_refused_and_nothing_changes(settings, space, storage):
+def test_tag_method_can_be_saved_without_parsing_existing_chunks(settings, space, storage):
     owner, dataset = space
     doc = one_doc(settings, owner, dataset, storage)
     before = row_of(doc["id"])
-    err = refused(lambda: change(settings, owner, dataset, doc["id"], "tag", {"chunk_token_num": 64}))
-    assert (err.kind, err.reason) == (Kind.INVALID, "chunker_unavailable")
-    assert row_of(doc["id"]) == before
+    change(settings, owner, dataset, doc["id"], "tag", {"chunk_token_num": 64})
+    after = row_of(doc["id"])
+    assert after[0] == "tag"
+    assert (after[2], after[3], after[4]) == (before[2], before[3], before[4])
 
 
 def test_an_unknown_method_is_parser_invalid(settings, space, storage):
@@ -137,9 +138,8 @@ def test_who_may_change_follows_uploader_creator_owner_and_the_token_subject(set
         assert stored_config(mine)["chunk_token_num"] == values["chunk_token_num"]
 
 
-def test_dataset_update_refuses_an_unbuilt_method(settings, space):
+def test_dataset_update_accepts_tag_as_default_method(settings, space):
     owner, dataset = space
     visible = kbsvc.load_visible_dataset(principal_of(owner), dataset.id)
-    err = refused(lambda: kbsvc.update_dataset(settings, visible, owner.user_id, {"parser_id": "tag"}))
-    assert (err.kind, err.reason) == (Kind.INVALID, "chunker_unavailable")
-    assert kbsvc.load_visible_dataset(principal_of(owner), dataset.id).dataset.parser_id == dataset.parser_id
+    kbsvc.update_dataset(settings, visible, owner.user_id, {"parser_id": "tag"})
+    assert kbsvc.load_visible_dataset(principal_of(owner), dataset.id).dataset.parser_id == "tag"

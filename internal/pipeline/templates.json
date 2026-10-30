@@ -96,10 +96,10 @@
   {
     "id": "tag",
     "name": "Tag",
-    "description": "Read explicit document tags.",
+    "description": "Add weighted tags from frequent source terms.",
     "parser_id": "tag",
     "parser_config": {},
-    "available": false
+    "available": true
   },
   {
     "id": "one",

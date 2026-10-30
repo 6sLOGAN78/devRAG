@@ -73,6 +73,7 @@ class UpdateDatasetBody(BaseModel):
 
     model_config = ConfigDict(extra="forbid")
 
+    pagerank: Any = None
     name: str | None = None
     description: str | None = None
     permission: str | None = None
@@ -110,6 +111,7 @@ class UploadLimitsView(BaseModel):
 
 
 class DatasetView(BaseModel):
+    pagerank: int = 0
     id: str
     name: str
     description: str

@@ -1,0 +1,12 @@
+{
+  "app_base": "sha256:62f389511ce063e2f97700fb6a71a6b8036a283c4904d3fe251c66f507ffc33f",
+  "native_vendor": "sha256:125a1211bed8b4ac8ecba49d284aea7a0a4c1183f71385508a3260c7c58d6c7b",
+  "app_image": "sha256:848eb75d91ede0fed09d738c6418a94090b26e8a03d547b2d8965be43a241a32",
+  "native_image": "sha256:48a42906583236c5994225cf7b0bf520c7c7c570d33caca00f936dbc98240ddf",
+  "containers_match_images": true,
+  "new_dependencies": 0,
+  "new_models": 0,
+  "native_copy": "Immutable approved vendor copied with --link; no acquisition.",
+  "pyproject_sha256": "a8eb4d8d2050b765a501d8737d64993fc67b97d5e446ffd980942ca315cb831c",
+  "uv_lock_sha256": "eb2d16cae34e3d893b2f1261be215a18d3a3c0f276e4b0aef3ae8e9ace2ea016"
+}

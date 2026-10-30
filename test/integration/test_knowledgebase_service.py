@@ -451,7 +451,7 @@ def test_the_dto_has_exactly_the_documented_keys(settings, llm, registry):
     plain = kb.dataset_dto(record, embedding_dimension=8, include_limits=None)
     assert set(plain) == {
         "id", "name", "description", "avatar", "language", "permission", "embd_id", "embedding_dimension", "parser_id", "parser_config",
-        "doc_num", "chunk_num", "token_num", "tenant_id", "created_by", "create_time", "update_time",
+        "doc_num", "chunk_num", "token_num", "tenant_id", "created_by", "create_time", "update_time", "pagerank",
     }  # fmt: skip
     detailed = kb.dataset_dto(record, embedding_dimension=8, include_limits=load_settings().upload)
     assert set(detailed["upload_limits"]) == {"max_file_bytes", "max_files_per_request", "max_documents", "allowed_extensions"}

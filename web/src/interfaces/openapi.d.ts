@@ -132,6 +132,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/datasets/tags/aggregation": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["get_aggregate"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/datasets/{dataset_id}": {
         parameters: {
             query?: never;
@@ -335,6 +351,22 @@ export interface paths {
         put?: never;
         post?: never;
         delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/datasets/{dataset_id}/tags": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["get_list_tags"];
+        put?: never;
+        post?: never;
+        delete: operations["delete_delete_tags"];
         options?: never;
         head?: never;
         patch?: never;
@@ -854,6 +886,11 @@ export interface components {
             language: string;
             /** Name */
             name: string;
+            /**
+             * Pagerank
+             * @default 0
+             */
+            pagerank: number;
             /** Parser Config */
             parser_config: {
                 [key: string]: unknown;
@@ -901,6 +938,13 @@ export interface components {
         DeletedSession: {
             /** Deleted */
             deleted: string;
+        };
+        /** DeletedTags */
+        DeletedTags: {
+            /** Count */
+            count: number;
+            /** Deleted */
+            deleted: string[];
         };
         /** DeletedView */
         DeletedView: {
@@ -1466,6 +1510,22 @@ export interface components {
             columns: number;
             /** Rows */
             rows: number;
+        };
+        /** TagItem */
+        TagItem: {
+            /** Count */
+            count: number;
+            /** Tag */
+            tag: string;
+            /** Weight */
+            weight: number;
+        };
+        /** TagPage */
+        TagPage: {
+            /** Items */
+            items: components["schemas"]["TagItem"][];
+            /** Total */
+            total: number;
         };
         /** TaskView */
         TaskView: {
@@ -2194,6 +2254,31 @@ export interface operations {
             };
         };
     };
+    get_aggregate: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Code */
+                        code: number;
+                        data: components["schemas"]["TagPage"];
+                        /** Message */
+                        message: string;
+                    };
+                };
+            };
+        };
+    };
     get_get_dataset: {
         parameters: {
             query?: never;
@@ -2258,6 +2343,11 @@ export interface operations {
                      * @default null
                      */
                     name?: string | null;
+                    /**
+                     * Pagerank
+                     * @default null
+                     */
+                    pagerank?: unknown;
                     /**
                      * Parser Config
                      * @default null
@@ -2761,6 +2851,67 @@ export interface operations {
                         /** Code */
                         code: number;
                         data: components["schemas"]["LogDetailView"];
+                        /** Message */
+                        message: string;
+                    };
+                };
+            };
+        };
+    };
+    get_list_tags: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                dataset_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Code */
+                        code: number;
+                        data: components["schemas"]["TagPage"];
+                        /** Message */
+                        message: string;
+                    };
+                };
+            };
+        };
+    };
+    delete_delete_tags: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                dataset_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": {
+                    /** Tags */
+                    tags: string[];
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Code */
+                        code: number;
+                        data: components["schemas"]["DeletedTags"];
                         /** Message */
                         message: string;
                     };

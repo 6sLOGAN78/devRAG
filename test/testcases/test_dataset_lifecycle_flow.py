@@ -95,7 +95,7 @@ def test_the_owner_updates_every_editable_field_and_the_answer_is_the_dataset(in
     made = ok(create(ingress, owner, "  First  "))
     assert made["name"] == "First"
 
-    # parser_id stays out: only "naive" has a built chunker in Phase 4 (D-27); refusing an unbuilt method is covered below.
+    # This edit leaves the parser unchanged; a later call chooses an implemented method explicitly.
     body = {"name": "  Renamed  ", "description": "changed", "permission": "team", "avatar": "data:image/png;base64,AAAA", "language": "German"}
     resp = update(ingress, owner, made["id"], body)
     data = ok(resp)
@@ -114,9 +114,10 @@ def test_the_owner_updates_every_editable_field_and_the_answer_is_the_dataset(in
     cleared = ok(update(ingress, owner, made["id"], {"description": None, "avatar": None}))
     assert cleared["description"] == "" and cleared["avatar"] == ""
 
-    refused = update(ingress, owner, made["id"], {"parser_id": "book"})
-    assert refused.status_code == 400 and refused.json()["data"]["reason"] == "chunker_unavailable"
-    assert ok(api(ingress, "GET", dataset_path(made["id"]), owner.token))["parser_id"] == made["parser_id"]
+    assert ok(update(ingress, owner, made["id"], {"parser_id": "book"}))["parser_id"] == "book"
+    refused = update(ingress, owner, made["id"], {"parser_id": "bogus"})
+    assert refused.status_code == 400 and refused.json()["data"]["reason"] == "dataset_invalid"
+    assert ok(api(ingress, "GET", dataset_path(made["id"]), owner.token))["parser_id"] == "book"
 
 
 def test_renaming_checks_duplicates_against_other_datasets_only(ingress: httpx.Client, registry: AccountRegistry, fake_provider_stack: FakeProvider) -> None:  # noqa: F811

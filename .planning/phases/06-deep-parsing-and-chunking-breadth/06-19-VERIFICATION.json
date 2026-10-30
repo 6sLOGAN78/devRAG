@@ -1,0 +1,133 @@
+{
+  "recorded_at": "2026-10-30T05:10:12.361850+00:00",
+  "plan": "06-19",
+  "requirements": [
+    "CHUNK-13",
+    "KB-10",
+    "KB-11",
+    "RETR-13"
+  ],
+  "new_packages": 0,
+  "new_models": 0,
+  "paid_external_calls": 0,
+  "local_asr_submissions_this_plan": 0,
+  "local_asr_remaining": 0,
+  "human_uat_approved": false,
+  "phase_gate_complete": false,
+  "evidence": {
+    "initial_red": {
+      "log": "ragflow-logs/phase6-19-red.log",
+      "sha256": "d5eb18854e7875a738b5684f900be244d18a71b7cca4773431bfd3050f00edf2",
+      "result": "3 failed"
+    },
+    "index_red": {
+      "log": "ragflow-logs/phase6-19-index-red.log",
+      "sha256": "33a3bc5ca631ae3cc17d4a194525478485fb07fdd89c994afd7753e83dbf8077",
+      "result": "RED"
+    },
+    "route_red": {
+      "log": "ragflow-logs/phase6-19-routes-red.log",
+      "sha256": "b058d23c5cddaecc7292e4fba2f574314fffcd7e8d87224ceb7e59c2836f64aa",
+      "result": "RED"
+    },
+    "pagerank_red": {
+      "log": "ragflow-logs/phase6-19-pagerank-red.log",
+      "sha256": "4fa06697dc01c323b09136818e89ea76b9f5f32df8628890708a9627464cb0dc",
+      "result": "RED"
+    },
+    "ui_red": {
+      "log": "ragflow-logs/phase6-19-ui-behavior-red.log",
+      "sha256": "f6454b3237ae8c5ff2b5b20dc19c855c33f3ce48d2ddffa367a2b9d775d50a1b",
+      "result": "RED"
+    },
+    "marked_unit": {
+      "log": "ragflow-logs/phase6-19-unit-all.log",
+      "sha256": "c6731f5cbc2e2f98db419067af12417ea3ad1b07577f3b65916b2c7e10c99430",
+      "result": "2588 passed, 8 skipped, 51 deselected"
+    },
+    "frontend": {
+      "log": "ragflow-logs/phase6-19-web-all.log",
+      "sha256": "204657d44e046332356f54108d808ae034e00192df18d9c15e267debd849f9e6",
+      "result": "2183 passed; 111 files"
+    },
+    "services": {
+      "log": "ragflow-logs/phase6-19-services-final.log",
+      "sha256": "993ac57364f5817c8e72b4233e5c3d754bf4244cdc23e0750748c5822d3eb3eb",
+      "result": "193 passed"
+    },
+    "browser_dataset": {
+      "log": "ragflow-logs/phase6-19-browser-dataset.log",
+      "sha256": "4d65507867c4024fb5929fcc9ee48fa7a70f62b9cc0f1aed0995d1f9913bcbcf",
+      "result": "51 passed"
+    },
+    "matrix": {
+      "log": "ragflow-logs/phase6-19-matrix.log",
+      "sha256": "130a70f4318835ef8d7b7253c965090cc0e9ba67eae89a9bbbda62257ca88b16",
+      "result": "17 passed"
+    },
+    "leaks": {
+      "log": "ragflow-logs/phase6-19-leaks.log",
+      "sha256": "c67d9bba876270d10d47fe1ef14b9a99b006ad18fb66ee0f5870280d34f16a1b",
+      "result": "6 passed"
+    },
+    "go": {
+      "log": "ragflow-logs/phase6-19-go.log",
+      "sha256": "472adf6b28f62698024af87f55de1ac56eade986c4de9d35dbe950f298a3fa0e",
+      "result": "exit 0"
+    },
+    "ci": {
+      "log": "ragflow-logs/phase6-19-ci.log",
+      "sha256": "67fc9151da8d3eb86a7575806469249c72b2bba6ab7bace7318be51a67a360ae",
+      "result": "7/7 gates passed"
+    },
+    "records": {
+      "log": "ragflow-logs/phase6-19-records.log",
+      "sha256": "3f2ea59ea3ff3b1f8ed8689f38597c7b6868acf5bbab9f1e2bf4e322510ff5ce",
+      "result": "5 passed"
+    },
+    "app_build": {
+      "log": "ragflow-logs/phase6-19-app-build.log",
+      "sha256": "d57935289f6a454fa68ea4a2b39df12c491267b4cda3f0d681c894ec3a06a536",
+      "result": "exit 0"
+    },
+    "native_build": {
+      "log": "ragflow-logs/phase6-19-native-build.log",
+      "sha256": "3f962ea9b49271c5abe5e8af702bbc3edfec9b60a8d2d6184fd02c325fdd5af1",
+      "result": "exit 0"
+    }
+  },
+  "original_fixture": {
+    "path": "test/fixtures/phase6/tags-original.txt",
+    "sha256": "368c39a723d1d5848bdb9aaf57ecf5f64f44ac07675bf492a1115bb48537d7df",
+    "annotation": "test/fixtures/phase6/tags-original-annotation.json",
+    "annotation_sha256": "f2e68f8effe6ec92fa2df3dcdc5efd8fbe8b3963f4d361d14ea9319a0a23dc18"
+  },
+  "screenshots": [
+    {
+      "path": "output/playwright/phase6-review/tag-manager.png",
+      "sha256": "af49e231fa743d28c4aa8d30e782e2631a99dea70cb79fa21cdafcaed0709867",
+      "reviewer": "assistant, actual Chrome"
+    },
+    {
+      "path": "output/playwright/phase6-review/tag-rank-source.png",
+      "sha256": "099b5227e00d19bd7298a4620045022053da12006357b74c8115329eb01a9920",
+      "reviewer": "assistant, actual Chrome"
+    }
+  ],
+  "images": {
+    "app_worker": "sha256:848eb75d91ede0fed09d738c6418a94090b26e8a03d547b2d8965be43a241a32",
+    "deepdoc": "sha256:48a42906583236c5994225cf7b0bf520c7c7c570d33caca00f936dbc98240ddf",
+    "containers_match_images": true,
+    "health": "healthy"
+  },
+  "source_sha256": {
+    "rag/chunking/tag.py": "5ddf85b867cfe597a44cd9418c609b7980dd43d77daab19646cabeab33f781de",
+    "rag/parsers/tags.py": "7a7f440dfe538f7cb34b1fd516d17ff8214079020622639c805286e34d059396",
+    "rag/nlp/fusion.py": "8c3141da670baa7a0a5088e46e04ec72961c7add0b08a8006397aa1ccf33f2da",
+    "rag/nlp/search.py": "a4c1e8f29a73875da95df8d76d95891a75bc2120e13ca1b99355ce2170d7d922",
+    "api/db/services/dataset_tag_service.py": "a4176f46b545185a842b0c8d9375c28ce65c87b335bf9078a0ad9ef2d157a76a",
+    "api/apps/restful_apis/dataset_tag_api.py": "341696d8f1b3fdd6b22262cfd3534d2b7bbd06534fcd73fd1cc527179a0b5d88",
+    "web/src/pages/dataset/tags.tsx": "5bc410d69f2bd99c199192ed024d26a189f02e631ac83070d842d8ebde4b5449"
+  },
+  "notes": "Actual original source52 metres/73 units and Tag4/5 ratio; selected delete checked, PageRank2 persisted and ranked. R250 automatic only. Phase5 final human acceptance, Phase4 B36 and final Phase6 gate remain pending. All3 prior local ASR submissions exhausted; no replay."
+}

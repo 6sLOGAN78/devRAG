@@ -100,7 +100,7 @@ function Body({ target, pendingRef, onClose }: { target: ChunkTarget; pendingRef
 
 /**
  * Chunking method and parser settings (UI-13, UI-14 in part, D-15, D-27), for one document or as the dataset default.
- * Only General can be chosen; the other seven methods are shown as unavailable. The body is mounted only while open and
+ * All fourteen implemented methods can be chosen. The body is mounted only while open and
  * keyed by its target, so every opening starts from the stored settings with no earlier error (FE-04). The owner draws
  * the control that opens it only for callers who may change the document or manage the dataset.
  */

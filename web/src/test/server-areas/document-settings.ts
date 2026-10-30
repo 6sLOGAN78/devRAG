@@ -1,6 +1,7 @@
 import { AxiosError, AxiosHeaders, type InternalAxiosRequestConfig } from "axios";
 import type { AreaHandler, DatasetServer } from "../dataset-server";
 import { documentDetailOf, setDatasetDefaults, setFileExtra } from "./files";
+import { isImplemented } from "@/constants/chunk-methods";
 
 /**
  * Test-server area for chunking settings (R-167): `PATCH .../documents/{doc}` for one document and the chunking keys of
@@ -9,7 +10,6 @@ import { documentDetailOf, setDatasetDefaults, setFileExtra } from "./files";
  * the `files` area state, so the document detail and the dataset detail show them. Fake data only.
  */
 
-const IMPLEMENTED = ["naive", "one", "manual", "qa", "paper", "book", "laws", "presentation", "table", "picture", "audio", "email", "resume"];
 const DELIMITER_MAX = 64;
 
 export interface SettingsRefusal {
@@ -66,7 +66,7 @@ function checked(config: InternalAxiosRequestConfig, server: DatasetServer, sent
     stateOf(server).refuse = null;
     return refuse(config, pending.status, pending.reason, pending.field);
   }
-  if (typeof sent.parser_id === "string" && !IMPLEMENTED.includes(sent.parser_id)) return refuse(config, 400, "chunker_unavailable");
+  if (typeof sent.parser_id === "string" && !isImplemented(sent.parser_id)) return refuse(config, 400, "chunker_unavailable");
   const parserConfig = sent.parser_config;
   if (parserConfig !== undefined) {
     if (typeof parserConfig !== "object" || parserConfig === null) return refuse(config, 400, "parser_config_invalid");

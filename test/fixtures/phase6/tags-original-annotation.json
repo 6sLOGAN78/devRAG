@@ -1,0 +1,17 @@
+{
+  "provenance": "Original tag-oriented field record authored before06-19 production changes. No external source/model.",
+  "sha256": "368c39a723d1d5848bdb9aaf57ecf5f64f44ac07675bf492a1115bb48537d7df",
+  "term_counts": {
+    "lighthouse": 4,
+    "calibration": 5,
+    "height": 1,
+    "metres": 1,
+    "offset": 1,
+    "units": 1
+  },
+  "facts": {
+    "height_metres": 52,
+    "offset_units": 73
+  },
+  "body": "Lighthouse lighthouse lighthouse.\nCalibration calibration calibration calibration.\n\nLighthouse height: 52 metres. Calibration offset: 73 units.\n"
+}

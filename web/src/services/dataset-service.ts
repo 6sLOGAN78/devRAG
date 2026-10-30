@@ -23,6 +23,7 @@ export interface DatasetView {
   createdBy: string;
   tenantId: string;
   updateTime: number;
+  pagerank?: number;
 }
 
 /** What one upload request may carry, from the server's settings (KB-04). */
@@ -86,6 +87,7 @@ export interface CreateDatasetInput {
 
 /** The fields a settings save may change (plan 03-18). An absent key is no change; a null description clears it. */
 export interface DatasetChanges {
+  pagerank?: number;
   name?: string;
   description?: string | null;
   permission?: string;
@@ -111,6 +113,7 @@ function toDataset(raw: unknown): DatasetView {
     createdBy: text(dto.created_by),
     tenantId: text(dto.tenant_id),
     updateTime: count(dto.update_time),
+    ...(dto.pagerank!==undefined ? {pagerank:count(dto.pagerank)} : {}),
   };
 }
 
@@ -194,7 +197,8 @@ export async function createDataset(input: CreateDatasetInput): Promise<DatasetV
  * the dialog shows the refusal inline.
  */
 export async function updateDataset(id: string, changes: DatasetChanges): Promise<DatasetView> {
-  const data: Record<string, string | null> = {};
+  const data: Record<string, string | number | null> = {};
+  if (changes.pagerank !== undefined) data.pagerank=changes.pagerank;
   if (changes.name !== undefined) data.name = changes.name;
   if (changes.description !== undefined) data.description = changes.description;
   if (changes.permission !== undefined) data.permission = changes.permission;

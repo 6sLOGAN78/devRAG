@@ -76,3 +76,11 @@ def sanitize_floats[T](obj: T) -> T:
     if isinstance(obj, tuple):
         return tuple(sanitize_floats(value) for value in obj)  # type: ignore[return-value]
     return obj
+
+
+def tag_cosine(query: dict[str, float], source: dict[str, float]) -> float:
+    """Cosine of complete tag vectors, with missing/zero vectors contributing zero."""
+    from rag.parsers.tags import normalize_tags
+
+    query, source = normalize_tags(query, limit=8192), normalize_tags(source)
+    return min(1.0, max(0.0, sum(weight * source.get(label, 0.0) for label, weight in query.items())))

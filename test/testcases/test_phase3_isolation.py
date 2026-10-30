@@ -153,6 +153,18 @@ def _inv_dataset(w: World, who: Account | None, token: str, as_tenant: str | Non
     return call(w.client, "GET", f"{DATASETS}/{_team_id(w)}", token, {})
 
 
+def _inv_dataset_tags(w: World, who: Account | None, token: str, as_tenant: str | None) -> httpx.Response:
+    return call(w.client, "GET", f"{DATASETS}/{_team_id(w)}/tags", token, {})
+
+
+def _inv_delete_dataset_tags(w: World, who: Account | None, token: str, as_tenant: str | None) -> httpx.Response:
+    return call(w.client, "DELETE", f"{DATASETS}/{_team_id(w)}/tags", token, {}, body={"tags":["isolation-unused-tag"]})
+
+
+def _inv_aggregate_dataset_tags(w: World, who: Account | None, token: str, as_tenant: str | None) -> httpx.Response:
+    return call(w.client,"GET",DATASETS+"/tags/aggregation",token,{},query={"dataset_ids":_team_id(w)})
+
+
 def _inv_update_dataset(w: World, who: Account | None, token: str, as_tenant: str | None) -> httpx.Response:
     return call(w.client, "PUT", f"{DATASETS}/{_team_id(w)}", token, {}, body={"description": "isolation-table"})
 
@@ -312,6 +324,9 @@ def _inv_completion(w: World, who: Account | None, token: str, as_tenant: str | 
 
 
 INVOKERS: dict[str, Invoker] = {
+    "GET /api/v1/datasets/tags/aggregation": _inv_aggregate_dataset_tags,
+    "GET /api/v1/datasets/{dataset_id}/tags": _inv_dataset_tags,
+    "DELETE /api/v1/datasets/{dataset_id}/tags": _inv_delete_dataset_tags,
     "GET /api/v1/documents/images/{image_id}": _inv_document_image,
     "POST /api/v1/chat/completions": _inv_completion,
     "POST /api/v1/chats/{chat_id}/sessions": _inv_create_session,
@@ -362,6 +377,7 @@ INVOKERS: dict[str, Invoker] = {
 # (settings and delete are for the creator, an owner or an admin; a document is removed by its uploader or those).
 NORMAL_IS_REFUSED_ON_A_RESOURCE = frozenset(
     {
+        "DELETE /api/v1/datasets/{dataset_id}/tags",
         "PUT /api/v1/datasets/{dataset_id}",
         "DELETE /api/v1/datasets",
         "DELETE /api/v1/datasets/{dataset_id}/documents",
@@ -385,6 +401,9 @@ PRIVATE_SESSION_ROWS = frozenset({
 # Rows whose resource is addressed by a dataset id: a stranger reaches nothing even without naming the workspace.
 ID_ROWS = frozenset(
     {
+        "GET /api/v1/datasets/tags/aggregation",
+        "GET /api/v1/datasets/{dataset_id}/tags",
+        "DELETE /api/v1/datasets/{dataset_id}/tags",
         "GET /api/v1/datasets/{dataset_id}",
         "PUT /api/v1/datasets/{dataset_id}",
         "DELETE /api/v1/datasets",
