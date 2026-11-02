@@ -79,6 +79,7 @@ def build_row(
     meta_fields: dict[str, Any] | None = None,
     keywords: tuple[str, ...] = (),
     questions: tuple[str, ...] = (),
+    tag_origin: str = "",
 ) -> dict[str, Any]:
     chunk_id = parsed_chunk_id(doc_id, from_page, index, to_page)
     moment = now or datetime.datetime.now()
@@ -102,6 +103,8 @@ def build_row(
         weights = normalize_tags({item.label:item.weight for item in chunk.tags})
         features[TAG_FIELD] = weights
         features[TAG_LABEL_FIELD] = list(weights)
+        if tag_origin:
+            features["tags_source_kwd"] = tag_origin
     if chunk.audio:
         features["audio_start_flt"] = chunk.audio.start
         features["audio_end_flt"] = chunk.audio.end

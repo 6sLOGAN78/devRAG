@@ -15,7 +15,7 @@ import { Pagination } from "@/components/ui/pagination";
 import { SearchInput } from "@/components/ui/search-input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCaption, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { canChangeDocument, useRoleIn } from "@/hooks/use-dataset-permissions";
+import { canChangeDocument, canManageDataset, useRoleIn } from "@/hooks/use-dataset-permissions";
 import { DOCUMENTS_PAGE_SIZE, useDocumentsRequest, useInvalidateOnParseEnd, usePollHealth } from "@/hooks/use-document-request";
 import { useUserStore } from "@/stores/user-store";
 import type { UploadLimitsView } from "@/services/dataset-service";
@@ -366,7 +366,7 @@ export function DatasetFiles({ dataset, limits, page, keywords, onPageChange, on
         </Alert>
       ) : null}
       <Card className="overflow-x-auto">{body}</Card>
-      <DatasetMetadata key={`${dataset.tenantId}:${dataset.id}`} datasetId={dataset.id} tenantId={dataset.tenantId} selected={selectedItems} open={metadataOpen} onOpenChange={setMetadataOpen} />
+      <DatasetMetadata key={`${dataset.tenantId}:${dataset.id}`} datasetId={dataset.id} tenantId={dataset.tenantId} canManage={canManageDataset(dataset.createdBy,userId,role)} selected={selectedItems} open={metadataOpen} onOpenChange={setMetadataOpen} />
       {!documents.isPending && !documents.isError && !pastEnd && items.length > 0 ? (
         <Pagination
           page={page}

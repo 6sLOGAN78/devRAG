@@ -59,7 +59,7 @@ def _inventory(engine,visible,remaining,started,*,include_disabled=False):
     rows=[]
     for offset in range(0,total,500):
         _deadline(started)
-        result=engine.search([TAG_FIELD,TAG_LABEL_FIELD,"doc_id","task_id"],[],condition,[],OrderByExpr().asc("id"),offset,500,index_name(tenant),[visible.dataset.id])
+        result=engine.search([TAG_FIELD,TAG_LABEL_FIELD,"tags_source_kwd","doc_id","task_id"],[],condition,[],OrderByExpr().asc("id"),offset,500,index_name(tenant),[visible.dataset.id])
         if result.total>remaining or len(rows)+len(result.hits)>remaining:
             raise ServiceError(Kind.CONFLICT,reasons.FIELDS_INVALID,"too many indexed chunks for this tag operation")
         rows.extend(row for row in result.hits if row.get("doc_id") in doc_ids)
@@ -69,15 +69,17 @@ def _inventory(engine,visible,remaining,started,*,include_disabled=False):
 def _summarize(rows):
     totals=Counter()
     counts=Counter()
+    origins={}
     for row in rows:
         weights=normalize_tags(row.get(TAG_FIELD) or {})
         for label,weight in weights.items():
             totals[label]+=weight
             counts[label]+=1
+            origins.setdefault(label,set()).add("generated" if row.get("tags_source_kwd")=="generated" else "source")
             if len(totals)>MAX_LABELS:
                 raise ServiceError(Kind.CONFLICT,reasons.FIELDS_INVALID,"too many tags to display; reduce the selected datasets")
     weights=normalize_tags(dict(totals),limit=MAX_LABELS)
-    items=[{"tag":label,"weight":weight,"count":counts[label]} for label,weight in weights.items()]
+    items=[{"tag":label,"weight":weight,"count":counts[label],**({"origin":"generated" if len(origins[label])==1 else "mixed"} if "generated" in origins[label] else {})} for label,weight in weights.items()]
     items.sort(key=lambda item:(-item["weight"],item["tag"]))
     return {"items":items,"total":len(items)}
 

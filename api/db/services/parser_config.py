@@ -10,11 +10,12 @@ import json
 from collections.abc import Callable
 from typing import Any, Literal
 
-from pydantic import BaseModel, ConfigDict, Field, StrictBool, StrictInt, StrictStr, ValidationError, field_validator
+from pydantic import BaseModel, ConfigDict, Field, StrictBool, StrictInt, StrictStr, ValidationError, field_validator, model_validator
 
 from api.db.services.service_errors import Kind, ServiceError
 from api.utils import reasons
 from common.ingest_codes import IMPLEMENTED_PARSERS
+from rag.parsers.tags import tag_label
 
 MAX_PARSER_CONFIG = 4096
 MAX_DELIMITER = 64
@@ -42,6 +43,25 @@ class ParserConfig(BaseModel):
     auto_metadata: StrictBool = False
     metadata_schema: list["MetadataSchemaField"] = Field(default_factory=list, max_length=32)
     metadata_model_id: StrictStr = Field(default="", max_length=128)
+    auto_tags: StrictBool = False
+    allowed_tags: list[StrictStr] = Field(default_factory=list, max_length=128)
+    tag_model_id: StrictStr = Field(default="", max_length=128)
+
+    @field_validator("allowed_tags")
+    @classmethod
+    def _normalized_allowed_tags(cls, value: list[str]) -> list[str]:
+        normalized = [tag_label(label) for label in value]
+        if len(normalized) != len(set(normalized)):
+            raise ValueError("duplicate allowed tag")
+        return sorted(normalized)
+
+    @model_validator(mode="after")
+    def _enabled_generation_has_controls(self) -> "ParserConfig":
+        if self.auto_tags and (not self.allowed_tags or not self.tag_model_id):
+            raise ValueError("tag generation requires an allowed set and selected model")
+        if self.auto_metadata and (not self.metadata_schema or not self.metadata_model_id):
+            raise ValueError("metadata generation requires a schema and selected model")
+        return self
 
     @field_validator("pages")
     @classmethod

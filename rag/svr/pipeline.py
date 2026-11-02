@@ -9,14 +9,18 @@ The database connection is released before each long call and reopened by each s
 from __future__ import annotations
 
 import logging
+import json
+import math
 import tempfile
 from collections.abc import Iterator
 from contextlib import contextmanager
 from dataclasses import dataclass, replace
 from pathlib import Path
 
-from api.db.services import document_asset_service, task_service, tenant_model_service
+from api.db.services import document_asset_service, document_metadata_service, task_service, tenant_model_service
+from api.db.services.service_errors import ServiceError
 from api.db.services.task_service import TaskContext
+from api.utils import reasons
 from common.constants import BUCKET_NAME
 from common.doc_store.doc_store_base import DocStoreConnection, index_name
 from common.ingest_codes import RUN_CANCELLED
@@ -26,10 +30,11 @@ from rag.chunking.types import Chunk
 from rag.parsers.pdf import thumbnail_data_url
 from rag.parsers.router import parser_for_suffix
 from rag.parsers.types import ParseLimits, ParseReport, SourceFile
+from rag.parsers.tags import TagFeature
 from rag.svr.chunk_doc import build_row, l2_normalize, parsed_chunk_id
 from rag.svr.control import LockLost, TaskCancelled, TaskControl
 from rag.svr.embedding import EmbedRunner, release_database_connection
-from rag.svr.enrichment import ENRICHMENT_BATCH, MAX_ENRICHED_CHUNKS, EnrichedFeatures
+from rag.svr.enrichment import ENRICHMENT_BATCH, MAX_ENRICHED_CHUNKS, EnrichedFeatures, parse_generated_metadata
 from rag.svr.failure import TaskFailure, classify
 from rag.svr.limiters import Limiters
 from rag.utils.storage_base import Storage
@@ -226,7 +231,7 @@ def _embed_batch(ctx: TaskContext, deps: PipelineDeps, control: TaskControl, chu
     return [l2_normalize(v) for v in vectors]
 
 
-def _index_batches(ctx: TaskContext, deps: PipelineDeps, control: TaskControl, chunks: list[Chunk], dimension: int, index: str, enriched: list[EnrichedFeatures]) -> list[str]:
+def _index_batches(ctx: TaskContext, deps: PipelineDeps, control: TaskControl, chunks: list[Chunk], dimension: int, index: str, enriched: list[EnrichedFeatures], controlled_tags: list[tuple[str, ...]] | None = None, metadata: dict | None = None) -> list[str]:
     ids: list[str] = []
     size = deps.settings.ingest.batch_size
     total = len(chunks)
@@ -240,7 +245,7 @@ def _index_batches(ctx: TaskContext, deps: PipelineDeps, control: TaskControl, c
         with _step("index", ctx):
             rows = [
                 build_row(
-                    c,
+                    replace(c, tags=tuple(TagFeature(label, 1 / math.sqrt(len(controlled_tags[start + k]))) for label in controlled_tags[start + k])) if controlled_tags is not None else c,
                     index=start + k,
                     doc_id=ctx.doc_id,
                     kb_id=ctx.dataset_id,
@@ -251,9 +256,10 @@ def _index_batches(ctx: TaskContext, deps: PipelineDeps, control: TaskControl, c
                     vector=v,
                     enabled=switch.enabled,
                     pagerank=getattr(ctx, "pagerank", 0),
-                    meta_fields=getattr(ctx, "meta_fields", {}),
+                    meta_fields=metadata if metadata is not None else getattr(ctx, "meta_fields", {}),
                     keywords=enriched[start + k].keywords,
                     questions=enriched[start + k].questions,
+                    tag_origin="generated" if controlled_tags is not None else "",
                 )
                 for k, (c, v) in enumerate(zip(batch, vectors, strict=True))
             ]
@@ -320,12 +326,59 @@ def run_pipeline(ctx: TaskContext, control: TaskControl, deps: PipelineDeps) -> 
                 if len(generated) != len(batch):
                     raise TaskFailure("embed", "provider_refused")
                 enriched[start:start + len(batch)] = generated
+    controlled_tags = None
+    if chunks and ctx.parser_config.get("auto_tags", False):
+        with _step("embed", ctx):
+            allowed = ctx.parser_config.get("allowed_tags")
+            model_id = ctx.parser_config.get("tag_model_id")
+            if len(chunks) > MAX_ENRICHED_CHUNKS:
+                raise TaskFailure("embed", "file_too_large")
+            if not isinstance(allowed, list) or not allowed:
+                raise TaskFailure("embed", "provider_refused")
+            if not isinstance(model_id, str) or not model_id:
+                raise TaskFailure("embed", "model_unavailable")
+            controlled_tags = []
+            for start in range(0, len(chunks), ENRICHMENT_BATCH):
+                control.check()
+                batch = chunks[start:start + ENRICHMENT_BATCH]
+                labels = deps.embedder.generate_tags([chunk.text for chunk in batch], model_id, allowed, ctx, control)
+                if len(labels) != len(batch):
+                    raise TaskFailure("embed", "provider_refused")
+                controlled_tags.extend(labels)
+    metadata = None
+    if chunks and ctx.parser_config.get("auto_metadata", False):
+        with _step("embed", ctx):
+            schema = ctx.parser_config.get("metadata_schema")
+            model_id = ctx.parser_config.get("metadata_model_id")
+            if len(chunks) > MAX_ENRICHED_CHUNKS:
+                raise TaskFailure("embed", "file_too_large")
+            if not isinstance(schema, list) or not schema:
+                raise TaskFailure("embed", "provider_refused")
+            if not isinstance(model_id, str) or not model_id:
+                raise TaskFailure("embed", "model_unavailable")
+            extracted = {}
+            for start in range(0, len(chunks), ENRICHMENT_BATCH):
+                control.check()
+                batch = chunks[start:start + ENRICHMENT_BATCH]
+                values = deps.embedder.generate_metadata([chunk.text for chunk in batch], model_id, schema, ctx, control)
+                for key, value in values.items():
+                    extracted.setdefault(key, value)
+            parse_generated_metadata(json.dumps({"metadata": extracted}, ensure_ascii=False), schema)
+            control.check()
+            try:
+                metadata = document_metadata_service.publish_generated_metadata(ctx, extracted)
+            except ServiceError as exc:
+                if exc.reason == reasons.PARSE_RUNNING:
+                    raise TaskCancelled("task replaced") from None
+                raise
+            except ValueError:
+                raise TaskFailure("embed", "file_too_large") from None
     with _step("index", ctx):
         deps.doc_store.delete({"doc_id": [ctx.doc_id], "task_id": [ctx.task_id]}, index, ctx.dataset_id)
     pages_total = int(report.pages_total or 0)
     if report.pages_without_text:
         task_service.set_progress(ctx.task_id, PARSED_PROGRESS, f"{report.pages_without_text} of {pages_total} pages in this range had no readable text.")
-    ids = _index_batches(ctx, deps, control, chunks, dimension, index, enriched) if chunks else []
+    ids = _index_batches(ctx, deps, control, chunks, dimension, index, enriched, controlled_tags, metadata) if chunks else []
     deps.embedder.forget(ctx.task_id)
     # Single machine lines the roll-up reads back (the latest of each wins when a task is retried).
     task_service.set_progress(ctx.task_id, 1.0, f"[pages] total={pages_total} without_text={report.pages_without_text}")

@@ -131,6 +131,32 @@ class EmbedRunner:
         control.check()
         return result
 
+    def generate_tags(self, texts: list[str], model_id: str, allowed: list[str], ctx: TaskContext, control: TaskControl):
+        from rag.svr.enrichment import controlled_tag_completion
+
+        return self._bounded_chat(lambda bundle: controlled_tag_completion(bundle, texts, allowed), model_id, ctx, control)
+
+    def generate_metadata(self, texts: list[str], model_id: str, schema: list[dict], ctx: TaskContext, control: TaskControl):
+        from rag.svr.enrichment import generated_metadata_completion
+
+        return self._bounded_chat(lambda bundle: generated_metadata_completion(bundle, texts, schema), model_id, ctx, control)
+
+    def _bounded_chat(self, completion, model_id: str, ctx: TaskContext, control: TaskControl):
+        def run():
+            release_database_connection()
+            with self._limiters.embed_limiter:
+                control.check()
+                llm = replace(self._settings.llm, max_retries=0, chat_timeout_seconds=min(self._settings.llm.chat_timeout_seconds, 30))
+                bundle = LLMBundle(ctx.tenant_id, model_id, "chat", settings=replace(self._settings, llm=llm))
+                control.check()
+                return completion(bundle)
+
+        control.check()
+        release_database_connection()
+        result = wait_for(self._executor().submit(run), control)
+        control.check()
+        return result
+
     def forget(self, task_id: str) -> None:
         with self._lock:
             self._bundles.pop(task_id, None)

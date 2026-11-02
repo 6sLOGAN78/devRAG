@@ -15,6 +15,7 @@ class TagItem(BaseModel):
     tag: str
     weight: float
     count: int
+    origin: str | None = None
 
 
 class TagPage(BaseModel):

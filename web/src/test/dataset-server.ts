@@ -134,6 +134,7 @@ export interface DatasetServer {
   memberships: MembershipRow[];
   datasets: Record<string, DatasetRow>;
   documents: Record<string, DocumentRow[]>;
+  models: Record<string, unknown>[];
   /** `created_by` of documents stored by the upload endpoint. */
   uploader: string;
   adapter: AxiosAdapter;
@@ -160,6 +161,7 @@ export function createDatasetServer(): DatasetServer {
     memberships: [],
     datasets: {},
     documents: {},
+    models: [],
     uploader: "u1",
     adapter: undefined as never,
     reset: () => {
@@ -169,6 +171,7 @@ export function createDatasetServer(): DatasetServer {
       server.memberships = [];
       server.datasets = {};
       server.documents = {};
+      server.models = [];
       server.uploader = "u1";
       state.clear();
     },
@@ -191,7 +194,7 @@ export function createDatasetServer(): DatasetServer {
       if (answer !== undefined) return answer;
     }
     if (key === "GET /v1/tenant/list") return ok(config, server.memberships);
-    if (key === "GET /api/v1/models") return ok(config, []);
+    if (key === "GET /api/v1/models") return ok(config, server.models);
     if (key === "GET /api/v1/models/default") return ok(config, { chat: "", embedding: "" });
     if (key === "POST /api/v1/documents/upload") {
       const id = String(params.dataset_id ?? "");

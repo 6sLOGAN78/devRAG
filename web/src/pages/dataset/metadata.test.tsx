@@ -51,3 +51,37 @@ it("blocks invalid keys before a request and hides held old workspace metadata",
   await waitFor(()=>expect(screen.queryByTestId("dataset-metadata-section")).toBeNull());
   expect(screen.queryByText("private-old-value")).toBeNull();
 });
+
+it("saves the selected model and typed generation schema through dataset settings",async()=>{
+  server.documents[DATASET_ID]=[documentRow(1)];
+  server.models=[{id:"fake-chat@provider",name:"Fake chat",provider:"Provider",type:"chat",dimension:null,max_tokens:8192}];
+  renderTable();
+  const user=userEvent.setup();
+  await screen.findByTestId("documents-table");
+  await user.click(within(rowOf(1)).getByTestId("document-select"));
+  await user.click(screen.getByTestId("selection-metadata"));
+  const panel=await screen.findByTestId("metadata-generation-config");
+  await user.click(within(panel).getByRole("checkbox",{name:"Generate metadata while parsing"}));
+  await user.selectOptions(within(panel).getByTestId("metadata-model"),"fake-chat@provider");
+  await user.click(within(panel).getByRole("button",{name:"Add field"}));
+  await user.type(within(panel).getByLabelText("Field name"),"tower_height_metres");
+  await user.selectOptions(within(panel).getByLabelText("Type"),"number");
+  await user.click(within(panel).getByRole("checkbox",{name:"Required"}));
+  await user.click(within(panel).getByTestId("metadata-config-save"));
+  await waitFor(()=>expect(server.callsTo("PUT",`/api/v1/datasets/${DATASET_ID}`)).toHaveLength(1));
+  expect(JSON.parse(String(server.callsTo("PUT",`/api/v1/datasets/${DATASET_ID}`)[0]?.data))).toEqual({parser_config:{auto_metadata:true,metadata_model_id:"fake-chat@provider",metadata_schema:[{name:"tower_height_metres",type:"number",required:true}]}});
+});
+
+it("keeps invalid generation schema local and makes no dataset update",async()=>{
+  renderTable();
+  const user=userEvent.setup();
+  await screen.findByTestId("documents-table");
+  await user.click(screen.getByTestId("dataset-metadata-open"));
+  const panel=await screen.findByTestId("metadata-generation-config");
+  await user.click(within(panel).getByTestId("metadata-auto-generate"));
+  await user.click(within(panel).getByTestId("metadata-schema-add"));
+  await user.type(within(panel).getByTestId("metadata-schema-name"),"private.owner");
+  await user.click(within(panel).getByTestId("metadata-config-save"));
+  expect(await screen.findByRole("alert")).toHaveTextContent("unique, valid schema fields");
+  expect(server.callsTo("PUT",`/api/v1/datasets/${DATASET_ID}`)).toHaveLength(0);
+});

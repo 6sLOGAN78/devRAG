@@ -336,7 +336,7 @@ def update_chunk(
                 features["question_tks"] = ""
         if doc.parser_id == "tag" or stored.get(TAG_FIELD):
             weights = tag_weights(clean,(doc.parser_config or {}).get("tag_top_n",8)) if doc.parser_id == "tag" else {}
-            features.update({TAG_FIELD:weights,TAG_LABEL_FIELD:list(weights)})
+            features.update({TAG_FIELD:weights,TAG_LABEL_FIELD:list(weights),"tags_source_kwd":"source" if weights else ""})
         if stored.get("content_token_offsets_int") and "content_token_offsets_int" not in features:
             features["content_token_offsets_int"] = []
         values.update(

@@ -38,6 +38,12 @@ export interface UploadLimitsView {
 export interface DatasetParserConfig {
   autoKeywords?: number;
   autoQuestions?: number;
+  autoTags?: boolean;
+  allowedTags?: string[];
+  tagModelId?: string;
+  autoMetadata?: boolean;
+  metadataSchema?: {name:string;type:"string"|"number"|"boolean"|"string_array";required:boolean}[];
+  metadataModelId?: string;
   pages?: [number, number][];
   layoutRecognize?: boolean | string;
   resumeModel?: string;
@@ -137,6 +143,12 @@ function toParserConfig(raw: unknown): DatasetParserConfig {
   return {
     autoKeywords: count(dto.auto_keywords),
     autoQuestions: count(dto.auto_questions),
+    ...(dto.auto_tags!==undefined?{autoTags:dto.auto_tags===true}:{}),
+    ...(dto.allowed_tags!==undefined?{allowedTags:Array.isArray(dto.allowed_tags) ? dto.allowed_tags.filter((value):value is string=>typeof value==="string").slice(0,128) : []}:{}),
+    ...(dto.tag_model_id!==undefined?{tagModelId:text(dto.tag_model_id).slice(0,128)}:{}),
+    ...(dto.auto_metadata!==undefined?{autoMetadata:dto.auto_metadata===true}:{}),
+    ...(dto.metadata_schema!==undefined?{metadataSchema:Array.isArray(dto.metadata_schema) ? dto.metadata_schema.slice(0,32).flatMap(item=>{const field=asRecord(item);return typeof field.name==="string"&&["string","number","boolean","string_array"].includes(text(field.type))?[{name:field.name,type:field.type as "string"|"number"|"boolean"|"string_array",required:field.required===true}]:[];}) : []}:{}),
+    ...(dto.metadata_model_id!==undefined?{metadataModelId:text(dto.metadata_model_id).slice(0,128)}:{}),
     chunkTokenNum: tokens > 0 ? tokens : DEFAULT_CHUNK_TOKEN_NUM,
     delimiter: typeof dto.delimiter === "string" && dto.delimiter !== "" ? dto.delimiter : DEFAULT_DELIMITER,
     overlappedPercent: overlap > 0 ? overlap : DEFAULT_OVERLAPPED_PERCENT,
@@ -223,6 +235,12 @@ export async function deleteDatasets(ids: string[], tenantId: string): Promise<s
 export type DatasetChunkingInput = Partial<{
   autoKeywords: number;
   autoQuestions: number;
+  autoTags: boolean;
+  allowedTags: string[];
+  tagModelId: string;
+  autoMetadata: boolean;
+  metadataSchema: {name:string;type:"string"|"number"|"boolean"|"string_array";required:boolean}[];
+  metadataModelId: string;
   pages: [number, number][];
   layoutRecognize: boolean | string;
   resumeModel?: string;
@@ -251,6 +269,12 @@ export async function updateDatasetChunking(id: string, input: DatasetChunkingIn
   if (input.overlappedPercent !== undefined) config.overlapped_percent = input.overlappedPercent;
   if (input.autoKeywords !== undefined) config.auto_keywords = input.autoKeywords;
   if (input.autoQuestions !== undefined) config.auto_questions = input.autoQuestions;
+  if (input.autoTags !== undefined) config.auto_tags = input.autoTags;
+  if (input.allowedTags !== undefined) config.allowed_tags = input.allowedTags;
+  if (input.tagModelId !== undefined) config.tag_model_id = input.tagModelId;
+  if (input.autoMetadata !== undefined) config.auto_metadata = input.autoMetadata;
+  if (input.metadataSchema !== undefined) config.metadata_schema = input.metadataSchema;
+  if (input.metadataModelId !== undefined) config.metadata_model_id = input.metadataModelId;
   if (input.resumeModel !== undefined) config.resume_model = input.resumeModel;
   if (input.resumeUseModel !== undefined) config.resume_use_model = input.resumeUseModel;
   if (input.asrModel !== undefined) config.asr_model = input.asrModel;

@@ -1,0 +1,9 @@
+{
+  "origin": "Original fictional Plan 22 source and expected controls frozen before provider selection",
+  "source": "controlled-enrichment-original.txt",
+  "facts": {"tower_height_metres": 52, "optical_calibration_units": 73},
+  "allowed_tags": ["lighthouse", "calibration"],
+  "forbidden_tag": "private-owner",
+  "metadata_schema": [{"name": "tower_height_metres", "type": "number", "required": true}, {"name": "reviewed", "type": "boolean", "required": false}],
+  "human_precedence": "A member-authored tower_height_metres value remains in the user field; generated output remains under reserved provenance."
+}

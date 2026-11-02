@@ -587,7 +587,7 @@ Scope notes: this is the PROJECT.md Core Value. No Phase 6, 7 or 8 work starts u
 
 **Planning status (2026-10-27):** Research and UI contract complete; structural checks30/30,90 task verifications,58/58 primary requirements plus RETR-13 producer handoff covered. No Phase6 native package/model acquisition or paid inference performed. Automatic entry completed the read-only audit/preparation and stops at the exact-candidate blocking-human approval in06-01 Task2.20 audit-tool tests pass; native acquisition/features have not started. Phase5 human UAT and Phase4 B36 remain pending.
 
-**Execution status (2026-10-30):** 21/30 plans complete. Opt-in bounded keyword/question generation, original-source preservation, inspector and product retrieval verified on real MySQL/Elasticsearch and rebuilt app; marked unit2609/8 existing skips, web2189, services97, ES18, Chrome1, affected browser51, leaks6 and CI7. No new packages/models/paid/ASR calls. Next22 controlled tags/auto metadata; full phase gate and human validation pending.
+**Execution status (2026-11-01):** 22/30 plans complete. Controlled generated tags and metadata, human precedence, source preservation and explicit provenance verified on real MySQL/Elasticsearch and rebuilt Chrome; marked unit2613/8 existing skips, web2193, integration9, affected services30, Chrome4 and CI7. No new packages/models/paid/ASR calls. Next23 dataset-wide enrichment jobs; full phase gate and human validation pending.
 
 **Wave 1** *(admission audit and blocking-human acquisition checkpoint)*
 
@@ -654,7 +654,7 @@ Scope notes: this is the PROJECT.md Core Value. No Phase 6, 7 or 8 work starts u
 - [x] 06-21-PLAN.md — Generate keywords and questions when requested
 **Wave 22** *(blocked on Wave 21 completion and accepted06-01 snapshot)*
 
-- [ ] 06-22-PLAN.md — Apply controlled tags and auto metadata
+- [x] 06-22-PLAN.md — Apply controlled tags and auto metadata
 **Wave 23** *(blocked on Wave 22 completion and accepted06-01 snapshot)*
 
 - [ ] 06-23-PLAN.md — Run dataset-wide enrichment jobs safely
@@ -753,6 +753,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8. Ph
 | 3. Models, Knowledge Bases and Upload | 31/31 | Complete | 2026-10-10 |
 | 4. Ingestion Pipeline | 35/35 | Human verification pending (B-36 deferred) | 2026-10-19 |
 | 5. Retrieval and Cited Chat (Core Value Gate) | 28/28 | Automated gate passed; human review pending | 2026-10-27 |
-| 6. Deep Parsing and Chunking Breadth | 21/30 | Executing; keyword/question generation passed | - |
+| 6. Deep Parsing and Chunking Breadth | 22/30 | Executing; controlled tags and metadata passed | - |
 | 7. Agents and Workflows | 0/TBD | Not started | - |
 | 8. Go Surface, CLI, Integrations, Billing and Production Deployment | 0/TBD | Not started | - |

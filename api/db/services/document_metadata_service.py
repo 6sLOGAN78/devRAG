@@ -12,7 +12,7 @@ from typing import Any
 from pydantic import ValidationError
 
 from api.db.database import DB
-from api.db.models import Document
+from api.db.models import Document, Task
 from api.db.models.base import current_timestamp_ms, timestamp_to_date
 from api.db.services.auth_service import Principal
 from api.db.services.document_service import authorize_upload
@@ -145,6 +145,62 @@ def _current_user_fields(stored: object) -> dict[str, Any]:
     return validate_metadata({key: value for key, value in stored.items() if not key.startswith("_")})
 
 
+def effective_metadata(stored: object) -> dict[str, Any]:
+    """Public values: a human field always wins over the generated copy."""
+    human = _current_user_fields(stored)
+    generated = stored.get("_generated", {})
+    generated = validate_metadata(generated)
+    return validate_metadata({**generated, **human})
+
+
+def metadata_provenance(stored: object) -> dict[str, str]:
+    human = _current_user_fields(stored)
+    generated = validate_metadata(stored.get("_generated", {}))
+    return {key: "human" if key in human else "generated" for key in sorted(set(human) | set(generated))}
+
+
+def publish_generated_metadata(ctx: Any, values: dict[str, Any]) -> dict[str, Any]:
+    """Publish checked model output only while this task owns a running document."""
+    generated = validate_metadata(values)
+    with DB.connection_context(), DB.atomic():
+        doc = Document.select(Document.id, Document.kb_id, Document.run, Document.meta_fields).where(
+            (Document.id == ctx.doc_id) & (Document.kb_id == ctx.dataset_id)
+        ).for_update().first()
+        if doc is None or doc.run != "1" or not Task.select(Task.id).where((Task.id == ctx.task_id) & (Task.doc_id == ctx.doc_id)).exists():
+            raise ServiceError(Kind.CONFLICT, reasons.PARSE_RUNNING, "the parse task changed before metadata publication")
+        stored = dict(doc.meta_fields or {})
+        human = _current_user_fields(stored)
+        previous = validate_metadata(stored.get("_generated", {}))
+        origins = stored.get("_provenance", {})
+        if not isinstance(origins, dict):
+            raise ValueError("stored provenance is invalid")
+        origins = dict(origins)
+        if len(origins) > MAX_FIELDS or any(not isinstance(key, str) or not _KEY.fullmatch(key) or not isinstance(value, str) or len(value) > 128 for key, value in origins.items()):
+            raise ValueError("stored provenance is invalid")
+        # A new parse replaces prior task rows. Drop their generated fields before adding this run's results.
+        prior_ids = {origin.rsplit(":", 1)[-1] for origin in origins.values() if origin.startswith("generated:")}
+        current_ids = {row.id for row in Task.select(Task.id).where(Task.id.in_(prior_ids))} if prior_ids else set()
+        for key, origin in list(origins.items()):
+            if origin.rsplit(":", 1)[-1] not in current_ids:
+                previous.pop(key, None)
+                origins.pop(key, None)
+        candidate = f"generated:{ctx.from_page:010d}:{ctx.task_id}"
+        for key, value in generated.items():
+            if key not in origins or candidate < origins[key]:
+                previous[key] = value
+                origins[key] = candidate
+        updated = {**human, "_generated": previous, "_provenance": origins}
+        validate_metadata({**previous, **human})
+        if len(json.dumps(updated, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode()) > MAX_BYTES:
+            raise ValueError("metadata too large")
+        stamp = current_timestamp_ms()
+        if Document.update(meta_fields=updated, update_time=stamp, update_date=timestamp_to_date(stamp)).where(
+            (Document.id == ctx.doc_id) & (Document.kb_id == ctx.dataset_id) & (Document.run == "1")
+        ).execute() != 1:
+            raise ServiceError(Kind.CONFLICT, reasons.PARSE_RUNNING, "the parse task changed before metadata publication")
+    return updated
+
+
 def _merged_stored(stored: object, incoming: dict[str, Any], mode: str) -> dict[str, Any]:
     current = _current_user_fields(stored)
     internal = {key: value for key, value in stored.items() if key.startswith("_")}
@@ -156,7 +212,10 @@ def _merged_stored(stored: object, incoming: dict[str, Any], mode: str) -> dict[
         raw = internal["_provenance"]
         if not isinstance(raw, dict) or len(raw) > MAX_FIELDS or any(not isinstance(key, str) or not _KEY.fullmatch(key) or not isinstance(value, str) or len(value) > 128 for key, value in raw.items()):
             raise _invalid("stored metadata is invalid")
-    result = {**merge_metadata(current, incoming, mode=mode), **internal}
+    edited = merge_metadata(current, incoming, mode=mode)
+    if "_generated" in internal:
+        validate_metadata({**internal["_generated"], **edited})
+    result = {**edited, **internal}
     if len(json.dumps(result, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode()) > MAX_BYTES:
         raise ValueError("metadata too large")
     return result
@@ -262,7 +321,7 @@ def get_flattened_metadata(principal: Principal, dataset_ids: object, *, page: i
                         raise ServiceError(Kind.CONFLICT, reasons.FIELDS_INVALID, "too many documents for this metadata view")
                     if len(rows) % 64 == 0:
                         _deadline(started)
-                    fields = _current_user_fields(row.meta_fields or {})
+                    fields = effective_metadata(row.meta_fields or {})
                     bytes_seen += len(json.dumps(fields, ensure_ascii=False, separators=(",", ":")).encode())
                     if bytes_seen > MAX_AGGREGATE_BYTES:
                         raise ServiceError(Kind.CONFLICT, reasons.FIELDS_INVALID, "too much metadata for this view")

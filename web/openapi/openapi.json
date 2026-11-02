@@ -870,6 +870,13 @@
             "title": "Metadata",
             "type": "object"
           },
+          "metadata_provenance": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "title": "Metadata Provenance",
+            "type": "object"
+          },
           "name": {
             "title": "Name",
             "type": "string"
@@ -1114,6 +1121,13 @@
           "metadata": {
             "additionalProperties": true,
             "title": "Metadata",
+            "type": "object"
+          },
+          "metadata_provenance": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "title": "Metadata Provenance",
             "type": "object"
           },
           "name": {
@@ -2423,6 +2437,18 @@
           "count": {
             "title": "Count",
             "type": "integer"
+          },
+          "origin": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Origin"
           },
           "tag": {
             "title": "Tag",

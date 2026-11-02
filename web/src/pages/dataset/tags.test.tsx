@@ -80,3 +80,27 @@ it("hides management for a reader and never shows a held old-workspace tag respo
   await waitFor(()=>expect(screen.queryByTestId("dataset-tags-section")).toBeNull());
   expect(screen.queryByText("private-old-tag")).toBeNull();
 });
+
+it("saves only normalized allowed labels and the chosen chat model",async()=>{
+  server.models=[{id:"fake-chat@provider",name:"Fake chat",provider:"Provider",type:"chat",dimension:null,max_tokens:8192}];
+  const user=await mount();
+  await user.click(await screen.findByTestId("dataset-tags-open"));
+  const panel=screen.getByTestId("tag-generation-config");
+  await user.click(within(panel).getByRole("checkbox",{name:"Generate labels from the allowed set while parsing"}));
+  await user.type(within(panel).getByTestId("allowed-tags"),"Lighthouse\nCalibration");
+  await user.selectOptions(within(panel).getByTestId("tag-model"),"fake-chat@provider");
+  await user.click(within(panel).getByTestId("tag-config-save"));
+  await waitFor(()=>expect(server.callsTo("PUT",`/api/v1/datasets/${DATASET_ID}`)).toHaveLength(1));
+  expect(JSON.parse(String(server.callsTo("PUT",`/api/v1/datasets/${DATASET_ID}`)[0]?.data))).toEqual({parser_config:{auto_tags:true,allowed_tags:["lighthouse","calibration"],tag_model_id:"fake-chat@provider"}});
+});
+
+it("rejects duplicate allowed labels before sending settings",async()=>{
+  const user=await mount();
+  await user.click(await screen.findByTestId("dataset-tags-open"));
+  const panel=screen.getByTestId("tag-generation-config");
+  await user.click(within(panel).getByTestId("tag-auto-generate"));
+  await user.type(within(panel).getByTestId("allowed-tags"),"Lighthouse\nlighthouse");
+  await user.click(within(panel).getByTestId("tag-config-save"));
+  expect(await screen.findByRole("alert")).toHaveTextContent("unique, valid labels");
+  expect(server.callsTo("PUT",`/api/v1/datasets/${DATASET_ID}`)).toHaveLength(0);
+});

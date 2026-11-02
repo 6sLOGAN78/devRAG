@@ -71,6 +71,7 @@ class FakeProvider:
     delay_ms: int = 0  # embedding endpoints answer after this many milliseconds (plan 04-11: slows a call so a cancel can land mid-request)
     chat_mode: str = "plain"  # plan 05-01: one of CHAT_MODES, selects the text streamed by /v1/chat/completions
     chat_response: str | None = None
+    chat_responses: list[str] = field(default_factory=list)
     vision_caption: str = "A lighthouse with a red roof. Labels show height 52 metres and calibration offset 73 units."
     chat_pieces: tuple[str, ...] | None = None  # browser hostile-text scene: explicit provider output, never product stubbing
     embed_mode: str = "ok"  # plan 04-18: "ok", "refuse" (400), "timeout" (no answer until teardown) or "ratelimit" (429) on the embedding endpoints
@@ -127,6 +128,7 @@ class FakeProvider:
 
     def reset(self) -> None:
         self.requests.clear()
+        self.chat_responses.clear()
         self._counters.clear()
 
     def hits(self, path: str) -> list[Recorded]:
@@ -296,7 +298,9 @@ def build_app(state: FakeProvider) -> Quart:
             usage = bool((body.get("stream_options") or {}).get("include_usage"))
             return Response(_sse(state, model, usage), mimetype="text/event-stream")
         reply = _chat_completion(model)
-        if state.chat_response is not None:
+        if state.chat_responses:
+            reply["choices"][0]["message"]["content"] = state.chat_responses.pop(0)
+        elif state.chat_response is not None:
             reply["choices"][0]["message"]["content"] = state.chat_response
         if any(isinstance(message.get("content"),list) and any(isinstance(item,dict) and item.get("type")=="image_url" for item in message["content"]) for message in body.get("messages",[])):
             reply["choices"][0]["message"]["content"] = state.vision_caption
@@ -500,7 +504,7 @@ def _serving(bind_host: str, shared: FakeProvider | None = None) -> Iterator[Fak
     sock.bind((bind_host, 0))
     sock.listen(64)
     port = sock.getsockname()[1]
-    state = FakeProvider(port=port) if shared is None else FakeProvider(port=port, requests=shared.requests, _counters=shared._counters)
+    state = FakeProvider(port=port) if shared is None else FakeProvider(port=port, requests=shared.requests, chat_responses=shared.chat_responses, _counters=shared._counters)
     ready = threading.Event()
     stop_box: list[Any] = []
     thread = threading.Thread(target=_serve_in_thread, args=(state, sock, ready, stop_box), daemon=True, name="fake-provider")

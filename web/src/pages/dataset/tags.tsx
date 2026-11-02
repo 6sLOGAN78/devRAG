@@ -7,14 +7,16 @@ import {Alert} from "@/components/ui/alert";
 import {AlertDialog,AlertDialogContent,AlertDialogHeader,AlertDialogTitle,AlertDialogDescription,AlertDialogFooter,AlertDialogCancel,AlertDialogAction} from "@/components/ui/alert-dialog";
 import {useCanManageDataset} from "@/hooks/use-dataset-permissions";
 import {useUpdateDatasetRequest} from "@/hooks/use-knowledge-request";
+import {useModelsRequest} from "@/hooks/use-llm-request";
 import {useWorkspaceStore} from "@/stores/workspace-store";
-import {listDatasets,type DatasetDetailView} from "@/services/dataset-service";
+import {listDatasets,updateDatasetChunking,type DatasetDetailView} from "@/services/dataset-service";
 import {listDatasetTags,deleteDatasetTags,aggregateDatasetTags,type DatasetTag} from "@/services/dataset-tag-service";
 import {ApiError} from "@/services/http";
 import {notifySuccess} from "@/services/notify";
 
 function TagList({rows}:{rows:DatasetTag[]}){
-  return <ul className="grid gap-2 sm:grid-cols-2">{rows.map(row=><li key={row.tag} className="flex flex-wrap justify-between gap-2 rounded-md border p-3"><span className="break-words">{row.tag}</span><span className="tabular-nums text-muted-foreground">{row.weight.toFixed(3)} · {row.count}</span></li>)}</ul>;
+  const {t}=useTranslation();
+  return <ul className="grid gap-2 sm:grid-cols-2">{rows.map(row=><li key={row.tag} className="flex flex-wrap justify-between gap-2 rounded-md border p-3"><span className="break-words">{row.tag}{row.origin?<span className="ml-2 text-xs text-muted-foreground">({t(`datasets.tags.origin.${row.origin}`)})</span>:null}</span><span className="tabular-nums text-muted-foreground">{row.weight.toFixed(3)} · {row.count}</span></li>)}</ul>;
 }
 
 export function DatasetTags({dataset}:{dataset:DatasetDetailView}){
@@ -29,6 +31,9 @@ export function DatasetTags({dataset}:{dataset:DatasetDetailView}){
   const [busy,setBusy]=useState(false);
   const [error,setError]=useState<string|null>(null);
   const [rank,setRank]=useState(String(dataset.pagerank??0));
+  const [autoTags,setAutoTags]=useState(dataset.parserConfig.autoTags??false);
+  const [allowed,setAllowed]=useState((dataset.parserConfig.allowedTags??[]).join("\n"));
+  const [tagModel,setTagModel]=useState(dataset.parserConfig.tagModelId??"");
   const previous=useRef(dataset.pagerank??0);
   const [aggregateOpen,setAggregateOpen]=useState(false);
   const [datasetPage,setDatasetPage]=useState(1);
@@ -39,6 +44,7 @@ export function DatasetTags({dataset}:{dataset:DatasetDetailView}){
   const deleteButton=useRef<HTMLButtonElement>(null);
   useEffect(()=>{alive.current=true;return()=>{alive.current=false;};},[]);
   const update=useUpdateDatasetRequest();
+  const models=useModelsRequest("chat",current&&open);
   const tags=useQuery({queryKey:["ws",tenant,"dataset-tags",dataset.id],queryFn:({signal})=>listDatasetTags(dataset.id,signal),retry:false,enabled:current&&open});
   const choices=useQuery({queryKey:["ws",tenant,"tag-datasets",datasetPage],queryFn:()=>listDatasets({tenantId:tenant,page:datasetPage,pageSize:12,keywords:""}),retry:false,enabled:current&&open&&aggregateOpen});
   const aggregation=useQuery({queryKey:["ws",tenant,"dataset-tags","aggregation",submitted],queryFn:({signal})=>aggregateDatasetTags(submitted,signal),retry:false,enabled:current&&open&&aggregateOpen&&submitted.length>0});
@@ -68,6 +74,15 @@ export function DatasetTags({dataset}:{dataset:DatasetDetailView}){
     catch(value){if(isCurrent())setError(failure(value));}
     finally{inFlight.current=false;if(isCurrent())setBusy(false);}
   }
+  async function saveTagConfig(){
+    if(inFlight.current||!isCurrent())return;
+    const labels=allowed.split(/[\n,]/).map(value=>value.normalize("NFKC").toLowerCase().trim().replace(/\s+/g," ")).filter(Boolean);
+    if(labels.length>128||labels.some(value=>value.length>64||/[.\\/\u0000-\u001f]/.test(value))||new Set(labels).size!==labels.length||(autoTags&&(!labels.length||!tagModel))){setError(t("datasets.tags.invalidConfig"));return;}
+    inFlight.current=true;setBusy(true);setError(null);
+    try{await updateDatasetChunking(dataset.id,{autoTags,allowedTags:labels,tagModelId:tagModel});await queryClient.invalidateQueries({queryKey:["ws",tenant]});if(isCurrent())notifySuccess(t("datasets.tags.configSaved"));}
+    catch(value){if(isCurrent())setError(failure(value));}
+    finally{inFlight.current=false;if(isCurrent())setBusy(false);}
+  }
   if(!current)return null;
   return <section className="grid gap-4 rounded-lg border bg-card p-4" data-testid="dataset-tags-section">
     <Button type="button" variant="ghost" className="justify-start" data-testid="dataset-tags-open" aria-expanded={open} onClick={()=>setOpen(value=>!value)}>{t("datasets.tags.title")}</Button>
@@ -76,9 +91,10 @@ export function DatasetTags({dataset}:{dataset:DatasetDetailView}){
       {tags.isPending?<p role="status">{t("datasets.tags.loading")}</p>:null}
       {tags.isError?<Alert role="alert">{t("datasets.tags.failed")} <Button variant="outline" onClick={()=>void tags.refetch()}>{t("datasets.tags.refresh")}</Button></Alert>:null}
       {tags.data?.items.length===0?<p data-testid="dataset-tags-empty">{t("datasets.tags.empty")}</p>:null}
-      {tags.data?.items.length?<div role="group" aria-label={t("datasets.tags.selection")} className="grid max-h-80 gap-2 overflow-y-auto sm:grid-cols-2">{tags.data.items.map(row=><label key={row.tag} className="flex min-h-11 cursor-pointer items-center gap-3 rounded-md border p-3"><input type="checkbox" checked={selected.includes(row.tag)} disabled={!canManage||busy||(!selected.includes(row.tag)&&selected.length>=128)} aria-label={row.tag} onChange={event=>setSelected(values=>event.target.checked?[...values,row.tag]:values.filter(value=>value!==row.tag))}/><span className="min-w-0 flex-1 break-words">{row.tag}</span><span className="tabular-nums text-muted-foreground">{row.weight.toFixed(3)} · {t("datasets.tags.chunks",{count:row.count})}</span></label>)}</div>:null}
+      {tags.data?.items.length?<div role="group" aria-label={t("datasets.tags.selection")} className="grid max-h-80 gap-2 overflow-y-auto sm:grid-cols-2">{tags.data.items.map(row=><label key={row.tag} data-testid={row.origin?"generated-tag-label":undefined} className="flex min-h-11 cursor-pointer items-center gap-3 rounded-md border p-3"><input type="checkbox" checked={selected.includes(row.tag)} disabled={!canManage||busy||(!selected.includes(row.tag)&&selected.length>=128)} aria-label={row.tag} onChange={event=>setSelected(values=>event.target.checked?[...values,row.tag]:values.filter(value=>value!==row.tag))}/><span className="min-w-0 flex-1 break-words">{row.tag}{row.origin?<small className="ml-2 text-muted-foreground">({t(`datasets.tags.origin.${row.origin}`)})</small>:null}</span><span className="tabular-nums text-muted-foreground">{row.weight.toFixed(3)} · {t("datasets.tags.chunks",{count:row.count})}</span></label>)}</div>:null}
       {canManage?<>
         <Button ref={deleteButton} type="button" variant="outline" data-testid="tags-delete-selected" disabled={busy||!selected.length} onClick={()=>{setError(null);setConfirm(true);}}>{t("datasets.tags.deleteSelected",{count:selected.length})}</Button>
+        <div className="grid gap-3 border-t pt-4" data-testid="tag-generation-config"><label className="flex items-center gap-2 text-sm"><input type="checkbox" data-testid="tag-auto-generate" checked={autoTags} disabled={busy} onChange={event=>setAutoTags(event.target.checked)}/>{t("datasets.tags.autoGenerate")}</label><label className="grid gap-1 text-sm">{t("datasets.tags.allowedSet")}<textarea data-testid="allowed-tags" className="min-h-24 rounded-md border bg-background p-2" value={allowed} disabled={busy} onChange={event=>setAllowed(event.target.value)}/></label><label className="grid gap-1 text-sm">{t("datasets.tags.selectedModel")}<select data-testid="tag-model" className="h-10 rounded-md border bg-background px-2" value={tagModel} disabled={busy||models.isPending} onChange={event=>setTagModel(event.target.value)}><option value="">{t("datasets.tags.chooseModel")}</option>{models.data?.map(model=><option key={model.id} value={model.id}>{model.name} · {model.provider}</option>)}</select></label><Button type="button" data-testid="tag-config-save" disabled={busy} onClick={()=>void saveTagConfig()}>{t("datasets.tags.saveConfig")}</Button></div>
         <div className="flex flex-wrap items-end gap-3"><label className="grid gap-1 text-sm">{t("datasets.tags.pagerank")}<Input type="number" min={0} max={100} step={1} value={rank} onChange={event=>setRank(event.target.value)} disabled={busy} data-testid="dataset-pagerank"/></label><Button type="button" variant="outline" disabled={busy||rank===String(dataset.pagerank??0)} data-testid="dataset-pagerank-save" onClick={()=>void saveRank()}>{t("datasets.tags.saveRank")}</Button></div>
       </>:null}
       {error?<Alert role="alert">{error}</Alert>:null}

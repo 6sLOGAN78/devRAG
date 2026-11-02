@@ -5,6 +5,8 @@ import { Alert } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { documentsKeyRoot } from "@/hooks/use-document-request";
+import { useModelsRequest } from "@/hooks/use-llm-request";
+import { updateDatasetChunking } from "@/services/dataset-service";
 import { editDocumentMetadata, getMetadataConfig, listFlattenedMetadata, type MetadataValue } from "@/services/document-metadata-service";
 import type { DocumentView } from "@/services/document-service";
 import { notifySuccess } from "@/services/notify";
@@ -12,6 +14,7 @@ import { useWorkspaceStore } from "@/stores/workspace-store";
 
 type ValueType = "string" | "number" | "boolean" | "null" | "string_array";
 interface Draft { id: number; key: string; type: ValueType; value: string }
+type SchemaField = {name:string;type:"string"|"number"|"boolean"|"string_array";required:boolean};
 const emptyDraft = (id: number): Draft => ({id, key: "", type: "string", value: ""});
 const keyRule = /^[A-Za-z][A-Za-z0-9_-]{0,63}$/;
 const reserved = new Set(["provenance", "source", "generation", "generated", "internal"]);
@@ -36,7 +39,7 @@ function valueOf(draft: Draft): MetadataValue {
   return draft.value;
 }
 
-export function DatasetMetadata({datasetId, tenantId, selected, open, onOpenChange}:{datasetId:string;tenantId:string;selected:DocumentView[];open:boolean;onOpenChange:(open:boolean)=>void}) {
+export function DatasetMetadata({datasetId, tenantId, canManage, selected, open, onOpenChange}:{datasetId:string;tenantId:string;canManage:boolean;selected:DocumentView[];open:boolean;onOpenChange:(open:boolean)=>void}) {
   const {t} = useTranslation();
   const client = useQueryClient();
   const current = useWorkspaceStore(state => state.activeTenantId) === tenantId;
@@ -48,8 +51,14 @@ export function DatasetMetadata({datasetId, tenantId, selected, open, onOpenChan
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [fieldPage,setFieldPage]=useState(1);
+  const [autoEnabled,setAutoEnabled]=useState(false);
+  const [modelId,setModelId]=useState("");
+  const [schema,setSchema]=useState<SchemaField[]>([]);
+  const [configBusy,setConfigBusy]=useState(false);
+  const models=useModelsRequest("chat",current&&open);
   const fields = useQuery({queryKey:["ws",tenantId,"metadata-fields",datasetId,fieldPage],queryFn:({signal})=>listFlattenedMetadata([datasetId],signal,fieldPage),enabled:current&&open,retry:false});
   const config = useQuery({queryKey:["ws",tenantId,"metadata-config",datasetId],queryFn:({signal})=>getMetadataConfig(datasetId,signal),enabled:current&&open,retry:false});
+  useEffect(()=>{if(config.data){setAutoEnabled(config.data.enabled);setModelId(config.data.modelId);setSchema(config.data.schema as SchemaField[]);}},[config.data]);
   useEffect(()=>{alive.current=true;return()=>{alive.current=false;};},[]);
   const isCurrent=()=>alive.current&&useWorkspaceStore.getState().activeTenantId===tenantId;
   const selection=selected.map(item=>item.id);
@@ -74,6 +83,19 @@ export function DatasetMetadata({datasetId, tenantId, selected, open, onOpenChan
     }catch{if(isCurrent())setError(t("datasets.metadata.failed"));}
     finally{inFlight.current=false;if(isCurrent())setBusy(false);}
   }
+  async function saveConfig(){
+    if(configBusy||!canManage||!isCurrent())return;
+    const names=schema.map(item=>item.name.trim().toLowerCase());
+    if(autoEnabled&&(!modelId||!schema.length)||schema.length>32||names.some(name=>!keyRule.test(name)||reserved.has(name)||name.startsWith("internal_")||name.startsWith("generated_"))||new Set(names).size!==names.length){setError(t("datasets.metadata.invalidConfig"));return;}
+    setConfigBusy(true);setError(null);
+    try{
+      const normalized=schema.map((item,index)=>({...item,name:names[index]!}));
+      await updateDatasetChunking(datasetId,{autoMetadata:autoEnabled,metadataModelId:modelId,metadataSchema:normalized});
+      await client.invalidateQueries({queryKey:["ws",tenantId,"metadata-config",datasetId]});
+      if(isCurrent())notifySuccess(t("datasets.metadata.configSaved"));
+    }catch{if(isCurrent())setError(t("datasets.metadata.failed"));}
+    finally{if(isCurrent())setConfigBusy(false);}
+  }
   if(!current)return null;
   return <section className="grid gap-4 rounded-lg border bg-card p-4" data-testid="dataset-metadata-section">
     <Button type="button" variant="ghost" className="justify-start" data-testid="dataset-metadata-open" aria-expanded={open} onClick={()=>onOpenChange(!open)}>{t("datasets.metadata.title")}</Button>
@@ -82,6 +104,14 @@ export function DatasetMetadata({datasetId, tenantId, selected, open, onOpenChan
       {fields.isPending||config.isPending?<p role="status">{t("datasets.metadata.loading")}</p>:null}
       {fields.isError||config.isError?<Alert role="alert">{t("datasets.metadata.failed")} <Button variant="outline" onClick={()=>{void fields.refetch();void config.refetch();}}>{t("datasets.metadata.retry")}</Button></Alert>:null}
       {config.data?<div data-testid="metadata-config" className="grid gap-1 text-sm"><p>{config.data.enabled?t("datasets.metadata.autoOn"):t("datasets.metadata.autoOff")} · {t("datasets.metadata.schema",{count:config.data.schema.length})}</p>{config.data.modelId?<p className="break-words text-muted-foreground">{t("datasets.metadata.model")}: {config.data.modelId}</p>:null}{config.data.schema.length?<ul className="flex flex-wrap gap-2">{config.data.schema.map(field=><li key={field.name} className="rounded border px-2 py-1">{field.name} ({field.type}){field.required?" *":""}</li>)}</ul>:null}</div>:null}
+      {config.data&&canManage?<div className="grid gap-3 border-t pt-4" data-testid="metadata-generation-config">
+        <label className="flex items-center gap-2 text-sm"><input type="checkbox" data-testid="metadata-auto-generate" checked={autoEnabled} disabled={configBusy} onChange={event=>setAutoEnabled(event.target.checked)}/>{t("datasets.metadata.autoGenerate")}</label>
+        <label className="grid gap-1 text-sm">{t("datasets.metadata.model")}<select data-testid="metadata-model" className="h-10 rounded-md border bg-background px-2" value={modelId} disabled={configBusy||models.isPending} onChange={event=>setModelId(event.target.value)}><option value="">{t("datasets.metadata.chooseModel")}</option>{models.data?.map(model=><option key={model.id} value={model.id}>{model.name} · {model.provider}</option>)}</select></label>
+        {schema.map((field,index)=><div key={index} className="grid gap-2 rounded-md border p-3 sm:grid-cols-[1fr_9rem_auto_auto]"><label className="grid gap-1 text-sm">{t("datasets.metadata.field")}<Input data-testid="metadata-schema-name" value={field.name} disabled={configBusy} onChange={event=>setSchema(old=>old.map((item,i)=>i===index?{...item,name:event.target.value}:item))}/></label><label className="grid gap-1 text-sm">{t("datasets.metadata.type")}<select data-testid="metadata-schema-type" className="h-10 rounded-md border bg-background px-2" value={field.type} disabled={configBusy} onChange={event=>setSchema(old=>old.map((item,i)=>i===index?{...item,type:event.target.value as SchemaField["type"]}:item))}>{(["string","number","boolean","string_array"] as const).map(type=><option key={type} value={type}>{t(`datasets.metadata.types.${type}`)}</option>)}</select></label><label className="flex items-center gap-2 text-sm"><input type="checkbox" data-testid="metadata-schema-required" checked={field.required} disabled={configBusy} onChange={event=>setSchema(old=>old.map((item,i)=>i===index?{...item,required:event.target.checked}:item))}/>{t("datasets.metadata.required")}</label><Button type="button" variant="ghost" disabled={configBusy} onClick={()=>setSchema(old=>old.filter((_,i)=>i!==index))}>{t("datasets.metadata.removeField")}</Button></div>)}
+        <div className="flex gap-2"><Button type="button" variant="outline" data-testid="metadata-schema-add" disabled={configBusy||schema.length>=32} onClick={()=>setSchema(old=>[...old,{name:"",type:"string",required:false}])}>{t("datasets.metadata.addField")}</Button><Button type="button" data-testid="metadata-config-save" disabled={configBusy} onClick={()=>void saveConfig()}>{t("datasets.metadata.saveConfig")}</Button></div>
+      </div>:null}
+      {error?<Alert role="alert">{error}</Alert>:null}
+      {selected.length?<ul className="grid gap-2" data-testid="metadata-selected-values">{selected.map(item=><li key={item.id} className="rounded border p-2 text-sm"><strong>{item.name}</strong>{Object.entries(item.metadata).length?<ul>{Object.entries(item.metadata).map(([key,value])=><li key={key} data-testid="metadata-field-value">{key}: {Array.isArray(value)?value.join(", "):String(value)} <span className="text-muted-foreground">({t(`datasets.metadata.origin.${item.metadataProvenance?.[key]??"human"}`)})</span></li>)}</ul>:null}</li>)}</ul>:null}
       {fields.data?.fields.length?<ul className="grid gap-2">{fields.data.fields.map(field=><li key={field.name} className="rounded-md border p-3 text-sm"><strong className="break-words">{field.name}</strong> <span className="text-muted-foreground">({field.type}, {field.total})</span><p className="break-words">{field.values.map(value=>Array.isArray(value)?value.join(", "):value===null?"null":String(value)).join(" · ")}</p></li>)}</ul>:fields.data?<p data-testid="metadata-empty">{t("datasets.metadata.empty")}</p>:null}
       {fields.data?.fields.length?<div className="flex gap-2"><Button type="button" variant="outline" disabled={fieldPage<=1} onClick={()=>setFieldPage(page=>page-1)}>{t("datasets.metadata.previous")}</Button><Button type="button" variant="outline" disabled={!fields.data.hasMore} onClick={()=>setFieldPage(page=>page+1)}>{t("datasets.metadata.next")}</Button></div>:null}
       {selection.length?<div className="grid gap-3 border-t pt-4" data-testid="metadata-editor">
@@ -96,7 +126,6 @@ export function DatasetMetadata({datasetId, tenantId, selected, open, onOpenChan
         </div>)}
         <div className="flex flex-wrap gap-2"><Button type="button" variant="outline" disabled={busy||drafts.length>=32} onClick={()=>setDrafts(items=>[...items,emptyDraft(nextId.current++)])}>{t("datasets.metadata.addField")}</Button><Button type="button" data-testid="metadata-save" disabled={busy||selected.some(item=>item.run==="1")} onClick={()=>void save()}>{busy?t("datasets.metadata.saving"):t("datasets.metadata.save")}</Button></div>
         {selected.some(item=>item.run==="1")?<p role="status">{t("datasets.metadata.parsing")}</p>:null}
-        {error?<Alert role="alert">{error}</Alert>:null}
       </div>:null}
     </div>:null}
   </section>;

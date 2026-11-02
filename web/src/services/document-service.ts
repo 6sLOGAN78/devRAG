@@ -22,6 +22,7 @@ export interface DocumentView {
   createdBy: string;
   parserId: string;
   metadata: Record<string, string | number | boolean | null | string[]>;
+  metadataProvenance?: Record<string, "human" | "generated">;
   chunkNum: number;
   updateTime: number;
   createTime: number;
@@ -112,6 +113,7 @@ export function toDocument(raw: unknown): DocumentView {
     createdBy: text(dto.created_by),
     parserId: text(dto.parser_id),
     metadata: toMetadata(dto.metadata),
+    ...(dto.metadata_provenance!==undefined?{metadataProvenance:Object.fromEntries(Object.entries(asRecord(dto.metadata_provenance)).filter(([key,value])=>/^[A-Za-z][A-Za-z0-9_-]{0,63}$/.test(key)&&(value==="human"||value==="generated"))) as Record<string,"human"|"generated">}:{}),
     chunkNum: chunks,
     updateTime: count(dto.update_time),
     createTime: count(dto.create_time),

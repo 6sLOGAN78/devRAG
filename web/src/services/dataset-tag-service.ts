@@ -1,14 +1,15 @@
 import {datasetPath,datasetsPath} from "@/constants/api-paths";
 import {asRecord,count,text} from "./mapping";
 import {request} from "./http";
-export interface DatasetTag {tag:string;weight:number;count:number}
+export interface DatasetTag {tag:string;weight:number;count:number;origin?:"generated"|"mixed"}
 export interface TagPage {items:DatasetTag[];total:number}
 function page(raw:unknown):TagPage {
   const dto=asRecord(raw);
   const items=Array.isArray(dto.items)?dto.items.flatMap(value=>{
     const row=asRecord(value);
     const tag=text(row.tag);
-    return tag&&tag.length<=64&&typeof row.weight==="number"&&Number.isFinite(row.weight)&&row.weight>=0&&row.weight<=1 ? [{tag,weight:row.weight,count:count(row.count)}] : [];
+    const origin:DatasetTag["origin"]=row.origin==="generated"?"generated":row.origin==="mixed"?"mixed":undefined;
+    return tag&&tag.length<=64&&typeof row.weight==="number"&&Number.isFinite(row.weight)&&row.weight>=0&&row.weight<=1 ? [{tag,weight:row.weight,count:count(row.count),...(origin?{origin}:{})}] : [];
   }):[];
   return {items,total:count(dto.total)};
 }

@@ -1085,6 +1085,10 @@ export interface components {
             metadata?: {
                 [key: string]: unknown;
             };
+            /** Metadata Provenance */
+            metadata_provenance?: {
+                [key: string]: string;
+            };
             /** Name */
             name: string;
             /** Overlapped Percent */
@@ -1177,6 +1181,10 @@ export interface components {
             /** Metadata */
             metadata?: {
                 [key: string]: unknown;
+            };
+            /** Metadata Provenance */
+            metadata_provenance?: {
+                [key: string]: string;
             };
             /** Name */
             name: string;
@@ -1642,6 +1650,11 @@ export interface components {
         TagItem: {
             /** Count */
             count: number;
+            /**
+             * Origin
+             * @default null
+             */
+            origin: string | null;
             /** Tag */
             tag: string;
             /** Weight */

@@ -33,7 +33,7 @@ ROW_KEYS: tuple[str, ...] = (
     "id", "name", "size", "type", "suffix", "dataset_id", "created_by", "parser_id", "create_time", "update_time",
     "run", "progress", "progress_message", "chunk_count", "token_num", "parseable", "enabled", "thumbnail", "last_log_id",
     "pages_total", "pages_without_text", "error",
-    "metadata",
+    "metadata", "metadata_provenance",
 )  # fmt: skip
 MAX_MESSAGE = 300
 MESSAGE_TAIL = 2000
@@ -83,6 +83,8 @@ def row_dto(doc: Document, latest_log: Mapping[str, Any] | None, progress_messag
     """One document as the list and detail show it. ``latest_log`` is ``{"id", "dsl"}`` of the newest log row, or ``None``."""
     dsl = (latest_log or {}).get("dsl")
     dsl = dsl if isinstance(dsl, dict) else {}
+    from api.db.services.document_metadata_service import effective_metadata, metadata_provenance
+    stored_metadata = doc.meta_fields or {}
     return {
         "id": doc.id,
         "name": doc.name,
@@ -92,7 +94,8 @@ def row_dto(doc: Document, latest_log: Mapping[str, Any] | None, progress_messag
         "dataset_id": doc.kb_id,
         "created_by": doc.created_by,
         "parser_id": doc.parser_id,
-        "metadata": {key: value for key, value in (doc.meta_fields or {}).items() if isinstance(key, str) and not key.startswith("_")},
+        "metadata": effective_metadata(stored_metadata),
+        "metadata_provenance": metadata_provenance(stored_metadata),
         "create_time": int(doc.create_time or 0),
         "update_time": int(doc.update_time or 0),
         "run": doc.run,
