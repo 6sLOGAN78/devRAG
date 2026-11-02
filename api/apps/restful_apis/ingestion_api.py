@@ -88,6 +88,8 @@ class LogPage(BaseModel):
 class TaskView(BaseModel):
     id: str
     doc_id: str
+    job_id: str | None = None
+    task_type: str | None = None
     dataset_id: str
     from_page: int
     to_page: int

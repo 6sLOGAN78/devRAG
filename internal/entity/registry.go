@@ -16,6 +16,7 @@ func All() []any {
 		Connector{},
 		Connector2KB{},
 		Conversation{},
+		DatasetJob{},
 		Dialog{},
 		Document{},
 		DocumentAsset{},

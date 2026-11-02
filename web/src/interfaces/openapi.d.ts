@@ -388,6 +388,54 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/datasets/{dataset_id}/jobs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["get_list_jobs"];
+        put?: never;
+        post: operations["post_start"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/datasets/{dataset_id}/jobs/{job_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["get_get_job"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/datasets/{dataset_id}/jobs/{job_id}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["post_cancel"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/datasets/{dataset_id}/metadata/config": {
         parameters: {
             query?: never;
@@ -1320,6 +1368,35 @@ export interface components {
             /** Name */
             name: string;
         };
+        /** JobList */
+        JobList: {
+            /** Items */
+            items: components["schemas"]["JobView"][];
+        };
+        /** JobView */
+        JobView: {
+            /** Completed */
+            completed: number;
+            /** Created At */
+            created_at: number;
+            /** Failed */
+            failed: number;
+            /** Id */
+            id: string;
+            /** Progress */
+            progress: number;
+            /**
+             * Run
+             * @enum {string}
+             */
+            run: "1" | "2" | "3" | "4";
+            /** Total */
+            total: number;
+            /** Type */
+            type: string;
+            /** Updated At */
+            updated_at: number;
+        };
         /** LanguageData */
         LanguageData: {
             /** Engine */
@@ -1684,10 +1761,20 @@ export interface components {
             from_page: number;
             /** Id */
             id: string;
+            /**
+             * Job Id
+             * @default null
+             */
+            job_id: string | null;
             /** Progress */
             progress: number;
             /** Progress Message */
             progress_message: string;
+            /**
+             * Task Type
+             * @default null
+             */
+            task_type: string | null;
             /** To Page */
             to_page: number;
         };
@@ -3060,6 +3147,126 @@ export interface operations {
                         /** Code */
                         code: number;
                         data: components["schemas"]["LogDetailView"];
+                        /** Message */
+                        message: string;
+                    };
+                };
+            };
+        };
+    };
+    get_list_jobs: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                dataset_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Code */
+                        code: number;
+                        data: components["schemas"]["JobList"];
+                        /** Message */
+                        message: string;
+                    };
+                };
+            };
+        };
+    };
+    post_start: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                dataset_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": {
+                    /**
+                     * Type
+                     * @enum {string}
+                     */
+                    type: "enrich" | "raptor";
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Code */
+                        code: number;
+                        data: components["schemas"]["JobView"];
+                        /** Message */
+                        message: string;
+                    };
+                };
+            };
+        };
+    };
+    get_get_job: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                dataset_id: string;
+                job_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Code */
+                        code: number;
+                        data: components["schemas"]["JobView"];
+                        /** Message */
+                        message: string;
+                    };
+                };
+            };
+        };
+    };
+    post_cancel: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                dataset_id: string;
+                job_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Code */
+                        code: number;
+                        data: components["schemas"]["JobView"];
                         /** Message */
                         message: string;
                     };

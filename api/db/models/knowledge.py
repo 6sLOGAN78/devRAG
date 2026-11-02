@@ -133,6 +133,29 @@ Task.add_index(Task.doc_id, name="idx_task_doc_id")
 Task.add_index(Task.progress, name="idx_task_progress")
 
 
+class DatasetJob(BaseModel):
+    """Owned dataset operation; child Task.doc_id is this id, never a Document id."""
+
+    id = peewee.CharField(max_length=32, primary_key=True)
+    tenant_id = peewee.CharField(max_length=32, null=False, index=True)
+    kb_id = peewee.CharField(max_length=32, null=False, index=True)
+    created_by = peewee.CharField(max_length=32, null=False)
+    job_type = peewee.CharField(max_length=16, null=False)
+    status = peewee.CharField(max_length=16, null=False, default="running", index=True)
+    digest = peewee.CharField(max_length=64, null=False)
+    generation = peewee.CharField(max_length=32, null=False)
+    snapshot = JSONField(null=False, default=list)
+    config = JSONField(null=False, default=dict)
+    total = peewee.IntegerField(null=False, default=0)
+    progress_msg = LongTextField(null=False, default="")
+
+    class Meta:
+        table_name = "dataset_job"
+
+
+DatasetJob.add_index(DatasetJob.kb_id, DatasetJob.create_time, name="idx_dataset_job_history")
+
+
 class PipelineOperationLog(BaseModel):
     id = peewee.CharField(max_length=32, primary_key=True)
     document_id = peewee.CharField(max_length=32, index=True)

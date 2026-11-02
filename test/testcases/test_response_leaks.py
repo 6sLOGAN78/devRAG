@@ -588,6 +588,45 @@ def sweep_document_metadata_rows(s: Sweep, w: World) -> None:
     s.req(row, "private metadata", "PATCH", f"{private}/documents/metadatas", member, body)
 
 
+def sweep_dataset_job_rows(s: Sweep, w: World) -> None:
+    """Exercise actual job start and scoped reads/cancel without exposing sentinel task ids."""
+    from test.helpers.wait import wait_until
+
+    owner, member = w.a.token, w.normal.token
+    made = s.req(f"POST {DATASETS}", "dataset for job sweep", "POST", DATASETS, owner,
+                 {"name": "leak-job-" + uuid.uuid4().hex[:8]})
+    team_id = str(made.json()["data"]["id"])
+    file = s.req(f"POST {UPLOAD}", "source for job sweep", "POST", f"{UPLOAD}?dataset_id={team_id}", owner,
+                 files=[("file", ("job-source.txt", b"Lighthouse height is 52 metres. Calibration offset is 73 units.", "text/plain"))])
+    doc_id = str(file.json()["data"][0]["id"])
+    s.req(f"POST {DATASETS}/{{dataset_id}}/documents/parse", "parse source for job sweep", "POST",
+          f"{DATASETS}/{team_id}/documents/parse", owner, {"doc_ids": [doc_id], "run": "1"})
+    wait_until(lambda: s.client.get(f"{DATASETS}/{team_id}/documents/{doc_id}", headers={"Authorization": f"Bearer {owner}"}).json().get("data", {}).get("run") == "3", timeout=90)
+    s.req(f"PUT {DATASETS}/{{dataset_id}}", "job config", "PUT", f"{DATASETS}/{team_id}", owner,
+          {"parser_config": {"auto_keywords": 1}})
+    team = f"{DATASETS}/{team_id}/jobs"
+    private = f"{DATASETS}/{w.a_private_dataset['id']}/jobs"
+    row = f"POST {DATASETS}/{{dataset_id}}/jobs"
+    started = s.req(row, "owned start", "POST", team, owner, {"type": "enrich"})
+    job_id = str(started.json()["data"]["id"])
+    s.req(row, "foreign start", "POST", private, member, {"type": "enrich"})
+    s.req(row, "invalid type", "POST", team, owner, {"type": "unknown"})
+    s.errors(row, "POST", team, "DELETE")
+    row = f"GET {DATASETS}/{{dataset_id}}/jobs"
+    s.req(row, "owned list", "GET", team, owner)
+    s.req(row, "private list as member", "GET", private, member)
+    s.errors(row, "GET", team, "DELETE")
+    row = f"GET {DATASETS}/{{dataset_id}}/jobs/{{job_id}}"
+    s.req(row, "owned status", "GET", f"{team}/{job_id}", owner)
+    s.req(row, "foreign status", "GET", f"{private}/{job_id}", member)
+    s.errors(row, "GET", f"{team}/{job_id}", "DELETE")
+    row = f"POST {DATASETS}/{{dataset_id}}/jobs/{{job_id}}/cancel"
+    s.req(row, "owned cancel", "POST", f"{team}/{job_id}/cancel", owner)
+    s.req(row, "foreign cancel", "POST", f"{private}/{job_id}/cancel", member)
+    s.errors(row, "POST", f"{team}/{job_id}/cancel", "DELETE")
+    s.req(f"DELETE {DATASETS}", "job sweep cleanup", "DELETE", DATASETS, owner, {"ids": [team_id]})
+
+
 def sweep_parse_rows(s: Sweep, w: World) -> None:
     """``POST /api/v1/datasets/{dataset_id}/documents/parse`` on success and error paths (plan 04-14).
 
@@ -1191,6 +1230,7 @@ def sweep(ingress: httpx.Client) -> Iterator[Sweep]:
             sweep_dataset_write_rows(s, world)
             sweep_dataset_tag_rows(s, world)
             sweep_document_metadata_rows(s, world)
+            sweep_dataset_job_rows(s, world)
             sweep_parse_rows(s, world)
             sweep_detail_rows(s, world)
             sweep_status_rows(s, world)

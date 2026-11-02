@@ -23,7 +23,7 @@ from typing import Any
 import peewee
 
 from api.db.database import DB
-from api.db.models import Document, PipelineOperationLog, Task
+from api.db.models import DatasetJob, Document, PipelineOperationLog, Task
 from api.db.services.auth_service import Principal
 from api.db.services.knowledgebase_service import VisibleDataset, _require_manage, embedding_dimensions, load_visible_dataset
 from api.db.services.llm_service import LLMBundle
@@ -248,6 +248,19 @@ def task_status(principal: Principal, task_id: object) -> dict[str, Any]:
     """A task by id. Task, document and dataset come from MySQL; the dataset must be visible to the caller, otherwise the one ``NOT_FOUND``."""
     if not isinstance(task_id, str) or _ID.fullmatch(task_id) is None:
         raise _not_found()
+    with DB.connection_context():
+        child = (Task.select(Task.id, Task.doc_id, Task.from_page, Task.to_page, Task.progress, Task.progress_msg, Task.retry_count, DatasetJob.kb_id)
+                 .join(DatasetJob, on=(Task.doc_id == DatasetJob.id))
+                 .where((Task.id == task_id) & (Task.task_type == "dataset_enrich")).first())
+    if child is not None:
+        job = child.datasetjob
+        load_visible_dataset(principal, job.kb_id)
+        progress = float(child.progress or 0.0)
+        found = parse_failure_line(child.progress_msg) if progress < 0 else None
+        return {"id": child.id, "doc_id": "", "job_id": child.doc_id, "task_type": "dataset_enrich", "dataset_id": job.kb_id,
+                "from_page": 0, "to_page": 0, "progress": progress, "progress_message": _last_line(child.progress_msg),
+                "attempts": int(child.retry_count or 0), "finished": progress >= 1.0, "failed": progress < 0,
+                "error": (_error(found.step, found.code, found.detail) if found else _error("embed", UNEXPECTED)) if progress < 0 else None}
     query = (
         Task.select(Task.id, Task.doc_id, Task.from_page, Task.to_page, Task.progress, Task.progress_msg, Task.retry_count, Document.kb_id)
         .join(Document, on=(Task.doc_id == Document.id))

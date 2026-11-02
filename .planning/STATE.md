@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Phase6 plan22 Controlled tags and metadata verified; continuing23 jobs
-last_updated: "2026-11-01"
-last_activity: 2026-11-01 -- Controlled tags/metadata verified; continuing23
+stopped_at: Phase6 plan23 Dataset enrichment jobs verified; continuing24 RAPTOR
+last_updated: "2026-11-02"
+last_activity: 2026-11-02 -- Dataset enrichment jobs verified; continuing24 RAPTOR
 progress:
   total_phases: 8
   completed_phases: 4
   total_plans: 176
-  completed_plans: 168
-  percent: 94
+  completed_plans: 169
+  percent: 96
 ---
 
 # Project State
@@ -21,18 +21,18 @@ progress:
 See: .planning/PROJECT.md (updated 2026-10-05)
 
 **Core value:** A user can upload a document into a knowledge base and get an accurate, cited answer to a question about it, end-to-end through the real pipeline (parse, chunk, embed, index, hybrid retrieve, rerank, generate), with no mocked stages.
-**Current focus:** Phase 6 execution — 06-23 dataset-wide enrichment jobs
+**Current focus:** Phase 6 execution — 06-24 RAPTOR summaries
 
 ## Current Position
 
 Phase: 6 (deep-parsing-and-chunking-breadth) — EXECUTING
-Plan: 23 of 30; plans01–22 complete; dataset-wide enrichment jobs next
-Status: Plans01–22 complete; R232..253 recorded. Controlled tag/metadata marked unit2613/8 existing skips, web2193, integration9, affected services30, rebuilt Chrome4, CI7. Local ASR3/3 retained; zero external paid calls.
+Plan: 24 of 30; plans01–23 complete; RAPTOR summaries next
+Status: Plans01–23 complete; R232..254 recorded. Dataset enrichment marked unit2616/8 existing skips, web2195, integration5, route isolation24, leak sweep6, rebuilt Chrome2, CI7. Local ASR3/3 retained; zero external paid calls.
 Prior checks: Phase5 UAT5/6 passed (two user answer judgments and delegated screenshot/Chinese/footprint review). Final Phase5 acceptance remains pending; Phase4 B36 remains separately deferred. Prior paid evidence retained.
-Current checkpoint:22 verified; generated metadata and tag screenshots inspected. Continue23; existing acquisition/publication approvals persist; no ASR replay.
-Last activity: 2026-11-01
+Current checkpoint:23 verified; real dataset refresh and cancel, scoped status and inspected job screenshot. Continue24; existing acquisition/publication approvals persist; no ASR replay.
+Last activity: 2026-11-02
 
-Progress: 168/176 currently planned execution plans complete (95%); Phase6 22/30 complete.
+Progress: 169/176 currently planned execution plans complete (96%); Phase6 23/30 complete.
 
 ## Performance Metrics
 

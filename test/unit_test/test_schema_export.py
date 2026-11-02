@@ -15,7 +15,7 @@ EXPECTED_TABLES = {
     "system_settings", "user", "tenant", "user_tenant", "invitation_code",
     "llm_factories", "llm", "tenant_llm", "tenant_langfuse",
     "tenant_model_provider", "tenant_model_instance", "tenant_model", "tenant_model_group", "tenant_model_group_mapping",
-    "knowledgebase", "document", "document_asset", "task", "pipeline_operation_log",
+    "knowledgebase", "document", "document_asset", "task", "dataset_job", "pipeline_operation_log",
     "file", "file2document", "file_commit", "file_commit_item",
     "dialog", "conversation", "api_token", "api_4_conversation", "search",
     "user_canvas", "canvas_template", "user_canvas_version", "mcp_server", "compilation_template", "compilation_template_group",
@@ -23,9 +23,9 @@ EXPECTED_TABLES = {
 }  # fmt: skip
 
 
-def test_table_set_includes_the_planned_document_asset_relation() -> None:
+def test_table_set_includes_dataset_jobs() -> None:
     names = [m._meta.table_name for m in ALL_MODELS]
-    assert len(names) == 39
+    assert len(names) == 40
     assert set(names) == EXPECTED_TABLES
 
 

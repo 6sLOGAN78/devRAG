@@ -1557,6 +1557,214 @@
       ]
     },
     {
+      "name": "dataset_job",
+      "columns": [
+        {
+          "name": "config",
+          "type": "longtext",
+          "nullable": false,
+          "default": null,
+          "app_default": null,
+          "primary_key": false,
+          "auto_increment": false
+        },
+        {
+          "name": "create_date",
+          "type": "datetime",
+          "nullable": true,
+          "default": null,
+          "app_default": null,
+          "primary_key": false,
+          "auto_increment": false
+        },
+        {
+          "name": "create_time",
+          "type": "bigint",
+          "nullable": true,
+          "default": null,
+          "app_default": null,
+          "primary_key": false,
+          "auto_increment": false
+        },
+        {
+          "name": "created_by",
+          "type": "varchar(32)",
+          "nullable": false,
+          "default": null,
+          "app_default": null,
+          "primary_key": false,
+          "auto_increment": false
+        },
+        {
+          "name": "digest",
+          "type": "varchar(64)",
+          "nullable": false,
+          "default": null,
+          "app_default": null,
+          "primary_key": false,
+          "auto_increment": false
+        },
+        {
+          "name": "generation",
+          "type": "varchar(32)",
+          "nullable": false,
+          "default": null,
+          "app_default": null,
+          "primary_key": false,
+          "auto_increment": false
+        },
+        {
+          "name": "id",
+          "type": "varchar(32)",
+          "nullable": false,
+          "default": null,
+          "app_default": null,
+          "primary_key": true,
+          "auto_increment": false
+        },
+        {
+          "name": "job_type",
+          "type": "varchar(16)",
+          "nullable": false,
+          "default": null,
+          "app_default": null,
+          "primary_key": false,
+          "auto_increment": false
+        },
+        {
+          "name": "kb_id",
+          "type": "varchar(32)",
+          "nullable": false,
+          "default": null,
+          "app_default": null,
+          "primary_key": false,
+          "auto_increment": false
+        },
+        {
+          "name": "progress_msg",
+          "type": "longtext",
+          "nullable": false,
+          "default": null,
+          "app_default": "",
+          "primary_key": false,
+          "auto_increment": false
+        },
+        {
+          "name": "snapshot",
+          "type": "longtext",
+          "nullable": false,
+          "default": null,
+          "app_default": null,
+          "primary_key": false,
+          "auto_increment": false
+        },
+        {
+          "name": "status",
+          "type": "varchar(16)",
+          "nullable": false,
+          "default": null,
+          "app_default": "running",
+          "primary_key": false,
+          "auto_increment": false
+        },
+        {
+          "name": "tenant_id",
+          "type": "varchar(32)",
+          "nullable": false,
+          "default": null,
+          "app_default": null,
+          "primary_key": false,
+          "auto_increment": false
+        },
+        {
+          "name": "total",
+          "type": "int",
+          "nullable": false,
+          "default": null,
+          "app_default": 0,
+          "primary_key": false,
+          "auto_increment": false
+        },
+        {
+          "name": "update_date",
+          "type": "datetime",
+          "nullable": true,
+          "default": null,
+          "app_default": null,
+          "primary_key": false,
+          "auto_increment": false
+        },
+        {
+          "name": "update_time",
+          "type": "bigint",
+          "nullable": true,
+          "default": null,
+          "app_default": null,
+          "primary_key": false,
+          "auto_increment": false
+        }
+      ],
+      "indexes": [
+        {
+          "name": "datasetjob_create_date",
+          "columns": [
+            "create_date"
+          ],
+          "unique": false
+        },
+        {
+          "name": "datasetjob_create_time",
+          "columns": [
+            "create_time"
+          ],
+          "unique": false
+        },
+        {
+          "name": "datasetjob_kb_id",
+          "columns": [
+            "kb_id"
+          ],
+          "unique": false
+        },
+        {
+          "name": "datasetjob_status",
+          "columns": [
+            "status"
+          ],
+          "unique": false
+        },
+        {
+          "name": "datasetjob_tenant_id",
+          "columns": [
+            "tenant_id"
+          ],
+          "unique": false
+        },
+        {
+          "name": "datasetjob_update_date",
+          "columns": [
+            "update_date"
+          ],
+          "unique": false
+        },
+        {
+          "name": "datasetjob_update_time",
+          "columns": [
+            "update_time"
+          ],
+          "unique": false
+        },
+        {
+          "name": "idx_dataset_job_history",
+          "columns": [
+            "kb_id",
+            "create_time"
+          ],
+          "unique": false
+        }
+      ]
+    },
+    {
       "name": "dialog",
       "columns": [
         {

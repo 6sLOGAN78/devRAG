@@ -560,6 +560,36 @@ def _dataset_detail(w: World) -> Target:
     return Target({"dataset_id": str(w.a_team_dataset["id"])}, _sender("GET", DATASETS + "/{dataset_id}", extra_fields=set()), w.snapshot_datasets)
 
 
+def _seed_dataset_job(w: World) -> str:
+    from api.db.database import DB
+    from api.db.models import DatasetJob
+
+    job_id = uuid.uuid4().hex
+    with DB.connection_context():
+        DatasetJob.create(id=job_id, tenant_id=w.a.tenant_id, kb_id=str(w.a_team_dataset["id"]), created_by=w.a.user_id,
+                          job_type="enrich", status="done", digest="0" * 64, generation=uuid.uuid4().hex,
+                          snapshot=[], config={}, total=0, progress_msg="Completed.")
+    return job_id
+
+
+def _start_dataset_job(w: World) -> Target:
+    return Target({"dataset_id": str(w.a_team_dataset["id"])}, _sender("POST", DATASETS + "/{dataset_id}/jobs", {"type": "raptor"}, extra_fields=set()), w.snapshot_datasets)
+
+
+def _list_dataset_jobs(w: World) -> Target:
+    return Target({"dataset_id": str(w.a_team_dataset["id"])}, _sender("GET", DATASETS + "/{dataset_id}/jobs", extra_fields=set()), w.snapshot_datasets)
+
+
+def _get_dataset_job(w: World) -> Target:
+    return Target({"dataset_id": str(w.a_team_dataset["id"]), "job_id": _seed_dataset_job(w)},
+                  _sender("GET", DATASETS + "/{dataset_id}/jobs/{job_id}", extra_fields=set()), w.snapshot_datasets)
+
+
+def _cancel_dataset_job(w: World) -> Target:
+    return Target({"dataset_id": str(w.a_team_dataset["id"]), "job_id": _seed_dataset_job(w)},
+                  _sender("POST", DATASETS + "/{dataset_id}/jobs/{job_id}/cancel", extra_fields=set()), w.snapshot_datasets)
+
+
 def _update_dataset(w: World) -> Target:
     """PUT on A's team dataset: only its visibility keeps an outsider from it. The model takes only its own fields, so nothing else is smuggled in."""
     return Target({"dataset_id": str(w.a_team_dataset["id"])}, _sender("PUT", DATASETS + "/{dataset_id}", {"description": "matrix-rewrite"}, extra_fields=set()), w.snapshot_datasets)
@@ -717,6 +747,10 @@ def _task_status(w: World) -> Target:
 
 
 BUILDERS: dict[str, Builder] = {
+    "POST /api/v1/datasets/{dataset_id}/jobs": _start_dataset_job,
+    "GET /api/v1/datasets/{dataset_id}/jobs": _list_dataset_jobs,
+    "GET /api/v1/datasets/{dataset_id}/jobs/{job_id}": _get_dataset_job,
+    "POST /api/v1/datasets/{dataset_id}/jobs/{job_id}/cancel": _cancel_dataset_job,
     "GET /api/v1/datasets/{dataset_id}/metadata/config": _metadata_config,
     "PATCH /api/v1/datasets/{dataset_id}/documents/metadatas": _edit_document_metadata,
     "GET /api/v1/datasets/{dataset_id}/tags": _list_dataset_tags,

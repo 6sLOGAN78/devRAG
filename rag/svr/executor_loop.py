@@ -20,7 +20,7 @@ from enum import Enum
 
 import valkey
 
-from api.db.services import task_service
+from api.db.services import dataset_job_service, task_service
 from api.db.services.service_errors import ServiceError
 from api.db.services.task_service import TaskContext
 from api.db.services.totals_service import settle_totals
@@ -29,6 +29,7 @@ from common.settings import Settings
 from rag.queue.queue_base import QueueMessage, TaskQueue
 from rag.svr import healthcheck
 from rag.svr.control import LockLost, ShutdownRequested, TaskCancelled, TaskControl
+from rag.svr.dataset_jobs import run_refresh
 from rag.svr.embedding import release_database_connection
 from rag.svr.failure import TaskFailure, classify
 from rag.svr.heartbeat import TaskWatcher
@@ -96,8 +97,12 @@ class Executor:
 
     def _handle(self, message: QueueMessage) -> Outcome:
         ingest = self.settings.ingest
-        ctx = task_service.load_task_context(message.task_id)
-        if ctx is None or ctx.digest != message.digest or ctx.doc_run != RUN_RUNNING:
+        dataset_task = task_service.task_type_of(message.task_id) == dataset_job_service.TASK_TYPE
+        child = task_service.load_dataset_job_context(message.task_id) if dataset_task else None
+        ctx = child if dataset_task else task_service.load_task_context(message.task_id)
+        if ctx is None or ctx.digest != message.digest or (child is None and ctx.doc_run != RUN_RUNNING):
+            if ctx is None and dataset_task:
+                dataset_job_service.fail_stale_child(message.task_id)
             self.queue.ack(message)
             return Outcome.DROPPED
         lock = TaskLock(self._client, message.task_id, ingest.lock_ttl_seconds, prefix=ingest.queue_prefix)
@@ -116,10 +121,14 @@ class Executor:
             return Outcome.DROPPED
         if claim.outcome == task_service.EXHAUSTED:
             task_service.mark_task_failed(message.task_id, TaskFailure("parse", "worker_lost").line())
+            dataset_job_service.settle_for_child(message.task_id)
             self.queue.ack(message)
             return Outcome.WORKER_LOST
-        ctx = task_service.load_task_context(message.task_id)
+        dataset_task = task_service.task_type_of(message.task_id) == dataset_job_service.TASK_TYPE
+        ctx = task_service.load_dataset_job_context(message.task_id) if dataset_task else task_service.load_task_context(message.task_id)
         if ctx is None:
+            if dataset_task:
+                dataset_job_service.fail_stale_child(message.task_id)
             self.queue.ack(message)
             return Outcome.DROPPED
         control = TaskControl()
@@ -136,7 +145,7 @@ class Executor:
             with self._guard:
                 self._control = None
 
-    def _run(self, message: QueueMessage, ctx: TaskContext, lock: TaskLock, control: TaskControl, attempt: int) -> Outcome:
+    def _run(self, message: QueueMessage, ctx: TaskContext | dataset_job_service.DatasetChild, lock: TaskLock, control: TaskControl, attempt: int) -> Outcome:
         began = time.monotonic()
         try:
             result = self._pipeline(ctx, control)
@@ -144,7 +153,10 @@ class Executor:
         except ShutdownRequested:
             return self._hand_on(message, ctx, lock, refund=True)
         except TaskCancelled:
-            self._settle_after_cancel(ctx)
+            if isinstance(ctx, dataset_job_service.DatasetChild):
+                dataset_job_service.settle(ctx.job_id)
+            else:
+                self._settle_after_cancel(ctx)
             self.queue.ack(message)
             return Outcome.CANCELLED
         except LockLost:
@@ -153,6 +165,8 @@ class Executor:
         except Exception as exc:  # noqa: BLE001 - every failure is classified once, here
             return self._failed(message, ctx, lock, control, classify(exc, "parse"), attempt)
         task_service.mark_task_done(ctx.task_id, result.chunk_ids, time.monotonic() - began)
+        if isinstance(ctx, dataset_job_service.DatasetChild):
+            dataset_job_service.settle(ctx.job_id)
         self.queue.ack(message)
         return Outcome.DONE
 
@@ -163,19 +177,21 @@ class Executor:
         except ServiceError:
             logger.warning("could not settle totals after a cancel", extra={"task": ctx.task_id})
 
-    def _pipeline(self, ctx: TaskContext, control: TaskControl) -> PipelineResult:
+    def _pipeline(self, ctx: TaskContext | dataset_job_service.DatasetChild, control: TaskControl) -> PipelineResult:
         limiter = self.deps.limiters.task_limiter
         while not limiter.acquire(timeout=0.5):
             control.check()
         try:
-            return run_pipeline(ctx, control, self.deps)
+            return run_refresh(ctx, control, self.deps) if isinstance(ctx, dataset_job_service.DatasetChild) else run_pipeline(ctx, control, self.deps)
         finally:
             limiter.release()
 
-    def _failed(self, message: QueueMessage, ctx: TaskContext, lock: TaskLock, control: TaskControl, failure: TaskFailure, attempt: int) -> Outcome:
+    def _failed(self, message: QueueMessage, ctx: TaskContext | dataset_job_service.DatasetChild, lock: TaskLock, control: TaskControl, failure: TaskFailure, attempt: int) -> Outcome:
         ingest = self.settings.ingest
         if failure.terminal or attempt >= ingest.max_attempts:
             task_service.mark_task_failed(ctx.task_id, failure.line())
+            if isinstance(ctx, dataset_job_service.DatasetChild):
+                dataset_job_service.settle(ctx.job_id)
             self.queue.ack(message)
             return Outcome.FAILED
         plain = failure.message.rstrip(".")
@@ -190,7 +206,7 @@ class Executor:
             return Outcome.CANCELLED
         return self._hand_on(message, ctx, lock, refund=False, outcome=Outcome.SHUTDOWN if self.stop.is_set() else Outcome.RETRIED)
 
-    def _hand_on(self, message: QueueMessage, ctx: TaskContext, lock: TaskLock, *, refund: bool, outcome: Outcome = Outcome.SHUTDOWN) -> Outcome:
+    def _hand_on(self, message: QueueMessage, ctx: TaskContext | dataset_job_service.DatasetChild, lock: TaskLock, *, refund: bool, outcome: Outcome = Outcome.SHUTDOWN) -> Outcome:
         """Publish a fresh message, then acknowledge the old one. The lock is released first so the next reader is not turned away."""
         if refund:
             task_service.refund_attempt(ctx.task_id)
@@ -202,7 +218,7 @@ class Executor:
     # -- the loop ------------------------------------------------------------------------------------------------
     def run_forever(self) -> None:
         self._safe_ensure_group()
-        next_beat = next_reclaim = 0.0
+        next_beat = next_reclaim = next_dataset_reconcile = 0.0
         while not self.stop.is_set():
             try:
                 healthcheck.touch_alive()
@@ -214,6 +230,11 @@ class Executor:
                     next_reclaim = now + self.settings.ingest.reclaim_interval_seconds
                     for message in self.queue.claim_idle(self.name, self.settings.ingest.reclaim_idle_ms):
                         self.handle_message(message)
+                if now >= next_dataset_reconcile:
+                    next_dataset_reconcile = now + 60.0
+                    dataset_job_service.reconcile_running_jobs()
+                    for task_id, digest in dataset_job_service.pending_children():
+                        self.queue.enqueue(task_id, digest, 0)
                 for message in self.queue.read(self.name, count=1, block_ms=READ_BLOCK_MS):
                     self.handle_message(message)
             except Exception as exc:  # noqa: BLE001 - outages (queue, database, stream) and surprises never end the loop (R-157)

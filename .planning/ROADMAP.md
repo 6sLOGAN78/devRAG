@@ -657,7 +657,7 @@ Scope notes: this is the PROJECT.md Core Value. No Phase 6, 7 or 8 work starts u
 - [x] 06-22-PLAN.md — Apply controlled tags and auto metadata
 **Wave 23** *(blocked on Wave 22 completion and accepted06-01 snapshot)*
 
-- [ ] 06-23-PLAN.md — Run dataset-wide enrichment jobs safely
+- [x] 06-23-PLAN.md — Run dataset-wide enrichment jobs safely
 **Wave 24** *(blocked on Wave 23 completion and accepted06-01 snapshot)*
 
 - [ ] 06-24-PLAN.md — Retrieve RAPTOR summaries with real source citations

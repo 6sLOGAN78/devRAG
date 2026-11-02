@@ -39,7 +39,7 @@ import peewee
 
 from api.apps.permissions_gen import allowed
 from api.db.database import DB, DatabaseLock, LockError, LockTimeoutError, transaction
-from api.db.models import Connector2Kb, Document, Knowledgebase, PipelineOperationLog, SyncLogs
+from api.db.models import Connector2Kb, DatasetJob, Document, Knowledgebase, PipelineOperationLog, SyncLogs, Task
 from api.db.models.base import current_timestamp_ms, timestamp_to_date
 from api.db.services import file_service, tenant_model_service
 from api.db.services.auth_service import Principal
@@ -639,6 +639,10 @@ def _drop_rows(dataset_id: str) -> tuple[list[str], int]:
                     raise _not_found()
                 left = [doc.id for doc in Document.select(Document.id).where(Document.kb_id == dataset_id).order_by(Document.id)]
                 freed = file_service.release_files(left)
+                job_ids = [job.id for job in DatasetJob.select(DatasetJob.id).where(DatasetJob.kb_id == dataset_id)]
+                if job_ids:
+                    Task.delete().where(Task.doc_id.in_(job_ids)).execute()
+                    DatasetJob.delete().where(DatasetJob.id.in_(job_ids)).execute()
                 for related in (PipelineOperationLog, Connector2Kb, SyncLogs):
                     related.delete().where(related.kb_id == dataset_id).execute()
                 Knowledgebase.delete().where(Knowledgebase.id == dataset_id).execute()

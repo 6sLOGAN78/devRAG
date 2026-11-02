@@ -1,0 +1,96 @@
+{
+  "recorded_at": "2026-11-02T17:15:27.461329+00:00",
+  "plan": "06-23",
+  "requirements": [
+    "ING-18",
+    "LLM-32"
+  ],
+  "new_packages": 0,
+  "paid_external_calls": 0,
+  "local_asr_submissions_this_plan": 0,
+  "local_asr_remaining": 0,
+  "human_uat_approved": false,
+  "phase_gate_complete": false,
+  "initial_red": "One intended behavioral failure: load_dataset_job_context absent before implementation; no import or fixture error.",
+  "evidence": {
+    "marked_unit": {
+      "log": "ragflow-logs/phase6-23-unit-full.log",
+      "sha256": "7e4e3802f24c8c1ece48d91a17af855a4c7118cb7447c3193b19005da3b04e10",
+      "result": "2616 passed, 8 existing skipped, 51 deselected"
+    },
+    "records": {
+      "log": "ragflow-logs/phase6-23-records.log",
+      "sha256": "36d79b4506934dd0a9d9a446970d04b03d95e121e9f5a917a88480e9ff7c3acc",
+      "result": "8 passed"
+    },
+    "integration": {
+      "log": "ragflow-logs/phase6-23-integration-final.log",
+      "sha256": "f2768ca576dc5fd8bef969a1f276c1af7c698d193e13ce40cf59a6e9b149fc50",
+      "result": "5 passed, real MySQL/Elasticsearch/local HTTP provider"
+    },
+    "browser_two_workers": {
+      "log": "ragflow-logs/phase6-23-e2e-two-workers.log",
+      "sha256": "0b3fbc987f4906d8f1dace2efcf406be1e8e66bd088991f7ffab9f92cde859c8",
+      "result": "2 passed, duplicate delivery with two workers and cancel during model"
+    },
+    "route_isolation": {
+      "log": "ragflow-logs/phase6-23-isolation-jobs.log",
+      "sha256": "56b275523cf492c76077909ac00fc6a7804b6538fa5641c1fd006078f25f7d99",
+      "result": "24 passed"
+    },
+    "leak_sweep": {
+      "log": "ragflow-logs/phase6-23-leak-final.log",
+      "sha256": "0c0b31119f082ad64a6feecb2d1e80659338123c498f1ba2585ab1bb7a52de10",
+      "result": "6 passed"
+    },
+    "frontend": {
+      "log": "ragflow-logs/phase6-23-web-all.log",
+      "sha256": "8dfdbdab0ec13df55b01453d929eee0884d2e47315e1d59ece6620e3d47ff5a0",
+      "result": "2195 passed, 114 files"
+    },
+    "frontend_build": {
+      "log": "ragflow-logs/phase6-23-web-build.log",
+      "sha256": "1c9139e79b9f3fb792aa8ed07cc69f00c2c32afaaeb37b1c13cf7233d1681500",
+      "result": "TypeScript and production build check passed"
+    },
+    "go_internal": {
+      "log": "ragflow-logs/phase6-23-go-internal.log",
+      "sha256": "f16659f6414677fd1cf51144d6a1d311044b889d95b02788ce3c6d2ee6cde4b3",
+      "result": "go test ./internal/... passed"
+    },
+    "ci_release": {
+      "log": "ragflow-logs/phase6-23-ci-final.log",
+      "sha256": "92cf108524fb087a8131f61db3b7add9f8d6bbf37feb9f18d9dfc53cff353104",
+      "result": "7/7 gates passed"
+    },
+    "app_build": {
+      "log": "ragflow-logs/phase6-23-app-build-source-status.log",
+      "sha256": "8bcaeeefd60e11ea24b072559e73316b46efa82959b7402524df2f716c742436",
+      "result": "exit 0, frozen lock"
+    },
+    "two_worker_health": {
+      "log": "ragflow-logs/phase6-23-two-worker-health.log",
+      "sha256": "32254ac424a678cc99d0a6155a2c5436ec28ea8a739857bfbd5e4e9dc4e2a2a7",
+      "result": "full compose stack healthy, two task executors"
+    }
+  },
+  "original_fixture": {
+    "path": "test/fixtures/phase6/controlled-enrichment-original.txt",
+    "sha256": "e4aba547c3f03436376118e8e586ad64fd4ab0feba406f8af390edf4fbf35945",
+    "annotation": "test/fixtures/phase6/controlled-enrichment-original-annotation.json",
+    "annotation_sha256": "fcc6ae54fc29e6153bfd49dc680ad81566699ac45bbb63bcb6ec5e9e26e7a201"
+  },
+  "screenshot": {
+    "path": "output/playwright/phase6-review/dataset-enrichment-job.png",
+    "sha256": "195ffb809776f071a615f31663a4cca5eb6af5ad7fe7e18723bc02155186ff3d",
+    "reviewer": "assistant, actual Chrome",
+    "observation": "Derived jobs shows Enrichment refresh Done, 1 of 1 documents complete, 0 failed"
+  },
+  "images": {
+    "app": "sha256:617367e35cc174d33d55bd3191973b1eb7be5c2783942287bd6bc9bad8e02555",
+    "task_executor_1": "sha256:617367e35cc174d33d55bd3191973b1eb7be5c2783942287bd6bc9bad8e02555",
+    "task_executor_2": "sha256:617367e35cc174d33d55bd3191973b1eb7be5c2783942287bd6bc9bad8e02555",
+    "deepdoc": "sha256:cad3d548d43971d95b13794c4964e4c23e657740398aeebc6c63dc32171794f8"
+  },
+  "notes": "Partial derived-field publication can remain after late cancellation or an index failure; job remains cancelled or failed and a later run can refresh. Phase5 human acceptance, Phase4 B36, and Phase6 final gate/UAT remain open. REQUIREMENTS.md unchanged."
+}

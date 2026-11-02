@@ -153,6 +153,22 @@ def _inv_dataset(w: World, who: Account | None, token: str, as_tenant: str | Non
     return call(w.client, "GET", f"{DATASETS}/{_team_id(w)}", token, {})
 
 
+def _inv_start_dataset_job(w: World, who: Account | None, token: str, as_tenant: str | None) -> httpx.Response:
+    return call(w.client, "POST", f"{DATASETS}/{_team_id(w)}/jobs", token, {}, body={"type": "enrich"})
+
+
+def _inv_list_dataset_jobs(w: World, who: Account | None, token: str, as_tenant: str | None) -> httpx.Response:
+    return call(w.client, "GET", f"{DATASETS}/{_team_id(w)}/jobs", token, {})
+
+
+def _inv_get_dataset_job(w: World, who: Account | None, token: str, as_tenant: str | None) -> httpx.Response:
+    return call(w.client, "GET", f"{DATASETS}/{_team_id(w)}/jobs/{w.scratch.get('job_id', uuid.uuid4().hex)}", token, {})
+
+
+def _inv_cancel_dataset_job(w: World, who: Account | None, token: str, as_tenant: str | None) -> httpx.Response:
+    return call(w.client, "POST", f"{DATASETS}/{_team_id(w)}/jobs/{w.scratch.get('job_id', uuid.uuid4().hex)}/cancel", token, {})
+
+
 def _inv_dataset_tags(w: World, who: Account | None, token: str, as_tenant: str | None) -> httpx.Response:
     return call(w.client, "GET", f"{DATASETS}/{_team_id(w)}/tags", token, {})
 
@@ -337,6 +353,10 @@ def _inv_completion(w: World, who: Account | None, token: str, as_tenant: str | 
 
 
 INVOKERS: dict[str, Invoker] = {
+    "POST /api/v1/datasets/{dataset_id}/jobs": _inv_start_dataset_job,
+    "GET /api/v1/datasets/{dataset_id}/jobs": _inv_list_dataset_jobs,
+    "GET /api/v1/datasets/{dataset_id}/jobs/{job_id}": _inv_get_dataset_job,
+    "POST /api/v1/datasets/{dataset_id}/jobs/{job_id}/cancel": _inv_cancel_dataset_job,
     "GET /api/v1/datasets/metadata/flattened": _inv_flattened_metadata,
     "GET /api/v1/datasets/{dataset_id}/metadata/config": _inv_metadata_config,
     "PATCH /api/v1/datasets/{dataset_id}/documents/metadatas": _inv_edit_metadata,
@@ -393,6 +413,8 @@ INVOKERS: dict[str, Invoker] = {
 # (settings and delete are for the creator, an owner or an admin; a document is removed by its uploader or those).
 NORMAL_IS_REFUSED_ON_A_RESOURCE = frozenset(
     {
+        "POST /api/v1/datasets/{dataset_id}/jobs",
+        "POST /api/v1/datasets/{dataset_id}/jobs/{job_id}/cancel",
         "DELETE /api/v1/datasets/{dataset_id}/tags",
         "PUT /api/v1/datasets/{dataset_id}",
         "DELETE /api/v1/datasets",
@@ -417,6 +439,10 @@ PRIVATE_SESSION_ROWS = frozenset({
 # Rows whose resource is addressed by a dataset id: a stranger reaches nothing even without naming the workspace.
 ID_ROWS = frozenset(
     {
+        "POST /api/v1/datasets/{dataset_id}/jobs",
+        "GET /api/v1/datasets/{dataset_id}/jobs",
+        "GET /api/v1/datasets/{dataset_id}/jobs/{job_id}",
+        "POST /api/v1/datasets/{dataset_id}/jobs/{job_id}/cancel",
         "GET /api/v1/datasets/tags/aggregation",
         "GET /api/v1/datasets/metadata/flattened",
         "GET /api/v1/datasets/{dataset_id}/tags",
@@ -504,7 +530,31 @@ def _prepare_session(w: World) -> None:
     w.scratch["session_id"] = str(made["id"])
 
 
+def _prepare_start_dataset_job(w: World) -> None:
+    import json
+
+    from api.db.database import DB
+    from api.db.models import DatasetJob
+    from test.helpers.uploads import sql
+
+    dataset_id = str(w.a_team_dataset["id"])
+    doc_id = str(w.a_team_documents[0]["id"])
+    with DB.connection_context():
+        DatasetJob.update(status="cancelled").where((DatasetJob.kb_id == dataset_id) & (DatasetJob.status == "running")).execute()
+    sql("UPDATE `knowledgebase` SET `parser_config`=%s WHERE `id`=%s", (json.dumps({"auto_keywords": 1}), dataset_id))
+    sql("UPDATE `document` SET `run`='3', `chunk_num`=1 WHERE `id`=%s", (doc_id,))
+
+
+def _prepare_dataset_job(w: World) -> None:
+    from test.testcases._matrix_fixtures import _seed_dataset_job
+
+    w.scratch["job_id"] = _seed_dataset_job(w)
+
+
 PREPARE: dict[str, Callable[[World], None]] = {
+    "POST /api/v1/datasets/{dataset_id}/jobs": _prepare_start_dataset_job,
+    "GET /api/v1/datasets/{dataset_id}/jobs/{job_id}": _prepare_dataset_job,
+    "POST /api/v1/datasets/{dataset_id}/jobs/{job_id}/cancel": _prepare_dataset_job,
     "DELETE /api/v1/chats/{chat_id}/sessions/{session_id}": _prepare_session,
     "DELETE /api/v1/chats/{chat_id}": _prepare_chat,
     "DELETE /api/v1/providers/{provider}": _prepare_provider,
@@ -519,6 +569,7 @@ def run(w: World, key: str, who: Account | None, token: str, as_tenant: str | No
     PREPARE.get(key, lambda _w: None)(w)
     if random_id:
         w.scratch["dataset_id"] = uuid.uuid4().hex
+        w.scratch["job_id"] = uuid.uuid4().hex
         w.scratch["document_id"] = uuid.uuid4().hex
         w.scratch["chat_id"] = uuid.uuid4().hex
         w.scratch["session_id"] = uuid.uuid4().hex

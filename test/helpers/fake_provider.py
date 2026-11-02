@@ -48,7 +48,7 @@ GATED_FIRST_PIECE = "Start ##2$$ "
 GATED_LAST_PIECE = "end."
 ERROR_MIDSTREAM_PIECES = ("Par", "tial ")
 TEI_MAX_BATCH = 32
-CHAT_MODES = ("plain", "marker", "split_marker", "gated", "gated_before_first", "error_midstream", "long")
+CHAT_MODES = ("plain", "marker", "split_marker", "gated", "gated_before_first", "gated_nonstream", "error_midstream", "long")
 STACK_HOST = "host.docker.internal"  # how the dev app container reaches the host (extra_hosts in docker-compose.dev.yml)
 
 
@@ -297,6 +297,9 @@ def build_app(state: FakeProvider) -> Quart:
         if body.get("stream"):
             usage = bool((body.get("stream_options") or {}).get("include_usage"))
             return Response(_sse(state, model, usage), mimetype="text/event-stream")
+        if state.chat_mode == "gated_nonstream":
+            assert state._chat_gate is not None
+            await state._chat_gate.wait()
         reply = _chat_completion(model)
         if state.chat_responses:
             reply["choices"][0]["message"]["content"] = state.chat_responses.pop(0)

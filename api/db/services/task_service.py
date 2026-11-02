@@ -137,6 +137,20 @@ def load_task_context(task_id: str) -> TaskContext | None:
     )
 
 
+def load_dataset_job_context(task_id: str):
+    """Dataset child tasks use a job sentinel, resolved through their owned snapshot."""
+    from api.db.services.dataset_job_service import load_child
+
+    return load_child(task_id)
+
+
+def task_type_of(task_id: str) -> str | None:
+    """Read the wire task type before any Document join can see a job sentinel."""
+    with DB.connection_context():
+        row = Task.select(Task.task_type).where(Task.id == task_id).first()
+    return row.task_type if row is not None else None
+
+
 @dataclass(frozen=True)
 class DocSwitch:
     enabled: bool
@@ -248,9 +262,11 @@ def tasks_of(doc_id: str) -> list[Task]:
 def watch_state(task_id: str) -> tuple[bool, str | None]:
     """``(task exists, document run)``; the run is None when the document is gone."""
     with DB.connection_context():
-        task = Task.select(Task.doc_id).where(Task.id == task_id).first()
+        task = Task.select(Task.doc_id, Task.task_type).where(Task.id == task_id).first()
         if task is None:
             return False, None
+        if task.task_type == "dataset_enrich":
+            return True, "1" if load_dataset_job_context(task_id) is not None else None
         doc = Document.select(Document.run).where(Document.id == task.doc_id).first()
     return True, (doc.run or "0") if doc is not None else None
 

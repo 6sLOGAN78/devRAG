@@ -17,6 +17,7 @@ import { useCanManageDataset } from "@/hooks/use-dataset-permissions";
 import type { DatasetDetailView } from "@/services/dataset-service";
 import { MAX_DOCUMENT_KEYWORDS_LENGTH } from "@/services/document-service";
 import { DatasetTags } from "./tags";
+import { DerivedJobs } from "./derived-jobs";
 import { DatasetFiles } from "./dataset-files";
 import { DatasetPageSkeleton } from "./page-states";
 
@@ -263,6 +264,7 @@ export function DatasetWorkspace({ dataset, ready, onDeleted, onDeleteDialogChan
         <DatasetPageSkeleton />
       )}
       {ready ? <DatasetTags key={`${dataset.tenantId}:${dataset.id}`} dataset={dataset}/> : null}
+      {ready ? <DerivedJobs key={`jobs:${dataset.tenantId}:${dataset.id}`} dataset={dataset} /> : null}
       {dragging ? (
         <div
           data-testid="dataset-drop-overlay"
