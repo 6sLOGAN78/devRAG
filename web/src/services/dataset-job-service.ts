@@ -12,6 +12,7 @@ export interface DatasetJob {
   progress: number;
   createdAt: number;
   updatedAt: number;
+  artifactFilename: string | null;
 }
 
 function mapJob(value: unknown): DatasetJob | null {
@@ -21,7 +22,8 @@ function mapJob(value: unknown): DatasetJob | null {
   if (!/^[0-9a-f]{32}$/.test(text(raw.id)) || !["enrich", "raptor"].includes(text(raw.type)) || !status) return null;
   return { id: text(raw.id), type: raw.type as "enrich" | "raptor", status, total: count(raw.total),
     completed: count(raw.completed), failed: count(raw.failed), progress: typeof raw.progress === "number" && Number.isFinite(raw.progress) ? Math.min(1, Math.max(0, raw.progress)) : 0,
-    createdAt: count(raw.created_at), updatedAt: count(raw.updated_at) };
+    createdAt: count(raw.created_at), updatedAt: count(raw.updated_at),
+    artifactFilename: /^[0-9a-f]{32}\.json$/.test(text(raw.artifact_filename)) ? text(raw.artifact_filename) : null };
 }
 
 export async function listDatasetJobs(datasetId: string, signal?: AbortSignal): Promise<DatasetJob[]> {

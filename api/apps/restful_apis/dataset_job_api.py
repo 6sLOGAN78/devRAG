@@ -34,6 +34,7 @@ class JobView(BaseModel):
     progress: float
     created_at: int
     updated_at: int
+    artifact_filename: str | None = None
 
 
 class JobEnvelope(BaseModel):

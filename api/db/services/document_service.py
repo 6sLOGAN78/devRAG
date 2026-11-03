@@ -40,7 +40,7 @@ import peewee
 
 from api.apps.permissions_gen import allowed
 from api.db.database import DB, DatabaseLock, LockError, LockTimeoutError, transaction
-from api.db.models import Document, File, File2Document, Knowledgebase
+from api.db.models import DatasetJob, Document, DocumentAsset, File, File2Document, Knowledgebase
 from api.db.models.base import current_timestamp_ms, timestamp_to_date
 from api.db.services import file_service
 from api.db.services.auth_service import Principal
@@ -563,6 +563,13 @@ def _remove_rows(dataset_id: str, wanted: list[str]) -> list[str]:
                 if len(locked) != len(wanted) or any(doc.kb_id != dataset_id for doc in locked):
                     raise _not_found()  # a concurrent delete got there first: nothing is changed
                 freed = file_service.release_files(wanted)
+                DatasetJob.update(status="cancelled").where((DatasetJob.kb_id == dataset_id) &
+                    (DatasetJob.job_type == "raptor") & (DatasetJob.status == "running")).execute()
+                derived = list(DocumentAsset.select(DocumentAsset.object_key).where(
+                    (DocumentAsset.kb_id == dataset_id) & (DocumentAsset.kind == "raptor")))
+                freed.extend(asset.object_key for asset in derived)
+                DocumentAsset.delete().where((DocumentAsset.kb_id == dataset_id) &
+                    (DocumentAsset.kind == "raptor")).execute()
                 chunks = sum(int(doc.chunk_num or 0) for doc in locked)
                 tokens = sum(int(doc.token_num or 0) for doc in locked)
                 now = current_timestamp_ms()

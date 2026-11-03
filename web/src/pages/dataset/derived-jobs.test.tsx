@@ -2,7 +2,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { act, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router";
-import { expect, it } from "vitest";
+import { AxiosHeaders } from "axios";
+import { expect, it, vi } from "vitest";
 import type { DatasetDetailView } from "@/services/dataset-service";
 import { useWorkspaceStore } from "@/stores/workspace-store";
 import { DATASET, OWNER, server, useFilesServer } from "@/test/files-harness";
@@ -12,6 +13,8 @@ import { DerivedJobs } from "./derived-jobs";
 useFilesServer();
 const URL = `/api/v1/datasets/${DATASET_ID}/jobs`;
 const JOB_ID = "abcdef0123456789abcdef0123456789";
+const ARTIFACT_ID = "1234567890abcdef1234567890abcdef";
+const HISTORY = `/api/v1/datasets/${DATASET_ID}/artifacts/alteration`;
 const detail = { ...DATASET, permission: "team", parserConfig: { chunkTokenNum: 512, delimiter: "\n", overlappedPercent: 0 },
   description: "", avatar: "", embdId: "embed", embeddingDimension: 8, docNum: 1, chunkNum: 1, tokenNum: 10,
   language: "English", parserId: "naive", createTime: 1, updateTime: 1, uploadLimits: null } as DatasetDetailView;
@@ -20,6 +23,20 @@ server.use(({ server: state, method, url, config, ok }) => {
   if (method === "PUT" && url === `/api/v1/datasets/${DATASET_ID}`) {
     expect(JSON.parse(String(config.data))).toEqual({ parser_config: { raptor: true } });
     return ok({ ...DATASET, parser_config: { raptor: true } });
+  }
+  if (method === "GET" && url === HISTORY) {
+    const rows = state.areaState<Array<Record<string, unknown>>>("alterations", () => []);
+    return ok({ items: rows, total: rows.length, page: 1, size: 20 });
+  }
+  if (method === "DELETE" && url === `/api/v1/datasets/${DATASET_ID}/raptor`) {
+    const jobs = state.areaState<Array<Record<string, unknown>>>("jobs", () => []);
+    for (const job of jobs) if (job.type === "raptor") { job.run = "2"; job.artifact_filename = null; }
+    state.areaState<Array<Record<string, unknown>>>("alterations", () => []).unshift({ actor: OWNER.id, type: "raptor", generation: JOB_ID, outcome: "done", time: 1, deleted_count: 4 });
+    return ok({ type: "raptor", deleted_count: 4, artifact_count: 1 });
+  }
+  if (method === "GET" && url === `/api/v1/documents/artifact/${ARTIFACT_ID}.json`) {
+    return { data: new Blob(['{"schema_version":1}'], { type: "application/json" }), status: 200,
+      statusText: "OK", headers: new AxiosHeaders(), config } as never;
   }
   if (!url.startsWith(URL)) return undefined;
   const jobs = state.areaState<Array<Record<string, unknown>>>("jobs", () => []);
@@ -82,4 +99,32 @@ it("enables RAPTOR and starts a source-linked summary run", async () => {
   await waitFor(() => expect(server.callsTo("PUT", `/api/v1/datasets/${DATASET_ID}`)).toHaveLength(1));
   await waitFor(() => expect(server.callsTo("POST", URL)).toHaveLength(1));
   expect(await screen.findByText("RAPTOR summaries")).toBeInTheDocument();
+});
+
+it("downloads an owned artifact and confirms derived-only deletion with bounded history", async () => {
+  server.areaState<Array<Record<string, unknown>>>("jobs", () => []).push({
+    id: JOB_ID, type: "raptor", run: "3", total: 1, completed: 1, failed: 0, progress: 1,
+    created_at: 1, updated_at: 1, artifact_filename: `${ARTIFACT_ID}.json`,
+  });
+  const create = vi.spyOn(globalThis.URL, "createObjectURL").mockReturnValue("blob:raptor-test");
+  const click = vi.spyOn(HTMLAnchorElement.prototype, "click").mockImplementation(() => {});
+  try {
+    mount();
+    const user = userEvent.setup();
+    await user.click(screen.getByTestId("dataset-jobs-open"));
+    await user.click(await screen.findByTestId("dataset-job-artifact"));
+    await waitFor(() => expect(server.callsTo("GET", `/api/v1/documents/artifact/${ARTIFACT_ID}.json`)).toHaveLength(1));
+    expect(create).toHaveBeenCalledOnce();
+    expect(click).toHaveBeenCalledOnce();
+    await user.click(screen.getByTestId("dataset-raptor-delete"));
+    expect(await screen.findByText("Delete RAPTOR summaries?")).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Keep summaries" }));
+    expect(server.callsTo("DELETE", `/api/v1/datasets/${DATASET_ID}/raptor`)).toHaveLength(0);
+    await user.click(screen.getByTestId("dataset-raptor-delete"));
+    await user.click(screen.getAllByRole("button", { name: "Delete summaries" }).at(-1)!);
+    await waitFor(() => expect(server.callsTo("DELETE", `/api/v1/datasets/${DATASET_ID}/raptor`)).toHaveLength(1));
+    expect(await screen.findByTestId("dataset-raptor-deleted")).toHaveTextContent("Deleted 4 summaries and 1 generated artifacts.");
+    await user.click(screen.getByTestId("dataset-alteration-open"));
+    expect(await screen.findByTestId("dataset-alteration-row")).toHaveTextContent("4 summaries removed");
+  } finally { create.mockRestore(); click.mockRestore(); }
 });

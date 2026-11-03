@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Phase6 plan24 RAPTOR summaries verified; continuing25 derived deletion and download
-last_updated: "2026-11-03"
-last_activity: 2026-11-03 -- RAPTOR summaries and original citations verified; continuing25
+stopped_at: Phase6 plan25 derived deletion and download verified; continuing26 optional PDF backends
+last_updated: "2026-11-04"
+last_activity: 2026-11-04 -- derived deletion and artifact download verified; continuing26
 progress:
   total_phases: 8
   completed_phases: 4
   total_plans: 176
-  completed_plans: 170
+  completed_plans: 171
   percent: 97
 ---
 
@@ -21,18 +21,18 @@ progress:
 See: .planning/PROJECT.md (updated 2026-10-05)
 
 **Core value:** A user can upload a document into a knowledge base and get an accurate, cited answer to a question about it, end-to-end through the real pipeline (parse, chunk, embed, index, hybrid retrieve, rerank, generate), with no mocked stages.
-**Current focus:** Phase 6 execution — 06-25 derived deletion and download
+**Current focus:** Phase 6 execution — 06-26 Docling and MinerU backend selection
 
 ## Current Position
 
 Phase: 6 (deep-parsing-and-chunking-breadth) — EXECUTING
-Plan: 25 of 30; plans01–24 complete; derived deletion and authorized download next
-Status: Plans01–24 complete; R232..255 recorded. RAPTOR real native and MySQL/ES/local-provider integration3, rebuilt Chrome job/citation1, route isolation16, leak sweep6, frontend2197, CI7. Local ASR3/3 retained; zero external paid calls.
+Plan: 26 of 30; plans01–25 complete; optional Docling and MinerU backend selection next
+Status: Plans01–25 complete; R232..256 recorded. Derived artifact and deletion real MySQL/MinIO/ES/local-provider integration6, rebuilt Chrome download/deletion/history1, route isolation17, leak sweep6, frontend2198, CI7. Local ASR3/3 retained; zero external paid calls.
 Prior checks: Phase5 UAT5/6 passed (two user answer judgments and delegated screenshot/Chinese/footprint review). Final Phase5 acceptance remains pending; Phase4 B36 remains separately deferred. Prior paid evidence retained.
-Current checkpoint:24 verified; bounded recursive summary generation, current source validation, and inspected original citation screenshot. Continue25; existing acquisition/publication approvals persist; no ASR replay.
-Last activity: 2026-11-03
+Current checkpoint:25 verified; derived-only deletion, authorized artifact download and bounded audit history. Continue26; existing acquisition/publication approvals persist; no ASR replay. The 2026-11-04 reboot reset vm.max_map_count to 65530 and live stack restoration was requested.
+Last activity: 2026-11-04
 
-Progress: 170/176 currently planned execution plans complete (97%); Phase6 24/30 complete.
+Progress: 171/176 currently planned execution plans complete (97%); Phase6 25/30 complete.
 
 ## Performance Metrics
 

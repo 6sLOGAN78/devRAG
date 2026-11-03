@@ -1,0 +1,105 @@
+{
+  "recorded_at": "2026-11-03T19:44:21.421964+00:00",
+  "plan": "06-25",
+  "requirements": [
+    "KB-17",
+    "DOC-19"
+  ],
+  "new_unapproved_packages": 0,
+  "paid_external_calls": 0,
+  "local_asr_submissions_this_plan": 0,
+  "local_asr_remaining": 0,
+  "human_uat_approved": false,
+  "phase_gate_complete": false,
+  "initial_red": "One intended behavioral failure: owned dataset artifact service absent; no fixture/import error.",
+  "evidence": {
+    "red": {
+      "path": "ragflow-logs/phase6-25-red.log",
+      "sha256": "6991e5fc2348b2fd009edcd6294ef6d523fbab3deaff38269909535cc795c559"
+    },
+    "marked_unit": {
+      "path": "ragflow-logs/phase6-25-unit.log",
+      "sha256": "a1e88e13ee7f0064ad1fdb1d93feeae86591ddaeb61635ed009cf37338d55079"
+    },
+    "records": {
+      "path": "ragflow-logs/phase6-25-records.log",
+      "sha256": "3f2a7d474201c0ea38d8bf1671a9f35e691f355933bdef622342047561fb3da4"
+    },
+    "integration": {
+      "path": "ragflow-logs/phase6-25-integration-final.log",
+      "sha256": "f62e744bcd140e845deae51a0b9312994ce75d33fe41af3083232513cb53f6cf"
+    },
+    "integration_outcome": {
+      "path": "ragflow-logs/phase6-25-integration-outcome.log",
+      "sha256": "80c4b11988baac9e3ded37b30d4e41d369f64bfc8a68cbee0b1391f706dfc818"
+    },
+    "schema": {
+      "path": "ragflow-logs/phase6-25-schema-final.log",
+      "sha256": "fa9d5e219de83790a54f2f36f72798f1e14e48e1bddae0a122216a32b6a61ed6"
+    },
+    "browser": {
+      "path": "ragflow-logs/phase6-25-browser-final.log",
+      "sha256": "38a2551f8751a9b851e9eba508fd27b6b6308bf37154c404369e3af0c4bc3cb3"
+    },
+    "route_isolation": {
+      "path": "ragflow-logs/phase6-25-isolation-second.log",
+      "sha256": "37d665d003f725637e1f9a55683a60ec54ff7fd8a59fe3e1e3509e9f18dedc0d"
+    },
+    "leak_sweep": {
+      "path": "ragflow-logs/phase6-25-leak-final.log",
+      "sha256": "f6f2c72e9cb22bbe18cd9575dd94a20bb23ab458e651c5f4b3a9753b35482905"
+    },
+    "frontend": {
+      "path": "ragflow-logs/phase6-25-web-all.log",
+      "sha256": "4a7a9c44bc73136627d5872e673ce190aeb32ab1cf15513a1415295ed2d78603"
+    },
+    "frontend_build": {
+      "path": "ragflow-logs/phase6-25-web-build.log",
+      "sha256": "b31854d21478f92bf5b5e97b8cb5a04dd787f227d93ac3a19a59cab2dd6a9039"
+    },
+    "ci_release": {
+      "path": "ragflow-logs/phase6-25-ci-final.log",
+      "sha256": "1538af32fd4b5a8f94df60574b39e32529c5f49eb061ee98efe245ad6253e962"
+    },
+    "app_build": {
+      "path": "ragflow-logs/phase6-25-app-build-outcome.log",
+      "sha256": "8c5384a780e1b82109822268e37470d9d613d3d8dadef79a73e3d7157e1561e3"
+    },
+    "stack_health": {
+      "path": "ragflow-logs/phase6-25-stack-wait-outcome.log",
+      "sha256": "32254ac424a678cc99d0a6155a2c5436ec28ea8a739857bfbd5e4e9dc4e2a2a7"
+    }
+  },
+  "results": {
+    "marked_unit": "2633 passed, 8 existing skipped, 51 deselected",
+    "records": "9 passed, Phase 5 and Phase 6 bounded record tests",
+    "integration": "6 passed, real MySQL/MinIO/Elasticsearch/local provider across Plans 06-24 and 06-25",
+    "schema": "14 passed, fresh 41-table migration through version 0007",
+    "browser": "1 passed, actual Chrome download, confirmation, history and original retention",
+    "route_isolation": "17 passed, new routes in both tenant matrices",
+    "leak_sweep": "6 passed, all implemented routes covered",
+    "frontend": "2198 passed, 114 files",
+    "frontend_build": "TypeScript and production build passed",
+    "go_internal": "GOMAXPROCS=2 go test -p 1 ./internal/... passed",
+    "ci_release": "7/7 gates passed"
+  },
+  "screenshots": {
+    "download": {
+      "path": "output/playwright/phase6-review/artifact-download.png",
+      "sha256": "c99f023b45b6af690ecf2ece740b284e673dc60152bfcb93a3db7dccb222ab1b",
+      "reviewer": "assistant, actual Chrome"
+    },
+    "deletion_history": {
+      "path": "output/playwright/phase6-review/artifact-deleted-history.png",
+      "sha256": "34f9b911698091fcb59a49d0552ecc0cf14427f93bb3a51990c0150b6107c08e",
+      "reviewer": "assistant, actual Chrome"
+    }
+  },
+  "images": {
+    "app": "sha256:102b643e5c4d9050bed89d0516e0ea0e7f0cca581cfea4f6139dbb1e3631bad6",
+    "task_executor_1": "sha256:102b643e5c4d9050bed89d0516e0ea0e7f0cca581cfea4f6139dbb1e3631bad6",
+    "task_executor_2": "sha256:102b643e5c4d9050bed89d0516e0ea0e7f0cca581cfea4f6139dbb1e3631bad6",
+    "deepdoc": "sha256:b046a4f2aa40a62e44a532ec54f042668346b838c4523a1bd6332a0f18857aac"
+  },
+  "notes": "No REQUIREMENTS checkbox changed. Phase 5 human acceptance, Phase 4 B36 and Phase 6 final gate remain open. Host reboot after passing evidence reset vm.max_map_count; live stack restoration requested."
+}

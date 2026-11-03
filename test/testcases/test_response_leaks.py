@@ -1164,6 +1164,39 @@ def sweep_document_image_rows(s: Sweep, w: World) -> None:
     s.errors(row, "GET", image, "PUT")
 
 
+def sweep_dataset_artifact_rows(s: Sweep, w: World) -> None:
+    from test.helpers.dataset_artifacts import owned_artifact
+
+    owner, member, outsider = w.a.token, w.normal.token, w.b.token
+    token = str(w.a_tokens[0]["token"])
+    team = f"{DATASETS}/{w.a_team_dataset['id']}"
+    private = f"{DATASETS}/{w.a_private_dataset['id']}"
+    filename = owned_artifact(w)
+    artifact = f"/api/v1/documents/artifact/{filename}"
+    row = "GET /api/v1/documents/artifact/{filename}"
+    for label, credential in (("owner", owner), ("member", member), ("API token", token), ("outsider", outsider)):
+        s.req(row, label, "GET", artifact, credential)
+    s.req(row, "absent", "GET", f"/api/v1/documents/artifact/{uuid.uuid4().hex}.json", owner)
+    s.req(row, "malformed", "GET", "/api/v1/documents/artifact/bad.json", owner)
+    s.errors(row, "GET", artifact, "PUT")
+
+    row = f"DELETE {DATASETS}/{{dataset_id}}/{{index_type}}"
+    s.req(row, "member refused", "DELETE", f"{team}/raptor", member)
+    s.req(row, "outsider refused", "DELETE", f"{team}/raptor", outsider)
+    s.req(row, "unsupported type", "DELETE", f"{team}/source", owner)
+    s.req(row, "owner delete", "DELETE", f"{team}/raptor", owner)
+    s.req(row, "idempotent retry", "DELETE", f"{team}/raptor", owner)
+    s.errors(row, "DELETE", f"{team}/raptor", "POST")
+
+    row = f"GET {DATASETS}/{{dataset_id}}/artifacts/alteration"
+    s.req(row, "owner history", "GET", f"{team}/artifacts/alteration?page=1&size=1", owner)
+    s.req(row, "member history", "GET", f"{team}/artifacts/alteration", member)
+    s.req(row, "API token history", "GET", f"{team}/artifacts/alteration", token)
+    s.req(row, "private refused", "GET", f"{private}/artifacts/alteration", member)
+    s.req(row, "bad page", "GET", f"{team}/artifacts/alteration?page=0", owner)
+    s.errors(row, "GET", f"{team}/artifacts/alteration", "POST")
+
+
 def sealed_envelopes(tenant_id: str) -> list[str]:
     """Every sealed provider key stored for one workspace (the ``v1:`` envelopes), read straight from MySQL."""
     conn = root_connection()
@@ -1242,6 +1275,7 @@ def sweep(ingress: httpx.Client) -> Iterator[Sweep]:
             sweep_completion_rows(s, world)
             sweep_page_rows(s, world)
             sweep_document_image_rows(s, world)
+            sweep_dataset_artifact_rows(s, world)
             collect_database_secrets(s)
             s.secrets.extend(infrastructure_secrets())
             yield s

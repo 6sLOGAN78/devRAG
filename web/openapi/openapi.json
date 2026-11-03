@@ -1,6 +1,44 @@
 {
   "components": {
     "schemas": {
+      "AlterationView": {
+        "properties": {
+          "actor": {
+            "title": "Actor",
+            "type": "string"
+          },
+          "deleted_count": {
+            "title": "Deleted Count",
+            "type": "integer"
+          },
+          "generation": {
+            "title": "Generation",
+            "type": "string"
+          },
+          "outcome": {
+            "title": "Outcome",
+            "type": "string"
+          },
+          "time": {
+            "title": "Time",
+            "type": "integer"
+          },
+          "type": {
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "actor",
+          "type",
+          "generation",
+          "outcome",
+          "time",
+          "deleted_count"
+        ],
+        "title": "AlterationView",
+        "type": "object"
+      },
       "AssistantPage": {
         "properties": {
           "items": {
@@ -623,6 +661,29 @@
           "asr"
         ],
         "title": "DefaultsView",
+        "type": "object"
+      },
+      "DeleteView": {
+        "properties": {
+          "artifact_count": {
+            "title": "Artifact Count",
+            "type": "integer"
+          },
+          "deleted_count": {
+            "title": "Deleted Count",
+            "type": "integer"
+          },
+          "type": {
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "type",
+          "deleted_count",
+          "artifact_count"
+        ],
+        "title": "DeleteView",
         "type": "object"
       },
       "DeletedAssistant": {
@@ -1452,6 +1513,37 @@
         "title": "HealthData",
         "type": "object"
       },
+      "HistoryView": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/AlterationView"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "page": {
+            "title": "Page",
+            "type": "integer"
+          },
+          "size": {
+            "title": "Size",
+            "type": "integer"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "page",
+          "size"
+        ],
+        "title": "HistoryView",
+        "type": "object"
+      },
       "InstanceView": {
         "properties": {
           "api_version": {
@@ -1532,6 +1624,18 @@
       },
       "JobView": {
         "properties": {
+          "artifact_filename": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Artifact Filename"
+          },
           "completed": {
             "title": "Completed",
             "type": "integer"
@@ -4301,6 +4405,52 @@
         }
       }
     },
+    "/api/v1/datasets/{dataset_id}/artifacts/alteration": {
+      "get": {
+        "operationId": "get_alterations",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "dataset_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "title": "Code",
+                      "type": "integer"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/HistoryView"
+                    },
+                    "message": {
+                      "title": "Message",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "message",
+                    "data"
+                  ],
+                  "title": "HistoryEnvelope",
+                  "type": "object"
+                }
+              }
+            },
+            "description": ""
+          }
+        }
+      }
+    },
     "/api/v1/datasets/{dataset_id}/documents": {
       "delete": {
         "operationId": "delete_delete_documents",
@@ -5710,6 +5860,76 @@
             "description": ""
           }
         }
+      }
+    },
+    "/api/v1/datasets/{dataset_id}/{index_type}": {
+      "delete": {
+        "operationId": "delete_delete_derived",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "dataset_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "index_type",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "title": "Code",
+                      "type": "integer"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/DeleteView"
+                    },
+                    "message": {
+                      "title": "Message",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "message",
+                    "data"
+                  ],
+                  "title": "DeleteEnvelope",
+                  "type": "object"
+                }
+              }
+            },
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v1/documents/artifact/{filename}": {
+      "get": {
+        "operationId": "get_download_artifact",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "filename",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {}
       }
     },
     "/api/v1/documents/images/{image_id}": {

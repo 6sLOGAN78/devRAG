@@ -1557,6 +1557,171 @@
       ]
     },
     {
+      "name": "dataset_alteration",
+      "columns": [
+        {
+          "name": "actor_id",
+          "type": "varchar(32)",
+          "nullable": false,
+          "default": null,
+          "app_default": null,
+          "primary_key": false,
+          "auto_increment": false
+        },
+        {
+          "name": "create_date",
+          "type": "datetime",
+          "nullable": true,
+          "default": null,
+          "app_default": null,
+          "primary_key": false,
+          "auto_increment": false
+        },
+        {
+          "name": "create_time",
+          "type": "bigint",
+          "nullable": true,
+          "default": null,
+          "app_default": null,
+          "primary_key": false,
+          "auto_increment": false
+        },
+        {
+          "name": "deleted_count",
+          "type": "int",
+          "nullable": false,
+          "default": null,
+          "app_default": 0,
+          "primary_key": false,
+          "auto_increment": false
+        },
+        {
+          "name": "generation_id",
+          "type": "varchar(32)",
+          "nullable": false,
+          "default": null,
+          "app_default": "",
+          "primary_key": false,
+          "auto_increment": false
+        },
+        {
+          "name": "id",
+          "type": "varchar(32)",
+          "nullable": false,
+          "default": null,
+          "app_default": null,
+          "primary_key": true,
+          "auto_increment": false
+        },
+        {
+          "name": "index_type",
+          "type": "varchar(16)",
+          "nullable": false,
+          "default": null,
+          "app_default": null,
+          "primary_key": false,
+          "auto_increment": false
+        },
+        {
+          "name": "kb_id",
+          "type": "varchar(32)",
+          "nullable": false,
+          "default": null,
+          "app_default": null,
+          "primary_key": false,
+          "auto_increment": false
+        },
+        {
+          "name": "status",
+          "type": "varchar(16)",
+          "nullable": false,
+          "default": null,
+          "app_default": null,
+          "primary_key": false,
+          "auto_increment": false
+        },
+        {
+          "name": "tenant_id",
+          "type": "varchar(32)",
+          "nullable": false,
+          "default": null,
+          "app_default": null,
+          "primary_key": false,
+          "auto_increment": false
+        },
+        {
+          "name": "update_date",
+          "type": "datetime",
+          "nullable": true,
+          "default": null,
+          "app_default": null,
+          "primary_key": false,
+          "auto_increment": false
+        },
+        {
+          "name": "update_time",
+          "type": "bigint",
+          "nullable": true,
+          "default": null,
+          "app_default": null,
+          "primary_key": false,
+          "auto_increment": false
+        }
+      ],
+      "indexes": [
+        {
+          "name": "datasetalteration_create_date",
+          "columns": [
+            "create_date"
+          ],
+          "unique": false
+        },
+        {
+          "name": "datasetalteration_create_time",
+          "columns": [
+            "create_time"
+          ],
+          "unique": false
+        },
+        {
+          "name": "datasetalteration_kb_id",
+          "columns": [
+            "kb_id"
+          ],
+          "unique": false
+        },
+        {
+          "name": "datasetalteration_tenant_id",
+          "columns": [
+            "tenant_id"
+          ],
+          "unique": false
+        },
+        {
+          "name": "datasetalteration_update_date",
+          "columns": [
+            "update_date"
+          ],
+          "unique": false
+        },
+        {
+          "name": "datasetalteration_update_time",
+          "columns": [
+            "update_time"
+          ],
+          "unique": false
+        },
+        {
+          "name": "idx_dataset_alteration_history",
+          "columns": [
+            "kb_id",
+            "create_time"
+          ],
+          "unique": false
+        }
+      ]
+    },
+    {
       "name": "dataset_job",
       "columns": [
         {

@@ -359,7 +359,7 @@ def resource_of(row: Row) -> str:
         return "documents"
     if row.path.startswith(DATASETS):
         return "datasets"
-    if row.path.startswith("/api/v1/documents/images/"):
+    if row.path.startswith(("/api/v1/documents/images/", "/api/v1/documents/artifact/")):
         return "assets"
     if row.path.startswith(UPLOAD):
         return "objects"
@@ -590,6 +590,16 @@ def _cancel_dataset_job(w: World) -> Target:
                   _sender("POST", DATASETS + "/{dataset_id}/jobs/{job_id}/cancel", extra_fields=set()), w.snapshot_datasets)
 
 
+def _dataset_alterations(w: World) -> Target:
+    return Target({"dataset_id": str(w.a_team_dataset["id"])},
+                  _sender("GET", DATASETS + "/{dataset_id}/artifacts/alteration", extra_fields=set()), w.snapshot_datasets)
+
+
+def _delete_raptor(w: World) -> Target:
+    return Target({"dataset_id": str(w.a_team_dataset["id"]), "index_type": "raptor"},
+                  _sender("DELETE", DATASETS + "/{dataset_id}/{index_type}", extra_fields=set()), w.snapshot_datasets)
+
+
 def _update_dataset(w: World) -> Target:
     """PUT on A's team dataset: only its visibility keeps an outsider from it. The model takes only its own fields, so nothing else is smuggled in."""
     return Target({"dataset_id": str(w.a_team_dataset["id"])}, _sender("PUT", DATASETS + "/{dataset_id}", {"description": "matrix-rewrite"}, extra_fields=set()), w.snapshot_datasets)
@@ -700,6 +710,13 @@ def _document_image(w: World) -> Target:
     return Target({"image_id": owned_image(w)}, _sender("GET", "/api/v1/documents/images/{image_id}", extra_fields=set()), w.snapshot_assets)
 
 
+def _document_artifact(w: World) -> Target:
+    from test.helpers.dataset_artifacts import owned_artifact
+
+    return Target({"filename": owned_artifact(w)},
+                  _sender("GET", "/api/v1/documents/artifact/{filename}", extra_fields=set()), w.snapshot_assets)
+
+
 def _document_content(w: World) -> Target:
     ids = {"dataset_id": str(w.a_team_dataset["id"]), "doc_id": str(w.a_team_documents[0]["id"])}
     return Target(ids, _sender("GET", DATASETS + "/{dataset_id}/documents/{doc_id}/content", extra_fields=set()), w.snapshot_documents)
@@ -751,11 +768,14 @@ BUILDERS: dict[str, Builder] = {
     "GET /api/v1/datasets/{dataset_id}/jobs": _list_dataset_jobs,
     "GET /api/v1/datasets/{dataset_id}/jobs/{job_id}": _get_dataset_job,
     "POST /api/v1/datasets/{dataset_id}/jobs/{job_id}/cancel": _cancel_dataset_job,
+    "GET /api/v1/datasets/{dataset_id}/artifacts/alteration": _dataset_alterations,
+    "DELETE /api/v1/datasets/{dataset_id}/{index_type}": _delete_raptor,
     "GET /api/v1/datasets/{dataset_id}/metadata/config": _metadata_config,
     "PATCH /api/v1/datasets/{dataset_id}/documents/metadatas": _edit_document_metadata,
     "GET /api/v1/datasets/{dataset_id}/tags": _list_dataset_tags,
     "DELETE /api/v1/datasets/{dataset_id}/tags": _delete_dataset_tags,
     "GET /api/v1/documents/images/{image_id}": _document_image,
+    "GET /api/v1/documents/artifact/{filename}": _document_artifact,
     "POST /api/v1/chats/{chat_id}/sessions": _create_session,
     "GET /api/v1/chats/{chat_id}/sessions": _list_sessions,
     "GET /api/v1/chats/{chat_id}/sessions/{session_id}": _get_session,

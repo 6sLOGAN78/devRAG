@@ -156,6 +156,25 @@ class DatasetJob(BaseModel):
 DatasetJob.add_index(DatasetJob.kb_id, DatasetJob.create_time, name="idx_dataset_job_history")
 
 
+class DatasetAlteration(BaseModel):
+    """Bounded, content-free audit of an owned derived-index deletion attempt."""
+
+    id = peewee.CharField(max_length=32, primary_key=True)
+    tenant_id = peewee.CharField(max_length=32, null=False, index=True)
+    kb_id = peewee.CharField(max_length=32, null=False, index=True)
+    actor_id = peewee.CharField(max_length=32, null=False)
+    index_type = peewee.CharField(max_length=16, null=False)
+    generation_id = peewee.CharField(max_length=32, null=False, default="")
+    status = peewee.CharField(max_length=16, null=False)
+    deleted_count = peewee.IntegerField(null=False, default=0)
+
+    class Meta:
+        table_name = "dataset_alteration"
+
+
+DatasetAlteration.add_index(DatasetAlteration.kb_id, DatasetAlteration.create_time, name="idx_dataset_alteration_history")
+
+
 class PipelineOperationLog(BaseModel):
     id = peewee.CharField(max_length=32, primary_key=True)
     document_id = peewee.CharField(max_length=32, index=True)

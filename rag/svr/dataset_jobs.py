@@ -8,7 +8,7 @@ from dataclasses import replace
 from api.db.database import DB, transaction
 from api.db.models import DatasetJob, Document, Task
 from api.db.models.base import current_timestamp_ms, timestamp_to_date
-from api.db.services import dataset_job_service, document_metadata_service, task_service, tenant_model_service
+from api.db.services import dataset_job_service, document_metadata_service, knowledgebase_service as datasets, task_service, tenant_model_service
 from api.db.services.knowledgebase_service import embedding_dimensions
 from api.db.services.task_service import TaskContext
 from common.doc_store.doc_store_base import OrderByExpr, index_name, vector_field
@@ -22,6 +22,7 @@ from rag.svr.embedding import release_database_connection
 from rag.svr.enrichment import ENRICHMENT_BATCH, MAX_ENRICHED_CHUNKS, EnrichedFeatures, parse_generated_metadata
 from rag.svr.failure import TaskFailure
 from rag.svr.pipeline import PipelineDeps, PipelineResult
+from rag.utils.storage_base import StorageError
 
 
 def _current(child: dataset_job_service.DatasetChild, control: TaskControl) -> None:
@@ -192,9 +193,18 @@ def run_raptor(child: dataset_job_service.DatasetChild, control: TaskControl, de
                    raptor_level_int=summary.level, raptor_child_ids_kwd=list(summary.child_ids),
                    raptor_leaf_ids_kwd=list(summary.leaf_ids))
         rows.append(row)
-    _current(child, control)
-    if store.insert(rows, name, child.dataset_id):
-        raise TaskFailure("index", "index_unavailable")
-    _current(child, control)
+    from api.db.services.dataset_artifact_service import persist_raptor_artifact
+
+    with datasets._named_lock(datasets.upload_lock_name(child.dataset_id), 10, "another dataset change is running"):
+        _current(child, control)
+        if store.insert(rows, name, child.dataset_id):
+            raise TaskFailure("index", "index_unavailable")
+        try:
+            persist_raptor_artifact(deps.settings, child, rows, [leaf.chunk_id for leaf in leaves])
+        except StorageError:
+            raise TaskFailure("index", "storage_unavailable") from None
+        except ValueError:
+            raise TaskFailure("index", "file_too_large") from None
+        _current(child, control)
     deps.embedder.forget(child.task_id)
     return PipelineResult(tuple(row["id"] for row in rows), len(rows), 0, 0, 0)

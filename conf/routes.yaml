@@ -184,6 +184,10 @@ endpoints:
      note: "plan 06-23 scoped job progress and counts"}
   - {method: POST, path: "/api/v1/datasets/{dataset_id}/jobs/{job_id}/cancel", owner: python, auth: api, roles: [owner, admin, normal], scope: tenant, implemented: true,
      note: "plan 06-23 cancel a running job without publishing a fake document"}
+  - {method: GET, path: "/api/v1/datasets/{dataset_id}/artifacts/alteration", owner: python, auth: api, roles: [owner, admin, normal], scope: tenant, implemented: true,
+     note: "plan 06-25 bounded content-free derived deletion history for one visible dataset"}
+  - {method: DELETE, path: "/api/v1/datasets/{dataset_id}/{index_type}", owner: python, auth: api, roles: [owner, admin, normal], scope: tenant, implemented: true,
+     note: "plan 06-25 explicitly allowlisted derived-only deletion; manage permission in service"}
   - {method: GET, path: "/api/v1/datasets/{dataset_id}", owner: python, auth: api, roles: [owner, admin, normal], scope: tenant, implemented: true,
      note: "plan 03-14 reads a dataset; invisible and foreign ids answer the one 404 (D-20)"}
   - {method: PUT, path: "/api/v1/datasets/{dataset_id}", owner: python, auth: api, roles: [owner, admin, normal], scope: tenant, implemented: true,
@@ -250,6 +254,8 @@ endpoints:
      note: "plan 05-11 answers a question with a persisted cited completion; streaming follows in plan 05-12 (CHAT-14..21, CHAT-31)"}
   - {method: GET, path: "/api/v1/documents/images/{image_id}", owner: python, auth: api, roles: [owner, admin, normal], scope: tenant, implemented: true,
      note: "plan 06-05 reads an opaque normalized PNG only through its current original document and dataset visibility; foreign, stale and deleted images are the one 404"}
+  - {method: GET, path: "/api/v1/documents/artifact/{filename}", owner: python, auth: api, roles: [owner, admin, normal], scope: tenant, implemented: true,
+     note: "plan 06-25 authenticated opaque generated artifact with current all-source authorization"}
 
   - {method: GET, path: /api/v1/pipelines, owner: go, auth: none, roles: [], scope: none, implemented: true}
   - {method: GET, path: "/api/v1/pipelines/{id}", owner: go, auth: none, roles: [], scope: none, implemented: true}

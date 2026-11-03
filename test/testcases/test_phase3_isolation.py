@@ -169,6 +169,14 @@ def _inv_cancel_dataset_job(w: World, who: Account | None, token: str, as_tenant
     return call(w.client, "POST", f"{DATASETS}/{_team_id(w)}/jobs/{w.scratch.get('job_id', uuid.uuid4().hex)}/cancel", token, {})
 
 
+def _inv_dataset_alterations(w: World, who: Account | None, token: str, as_tenant: str | None) -> httpx.Response:
+    return call(w.client, "GET", f"{DATASETS}/{_team_id(w)}/artifacts/alteration", token, {})
+
+
+def _inv_delete_raptor(w: World, who: Account | None, token: str, as_tenant: str | None) -> httpx.Response:
+    return call(w.client, "DELETE", f"{DATASETS}/{_team_id(w)}/raptor", token, {})
+
+
 def _inv_dataset_tags(w: World, who: Account | None, token: str, as_tenant: str | None) -> httpx.Response:
     return call(w.client, "GET", f"{DATASETS}/{_team_id(w)}/tags", token, {})
 
@@ -279,6 +287,12 @@ def _inv_document_image(w: World, who: Account | None, token: str, as_tenant: st
     return call(w.client, "GET", "/api/v1/documents/images/{image_id}", token, {"image_id": owned_image(w)})
 
 
+def _inv_document_artifact(w: World, who: Account | None, token: str, as_tenant: str | None) -> httpx.Response:
+    from test.helpers.dataset_artifacts import owned_artifact
+
+    return call(w.client, "GET", "/api/v1/documents/artifact/{filename}", token, {"filename": owned_artifact(w)})
+
+
 def _inv_document_content(w: World, who: Account | None, token: str, as_tenant: str | None) -> httpx.Response:
     return call(w.client, "GET", _doc_path(w) + "/content", token, {})
 
@@ -357,6 +371,8 @@ INVOKERS: dict[str, Invoker] = {
     "GET /api/v1/datasets/{dataset_id}/jobs": _inv_list_dataset_jobs,
     "GET /api/v1/datasets/{dataset_id}/jobs/{job_id}": _inv_get_dataset_job,
     "POST /api/v1/datasets/{dataset_id}/jobs/{job_id}/cancel": _inv_cancel_dataset_job,
+    "GET /api/v1/datasets/{dataset_id}/artifacts/alteration": _inv_dataset_alterations,
+    "DELETE /api/v1/datasets/{dataset_id}/{index_type}": _inv_delete_raptor,
     "GET /api/v1/datasets/metadata/flattened": _inv_flattened_metadata,
     "GET /api/v1/datasets/{dataset_id}/metadata/config": _inv_metadata_config,
     "PATCH /api/v1/datasets/{dataset_id}/documents/metadatas": _inv_edit_metadata,
@@ -364,6 +380,7 @@ INVOKERS: dict[str, Invoker] = {
     "GET /api/v1/datasets/{dataset_id}/tags": _inv_dataset_tags,
     "DELETE /api/v1/datasets/{dataset_id}/tags": _inv_delete_dataset_tags,
     "GET /api/v1/documents/images/{image_id}": _inv_document_image,
+    "GET /api/v1/documents/artifact/{filename}": _inv_document_artifact,
     "POST /api/v1/chat/completions": _inv_completion,
     "POST /api/v1/chats/{chat_id}/sessions": _inv_create_session,
     "GET /api/v1/chats/{chat_id}/sessions": _inv_list_sessions,
@@ -415,6 +432,7 @@ NORMAL_IS_REFUSED_ON_A_RESOURCE = frozenset(
     {
         "POST /api/v1/datasets/{dataset_id}/jobs",
         "POST /api/v1/datasets/{dataset_id}/jobs/{job_id}/cancel",
+        "DELETE /api/v1/datasets/{dataset_id}/{index_type}",
         "DELETE /api/v1/datasets/{dataset_id}/tags",
         "PUT /api/v1/datasets/{dataset_id}",
         "DELETE /api/v1/datasets",
@@ -443,6 +461,8 @@ ID_ROWS = frozenset(
         "GET /api/v1/datasets/{dataset_id}/jobs",
         "GET /api/v1/datasets/{dataset_id}/jobs/{job_id}",
         "POST /api/v1/datasets/{dataset_id}/jobs/{job_id}/cancel",
+        "GET /api/v1/datasets/{dataset_id}/artifacts/alteration",
+        "DELETE /api/v1/datasets/{dataset_id}/{index_type}",
         "GET /api/v1/datasets/tags/aggregation",
         "GET /api/v1/datasets/metadata/flattened",
         "GET /api/v1/datasets/{dataset_id}/tags",
@@ -551,10 +571,17 @@ def _prepare_dataset_job(w: World) -> None:
     w.scratch["job_id"] = _seed_dataset_job(w)
 
 
+def _prepare_artifact(w: World) -> None:
+    from test.helpers.dataset_artifacts import owned_artifact
+
+    owned_artifact(w)
+
+
 PREPARE: dict[str, Callable[[World], None]] = {
     "POST /api/v1/datasets/{dataset_id}/jobs": _prepare_start_dataset_job,
     "GET /api/v1/datasets/{dataset_id}/jobs/{job_id}": _prepare_dataset_job,
     "POST /api/v1/datasets/{dataset_id}/jobs/{job_id}/cancel": _prepare_dataset_job,
+    "GET /api/v1/documents/artifact/{filename}": _prepare_artifact,
     "DELETE /api/v1/chats/{chat_id}/sessions/{session_id}": _prepare_session,
     "DELETE /api/v1/chats/{chat_id}": _prepare_chat,
     "DELETE /api/v1/providers/{provider}": _prepare_provider,
@@ -581,6 +608,8 @@ def run(w: World, key: str, who: Account | None, token: str, as_tenant: str | No
 
 
 def succeeded(resp: httpx.Response) -> bool:
+    if resp.status_code == 200 and resp.headers.get("content-disposition", "").startswith("attachment;"):
+        return resp.headers.get("content-type", "").startswith("application/json") and bool(resp.content)
     if resp.status_code == 200 and not resp.headers.get("content-type", "").startswith("application/json"):
         return True  # a binary body (page image, original file): the status alone says it was served
     return resp.status_code == 200 and resp.json().get("code") == 0

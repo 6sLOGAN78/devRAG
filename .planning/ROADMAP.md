@@ -663,7 +663,7 @@ Scope notes: this is the PROJECT.md Core Value. No Phase 6, 7 or 8 work starts u
 - [x] 06-24-PLAN.md — Retrieve RAPTOR summaries with real source citations
 **Wave 25** *(blocked on Wave 24 completion and accepted06-01 snapshot)*
 
-- [ ] 06-25-PLAN.md — Delete derived results and download authorized artifacts
+- [x] 06-25-PLAN.md — Delete derived results and download authorized artifacts
 **Wave 26** *(blocked on Wave 25 completion and accepted06-01 snapshot)*
 
 - [ ] 06-26-PLAN.md — Select Docling or MinerU parsing

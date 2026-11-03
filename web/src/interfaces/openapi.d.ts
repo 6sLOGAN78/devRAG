@@ -180,6 +180,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/datasets/{dataset_id}/artifacts/alteration": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["get_alterations"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/datasets/{dataset_id}/documents": {
         parameters: {
             query?: never;
@@ -468,6 +484,38 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/datasets/{dataset_id}/{index_type}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: operations["delete_delete_derived"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/documents/artifact/{filename}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["get_download_artifact"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/documents/images/{image_id}": {
         parameters: {
             query?: never;
@@ -749,6 +797,21 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** AlterationView */
+        AlterationView: {
+            /** Actor */
+            actor: string;
+            /** Deleted Count */
+            deleted_count: number;
+            /** Generation */
+            generation: string;
+            /** Outcome */
+            outcome: string;
+            /** Time */
+            time: number;
+            /** Type */
+            type: string;
+        };
         /** AssistantPage */
         AssistantPage: {
             /** Items */
@@ -1028,6 +1091,15 @@ export interface components {
             embedding: string;
             /** Vision */
             vision: string;
+        };
+        /** DeleteView */
+        DeleteView: {
+            /** Artifact Count */
+            artifact_count: number;
+            /** Deleted Count */
+            deleted_count: number;
+            /** Type */
+            type: string;
         };
         /** DeletedAssistant */
         DeletedAssistant: {
@@ -1344,6 +1416,17 @@ export interface components {
             /** Status */
             status: string;
         };
+        /** HistoryView */
+        HistoryView: {
+            /** Items */
+            items: components["schemas"]["AlterationView"][];
+            /** Page */
+            page: number;
+            /** Size */
+            size: number;
+            /** Total */
+            total: number;
+        };
         /** InstanceView */
         InstanceView: {
             /**
@@ -1375,6 +1458,11 @@ export interface components {
         };
         /** JobView */
         JobView: {
+            /**
+             * Artifact Filename
+             * @default null
+             */
+            artifact_filename: string | null;
             /** Completed */
             completed: number;
             /** Created At */
@@ -2637,6 +2725,33 @@ export interface operations {
             };
         };
     };
+    get_alterations: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                dataset_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Code */
+                        code: number;
+                        data: components["schemas"]["HistoryView"];
+                        /** Message */
+                        message: string;
+                    };
+                };
+            };
+        };
+    };
     get_list_documents: {
         parameters: {
             query?: never;
@@ -3361,6 +3476,46 @@ export interface operations {
                 };
             };
         };
+    };
+    delete_delete_derived: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                dataset_id: string;
+                index_type: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Code */
+                        code: number;
+                        data: components["schemas"]["DeleteView"];
+                        /** Message */
+                        message: string;
+                    };
+                };
+            };
+        };
+    };
+    get_download_artifact: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                filename: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: never;
     };
     get_image: {
         parameters: {

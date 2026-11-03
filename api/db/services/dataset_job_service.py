@@ -10,7 +10,7 @@ from dataclasses import dataclass
 from typing import Any
 
 from api.db.database import DB, transaction
-from api.db.models import DatasetJob, Document, Knowledgebase, Task
+from api.db.models import DatasetJob, Document, DocumentAsset, Knowledgebase, Task
 from api.db.models.base import current_timestamp_ms, timestamp_to_date
 from api.db.services.auth_service import Principal
 from api.db.services.knowledgebase_service import load_visible_dataset
@@ -91,9 +91,17 @@ def _view(row: DatasetJob) -> dict[str, Any]:
     elif status == "running" and done + failed == total:
         status = "failed" if failed else "done"
     run = {"running": "1", "cancelled": "2", "done": "3", "failed": "4"}[status]
+    artifact_filename = None
+    if row.job_type == "raptor" and row.status == "done":
+        with DB.connection_context():
+            artifact = DocumentAsset.select(DocumentAsset.id).where(
+                (DocumentAsset.generation_id == row.id) & (DocumentAsset.kb_id == row.kb_id) &
+                (DocumentAsset.tenant_id == row.tenant_id) & (DocumentAsset.kind == "raptor")).first()
+        artifact_filename = f"{artifact.id}.json" if artifact else None
     return {"id": row.id, "type": row.job_type, "run": run, "total": total, "completed": done,
             "failed": failed, "progress": (done + failed) / total if total else 1.0,
-            "created_at": int(row.create_time), "updated_at": int(row.update_time)}
+            "created_at": int(row.create_time), "updated_at": int(row.update_time),
+            "artifact_filename": artifact_filename}
 
 
 def start_job(settings: Settings, principal: Principal, dataset_id: str, job_type: str, *, queue: TaskQueue | None = None) -> dict[str, Any]:
