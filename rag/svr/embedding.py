@@ -141,6 +141,15 @@ class EmbedRunner:
 
         return self._bounded_chat(lambda bundle: generated_metadata_completion(bundle, texts, schema), model_id, ctx, control)
 
+    def summarize_raptor(self, texts: list[str], level: int, model_id: str, ctx: TaskContext, control: TaskControl) -> str:
+        from rag.prompts.raptor import SYSTEM, request
+
+        if not 2 <= len(texts) <= 8 or sum(len(text) for text in texts) > 12_000:
+            from rag.svr.failure import TaskFailure
+
+            raise TaskFailure("embed", "file_too_large")
+        return self._bounded_chat(lambda bundle: bundle.chat(SYSTEM, [{"role": "user", "content": request(texts, level)}], {"temperature": 0}), model_id, ctx, control)
+
     def _bounded_chat(self, completion, model_id: str, ctx: TaskContext, control: TaskControl):
         def run():
             release_database_connection()

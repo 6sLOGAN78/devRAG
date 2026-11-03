@@ -3,13 +3,19 @@ from __future__ import annotations
 
 import json
 import math
+from dataclasses import replace
 
 from api.db.database import DB, transaction
 from api.db.models import DatasetJob, Document, Task
 from api.db.models.base import current_timestamp_ms, timestamp_to_date
 from api.db.services import dataset_job_service, document_metadata_service, task_service, tenant_model_service
+from api.db.services.knowledgebase_service import embedding_dimensions
 from api.db.services.task_service import TaskContext
-from common.doc_store.doc_store_base import OrderByExpr, index_name
+from common.doc_store.doc_store_base import OrderByExpr, index_name, vector_field
+from rag.advanced_rag.raptor import Leaf, RaptorError, build_hierarchy
+from rag.nlp.token_count import count_tokens
+from rag.parsers.deepdoc_client import DeepDocClient
+from rag.svr.chunk_doc import manual_row
 from rag.nlp.tokenizer import tokenize
 from rag.svr.control import TaskCancelled, TaskControl
 from rag.svr.embedding import release_database_connection
@@ -127,5 +133,68 @@ def run_refresh(child: dataset_job_service.DatasetChild, control: TaskControl, d
         stored = _publish_metadata(child, metadata)
         if not store.update({"doc_id": child.doc_id}, {document_metadata_service.INDEX_FIELD: json.dumps(stored, ensure_ascii=False, sort_keys=True, separators=(",", ":"))}, name, child.dataset_id):
             raise TaskFailure("index", "index_unavailable")
+    deps.embedder.forget(child.task_id)
+    return PipelineResult(tuple(row["id"] for row in rows), len(rows), 0, 0, 0)
+
+
+def run_raptor(child: dataset_job_service.DatasetChild, control: TaskControl, deps: PipelineDeps) -> PipelineResult:
+    """Build one complete, source-bound generation from existing indexed leaves."""
+    _current(child, control)
+    model_id = child.config.get("raptor_model_id")
+    embedding_id = child.config.get("embedding_model_id")
+    if not isinstance(model_id, str) or not model_id or not isinstance(embedding_id, str) or not embedding_id:
+        raise TaskFailure("embed", "model_unavailable")
+    dimension = embedding_dimensions(child.tenant_id).get(embedding_id)
+    if type(dimension) is not int or not 2 <= dimension <= 4096:
+        raise TaskFailure("embed", "model_unavailable")
+    field = vector_field(dimension)
+    store, name = deps.doc_store, index_name(child.tenant_id)
+    result = store.search(["id", "doc_id", "content_with_weight", field], [],
+                          {"doc_id": list(child.source_doc_ids), "must_not": {"removed_kwd": "Y", "origin_kwd": "raptor"}},
+                          [], OrderByExpr().asc("id"), 0, 201, name, [child.dataset_id])
+    if not 2 <= result.total <= 200 or len(result.hits) != result.total:
+        raise TaskFailure("embed", "file_too_large" if result.total > 200 else "no_readable_text")
+    if any(row.get("doc_id") not in child.source_doc_ids or not isinstance(row.get("content_with_weight"), str)
+           or not row["content_with_weight"].strip() or not isinstance(row.get(field), list) for row in result.hits):
+        raise TaskFailure("embed", "no_readable_text")
+    leaves = [Leaf(str(row["id"]), str(row["doc_id"]), row["content_with_weight"], tuple(row[field])) for row in result.hits]
+    ctx = replace(_task_context(child), embd_id=embedding_id, parser_id="raptor")
+    native = DeepDocClient(deps.settings.deepdoc)
+
+    def summarize(texts: list[str], level: int) -> str:
+        _current(child, control)
+        return deps.embedder.summarize_raptor(texts, level, model_id, ctx, control)
+
+    def embed(texts: list[str]) -> list[list[float]]:
+        _current(child, control)
+        if any(count_tokens(text) > 2048 for text in texts):
+            raise TaskFailure("embed", "chunk_too_long")
+        return deps.embedder.encode(texts, ctx, control, dimension)
+
+    def cluster(vectors: list[list[float]], seed: int) -> list[list[int]]:
+        _current(child, control)
+        release_database_connection()
+        return native.raptor_clusters(vectors, seed)
+
+    try:
+        summaries = build_hierarchy(leaves, child.job_digest, summarize, embed, native=cluster)
+    except RaptorError:
+        raise TaskFailure("embed", "provider_refused") from None
+    _current(child, control)
+    if not summaries:
+        raise TaskFailure("embed", "no_readable_text")
+    rows = []
+    for summary in summaries:
+        row = manual_row(summary.text, doc_id=child.doc_id, kb_id=child.dataset_id, doc_name=ctx.doc_name,
+                         vector=list(summary.vector), enabled=True, token_num=count_tokens(summary.text))
+        row.update(id=summary.chunk_id, task_id=child.task_id, origin_kwd="raptor",
+                   raptor_job_id_kwd=child.job_id, raptor_generation_kwd=child.job_digest,
+                   raptor_level_int=summary.level, raptor_child_ids_kwd=list(summary.child_ids),
+                   raptor_leaf_ids_kwd=list(summary.leaf_ids))
+        rows.append(row)
+    _current(child, control)
+    if store.insert(rows, name, child.dataset_id):
+        raise TaskFailure("index", "index_unavailable")
+    _current(child, control)
     deps.embedder.forget(child.task_id)
     return PipelineResult(tuple(row["id"] for row in rows), len(rows), 0, 0, 0)

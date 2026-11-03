@@ -36,6 +36,7 @@ export interface UploadLimitsView {
 
 /** The dataset's default chunking values (the document dialog and the default chunking dialog load them). */
 export interface DatasetParserConfig {
+  raptor?: boolean;
   autoKeywords?: number;
   autoQuestions?: number;
   autoTags?: boolean;
@@ -111,6 +112,7 @@ export const CREATE_TIMEOUT_MS = 30000;
 function toDataset(raw: unknown): DatasetView {
   const dto = asRecord(raw);
   return {
+    ...(dto.raptor !== undefined ? { raptor: dto.raptor === true } : {}),
     id: text(dto.id),
     name: text(dto.name),
     description: text(dto.description),
@@ -233,6 +235,7 @@ export async function deleteDatasets(ids: string[], tenantId: string): Promise<s
 
 /** The default chunking method and values a save may change. An absent key is no change (the server merges). */
 export type DatasetChunkingInput = Partial<{
+  raptor: boolean;
   autoKeywords: number;
   autoQuestions: number;
   autoTags: boolean;
@@ -264,6 +267,7 @@ export async function updateDatasetChunking(id: string, input: DatasetChunkingIn
   const data: Record<string, unknown> = {};
   if (input.parserId !== undefined) data.parser_id = input.parserId;
   const config: Record<string, unknown> = {};
+  if (input.raptor !== undefined) config.raptor = input.raptor;
   if (input.chunkTokenNum !== undefined) config.chunk_token_num = input.chunkTokenNum;
   if (input.delimiter !== undefined) config.delimiter = input.delimiter;
   if (input.overlappedPercent !== undefined) config.overlapped_percent = input.overlappedPercent;

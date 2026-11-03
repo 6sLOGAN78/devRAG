@@ -28,6 +28,7 @@ from api.db.services.auth_service import Principal
 from api.db.services.chunk_view import chunk_view_fields
 from api.db.services.dialog_records import AssistantRecord
 from api.db.services.knowledgebase_service import VisibleDataset, embedding_dimensions, load_visible_dataset
+from api.db.services.raptor_visibility import visible_summaries
 from api.db.services.llm_service import LLMBundle
 from api.db.services.service_errors import Kind, ServiceError
 from api.db.services.tenant_scope import ActingScope
@@ -240,6 +241,9 @@ def chunk_hit_view(hit: Hit) -> dict[str, Any]:
     }
     if hit.rerank_similarity is not None:
         out["rerank_similarity"] = hit.rerank_similarity
+    if hit.summary_level is not None:
+        out["summary_level"] = hit.summary_level
+        out["source_leaves"] = list(hit.source_leaves)
     return out
 
 
@@ -348,7 +352,8 @@ def _run_retrieval(
     engine = doc_store if doc_store is not None else get_doc_store(settings)
     retriever = Retriever(engine, settings, SynonymSource(settings.redis, settings.retrieval))
     try:
-        result = retriever.retrieve(request, document_exists=_documents_that_exist(params["dataset_ids"]), reranker=rerank)
+        result = retriever.retrieve(request, document_exists=_documents_that_exist(params["dataset_ids"]), reranker=rerank,
+                                    summary_validator=lambda rows: visible_summaries(rows, engine, tenant_id, params["dataset_ids"]))
     except DocStoreError as exc:
         logger.warning("retrieval could not read the index datasets=%s error=%s", ",".join(params["dataset_ids"]), type(exc).__name__)
         raise ServiceError(Kind.UNAVAILABLE, reasons.INDEX_UNAVAILABLE, "the search index is not available, try again shortly") from None

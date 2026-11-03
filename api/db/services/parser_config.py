@@ -46,6 +46,7 @@ class ParserConfig(BaseModel):
     auto_tags: StrictBool = False
     allowed_tags: list[StrictStr] = Field(default_factory=list, max_length=128)
     tag_model_id: StrictStr = Field(default="", max_length=128)
+    raptor: StrictBool = False
 
     @field_validator("allowed_tags")
     @classmethod

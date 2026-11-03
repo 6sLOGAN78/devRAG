@@ -28,7 +28,7 @@ function Figure({ asset, source, showCaption = true }: { asset: DocumentAssetVie
 }
 
 interface Props { source: SourceView | null; open: boolean; onOpenChange: (open: boolean) => void; onCloseAutoFocus?: (event: Event) => void }
-function Body({ source, onCloseAutoFocus }: { source: SourceView; onCloseAutoFocus?: (event: Event) => void }) {
+function Body({ source, onCloseAutoFocus, onLeaf, onBack }: { source: SourceView; onCloseAutoFocus?: (event: Event) => void; onLeaf: (leaf: SourceView) => void; onBack: (() => void) | null }) {
   const { t, i18n } = useTranslation(), passage = useRef<HTMLDivElement>(null);
   const firstPage = source.positions[0]?.page, [page, setPage] = useState(firstPage ?? 1);
   const markdown = /\.(md|markdown)$/i.test(source.docName);
@@ -45,6 +45,8 @@ function Body({ source, onCloseAutoFocus }: { source: SourceView; onCloseAutoFoc
   return <SheetContent side="right" closeLabel={t("source.close")} data-testid="source-drawer" onCloseAutoFocus={onCloseAutoFocus} onOpenAutoFocus={(event) => { event.preventDefault(); passage.current?.focus(); }}>
     <SheetHeader><SheetTitle data-testid="source-title">{t(source.kind === "chat" ? "source.title" : "source.titleHit", { n: source.number })}</SheetTitle><SheetDescription data-testid="source-document" className="break-all">{source.docName}</SheetDescription></SheetHeader>
     <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto pr-1">
+      {onBack ? <Button type="button" variant="ghost" className="self-start" data-testid="source-back-summary" onClick={onBack}>{t("source.backSummary")}</Button> : null}
+      {source.sourceLeaves?.length ? <section data-testid="source-leaves" className="grid gap-2"><h2 className="text-xs font-semibold">{t("source.originalPassages")}</h2><ol className="grid gap-2">{source.sourceLeaves.map((leaf, index) => <li key={leaf.chunkId}><Button type="button" variant="outline" className="h-auto w-full justify-start whitespace-normal text-left" onClick={() => onLeaf(leaf)}>{t("source.openPassage", { n: index + 1 })}: {leaf.content.slice(0, 120)}</Button></li>)}</ol></section> : null}
       {source.audio ? <p data-testid="source-audio">{t("source.audio", {start:source.audio.start.toFixed(2),end:source.audio.end.toFixed(2)})}</p> : null}
       {source.slide ? <p data-testid="source-slide">{t("source.slide", {number:source.slide.number})} · {source.slide.title}</p> : null}
       <dl className="flex flex-wrap gap-4">
@@ -62,5 +64,8 @@ function Body({ source, onCloseAutoFocus }: { source: SourceView; onCloseAutoFoc
   </SheetContent>;
 }
 export function SourceDrawer({ source, open, onOpenChange, onCloseAutoFocus }: Props) {
-  return <Sheet open={open && source !== null} onOpenChange={onOpenChange}>{open && source ? <Body key={`${source.kind}:${source.chunkId}:${source.number}`} source={source} onCloseAutoFocus={onCloseAutoFocus} /> : null}</Sheet>;
+  const [selected, setSelected] = useState<{ parent: string; leaf: SourceView } | null>(null);
+  const leaf = selected && source && selected.parent === source.chunkId ? selected.leaf : null;
+  const active = leaf ?? source;
+  return <Sheet open={open && source !== null} onOpenChange={onOpenChange}>{open && active ? <Body key={`${active.kind}:${active.chunkId}:${active.number}`} source={active} onCloseAutoFocus={onCloseAutoFocus} onLeaf={selected => { if (source) setSelected({ parent: source.chunkId, leaf: selected }); }} onBack={leaf ? () => setSelected(null) : null} /> : null}</Sheet>;
 }

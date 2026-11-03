@@ -23,7 +23,7 @@ export async function searchDataset(input: RetrievalInput): Promise<RetrievalPag
   const d = asRecord(await request({ url: datasetSearchPath, method: "POST", data, timeout: RETRIEVAL_TIMEOUT_MS }, { silent: true }));
   const timing = asRecord(d.timings);
   return {
-    total: count(d.total), hits: Array.isArray(d.chunks) ? d.chunks.map(toSourceHit) : [], rerankApplied: d.rerank_applied === true,
+    total: count(d.total), hits: Array.isArray(d.chunks) ? d.chunks.map(item => toSourceHit(item)) : [], rerankApplied: d.rerank_applied === true,
     timings: { embedMs: finiteScore(timing.embed_ms), searchMs: finiteScore(timing.search_ms), rerankMs: finiteScore(timing.rerank_ms) },
   };
 }

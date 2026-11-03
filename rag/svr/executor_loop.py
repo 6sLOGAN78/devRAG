@@ -29,7 +29,7 @@ from common.settings import Settings
 from rag.queue.queue_base import QueueMessage, TaskQueue
 from rag.svr import healthcheck
 from rag.svr.control import LockLost, ShutdownRequested, TaskCancelled, TaskControl
-from rag.svr.dataset_jobs import run_refresh
+from rag.svr.dataset_jobs import run_raptor, run_refresh
 from rag.svr.embedding import release_database_connection
 from rag.svr.failure import TaskFailure, classify
 from rag.svr.heartbeat import TaskWatcher
@@ -97,7 +97,7 @@ class Executor:
 
     def _handle(self, message: QueueMessage) -> Outcome:
         ingest = self.settings.ingest
-        dataset_task = task_service.task_type_of(message.task_id) == dataset_job_service.TASK_TYPE
+        dataset_task = task_service.task_type_of(message.task_id) in dataset_job_service.JOB_TASK_TYPES
         child = task_service.load_dataset_job_context(message.task_id) if dataset_task else None
         ctx = child if dataset_task else task_service.load_task_context(message.task_id)
         if ctx is None or ctx.digest != message.digest or (child is None and ctx.doc_run != RUN_RUNNING):
@@ -124,7 +124,7 @@ class Executor:
             dataset_job_service.settle_for_child(message.task_id)
             self.queue.ack(message)
             return Outcome.WORKER_LOST
-        dataset_task = task_service.task_type_of(message.task_id) == dataset_job_service.TASK_TYPE
+        dataset_task = task_service.task_type_of(message.task_id) in dataset_job_service.JOB_TASK_TYPES
         ctx = task_service.load_dataset_job_context(message.task_id) if dataset_task else task_service.load_task_context(message.task_id)
         if ctx is None:
             if dataset_task:
@@ -182,7 +182,9 @@ class Executor:
         while not limiter.acquire(timeout=0.5):
             control.check()
         try:
-            return run_refresh(ctx, control, self.deps) if isinstance(ctx, dataset_job_service.DatasetChild) else run_pipeline(ctx, control, self.deps)
+            if isinstance(ctx, dataset_job_service.DatasetChild):
+                return run_raptor(ctx, control, self.deps) if task_service.task_type_of(ctx.task_id) == dataset_job_service.RAPTOR_TASK_TYPE else run_refresh(ctx, control, self.deps)
+            return run_pipeline(ctx, control, self.deps)
         finally:
             limiter.release()
 

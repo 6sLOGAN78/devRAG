@@ -10,7 +10,7 @@ _USER_FIELDS = frozenset({"id", "role", "content", "created_at"})
 _ASSISTANT_FIELDS = _USER_FIELDS | {"reference", "finish", "usage", "latency_ms", "empty", "feedback"}
 _CHUNK_FIELDS = frozenset({
     "index", "chunk_id", "doc_id", "doc_name", "dataset_id", "content", "positions", "page_sizes", "tables",
-    "similarity", "term_similarity", "vector_similarity", "rerank_similarity",
+    "similarity", "term_similarity", "vector_similarity", "rerank_similarity", "summary_level", "source_leaves",
 })
 _DOC_FIELDS = frozenset({"doc_id", "doc_name", "count"})
 
@@ -26,6 +26,18 @@ def redact_messages(messages: list[dict[str, Any]], tenant_id: str, user_id: str
     }
     known = live_datasets(ids)
     visible = {key for key in ids if key in known and openable(known[key], tenant_id, user_id)}
+    summary_chunks = [chunk for message in messages if isinstance(message.get("reference"), dict)
+                      for chunk in (message["reference"].get("chunks") or [])
+                      if isinstance(chunk, dict) and chunk.get("dataset_id") in visible and chunk.get("summary_level") is not None]
+    if summary_chunks:
+        try:
+            from api.db.services.raptor_visibility import current_reference_summaries
+
+            current_summaries = current_reference_summaries(summary_chunks, tenant_id)
+        except Exception:  # noqa: BLE001 - an unavailable index must hide stale derived content
+            current_summaries = {}
+    else:
+        current_summaries = {}
     result: list[dict[str, Any]] = []
     for message in messages:
         allowed = _ASSISTANT_FIELDS if message.get("role") == "assistant" else _USER_FIELDS
@@ -37,8 +49,10 @@ def redact_messages(messages: list[dict[str, Any]], tenant_id: str, user_id: str
             for chunk in reference.get("chunks") or []:
                 if not isinstance(chunk, dict):
                     continue
-                if chunk.get("dataset_id") in visible:
+                if chunk.get("dataset_id") in visible and (chunk.get("summary_level") is None or chunk.get("chunk_id") in current_summaries):
                     view = {key: chunk[key] for key in _CHUNK_FIELDS if key in chunk}
+                    if chunk.get("summary_level") is not None:
+                        view["source_leaves"] = current_summaries[chunk["chunk_id"]]
                     if "tables" in view:
                         view["tables"] = table_views(view["tables"])
                     chunks.append(view)

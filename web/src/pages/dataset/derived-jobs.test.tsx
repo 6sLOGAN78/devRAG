@@ -17,12 +17,17 @@ const detail = { ...DATASET, permission: "team", parserConfig: { chunkTokenNum: 
   language: "English", parserId: "naive", createTime: 1, updateTime: 1, uploadLimits: null } as DatasetDetailView;
 
 server.use(({ server: state, method, url, config, ok }) => {
+  if (method === "PUT" && url === `/api/v1/datasets/${DATASET_ID}`) {
+    expect(JSON.parse(String(config.data))).toEqual({ parser_config: { raptor: true } });
+    return ok({ ...DATASET, parser_config: { raptor: true } });
+  }
   if (!url.startsWith(URL)) return undefined;
   const jobs = state.areaState<Array<Record<string, unknown>>>("jobs", () => []);
   if (method === "GET" && url === URL) return ok({ items: jobs });
   if (method === "POST" && url === URL) {
-    expect(JSON.parse(String(config.data))).toEqual({ type: "enrich" });
-    const job = { id: JOB_ID, type: "enrich", run: "1", total: 2, completed: 0, failed: 0, progress: 0, created_at: 1, updated_at: 1 };
+    const type = JSON.parse(String(config.data)).type;
+    expect(["enrich", "raptor"]).toContain(type);
+    const job = { id: JOB_ID, type, run: "1", total: 2, completed: 0, failed: 0, progress: 0, created_at: 1, updated_at: 1 };
     jobs.unshift(job);
     return ok(job);
   }
@@ -67,4 +72,14 @@ it("hides held old workspace jobs after the active workspace changes", async () 
   act(() => release());
   await waitFor(() => expect(screen.queryByTestId("dataset-derived-jobs")).toBeNull());
   expect(screen.queryByText("Enrichment refresh")).toBeNull();
+});
+
+it("enables RAPTOR and starts a source-linked summary run", async () => {
+  mount();
+  const user = userEvent.setup();
+  await user.click(screen.getByTestId("dataset-jobs-open"));
+  await user.click(screen.getByTestId("dataset-raptor-start"));
+  await waitFor(() => expect(server.callsTo("PUT", `/api/v1/datasets/${DATASET_ID}`)).toHaveLength(1));
+  await waitFor(() => expect(server.callsTo("POST", URL)).toHaveLength(1));
+  expect(await screen.findByText("RAPTOR summaries")).toBeInTheDocument();
 });

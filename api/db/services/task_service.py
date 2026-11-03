@@ -265,7 +265,7 @@ def watch_state(task_id: str) -> tuple[bool, str | None]:
         task = Task.select(Task.doc_id, Task.task_type).where(Task.id == task_id).first()
         if task is None:
             return False, None
-        if task.task_type == "dataset_enrich":
+        if task.task_type in {"dataset_enrich", "dataset_raptor"}:
             return True, "1" if load_dataset_job_context(task_id) is not None else None
         doc = Document.select(Document.run).where(Document.id == task.doc_id).first()
     return True, (doc.run or "0") if doc is not None else None

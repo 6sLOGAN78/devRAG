@@ -50,12 +50,18 @@ SELECT_FIELDS = [
     "slide_title_kwd",
     "audio_start_flt",
     "audio_end_flt",
+    "origin_kwd",
+    "raptor_job_id_kwd",
+    "raptor_generation_kwd",
+    "raptor_level_int",
+    "raptor_leaf_ids_kwd",
 ]
 MAX_TOP_K = 10000
 FUSIONS = ("weighted_sum", "rrf")
 
 Reranker = Callable[[str, list[str]], list[float]]
 DocumentExists = Callable[[set[str]], Iterable[str]]
+SummaryValidator = Callable[[list[dict[str, Any]]], dict[str, list[dict[str, Any]]]]
 
 
 @dataclass(frozen=True)
@@ -104,6 +110,8 @@ class Hit:
     slide_title: str = ""
     audio_start: float | None = None
     audio_end: float | None = None
+    summary_level: int | None = None
+    source_leaves: tuple[dict[str, Any], ...] = ()
 
 
 @dataclass(frozen=True)
@@ -122,6 +130,7 @@ class _Candidate:
     vsim: float = 0.0
     sim: float = 0.0
     rerank: float | None = None
+    source_leaves: tuple[dict[str, Any], ...] = ()
 
 
 def _finite(value: Any) -> float:
@@ -140,7 +149,8 @@ class Retriever:
         self._builder = QueryBuilder(synonyms, self._settings)
 
     # --- public --------------------------------------------------------------------------------------------------
-    def retrieve(self, request: RetrievalRequest, *, document_exists: DocumentExists | None = None, reranker: Reranker | None = None) -> RetrievalResult:
+    def retrieve(self, request: RetrievalRequest, *, document_exists: DocumentExists | None = None, reranker: Reranker | None = None,
+                 summary_validator: SummaryValidator | None = None) -> RetrievalResult:
         started = time.monotonic()
         plan = self._builder.build(request.question)
         if plan.empty or request.doc_ids is not None and not request.doc_ids:
@@ -148,6 +158,13 @@ class Retriever:
         pool = self._pool(request, plan)
         if document_exists is not None and pool:
             pool = self._prune(pool, document_exists)
+        if pool:
+            summaries = [candidate.row for candidate in pool if candidate.row.get("origin_kwd") == "raptor"]
+            if summaries:
+                visible = summary_validator(summaries) if summary_validator is not None else {}
+                pool = [candidate for candidate in pool if candidate.row.get("origin_kwd") != "raptor" or str(candidate.row.get("id")) in visible]
+                for candidate in pool:
+                    candidate.source_leaves = tuple(visible.get(str(candidate.row.get("id")), ()))
         if pool:
             self._score(request, plan, pool)
         search_ms = (time.monotonic() - started) * 1000.0
@@ -285,4 +302,6 @@ def _to_hit(candidate: _Candidate) -> Hit:
         audio_start=row.get("audio_start_flt"),
         audio_end=row.get("audio_end_flt"),
         table_features=row.get("table_features_with_weight") if isinstance(row.get("table_features_with_weight"), str) else None,
+        summary_level=row.get("raptor_level_int") if type(row.get("raptor_level_int")) is int and 1 <= row["raptor_level_int"] <= 3 else None,
+        source_leaves=candidate.source_leaves,
     )

@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Phase6 plan23 Dataset enrichment jobs verified; continuing24 RAPTOR
-last_updated: "2026-11-02"
-last_activity: 2026-11-02 -- Dataset enrichment jobs verified; continuing24 RAPTOR
+stopped_at: Phase6 plan24 RAPTOR summaries verified; continuing25 derived deletion and download
+last_updated: "2026-11-03"
+last_activity: 2026-11-03 -- RAPTOR summaries and original citations verified; continuing25
 progress:
   total_phases: 8
   completed_phases: 4
   total_plans: 176
-  completed_plans: 169
-  percent: 96
+  completed_plans: 170
+  percent: 97
 ---
 
 # Project State
@@ -21,18 +21,18 @@ progress:
 See: .planning/PROJECT.md (updated 2026-10-05)
 
 **Core value:** A user can upload a document into a knowledge base and get an accurate, cited answer to a question about it, end-to-end through the real pipeline (parse, chunk, embed, index, hybrid retrieve, rerank, generate), with no mocked stages.
-**Current focus:** Phase 6 execution — 06-24 RAPTOR summaries
+**Current focus:** Phase 6 execution — 06-25 derived deletion and download
 
 ## Current Position
 
 Phase: 6 (deep-parsing-and-chunking-breadth) — EXECUTING
-Plan: 24 of 30; plans01–23 complete; RAPTOR summaries next
-Status: Plans01–23 complete; R232..254 recorded. Dataset enrichment marked unit2616/8 existing skips, web2195, integration5, route isolation24, leak sweep6, rebuilt Chrome2, CI7. Local ASR3/3 retained; zero external paid calls.
+Plan: 25 of 30; plans01–24 complete; derived deletion and authorized download next
+Status: Plans01–24 complete; R232..255 recorded. RAPTOR real native and MySQL/ES/local-provider integration3, rebuilt Chrome job/citation1, route isolation16, leak sweep6, frontend2197, CI7. Local ASR3/3 retained; zero external paid calls.
 Prior checks: Phase5 UAT5/6 passed (two user answer judgments and delegated screenshot/Chinese/footprint review). Final Phase5 acceptance remains pending; Phase4 B36 remains separately deferred. Prior paid evidence retained.
-Current checkpoint:23 verified; real dataset refresh and cancel, scoped status and inspected job screenshot. Continue24; existing acquisition/publication approvals persist; no ASR replay.
-Last activity: 2026-11-02
+Current checkpoint:24 verified; bounded recursive summary generation, current source validation, and inspected original citation screenshot. Continue25; existing acquisition/publication approvals persist; no ASR replay.
+Last activity: 2026-11-03
 
-Progress: 169/176 currently planned execution plans complete (96%); Phase6 23/30 complete.
+Progress: 170/176 currently planned execution plans complete (97%); Phase6 24/30 complete.
 
 ## Performance Metrics
 

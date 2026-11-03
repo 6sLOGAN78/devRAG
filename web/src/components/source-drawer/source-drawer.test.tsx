@@ -35,6 +35,15 @@ describe("source drawer", () => {
   it("finds a sparse reference by index and uses a one-based label", () => { expect(source()).toMatchObject({ kind: "chat", number: 4, content: "A saved passage." }); expect(sourceFromReference(toReference({ chunks: [raw()] }), 0)).toBeNull(); });
   it("does not normalize an unavailable reference into an openable source", () => expect(sourceFromReference(toReference({ chunks: [{ index: 3, unavailable: true }] }), 3)).toBeNull());
   it("normalizes a retrieval hit with the supplied rank", () => expect(sourceFromHit(toSourceHit(raw()), 7)).toMatchObject({ kind: "hit", number: 7, docName: "report.pdf" }));
+  it("opens an original RAPTOR leaf and returns to the summary", () => {
+    const leaf = raw({ chunk_id: "original-leaf", content: "Original lighthouse height is 52 metres." });
+    show(source({ summary_level: 1, source_leaves: [leaf], content: "Summary of the lighthouse.", positions: [] }));
+    expect(screen.getByTestId("source-leaves")).toHaveTextContent("Original lighthouse height is 52 metres.");
+    fireEvent.click(screen.getByRole("button", { name: /Open passage 1/ }));
+    expect(screen.getByTestId("source-passage")).toHaveTextContent("Original lighthouse height is 52 metres.");
+    fireEvent.click(screen.getByTestId("source-back-summary"));
+    expect(screen.getByTestId("source-passage")).toHaveTextContent("Summary of the lighthouse.");
+  });
   it("formats present scores to two decimals and omits null", () => { show(); expect(screen.getByTestId("source-score-overall")).toHaveTextContent("0.80"); expect(screen.getByTestId("source-score-term")).toHaveTextContent("0.60"); expect(screen.queryByTestId("source-score-rerank")).toBeNull(); });
   it("omits non-finite scores", () => { show(source({ similarity: NaN, term_similarity: Infinity, vector_similarity: null })); expect(screen.queryByTestId("source-score-overall")).toBeNull(); expect(screen.queryByText("NaN")).toBeNull(); });
   it("focuses the passage on open", () => { show(); expect(screen.getByRole("region", { name: "Passage text" })).toHaveFocus(); });

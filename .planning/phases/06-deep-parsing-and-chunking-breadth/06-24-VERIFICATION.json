@@ -1,0 +1,116 @@
+{
+  "recorded_at": "2026-11-03T14:22:21.214906+00:00",
+  "plan": "06-24",
+  "requirements": [
+    "CHUNK-26",
+    "ING-18"
+  ],
+  "new_unapproved_packages": 0,
+  "approved_native_pins_installed": 9,
+  "paid_external_calls": 0,
+  "local_asr_submissions_this_plan": 0,
+  "local_asr_remaining": 0,
+  "human_uat_approved": false,
+  "phase_gate_complete": false,
+  "initial_red": "One intended behavioral failure: run_raptor callable absent; no import or fixture error.",
+  "evidence": {
+    "red": {
+      "log": "ragflow-logs/phase6-24-red.log",
+      "sha256": "4926946fefec19472c01152bd9590a233e9a26dacaefe2b18fd6f37579bc8341"
+    },
+    "focused_unit": {
+      "log": "ragflow-logs/phase6-24-unit-focused.log",
+      "sha256": "dc7cbfcf7c363b799709bf93ff77593b767c1bcda77d4ad852197a2938b6d511"
+    },
+    "marked_unit": {
+      "log": "ragflow-logs/phase6-24-unit-final.log",
+      "sha256": "05912ec990e4652c8c88c77e9101ea2aeb65f5ab578d7b7724c543ccfa0b5693"
+    },
+    "records": {
+      "log": "ragflow-logs/phase6-24-records.log",
+      "sha256": "ad430bcd751b836a91fab4ff65c168e7e4f252c79243c40745308b866b554cb7"
+    },
+    "integration": {
+      "log": "ragflow-logs/phase6-24-integration-final.log",
+      "sha256": "edb7f69a302587b2065eed81dd2236f3129c22d0a41f1652aba2e2f30eefcd07"
+    },
+    "previous_job_regression": {
+      "log": "ragflow-logs/phase6-24-plan23-regression.log",
+      "sha256": "463d03c172fe7595ed700be9dc450b7db1c702f209c9092d2b0a8c525da0bb62"
+    },
+    "browser": {
+      "log": "ragflow-logs/phase6-24-e2e-final.log",
+      "sha256": "afc72383c4f0a0f27659a89a5b76412f14ba4e8c16bbd69d52e88ea6d364dd77"
+    },
+    "route_isolation": {
+      "log": "ragflow-logs/phase6-24-isolation-jobs.log",
+      "sha256": "73c462914d3fe3b5722d7b9f85445db4d13e2e5ed4fb224bd90c945f6e55e151"
+    },
+    "leak_sweep": {
+      "log": "ragflow-logs/phase6-24-leak-full.log",
+      "sha256": "be35e40506dbb11ab138fc435c6acb6644ff91e2c16e386e58607ded889c0a15"
+    },
+    "frontend": {
+      "log": "ragflow-logs/phase6-24-web-all.log",
+      "sha256": "81376fcdd8234cfc03ab90c492518441de04f4e120a8f5648e448f462f699d92"
+    },
+    "frontend_build": {
+      "log": "ragflow-logs/phase6-24-web-build.log",
+      "sha256": "ba26bc04d625f8581ae8698642abb62b92b7f63c369c78461ad5d93e708445d9"
+    },
+    "ci_release": {
+      "log": "ragflow-logs/phase6-24-ci-final.log",
+      "sha256": "5891a1650d0383b0f820d1ea237e27b077fe1719d28c4db2a623ecea4cf41a40"
+    },
+    "deepdoc_build": {
+      "log": "ragflow-logs/phase6-24-native-route-build.log",
+      "sha256": "efcaf4c48bf9e376bb6f08d5f53fc8d1c88443b7af178a5b02cc82e4a9506d3f"
+    },
+    "app_build": {
+      "log": "ragflow-logs/phase6-24-app-build.log",
+      "sha256": "947dc5738d59ad981cdf903cc8f095313e1b50c3f3032d30db7bf61f51de0095"
+    }
+  },
+  "results": {
+    "focused_unit": "6 passed",
+    "marked_unit": "2622 passed, 8 existing skipped, 51 deselected",
+    "records": "5 passed",
+    "integration": "3 passed, real native service/MySQL/Elasticsearch/local HTTP provider",
+    "previous_job_regression": "5 passed",
+    "browser": "1 passed, rebuilt Chrome job and original citation",
+    "route_isolation": "16 passed",
+    "leak_sweep": "6 passed",
+    "frontend": "2197 passed, 114 files",
+    "frontend_build": "TypeScript and production build passed",
+    "ci_release": "7/7 gates passed"
+  },
+  "original_fixture": {
+    "source": {
+      "path": "test/fixtures/phase6/raptor-original.txt",
+      "sha256": "b4cd097f09562cdd380e865c2b37592ddacf77869ddb06f0db99ab5bccd01c0d"
+    },
+    "annotation": {
+      "path": "test/fixtures/phase6/raptor-original-annotation.json",
+      "sha256": "ff8754920ab275fef2fb974c6311d1da553f252dbcfec520fe84f446ed09a952"
+    }
+  },
+  "screenshots": {
+    "job_done": {
+      "path": "output/playwright/phase6-review/raptor-job.png",
+      "sha256": "2d62e158ec0d75c877f092273e41178145a9b72c78682f9195117eebdfce0b68",
+      "reviewer": "assistant, actual Chrome"
+    },
+    "original_citation": {
+      "path": "output/playwright/phase6-review/raptor-original-citation.png",
+      "sha256": "54c8f162f591150bee7602ae6689a18e130d87d915434829bb23665ea00e99a6",
+      "reviewer": "assistant, actual Chrome"
+    }
+  },
+  "images": {
+    "app": "sha256:bca9d78f5da519900b4d55e30ac6bc951f0e6f7e42ecd1a7ee4eb2a8e3f0e7d5",
+    "task-executor-1": "sha256:bca9d78f5da519900b4d55e30ac6bc951f0e6f7e42ecd1a7ee4eb2a8e3f0e7d5",
+    "task-executor-2": "sha256:bca9d78f5da519900b4d55e30ac6bc951f0e6f7e42ecd1a7ee4eb2a8e3f0e7d5",
+    "deepdoc": "sha256:b046a4f2aa40a62e44a532ec54f042668346b838c4523a1bd6332a0f18857aac"
+  },
+  "notes": "No REQUIREMENTS checkbox changed. Phase5 human acceptance, Phase4 B36 and Phase6 final gate remain open."
+}

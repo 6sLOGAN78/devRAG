@@ -95,6 +95,19 @@ class DeepDocClient:
                 raise NativeUnavailable()
         return data
 
+    def raptor_clusters(self, vectors: list[list[float]], seed: int) -> list[list[int]]:
+        """Use the isolated approved native UMAP/GMM runtime for larger corpora."""
+        if not 9 <= len(vectors) <= 256:
+            raise NativeUnavailable()
+        payload = json.dumps({"vectors": vectors}, separators=(",", ":"), allow_nan=False).encode()
+        if len(payload) > 12 * 1024 * 1024:
+            raise FileTooLarge()
+        data = self._request("/v1/raptor/cluster", payload, {"seed": seed})
+        groups = data.get("groups")
+        if not isinstance(groups, list):
+            raise NativeUnavailable()
+        return groups
+
     def ocr_image(self, content: bytes) -> dict:
         from deepdoc.ocr_result import validate_result
         from deepdoc.model_runtime import NativeError

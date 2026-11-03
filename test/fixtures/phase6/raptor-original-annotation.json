@@ -1,0 +1,8 @@
+{
+  "origin": "Original fictional text written for Phase 6 RAPTOR verification; no external source or licence dependency.",
+  "source": "raptor-original.txt",
+  "paragraphs": 6,
+  "facts": {"lighthouse_height_metres": 52, "calibration_offset_units": 73},
+  "operators": ["Mira", "Jonas"],
+  "expected": "At least two distinct recursive summary levels retain all six original leaf IDs and cite the indexed passages."
+}

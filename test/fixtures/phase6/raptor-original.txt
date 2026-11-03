@@ -1,0 +1,11 @@
+Inspection A records the fictional lighthouse height as 52 metres and the calibration offset as 73 units. Operator Mira signed the morning log.
+
+Inspection B independently repeats the lighthouse height of 52 metres and the calibration offset of 73 units. Operator Jonas checked the scale.
+
+Inspection C confirms the lighthouse height remains 52 metres and the calibration offset remains 73 units after a dry run.
+
+Inspection D records the same 52 metre lighthouse and 73 unit calibration offset during the afternoon review.
+
+Inspection E notes that the fictional lighthouse height is 52 metres and its calibration offset is 73 units, with no change requested.
+
+Inspection F closes the series: lighthouse height 52 metres, calibration offset 73 units, and all six inspection notes retained.

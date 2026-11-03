@@ -69,6 +69,8 @@ def create_app(runtime: OCRRuntime, token: str, *, max_bytes: int = 100 * 1024 *
         content = files["file"].read(max_bytes + 1)
         if len(content) > max_bytes:
             return jsonify(schema_version=1, error="input_too_large"), 413
+        if operation == "cluster" and len(content) > 12 * 1024 * 1024:
+            return jsonify(schema_version=1, error="input_too_large"), 413
         if not content:
             return jsonify(schema_version=1, error="invalid_image"), 400
         if inflight is not None and not inflight.done():
@@ -91,7 +93,22 @@ def create_app(runtime: OCRRuntime, token: str, *, max_bytes: int = 100 * 1024 *
                     raise ValueError
             except (ValueError, RecursionError):
                 return jsonify(schema_version=1, error="invalid_options"), 400
-            if operation == "asr":
+            if operation == "cluster":
+                if set(options) != {"seed"}:
+                    return jsonify(schema_version=1, error="invalid_options"), 400
+                try:
+                    source = json.loads(content)
+                    if not isinstance(source, dict) or set(source) != {"vectors"}:
+                        raise ValueError
+                except (ValueError, RecursionError):
+                    return jsonify(schema_version=1, error="invalid_request"), 400
+                from deepdoc.raptor import cluster_vectors
+
+                def cluster_call():
+                    return {"schema_version": 1, "groups": cluster_vectors(source["vectors"], options["seed"])}
+
+                call, args = cluster_call, ()
+            elif operation == "asr":
                 if set(options) - {"language", "probe"}:
                     return jsonify(schema_version=1, error="invalid_options"), 400
                 call = getattr(runtime, "process_asr", None)
@@ -99,7 +116,10 @@ def create_app(runtime: OCRRuntime, token: str, *, max_bytes: int = 100 * 1024 *
                 call = getattr(runtime, "process_pdf", None)
             if call is None:
                 return jsonify(schema_version=1, error="capability_unavailable"), 503
-            args = (content, options) if operation == "asr" else (operation, content, options)
+            if operation == "asr":
+                args = (content, options)
+            elif operation != "cluster":
+                args = (operation, content, options)
         inflight = asyncio.get_running_loop().run_in_executor(executor, call, *args)
         # Retrieving exceptions prevents unhandled-future logs if the client goes away.
         inflight.add_done_callback(lambda future: future.exception() if not future.cancelled() else None)
@@ -160,6 +180,10 @@ def create_app(runtime: OCRRuntime, token: str, *, max_bytes: int = 100 * 1024 *
     @app.post("/v1/page-image")
     async def page_image():
         return await execute("page-image")
+
+    @app.post("/v1/raptor/cluster")
+    async def cluster():
+        return await execute("cluster")
 
     return app
 

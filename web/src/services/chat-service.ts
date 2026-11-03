@@ -15,6 +15,8 @@ export interface AssistantView {
 export interface AssistantDetail extends AssistantView { icon: string; membersWithChats: number }
 export interface SessionView { id: string; chatId: string; name: string; createTime: number; updateTime: number }
 export interface SourceHit {
+  summaryLevel?: number;
+  sourceLeaves?: SourceHit[];
   tables?: TableView[];
   slide?: SlideView;
   audio?: AudioView;
@@ -67,10 +69,12 @@ export function toSession(raw: unknown): SessionView {
   return { id: text(d.id), chatId: text(d.chat_id), name: text(d.name), createTime: count(d.create_time), updateTime: count(d.update_time) };
 }
 /** Retrieval hits and reference passages share the same explicit source fields. */
-export function toSourceHit(raw: unknown): SourceHit {
+export function toSourceHit(raw: unknown, includeLeaves = true): SourceHit {
   const d = asRecord(raw);
   const sizes = Object.entries(asRecord(d.page_sizes)).filter(([, v]) => Array.isArray(v) && v.length === 2 && v.every((n) => typeof n === "number" && Number.isFinite(n)));
   return {
+    ...(typeof d.summary_level === "number" && Number.isSafeInteger(d.summary_level) && d.summary_level >= 1 && d.summary_level <= 3 ? { summaryLevel: d.summary_level } : {}),
+    ...(includeLeaves && Array.isArray(d.source_leaves) ? { sourceLeaves: d.source_leaves.slice(0, 200).map(item => toSourceHit(item, false)).filter(item => item.chunkId && item.docId && item.datasetId) } : {}),
     ...(audioOf(d.audio) ? {audio:audioOf(d.audio)} : {}),
     ...(slideOf(d.slide) ? {slide:slideOf(d.slide)} : {}),
     ...(d.tables !== undefined ? { tables: tableViewsOf(d.tables) } : {}),

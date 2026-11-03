@@ -5,6 +5,8 @@ import type { TableView } from "@/services/table-features";
 import type { ChunkPosition } from "@/services/chunk-service";
 
 export interface SourceView {
+  summaryLevel?: number;
+  sourceLeaves?: SourceView[];
   tables?: TableView[];
   slide?: SlideView;
   audio?: AudioView;
@@ -14,6 +16,8 @@ export interface SourceView {
 }
 function normalize(hit: SourceHit, kind: SourceView["kind"], number: number): SourceView {
   return { kind, number, chunkId: hit.chunkId, docId: hit.docId, docName: hit.docName, datasetId: hit.datasetId, content: hit.content,
+    ...(hit.summaryLevel ? { summaryLevel: hit.summaryLevel } : {}),
+    ...(hit.sourceLeaves ? { sourceLeaves: hit.sourceLeaves.map((leaf, index) => normalize(leaf, kind, index + 1)) } : {}),
     ...(hit.audio ? {audio:hit.audio} : {}),
     ...(hit.slide ? {slide:hit.slide} : {}),
     ...(hit.tables !== undefined ? { tables: hit.tables } : {}),
