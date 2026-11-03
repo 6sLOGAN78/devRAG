@@ -73,9 +73,10 @@ def test_blueprint_urls_match_python_exact_routes():
     from api.apps.restful_apis.dataset_api import DATASETS
     from api.apps.restful_apis.document_api import UPLOAD
     from api.apps.restful_apis.models_api import MODELS, MODELS_DEFAULT
+    from api.apps.restful_apis.parse_api import BACKENDS
     from api.apps.restful_apis.provider_api import PROVIDERS
 
-    other_blueprints = {PROVIDERS, MODELS, MODELS_DEFAULT, DATASETS, UPLOAD, CHATS, COMPLETIONS}
+    other_blueprints = {PROVIDERS, MODELS, MODELS_DEFAULT, BACKENDS, DATASETS, UPLOAD, CHATS, COMPLETIONS}
     assert set(HEALTH_PATHS) == expected - other_blueprints
     assert other_blueprints <= expected
 

@@ -29,6 +29,7 @@ parse_bp = Blueprint("parse", __name__)
 
 # Identical to the endpoint row in conf/routes.yaml (Quart spells a path parameter <name>, the registry {name}).
 PARSE = "/api/v1/datasets/<dataset_id>/documents/parse"
+BACKENDS = "/api/v1/parser-backends"
 
 AUTHORIZE_TIMEOUT_SECONDS = 10.0
 # The service waits up to 30 s for the dataset lock and the index engine has its own deadline; the handler waits longer so the typed errors win.
@@ -61,8 +62,24 @@ class ParseEnvelope(BaseModel):
     data: ParseResult
 
 
+class BackendAvailability(BaseModel):
+    available: list[str]
+
+
+class BackendEnvelope(BaseModel):
+    code: int
+    message: str
+    data: BackendAvailability
+
+
 def _settings() -> Settings:
     return current_app.extensions["ragflow_settings"]
+
+
+@document_response(BackendEnvelope, 200)
+async def parser_backends() -> Response:
+    """Expose finite configured names only; provider addresses and tokens stay operator-side."""
+    return json_result({"available": list(_settings().deepdoc.configured_pdf_backends())})
 
 
 @validate_request(ParseBody)
@@ -93,3 +110,4 @@ async def parse_documents(dataset_id: str, data: ParseBody) -> Response:
 
 
 parse_bp.add_url_rule(PARSE, endpoint="parse_documents", view_func=parse_documents, methods=["POST"])
+parse_bp.add_url_rule(BACKENDS, endpoint="parser_backends", view_func=parser_backends, methods=["GET"])

@@ -183,6 +183,22 @@
         "title": "AudioView",
         "type": "object"
       },
+      "BackendAvailability": {
+        "properties": {
+          "available": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Available",
+            "type": "array"
+          }
+        },
+        "required": [
+          "available"
+        ],
+        "title": "BackendAvailability",
+        "type": "object"
+      },
       "BuiltinPipelineTemplate": {
         "additionalProperties": false,
         "properties": {
@@ -6214,6 +6230,45 @@
           }
         },
         "summary": "Set or clear the default chat and embedding model. Only the slots named in the body change."
+      }
+    },
+    "/api/v1/parser-backends": {
+      "get": {
+        "description": "",
+        "operationId": "get_parser_backends",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "title": "Code",
+                      "type": "integer"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/BackendAvailability"
+                    },
+                    "message": {
+                      "title": "Message",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "message",
+                    "data"
+                  ],
+                  "title": "BackendEnvelope",
+                  "type": "object"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "summary": "Expose finite configured names only; provider addresses and tokens stay operator-side."
       }
     },
     "/api/v1/pipelines": {

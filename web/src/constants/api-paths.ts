@@ -78,6 +78,8 @@ export function providerInstancePath(provider: string, instance: string): string
 export const modelsPath = resolve("python", "/api/v1/models");
 /** The workspace's default chat and embedding model (GET; PATCH arrives with the defaults card). */
 export const modelsDefaultPath = resolve("python", "/api/v1/models/default");
+/** Configured PDF parser names only; endpoint addresses and credentials are never returned. */
+export const parserBackendsPath = resolve("python", "/api/v1/parser-backends");
 
 /** Datasets of one workspace (GET list, POST create, DELETE a batch). The workspace goes in `tenant_id`. */
 export const datasetsPath = resolve("python", "/api/v1/datasets");

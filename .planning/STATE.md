@@ -3,9 +3,9 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Phase6 plan25 derived deletion and download verified; continuing26 optional PDF backends
+stopped_at: Phase6 plan26 optional Docling/MinerU adapters locally verified; real provider gate pending
 last_updated: "2026-11-04"
-last_activity: 2026-11-04 -- derived deletion and artifact download verified; continuing26
+last_activity: 2026-11-04 -- Plan26 local adapters/API/UI and missing-provider flow verified; real provider URLs pending
 progress:
   total_phases: 8
   completed_phases: 4
@@ -27,9 +27,9 @@ See: .planning/PROJECT.md (updated 2026-10-05)
 
 Phase: 6 (deep-parsing-and-chunking-breadth) — EXECUTING
 Plan: 26 of 30; plans01–25 complete; optional Docling and MinerU backend selection next
-Status: Plans01–25 complete; R232..256 recorded. Derived artifact and deletion real MySQL/MinIO/ES/local-provider integration6, rebuilt Chrome download/deletion/history1, route isolation17, leak sweep6, frontend2198, CI7. Local ASR3/3 retained; zero external paid calls.
+Status: Plans01–25 complete; R232..256 recorded. Plan26 local Docling/MinerU adapters, backend availability API and UI are implemented with synthetic dialect tests and live missing-provider refusal. Actual Docling/MinerU service URLs and versions are pending; no real adapter parse is claimed. Local ASR3/3 retained; zero external paid calls.
 Prior checks: Phase5 UAT5/6 passed (two user answer judgments and delegated screenshot/Chinese/footprint review). Final Phase5 acceptance remains pending; Phase4 B36 remains separately deferred. Prior paid evidence retained.
-Current checkpoint:25 verified; derived-only deletion, authorized artifact download and bounded audit history. Continue26; existing acquisition/publication approvals persist; no ASR replay. The 2026-11-04 reboot reset vm.max_map_count to 65530 and live stack restoration was requested.
+Current checkpoint:26 implementation in progress; see 06-26-CHECKPOINT.md. Full unit2652/8 existing skips, frontend2201/114 files, Go internal, generated and CI7 passed; real DeepDoc refusal and Chrome missing-provider flow passed after the final app/DeepDoc rebuild. Recreated two-worker stack healthy. Real provider one-page calls await operator endpoints and exact versions. Host vm.max_map_count and installed persistent sysctl file are both verified at 262144.
 Last activity: 2026-11-04
 
 Progress: 171/176 currently planned execution plans complete (97%); Phase6 25/30 complete.

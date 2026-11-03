@@ -109,8 +109,8 @@ class DeepDocClient:
         return groups
 
     def ocr_image(self, content: bytes) -> dict:
-        from deepdoc.ocr_result import validate_result
         from deepdoc.model_runtime import NativeError
+        from deepdoc.ocr_result import validate_result
         data = self._request("/v1/ocr", content, None)
         try:
             validate_result(data)
@@ -133,9 +133,11 @@ class DeepDocClient:
     def parse(self, source: SourceFile, report: ParseReport, *, page_range: tuple[int, int] | None, limits: ParseLimits | None, parser_config: dict[str, Any] | None = None) -> list[ParsedBlock]:
         limit = limits or ParseLimits()
         layout = (parser_config or {}).get("layout_recognize", False)
-        if type(layout) is not bool and layout != "deepdoc":
+        if type(layout) is not bool and layout not in {"deepdoc", "docling", "mineru"}:
             raise NativeUnavailable()
         options = {"max_pages": limit.max_pages, "max_text_bytes": limit.max_text_bytes, "layout": layout is not False}
+        if layout in {"docling", "mineru"}:
+            options["backend"] = layout
         if page_range is not None:
             options.update(start=page_range[0], end=page_range[1])
         data = self._request("/v1/parse", source.path, options)
@@ -147,9 +149,11 @@ class DeepDocClient:
             if type(total) is not int or type(missing) is not int or not 0 <= missing <= total <= limit.max_pages:
                 raise ValueError
             backend, regions = raw_report.get("layout_backend"), raw_report.get("layout_regions", 0)
-            if backend not in (None, "deepdoc-onnx") or type(regions) is not int or not 0 <= regions <= 300 * total:
+            expected_backend = layout if layout in {"docling", "mineru"} else "deepdoc-onnx"
+            region_limit = 100000 if expected_backend in {"docling", "mineru"} else 300 * total
+            if backend not in (None, expected_backend) or type(regions) is not int or not 0 <= regions <= region_limit:
                 raise ValueError
-            if options["layout"] and backend != "deepdoc-onnx" and total:
+            if options["layout"] and backend != expected_backend and total:
                 raise ValueError
             blocks, size = [], 0
             for raw in raw_blocks:

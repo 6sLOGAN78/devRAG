@@ -5,7 +5,6 @@ from __future__ import annotations
 import asyncio
 import hmac
 import json
-import math
 import os
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
@@ -15,13 +14,11 @@ from quart import Quart, jsonify, request
 from werkzeug.exceptions import BadRequest, RequestEntityTooLarge
 
 from deepdoc.model_runtime import NativeError
+from deepdoc.ocr_result import validate_result
 
 
 class OCRRuntime(Protocol):
     def ocr(self, content: bytes) -> dict[str, Any]: ...
-
-
-from deepdoc.ocr_result import validate_result
 
 
 def create_app(runtime: OCRRuntime, token: str, *, max_bytes: int = 100 * 1024 * 1024, deadline: float = 60.0, max_result_bytes: int = 32 * 1024 * 1024) -> Quart:
@@ -112,13 +109,20 @@ def create_app(runtime: OCRRuntime, token: str, *, max_bytes: int = 100 * 1024 *
                 if set(options) - {"language", "probe"}:
                     return jsonify(schema_version=1, error="invalid_options"), 400
                 call = getattr(runtime, "process_asr", None)
+            elif operation == "parse" and options.get("backend") in {"docling", "mineru"}:
+                from rag.parsers.backend_registry import run_selected
+
+                def selected_call():
+                    return run_selected(options["backend"], content, options)
+
+                call, args = selected_call, ()
             else:
                 call = getattr(runtime, "process_pdf", None)
             if call is None:
                 return jsonify(schema_version=1, error="capability_unavailable"), 503
             if operation == "asr":
                 args = (content, options)
-            elif operation != "cluster":
+            elif operation != "cluster" and not (operation == "parse" and options.get("backend") in {"docling", "mineru"}):
                 args = (operation, content, options)
         inflight = asyncio.get_running_loop().run_in_executor(executor, call, *args)
         # Retrieving exceptions prevents unhandled-future logs if the client goes away.

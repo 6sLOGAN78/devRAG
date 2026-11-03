@@ -8,9 +8,11 @@ import { Input } from "@/components/ui/input";
 import { ServerFieldError } from "@/components/create-dataset-dialog/server-field-error";
 import { CHUNK_SIZE_MAX, CHUNK_SIZE_MIN, OVERLAP_MAX, OVERLAP_MIN } from "@/constants/chunk-methods";
 import type { ChunkFormInput, ParseConfigField } from "./schema";
+import type { ExternalPdfBackend } from "@/services/parser-backend-service";
 
 export interface ParseConfigurationProps {
   control: Control<ChunkFormInput>;
+  availableBackends?: readonly ExternalPdfBackend[];
   disabled?: boolean;
   wholeDocument?: boolean;
   questionAnswer?: boolean;
@@ -68,7 +70,7 @@ function AudioFields({control,disabled}:{control:Control<ChunkFormInput>;disable
  * The settings of the General method: chunk size, delimiters and overlap, then the read-only "Not available yet" rows.
  * The delimiter field shows and takes `\n` and `\t` as typed text; the schema turns them into real characters.
  */
-export function ParseConfiguration({ control, disabled = false, wholeDocument = false, questionAnswer = false, book = false, paper = false, laws = false, presentation = false, table = false, picture = false, audio = false, email = false, resume = false, tag = false, answers = {}, onEdit }: ParseConfigurationProps) {
+export function ParseConfiguration({ control, availableBackends = [], disabled = false, wholeDocument = false, questionAnswer = false, book = false, paper = false, laws = false, presentation = false, table = false, picture = false, audio = false, email = false, resume = false, tag = false, answers = {}, onEdit }: ParseConfigurationProps) {
   const { t } = useTranslation();
   return (
     <div className="flex flex-col gap-4">
@@ -83,6 +85,22 @@ export function ParseConfiguration({ control, disabled = false, wholeDocument = 
             <FormLabel>{t("datasets.chunking.field.layout")}</FormLabel>
           </div>
           <FormDescription>{t("datasets.chunking.field.layoutHelp")}</FormDescription>
+          {availableBackends.length > 0 || typeof field.value === "string" && field.value !== "deepdoc" ? <>
+            <label htmlFor="field-pdf-backend" className="text-sm font-medium">{t("datasets.chunking.field.pdfBackend")}</label>
+            <select id="field-pdf-backend" data-testid="field-pdf-backend" className="w-full rounded border bg-background p-2"
+              value={typeof field.value === "string" && field.value !== "deepdoc" ? field.value : "deepdoc"}
+              disabled={disabled || field.value === false}
+              onChange={(event) => { onEdit?.("layoutRecognize"); field.onChange(event.target.value); }}>
+              <option value="deepdoc">{t("datasets.chunking.field.deepdoc")}</option>
+              {(["docling", "mineru"] as const).map((name) =>
+                availableBackends.includes(name) || field.value === name
+                  ? <option key={name} value={name} disabled={!availableBackends.includes(name)}>{t(`datasets.chunking.field.${name}`)}</option>
+                  : null)}
+            </select>
+            {typeof field.value === "string" && field.value !== "deepdoc" && !availableBackends.includes(field.value as ExternalPdfBackend)
+              ? <p role="status" className="text-sm text-muted-foreground">{t("datasets.chunking.field.backendUnavailable", { name: t(`datasets.chunking.field.${field.value}`) })}</p>
+              : null}
+          </> : null}
           <FormMessage /><ServerFieldError text={answers.layoutRecognize ?? null} />
         </FormItem>
       )} />

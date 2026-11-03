@@ -79,6 +79,7 @@ routes:
   - {owner: python, match: prefix, path: /api/v1/providers/, auth: api, body_limit: 1m}
   - {owner: python, match: exact, path: /api/v1/models, auth: api, body_limit: 1m}
   - {owner: python, match: exact, path: /api/v1/models/default, auth: api, body_limit: 1m}
+  - {owner: python, match: exact, path: /api/v1/parser-backends, auth: api, body_limit: 1m}
   - {owner: python, match: exact, path: /api/v1/datasets, auth: api, body_limit: 1m}
   - {owner: python, match: prefix, path: /api/v1/datasets/, auth: api, body_limit: 1m}
   - {owner: python, match: exact, path: /api/v1/chats, auth: api, body_limit: 1m}
@@ -106,6 +107,8 @@ endpoints:
      note: authenticated since plan 02-14 (D-19)}
   - {method: GET, path: /api/v1/openapi.json, owner: python, auth: api, roles: [], scope: none, implemented: true,
      note: R-113 requires authentication; frontend types come from the offline scripts/export_openapi.py}
+  - {method: GET, path: /api/v1/parser-backends, owner: python, auth: api, roles: [owner, admin, normal], scope: none, implemented: true,
+     note: plan 06-26 exposes only operator-configured PDF backend names; no address or token}
 
   # --- Phase 2, Go-owned, handlers not built yet ---
   - {method: POST, path: /api/v1/users, owner: go, auth: none, roles: [], scope: none, implemented: true}

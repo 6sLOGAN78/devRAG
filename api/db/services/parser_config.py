@@ -19,6 +19,7 @@ from rag.parsers.tags import tag_label
 
 MAX_PARSER_CONFIG = 4096
 MAX_DELIMITER = 64
+PDF_BACKENDS = frozenset({"deepdoc", "docling", "mineru", "paddleocr", "mistral", "tcadp", "somark", "opendataloader", "figure"})
 
 
 class ParserConfig(BaseModel):
@@ -47,6 +48,13 @@ class ParserConfig(BaseModel):
     allowed_tags: list[StrictStr] = Field(default_factory=list, max_length=128)
     tag_model_id: StrictStr = Field(default="", max_length=128)
     raptor: StrictBool = False
+
+    @field_validator("layout_recognize")
+    @classmethod
+    def _named_pdf_backend(cls, value: bool | str) -> bool | str:
+        if isinstance(value, str) and value not in PDF_BACKENDS:
+            raise ValueError("unknown PDF backend")
+        return value
 
     @field_validator("allowed_tags")
     @classmethod

@@ -84,12 +84,12 @@ describe("parse configuration schema", () => {
   });
 });
 
-function Probe({ initial = VALID }: { initial?: ChunkFormInput }) {
+function Probe({ initial = VALID, availableBackends = [] }: { initial?: ChunkFormInput; availableBackends?: ("docling" | "mineru")[] }) {
   const form = useForm<ChunkFormInput>({ resolver: zodResolver(chunkFormSchema, undefined, { raw: true }), defaultValues: initial });
   return (
     <Form {...form}>
       <form>
-        <ParseConfiguration control={form.control} />
+        <ParseConfiguration control={form.control} availableBackends={availableBackends} />
       </form>
     </Form>
   );
@@ -113,6 +113,19 @@ describe("ParseConfiguration", () => {
     expect(input).not.toBeChecked();
     const result = parse({ layoutRecognize: false });
     expect(result.success && result.data.layoutRecognize).toBe(false);
+  });
+  it("offers only configured external parsers and stores the selected name", async () => {
+    render(<Probe availableBackends={["docling"]} />);
+    const selector = screen.getByRole("combobox", { name: "PDF parser" });
+    expect(screen.getByRole("option", { name: "Docling" })).toBeInTheDocument();
+    expect(screen.queryByRole("option", { name: "MinerU" })).toBeNull();
+    await userEvent.selectOptions(selector, "docling");
+    expect(selector).toHaveValue("docling");
+  });
+  it("shows a saved parser when its operator service is missing", () => {
+    render(<Probe initial={{ ...VALID, layoutRecognize: "mineru" }} />);
+    expect(screen.getByRole("status")).toHaveTextContent("MinerU is not configured");
+    expect(screen.getByRole("option", { name: "MinerU" })).toBeDisabled();
   });
   it("renders the three fields with labels, helpers and a Mono delimiter input", () => {
     render(<Probe />);

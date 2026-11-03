@@ -597,6 +597,23 @@ export interface paths {
         patch: operations["patch_patch_defaults"];
         trace?: never;
     };
+    "/api/v1/parser-backends": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Expose finite configured names only; provider addresses and tokens stay operator-side. */
+        get: operations["get_parser_backends"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/pipelines": {
         parameters: {
             query?: never;
@@ -867,6 +884,11 @@ export interface components {
             end: number;
             /** Start */
             start: number;
+        };
+        /** BackendAvailability */
+        BackendAvailability: {
+            /** Available */
+            available: string[];
         };
         BuiltinPipelineTemplate: {
             available: boolean;
@@ -3679,6 +3701,31 @@ export interface operations {
                         /** Code */
                         code: number;
                         data: components["schemas"]["DefaultsView"];
+                        /** Message */
+                        message: string;
+                    };
+                };
+            };
+        };
+    };
+    get_parser_backends: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Code */
+                        code: number;
+                        data: components["schemas"]["BackendAvailability"];
                         /** Message */
                         message: string;
                     };

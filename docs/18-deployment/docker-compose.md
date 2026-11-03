@@ -76,6 +76,21 @@ flowchart TD
 
 ---
 
+## Optional PDF parser services (Phase 6)
+
+The `deepdoc` container can forward a selected PDF to an operator-managed Docling Serve or MinerU service. These services are not bundled by this Compose file. Configure a base URL and the actual running version for each service in `docker/.env`:
+
+| Parser | Required settings | Supported response dialect |
+| :--- | :--- | :--- |
+| Docling | `PDF_BACKEND_DOCLING_URL`, `PDF_BACKEND_DOCLING_VERSION` | Docling Serve `/v1/convert/file` JSON document |
+| MinerU | `PDF_BACKEND_MINERU_URL`, `PDF_BACKEND_MINERU_VERSION` | MinerU 2.x/3.x `/file_parse` content list |
+
+`PDF_BACKEND_DOCLING_TOKEN` and `PDF_BACKEND_MINERU_TOKEN` are optional operator secrets when the corresponding service requires a bearer token. Keep tokens in the local environment file; never put them in a dataset's parser configuration. The app exposes only configured parser names through authenticated `GET /api/v1/parser-backends`. A selected service failure stops parsing and does not switch to DeepDoc. MinerU 4.x uses a different task/result dialect and is not accepted by this adapter.
+
+The deterministic adapter tests prove transport and coordinate conversion, but they do not count as a real provider run. One approved one-page parse on each configured service remains part of the Phase 6 live gate.
+
+On Linux hosts using the Elasticsearch profile, copy the checked-in host setting once with `sudo cp docker/sysctl/99-devrag-elasticsearch.conf /etc/sysctl.d/`. The file applies `vm.max_map_count=262144` on future boots. For the current boot, run `sudo sysctl -w vm.max_map_count=262144` before starting Elasticsearch.
+
 ## References & Source Links
 
 - [`docker/docker-compose.yml:L1-L152`](file:///home/logan78/Desktop/ragflow/docker/docker-compose.yml#L1-L152) - Primary multi-service compose file.

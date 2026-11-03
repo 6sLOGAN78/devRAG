@@ -1,4 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useQuery } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
 import { useRef, useState, type MutableRefObject } from "react";
 import { useForm } from "react-hook-form";
@@ -20,6 +21,7 @@ import { useUpdateDatasetChunkingRequest } from "@/hooks/use-knowledge-request";
 import { invalidFieldOf, settingsFailureOf, storedUnavailableKey } from "@/pages/dataset/errors";
 import { isCancelled } from "@/pages/datasets/errors";
 import { notifySuccess } from "@/services/notify";
+import { listExternalPdfBackends } from "@/services/parser-backend-service";
 
 /** What a dialog edits: one document, or the dataset default. */
 export type ChunkTarget =
@@ -87,6 +89,7 @@ const FIELD_NAMES = ["chunkSize", "delimiters", "overlap", "pageRanges", "layout
  */
 export function ChunkMethodForm({ target, settings, pendingRef, onClose }: ChunkMethodFormProps) {
   const { t } = useTranslation();
+  const pdfBackends = useQuery({ queryKey: ["parser-backends"], queryFn: listExternalPdfBackends, retry: false });
   const mode: SettingsMode = target.mode;
   const workspaceName = useWorkspaceName(target.tenantId);
   const updateDocument = useUpdateDocumentSettingsRequest();
@@ -244,7 +247,7 @@ export function ChunkMethodForm({ target, settings, pendingRef, onClose }: Chunk
             </FormItem>
           )}
         />
-        <ParseConfiguration control={form.control} tag={form.watch("method") === "tag"} resume={form.watch("method") === "resume"} wholeDocument={form.watch("method") === "one"} questionAnswer={form.watch("method") === "qa"} book={form.watch("method") === "book"} paper={form.watch("method") === "paper"} laws={form.watch("method") === "laws"} presentation={form.watch("method") === "presentation"} table={form.watch("method") === "table"} email={form.watch("method") === "email"} audio={form.watch("method") === "audio"} picture={form.watch("method") === "picture"} disabled={busy} answers={answers} onEdit={(field) => clearAnswers(FIELD_NAMES.find((name) => name === field))} />
+        <ParseConfiguration control={form.control} availableBackends={pdfBackends.data ?? []} tag={form.watch("method") === "tag"} resume={form.watch("method") === "resume"} wholeDocument={form.watch("method") === "one"} questionAnswer={form.watch("method") === "qa"} book={form.watch("method") === "book"} paper={form.watch("method") === "paper"} laws={form.watch("method") === "laws"} presentation={form.watch("method") === "presentation"} table={form.watch("method") === "table"} email={form.watch("method") === "email"} audio={form.watch("method") === "audio"} picture={form.watch("method") === "picture"} disabled={busy} answers={answers} onEdit={(field) => clearAnswers(FIELD_NAMES.find((name) => name === field))} />
         <DialogFooter>
           <DialogClose asChild>
             <Button type="button" variant="ghost">

@@ -274,6 +274,20 @@ class DeepDocSettings:
     url: str = ""
     api_token: str = field(default="", repr=False)
     timeout_seconds: int = 60
+    docling_url: str = ""
+    docling_version: str = ""
+    mineru_url: str = ""
+    mineru_version: str = ""
+
+    def configured_pdf_backends(self) -> tuple[str, ...]:
+        if not self.url:
+            return ()
+        names = ["deepdoc"]
+        if self.docling_url and self.docling_version:
+            names.append("docling")
+        if self.mineru_url and self.mineru_version:
+            names.append("mineru")
+        return tuple(names)
 
 
 @dataclass(frozen=True)
@@ -548,7 +562,27 @@ def _parse_deepdoc(data: dict[str, Any]) -> DeepDocSettings:
             raise ConfigError("invalid value for config key: deepdoc.url")
         if len(token) < 24:
             raise ConfigError("invalid value for config key: deepdoc.api_token")
-    return DeepDocSettings(url, token, _bounded(sec, "deepdoc", "timeout_seconds", 60, 60))
+    optional = {}
+    for name in ("docling", "mineru"):
+        backend_url = _optional(sec, f"{name}_url").rstrip("/")
+        version = _optional(sec, f"{name}_version")
+        if bool(backend_url) != bool(version):
+            raise ConfigError(f"incomplete deepdoc.{name} backend configuration")
+        if name == "mineru" and version and not version.startswith(("2.", "3.")):
+            raise ConfigError("unsupported deepdoc.mineru response version")
+        if backend_url:
+            try:
+                parsed = urlsplit(backend_url)
+                valid = (parsed.scheme in {"http", "https"} and parsed.hostname and parsed.port != 0
+                         and not parsed.username and not parsed.password and not parsed.query and not parsed.fragment
+                         and parsed.path in {"", "/"})
+            except ValueError:
+                valid = False
+            if not valid or len(version) > 64 or any(char.isspace() for char in version):
+                raise ConfigError(f"invalid deepdoc.{name} backend configuration")
+        optional[f"{name}_url"] = backend_url
+        optional[f"{name}_version"] = version
+    return DeepDocSettings(url, token, _bounded(sec, "deepdoc", "timeout_seconds", 60, 60), **optional)
 
 
 def parse_settings(data: dict[str, Any]) -> Settings:

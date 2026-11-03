@@ -131,6 +131,10 @@ deepdoc:
   legacy_url: '${TENSORRT_DLA_SVR:-}'
   api_token: '${DEEPDOC_API_TOKEN:-}'
   timeout_seconds: 60
+  docling_url: '${PDF_BACKEND_DOCLING_URL:-}'
+  docling_version: '${PDF_BACKEND_DOCLING_VERSION:-}'
+  mineru_url: '${PDF_BACKEND_MINERU_URL:-}'
+  mineru_version: '${PDF_BACKEND_MINERU_VERSION:-}'
 
 # Chat sessions and turns (plan 05-09).
 chat:
