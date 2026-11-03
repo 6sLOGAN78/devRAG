@@ -11,3 +11,5 @@ Outstanding before this plan can be marked complete: a separately audited and ap
 The Docling body-reference structure has a known [upstream OCR omission report](https://github.com/docling-project/docling/issues/3473). The real Docling sample should include both a plain text page and a table or scanned page; verify every required fact survives the body traversal before accepting the adapter. Do not treat the synthetic response as proof of completeness.
 
 The host's `vm.max_map_count` was restored to 262144 for this boot. The operator copied the checked-in file to `/etc/sysctl.d/99-devrag-elasticsearch.conf`; the installed file and live value were both verified as 262144.
+
+Read-only service candidate and host review: [06-26-SERVICE-REVIEW.md](06-26-SERVICE-REVIEW.md). It is not an acquisition approval or a real parser result.
