@@ -1,0 +1,904 @@
+[
+  {
+    "package": "httpx2",
+    "ecosystem": "pypi",
+    "status": "SUS",
+    "flags": [
+      {
+        "signal": "TYPOSQUAT_RISK",
+        "severity": "warning",
+        "message": "Suspiciously close to 'httpx'. Could be a typosquat."
+      }
+    ],
+    "suggestion": "httpx"
+  },
+  {
+    "package": "mineru-magika",
+    "ecosystem": "pypi",
+    "status": "SUS",
+    "flags": [
+      {
+        "signal": "FRESH_PACKAGE",
+        "severity": "warning",
+        "message": "Only 17 days old. New packages deserve extra scrutiny."
+      }
+    ],
+    "suggestion": null
+  },
+  {
+    "package": "annotated-types",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "anyio",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "annotated-doc",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "aiosqlite",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "certifi",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "beautifulsoup4",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "audioop-lts",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "aiofiles",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "brotli",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "cffi",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "charset-normalizer",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [
+      {
+        "signal": "NO_REPO",
+        "severity": "info",
+        "message": "No source repository linked. Harder to verify what this code actually does."
+      }
+    ],
+    "suggestion": null
+  },
+  {
+    "package": "click",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "cryptography",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "docvortex",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [
+      {
+        "signal": "RECENTLY_CREATED",
+        "severity": "info",
+        "message": "Created 57 days ago. Relatively new."
+      }
+    ],
+    "suggestion": null
+  },
+  {
+    "package": "et-xmlfile",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "fastapi-offline",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "cobble",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "distro",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "fastapi",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "filelock",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "hf-gradio",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "groovy",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "fsspec",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "gradio-client",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [
+      {
+        "signal": "HALLUCINATION_PATTERN",
+        "severity": "info",
+        "message": "Name ends with '-client' -- classic LLM naming pattern. Name looks like LLM bait but package is established."
+      }
+    ],
+    "suggestion": null
+  },
+  {
+    "package": "hf-xet",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "h11",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "ftfy",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "gradio",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "fonttools",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "httpcore",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "httpcore2",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "httpx",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "flatbuffers",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "huggingface-hub",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "idna",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "httpx-retries",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "jieba",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "jinja2",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "loguru",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "jiter",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "lxml",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "markdown-it-py",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "mammoth",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "json-repair",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "markupsafe",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "latex2mathml",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "mathml2omml",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "mdurl",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "mineru-llama-cpp",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [
+      {
+        "signal": "RECENTLY_CREATED",
+        "severity": "info",
+        "message": "Created 83 days ago. Relatively new."
+      }
+    ],
+    "suggestion": null
+  },
+  {
+    "package": "mineru",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "mineru-vl-utils",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [
+      {
+        "signal": "HALLUCINATION_PATTERN",
+        "severity": "info",
+        "message": "Name ends with '-utils' -- classic LLM naming pattern. Name looks like LLM bait but package is established."
+      }
+    ],
+    "suggestion": null
+  },
+  {
+    "package": "ml-dtypes",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [
+      {
+        "signal": "HALLUCINATION_PATTERN",
+        "severity": "info",
+        "message": "Name starts with 'ml-' -- classic LLM naming pattern. Name looks like LLM bait but package is established."
+      }
+    ],
+    "suggestion": null
+  },
+  {
+    "package": "metafile-render",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [
+      {
+        "signal": "RECENTLY_CREATED",
+        "severity": "info",
+        "message": "Created 59 days ago. Relatively new."
+      }
+    ],
+    "suggestion": null
+  },
+  {
+    "package": "modelscope",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "modelscope-hub",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [
+      {
+        "signal": "NO_REPO",
+        "severity": "info",
+        "message": "No source repository linked. Harder to verify what this code actually does."
+      }
+    ],
+    "suggestion": null
+  },
+  {
+    "package": "olefile",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "onnxruntime",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "nh3",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "onnxruntime-ep-webgpu",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "openai",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "openpyxl",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "numpy",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "opentelemetry-api",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [
+      {
+        "signal": "HALLUCINATION_PATTERN",
+        "severity": "info",
+        "message": "Name ends with '-api' -- classic LLM naming pattern. Name looks like LLM bait but package is established."
+      }
+    ],
+    "suggestion": null
+  },
+  {
+    "package": "onnx",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "packaging",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "pandas",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "pillow",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "pyclipper",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "orjson",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "pycparser",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "protobuf",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "pydub",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "pydantic",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "pypdf",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "pydantic-core",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "pylatexenc",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "python-docx",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [
+      {
+        "signal": "HALLUCINATION_PATTERN",
+        "severity": "info",
+        "message": "Name starts with 'python-' -- classic LLM naming pattern. Name looks like LLM bait but package is established."
+      }
+    ],
+    "suggestion": null
+  },
+  {
+    "package": "python-dateutil",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [
+      {
+        "signal": "HALLUCINATION_PATTERN",
+        "severity": "info",
+        "message": "Name starts with 'python-' -- classic LLM naming pattern. Name looks like LLM bait but package is established."
+      }
+    ],
+    "suggestion": null
+  },
+  {
+    "package": "python-multipart",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [
+      {
+        "signal": "HALLUCINATION_PATTERN",
+        "severity": "info",
+        "message": "Name starts with 'python-' -- classic LLM naming pattern. Name looks like LLM bait but package is established."
+      }
+    ],
+    "suggestion": null
+  },
+  {
+    "package": "pypdfium2",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "pygments",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "pypptx-with-oxml",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "pytz",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "pyyaml",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "rich",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "semantic-version",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "safehttpx",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "requests",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "setuptools",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "rl-accel",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "reportlab",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "shapely",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "shellingham",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "resvg-py",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "sniffio",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "soupsieve",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "tokenizers",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "tomlkit",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "tinycss2",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "truststore",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "typer",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "starlette",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "typing-extensions",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "tqdm",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "tzdata",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "typing-inspection",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "urllib3",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [
+      {
+        "signal": "NO_REPO",
+        "severity": "info",
+        "message": "No source repository linked. Harder to verify what this code actually does."
+      }
+    ],
+    "suggestion": null
+  },
+  {
+    "package": "wcwidth",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "uvicorn",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "webencodings",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "xlsxwriter",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "ziafont",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "watchfiles",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  },
+  {
+    "package": "ziamath",
+    "ecosystem": "pypi",
+    "status": "OK",
+    "flags": [],
+    "suggestion": null
+  }
+]

@@ -1,0 +1,2414 @@
+{
+  "errors": {},
+  "lock_sha256": "41516a5c9fef3d9aede855e9fe07a514a29384d968a90403dee9d7e77eeadddb",
+  "packages": [
+    {
+      "artifact_count": 2,
+      "compatible_wheels": [
+        {
+          "file": "aiofiles-25.1.0-py3-none-any.whl",
+          "sha256": "abe311e527c862958650f9438e859c1fa7568a141b22abcd015e120e86a85695",
+          "size": 14668
+        }
+      ],
+      "license_expression": null,
+      "license_field_excerpt": "Apache-2.0",
+      "name": "aiofiles",
+      "project_urls": {
+        "Bug Tracker": "https://github.com/Tinche/aiofiles/issues",
+        "Changelog": "https://github.com/Tinche/aiofiles#history",
+        "Repository": "https://github.com/Tinche/aiofiles"
+      },
+      "released_at": "2025-10-09T20:51:03.174611Z",
+      "version": "25.1.0"
+    },
+    {
+      "artifact_count": 2,
+      "compatible_wheels": [
+        {
+          "file": "aiosqlite-0.22.1-py3-none-any.whl",
+          "sha256": "21c002eb13823fad740196c5a2e9d8e62f6243bd9e7e4a1f87fb5e44ecb4fceb",
+          "size": 17405
+        }
+      ],
+      "license_classifiers": [
+        "License :: OSI Approved :: MIT License"
+      ],
+      "license_expression": null,
+      "license_field_excerpt": "",
+      "name": "aiosqlite",
+      "project_urls": {
+        "Documentation": "https://aiosqlite.omnilib.dev",
+        "Github": "https://github.com/omnilib/aiosqlite"
+      },
+      "released_at": "2025-12-23T19:25:42.139290Z",
+      "version": "0.22.1"
+    },
+    {
+      "artifact_count": 2,
+      "compatible_wheels": [
+        {
+          "file": "annotated_doc-0.0.5-py3-none-any.whl",
+          "sha256": "117bac03a25ede5df5440e855b32d556049ca169ead221505badf432fed4b101",
+          "size": 5302
+        }
+      ],
+      "license_expression": "MIT",
+      "license_field_excerpt": "",
+      "name": "annotated-doc",
+      "project_urls": {
+        "Changelog": "https://github.com/fastapi/annotated-doc/release-notes.md",
+        "Documentation": "https://github.com/fastapi/annotated-doc",
+        "Homepage": "https://github.com/fastapi/annotated-doc",
+        "Issues": "https://github.com/fastapi/annotated-doc/issues",
+        "Repository": "https://github.com/fastapi/annotated-doc"
+      },
+      "released_at": "2026-07-28T13:50:57.239109Z",
+      "version": "0.0.5"
+    },
+    {
+      "artifact_count": 2,
+      "compatible_wheels": [
+        {
+          "file": "annotated_types-0.8.0-py3-none-any.whl",
+          "sha256": "f072f4d804ea359e4eaf198b1af7a8b0943881a87f31bb764f8bf219bb9419e0",
+          "size": 13427
+        }
+      ],
+      "license_expression": "MIT",
+      "license_field_excerpt": "",
+      "name": "annotated-types",
+      "project_urls": {
+        "Changelog": "https://github.com/annotated-types/annotated-types/releases",
+        "Homepage": "https://github.com/annotated-types/annotated-types",
+        "Source": "https://github.com/annotated-types/annotated-types"
+      },
+      "released_at": "2026-07-23T20:16:12.938651Z",
+      "version": "0.8.0"
+    },
+    {
+      "artifact_count": 2,
+      "compatible_wheels": [
+        {
+          "file": "anyio-4.16.0-py3-none-any.whl",
+          "sha256": "c66ae634e0b8228396b801741beb3294326d4b6102f7bba4041c0dfb58c29026",
+          "size": 134521
+        }
+      ],
+      "license_expression": "MIT",
+      "license_field_excerpt": "",
+      "name": "anyio",
+      "project_urls": {
+        "Changelog": "https://anyio.readthedocs.io/en/stable/versionhistory.html",
+        "Documentation": "https://anyio.readthedocs.io/en/latest/",
+        "Issue tracker": "https://github.com/agronholm/anyio/issues",
+        "Source code": "https://github.com/agronholm/anyio"
+      },
+      "released_at": "2026-11-01T11:20:05.590351Z",
+      "version": "4.16.0"
+    },
+    {
+      "artifact_count": 49,
+      "compatible_wheels": [
+        {
+          "file": "audioop_lts-0.2.2-cp313-abi3-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl",
+          "sha256": "51c916108c56aa6e426ce611946f901badac950ee2ddaf302b7ed35d9958970d",
+          "size": 85844
+        }
+      ],
+      "license_expression": "PSF-2.0",
+      "license_field_excerpt": "",
+      "name": "audioop-lts",
+      "project_urls": {
+        "funding": "https://github.com/sponsors/AbstractUmbra",
+        "github": "https://github.com/AbstractUmbra/audioop",
+        "homepage": "https://github.com/AbstractUmbra/audioop",
+        "issues": "https://github.com/AbstractUmbra/audioop/issues"
+      },
+      "released_at": "2025-08-05T16:42:20.836020Z",
+      "version": "0.2.2"
+    },
+    {
+      "artifact_count": 2,
+      "compatible_wheels": [
+        {
+          "file": "beautifulsoup4-4.15.0-py3-none-any.whl",
+          "sha256": "d6f88de62e1d4e38ecb1077eb9724cd0eff29d2a08ca16a401e9b9e93f117cf9",
+          "size": 109924
+        }
+      ],
+      "license_expression": null,
+      "license_field_excerpt": "MIT License",
+      "name": "beautifulsoup4",
+      "project_urls": {
+        "Download": "https://www.crummy.com/software/BeautifulSoup/bs4/download/",
+        "Homepage": "https://www.crummy.com/software/BeautifulSoup/bs4/"
+      },
+      "released_at": "2026-06-07T16:44:20.453113Z",
+      "version": "4.15.0"
+    },
+    {
+      "artifact_count": 143,
+      "compatible_wheels": [
+        {
+          "file": "brotli-1.2.1-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.whl",
+          "sha256": "264fd5b200f6f6170cb551a4b9fcaabf8aa846ddaefe72db4d5f49f9d3743df9",
+          "size": 1420480
+        }
+      ],
+      "license_expression": null,
+      "license_field_excerpt": "MIT",
+      "name": "brotli",
+      "project_urls": {
+        "Homepage": "https://github.com/google/brotli"
+      },
+      "released_at": "2026-10-22T13:57:11.170043Z",
+      "version": "1.2.1"
+    },
+    {
+      "artifact_count": 2,
+      "compatible_wheels": [
+        {
+          "file": "certifi-2026.10.23-py3-none-any.whl",
+          "sha256": "e9b54de76e530bb6cf0ccd036787103acb58fd42ba930ea8bf948ddbaa2f61d1",
+          "size": 135082
+        }
+      ],
+      "license_expression": null,
+      "license_field_excerpt": "MPL-2.0",
+      "name": "certifi",
+      "project_urls": {
+        "Homepage": "https://github.com/certifi/python-certifi",
+        "Source": "https://github.com/certifi/python-certifi"
+      },
+      "released_at": "2026-10-23T11:36:14.763067Z",
+      "version": "2026.10.23"
+    },
+    {
+      "artifact_count": 100,
+      "compatible_wheels": [
+        {
+          "file": "cffi-2.1.1-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.whl",
+          "sha256": "a931079504ecc49efed7744c476a5c343a92fabf66dec2db95edb1b2fdc770e2",
+          "size": 221824
+        }
+      ],
+      "license_expression": "MIT-0",
+      "license_field_excerpt": "",
+      "name": "cffi",
+      "project_urls": {
+        "Changelog": "https://cffi.readthedocs.io/en/latest/whatsnew.html",
+        "Contact": "https://groups.google.com/forum/#!forum/python-cffi",
+        "Documentation": "https://cffi.readthedocs.io/",
+        "Download": "https://github.com/python-cffi/cffi/releases",
+        "Issue Tracker": "https://github.com/python-cffi/cffi/issues",
+        "Source Code": "https://github.com/python-cffi/cffi"
+      },
+      "released_at": "2026-08-03T21:19:15.602573Z",
+      "version": "2.1.1"
+    },
+    {
+      "artifact_count": 172,
+      "compatible_wheels": [
+        {
+          "file": "charset_normalizer-3.5.2-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl",
+          "sha256": "7218e8f32b0956cfcd048fd42d9d5779809745ca1d86113ca56f66e7ae1549c4",
+          "size": 254660
+        },
+        {
+          "file": "charset_normalizer-3.5.2-cp37-abi3-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl",
+          "sha256": "1c50fe28bbc2ced33386f298650d91218076c05420e6cbd790b913adc41659e7",
+          "size": 253276
+        },
+        {
+          "file": "charset_normalizer-3.5.2-py3-none-any.whl",
+          "sha256": "b6b751274acb69d77b3323d6b7dbaa3c7fdfc1eb829b7eb61d262f32e1af9685",
+          "size": 68872
+        }
+      ],
+      "license_expression": null,
+      "license_field_excerpt": "MIT",
+      "name": "charset-normalizer",
+      "project_urls": {
+        "Changelog": "https://github.com/jawah/charset_normalizer/blob/master/CHANGELOG.md",
+        "Code": "https://github.com/jawah/charset_normalizer",
+        "Documentation": "https://charset-normalizer.readthedocs.io/",
+        "Issue tracker": "https://github.com/jawah/charset_normalizer/issues"
+      },
+      "released_at": "2026-09-30T04:34:42.843457Z",
+      "version": "3.5.2"
+    },
+    {
+      "artifact_count": 2,
+      "compatible_wheels": [
+        {
+          "file": "click-8.5.0-py3-none-any.whl",
+          "sha256": "255bc9599cf7748b4b1a446ccc735421bd08a2ae529a8b88597d3de5664ee360",
+          "size": 125251
+        }
+      ],
+      "license_expression": "BSD-3-Clause",
+      "license_field_excerpt": "",
+      "name": "click",
+      "project_urls": {
+        "Changes": "https://click.palletsprojects.com/page/changes/",
+        "Chat": "https://discord.gg/pallets",
+        "Documentation": "https://click.palletsprojects.com/",
+        "Donate": "https://palletsprojects.com/donate",
+        "Source": "https://github.com/pallets/click/"
+      },
+      "released_at": "2026-08-26T13:33:12.928043Z",
+      "version": "8.5.0"
+    },
+    {
+      "artifact_count": 2,
+      "compatible_wheels": [
+        {
+          "file": "cobble-0.1.4-py3-none-any.whl",
+          "sha256": "36c91b1655e599fd428e2b95fdd5f0da1ca2e9f1abb0bc871dec21a0e78a2b44",
+          "size": 3984
+        }
+      ],
+      "license_classifiers": [
+        "License :: OSI Approved :: BSD License"
+      ],
+      "license_expression": null,
+      "license_field_excerpt": "",
+      "name": "cobble",
+      "project_urls": {
+        "Homepage": "http://github.com/mwilliamson/python-cobble"
+      },
+      "released_at": "2024-06-01T18:11:07.911036Z",
+      "version": "0.1.4"
+    },
+    {
+      "artifact_count": 59,
+      "compatible_wheels": [
+        {
+          "file": "cryptography-50.0.2-cp311-abi3-manylinux2014_x86_64.manylinux_2_17_x86_64.whl",
+          "sha256": "630ebfea3bf689d075f82316324ff7433dc447fe6bc1bfc76524b74b4a9567d2",
+          "size": 4719841
+        },
+        {
+          "file": "cryptography-50.0.2-cp311-abi3-manylinux_2_28_x86_64.whl",
+          "sha256": "4061c0079120205fb760c58acab6443e217307dcf05e3702cf970e0689972856",
+          "size": 4753050
+        },
+        {
+          "file": "cryptography-50.0.2-cp311-abi3-manylinux_2_34_x86_64.whl",
+          "sha256": "9dab55f57c74c3cad24c323bacbbd04be4705ba6eb0d92e920b1fc4837ed5079",
+          "size": 4752576
+        },
+        {
+          "file": "cryptography-50.0.2-cp39-abi3-manylinux2014_x86_64.manylinux_2_17_x86_64.whl",
+          "sha256": "ee247f5c245c9a2fe7c8e2214e295918838e44e00a45a6718451e4004219e767",
+          "size": 4749145
+        },
+        {
+          "file": "cryptography-50.0.2-cp39-abi3-manylinux_2_28_x86_64.whl",
+          "sha256": "f21e8a22c8605750c7af886bab299a363721264061b4ac0a30efb73cfd58efc5",
+          "size": 4781387
+        },
+        {
+          "file": "cryptography-50.0.2-cp39-abi3-manylinux_2_34_x86_64.whl",
+          "sha256": "1981f1db4630889b9ef7803fadef12b056f428cb6b85c27ba57b774793b6093c",
+          "size": 4780973
+        }
+      ],
+      "license_expression": "Apache-2.0 OR BSD-3-Clause",
+      "license_field_excerpt": "",
+      "name": "cryptography",
+      "project_urls": {
+        "changelog": "https://cryptography.io/en/latest/changelog/",
+        "documentation": "https://cryptography.io/",
+        "homepage": "https://github.com/pyca/cryptography",
+        "issues": "https://github.com/pyca/cryptography/issues",
+        "source": "https://github.com/pyca/cryptography/"
+      },
+      "released_at": "2026-09-30T14:43:44.339921Z",
+      "version": "50.0.2"
+    },
+    {
+      "artifact_count": 2,
+      "compatible_wheels": [
+        {
+          "file": "distro-1.9.0-py3-none-any.whl",
+          "sha256": "7bffd925d65168f85027d8da9af6bddab658135b840670a223589bc0c8ef02b2",
+          "size": 20277
+        }
+      ],
+      "license_expression": null,
+      "license_field_excerpt": "Apache License, Version 2.0",
+      "name": "distro",
+      "project_urls": {
+        "Homepage": "https://github.com/python-distro/distro"
+      },
+      "released_at": "2023-12-24T09:54:30.421191Z",
+      "version": "1.9.0"
+    },
+    {
+      "artifact_count": 5,
+      "compatible_wheels": [
+        {
+          "file": "docvortex-0.6.12-cp311-abi3-manylinux_2_28_x86_64.whl",
+          "sha256": "515cb8cb531e8788766cbf1339417f2049f56c089604d66aff09f462274083b6",
+          "size": 5439733
+        }
+      ],
+      "license_expression": "MIT AND Apache-2.0 AND BSD-3-Clause",
+      "license_field_excerpt": "",
+      "name": "docvortex",
+      "project_urls": {
+        "Issues": "https://github.com/myhloli/DocVortex/issues",
+        "Repository": "https://github.com/myhloli/DocVortex"
+      },
+      "released_at": "2026-11-03T11:08:24.811540Z",
+      "version": "0.6.12"
+    },
+    {
+      "artifact_count": 2,
+      "compatible_wheels": [
+        {
+          "file": "et_xmlfile-2.0.0-py3-none-any.whl",
+          "sha256": "7a91720bc756843502c3b7504c77b8fe44217c85c537d85037f0f536151b2caa",
+          "size": 18059
+        }
+      ],
+      "license_expression": null,
+      "license_field_excerpt": "MIT",
+      "name": "et-xmlfile",
+      "project_urls": {
+        "Documentation": "https://openpyxl.pages.heptapod.net/et_xmlfile/",
+        "Homepage": "https://foss.heptapod.net/openpyxl/et_xmlfile",
+        "Source": "https://foss.heptapod.net/openpyxl/et_xmlfile",
+        "Tracker": "https://foss.heptapod.net/openpyxl/et_xmfile/-/issues"
+      },
+      "released_at": "2024-10-25T17:25:39.051783Z",
+      "version": "2.0.0"
+    },
+    {
+      "artifact_count": 2,
+      "compatible_wheels": [
+        {
+          "file": "fastapi-0.162.0-py3-none-any.whl",
+          "sha256": "3785963de305dd09912426cb81f2d230fce98ab3521cdfe97265c8d14983128c",
+          "size": 148912
+        }
+      ],
+      "license_expression": "MIT",
+      "license_field_excerpt": "",
+      "name": "fastapi",
+      "project_urls": {
+        "Changelog": "https://fastapi.tiangolo.com/release-notes/",
+        "Documentation": "https://fastapi.tiangolo.com/",
+        "Homepage": "https://github.com/fastapi/fastapi",
+        "Issues": "https://github.com/fastapi/fastapi/issues",
+        "Repository": "https://github.com/fastapi/fastapi"
+      },
+      "released_at": "2026-10-23T18:47:31.734776Z",
+      "version": "0.162.0"
+    },
+    {
+      "artifact_count": 2,
+      "compatible_wheels": [
+        {
+          "file": "fastapi_offline-1.7.7-py3-none-any.whl",
+          "sha256": "60c8399fd7d3e3b01510e14468709e3dea1a0e773ef920372d057392d736a1f9",
+          "size": 777007
+        }
+      ],
+      "license_expression": null,
+      "license_field_excerpt": "MIT",
+      "name": "fastapi-offline",
+      "project_urls": {
+        "Homepage": "https://github.com/turettn/fastapi_offline"
+      },
+      "released_at": "2026-06-19T20:43:27.767288Z",
+      "version": "1.7.7"
+    },
+    {
+      "artifact_count": 2,
+      "compatible_wheels": [
+        {
+          "file": "filelock-4.2.7-py3-none-any.whl",
+          "sha256": "d08972bbca2b8767ee552aff877b091dd111ffb1d22de7de885766ea7d719d5e",
+          "size": 164345
+        }
+      ],
+      "license_expression": "MIT",
+      "license_field_excerpt": "",
+      "name": "filelock",
+      "project_urls": {
+        "Changelog": "https://py-filelock.readthedocs.io/en/latest/changelog.html",
+        "Documentation": "https://py-filelock.readthedocs.io",
+        "Homepage": "https://github.com/tox-dev/filelock",
+        "Source": "https://github.com/tox-dev/filelock",
+        "Tracker": "https://github.com/tox-dev/filelock/issues"
+      },
+      "released_at": "2026-11-02T16:09:13.588706Z",
+      "version": "4.2.7"
+    },
+    {
+      "artifact_count": 1,
+      "compatible_wheels": [
+        {
+          "file": "flatbuffers-25.12.19-py2.py3-none-any.whl",
+          "sha256": "7634f50c427838bb021c2d66a3d1168e9d199b0607e6329399f04846d42e20b4",
+          "size": 26661
+        }
+      ],
+      "license_expression": null,
+      "license_field_excerpt": "Apache 2.0",
+      "name": "flatbuffers",
+      "project_urls": {
+        "Documentation": "https://google.github.io/flatbuffers/",
+        "Homepage": "https://google.github.io/flatbuffers/",
+        "Source": "https://github.com/google/flatbuffers"
+      },
+      "released_at": "2025-12-19T23:16:13.622515Z",
+      "version": "25.12.19"
+    },
+    {
+      "artifact_count": 65,
+      "compatible_wheels": [
+        {
+          "file": "fonttools-4.68.0-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.whl",
+          "sha256": "08851f7d2b983412f490b73a7c56f17cbda1d4d85d2ad3f857564bf15b5d9475",
+          "size": 5418193
+        },
+        {
+          "file": "fonttools-4.68.0-py3-none-any.whl",
+          "sha256": "d76f8fdcb6936f5e1045a0c9dd721a4bf11112e60d1e243bfa1d39f06a8b3104",
+          "size": 1248357
+        }
+      ],
+      "license_expression": null,
+      "license_field_excerpt": "MIT",
+      "name": "fonttools",
+      "project_urls": {
+        "Homepage": "http://github.com/fonttools/fonttools"
+      },
+      "released_at": "2026-10-27T16:28:02.169288Z",
+      "version": "4.68.0"
+    },
+    {
+      "artifact_count": 2,
+      "compatible_wheels": [
+        {
+          "file": "fsspec-2026.9.0-py3-none-any.whl",
+          "sha256": "8dd6e646e99ea382bd85f97a45e6b526a442d79423a7dc673f1e2756d05fcb5f",
+          "size": 221738
+        }
+      ],
+      "license_expression": "BSD-3-Clause",
+      "license_field_excerpt": "",
+      "name": "fsspec",
+      "project_urls": {
+        "Changelog": "https://filesystem-spec.readthedocs.io/en/latest/changelog.html",
+        "Documentation": "https://filesystem-spec.readthedocs.io/en/latest/",
+        "Homepage": "https://github.com/fsspec/filesystem_spec"
+      },
+      "released_at": "2026-09-18T17:50:41.341146Z",
+      "version": "2026.9.0"
+    },
+    {
+      "artifact_count": 2,
+      "compatible_wheels": [
+        {
+          "file": "ftfy-6.3.1-py3-none-any.whl",
+          "sha256": "7c70eb532015cd2f9adb53f101fb6c7945988d023a085d127d1573dc49dd0083",
+          "size": 44821
+        }
+      ],
+      "license_expression": null,
+      "license_field_excerpt": "Apache-2.0",
+      "name": "ftfy",
+      "project_urls": {
+        "Blog": "https://posts.arborelia.net",
+        "Changelog": "https://github.com/rspeer/python-ftfy/blob/main/CHANGELOG.md",
+        "Documentation": "https://ftfy.readthedocs.io/en/latest/",
+        "Homepage": "https://ftfy.readthedocs.io/en/latest/",
+        "Issues": "https://github.com/rspeer/python-ftfy/issues/",
+        "Repository": "https://github.com/rspeer/python-ftfy"
+      },
+      "released_at": "2024-10-26T00:50:33.425893Z",
+      "version": "6.3.1"
+    },
+    {
+      "artifact_count": 2,
+      "compatible_wheels": [
+        {
+          "file": "gradio-6.31.0-py3-none-any.whl",
+          "sha256": "7b50b9b6a2d23cd02851ad4c8b1c8312c88d8b911d1f29c93f9761c98348a64a",
+          "size": 31374795
+        }
+      ],
+      "license_expression": "Apache-2.0",
+      "license_field_excerpt": "",
+      "name": "gradio",
+      "project_urls": {
+        "Homepage": "https://github.com/gradio-app/gradio"
+      },
+      "released_at": "2026-10-28T03:41:37.660177Z",
+      "version": "6.31.0"
+    },
+    {
+      "artifact_count": 2,
+      "compatible_wheels": [
+        {
+          "file": "gradio_client-2.7.2-py3-none-any.whl",
+          "sha256": "12c9d2d940df28eb8dce58eef61f5e808265ad87bbbca53704d1330aa701e5e2",
+          "size": 64458
+        }
+      ],
+      "license_expression": "Apache-2.0",
+      "license_field_excerpt": "",
+      "name": "gradio-client",
+      "project_urls": {
+        "Homepage": "https://github.com/gradio-app/gradio"
+      },
+      "released_at": "2026-10-02T18:35:43.078896Z",
+      "version": "2.7.2"
+    },
+    {
+      "artifact_count": 2,
+      "compatible_wheels": [
+        {
+          "file": "groovy-0.1.2-py3-none-any.whl",
+          "sha256": "7f7975bab18c729a257a8b1ae9dcd70b7cafb1720481beae47719af57c35fa64",
+          "size": 14090
+        }
+      ],
+      "license_classifiers": [
+        "License :: OSI Approved :: MIT License"
+      ],
+      "license_expression": null,
+      "license_field_excerpt": "",
+      "name": "groovy",
+      "project_urls": {
+        "homepage": "https://github.com/gradio-app/groovy",
+        "repository": "https://github.com/gradio-app/groovy"
+      },
+      "released_at": "2025-02-28T20:24:55.152168Z",
+      "version": "0.1.2"
+    },
+    {
+      "artifact_count": 2,
+      "compatible_wheels": [
+        {
+          "file": "h11-0.16.0-py3-none-any.whl",
+          "sha256": "63cf8bbe7522de3bf65932fda1d9c2772064ffb3dae62d55932da54b31cb6c86",
+          "size": 37515
+        }
+      ],
+      "license_expression": null,
+      "license_field_excerpt": "MIT",
+      "name": "h11",
+      "project_urls": {
+        "Homepage": "https://github.com/python-hyper/h11"
+      },
+      "released_at": "2025-04-24T03:35:24.344199Z",
+      "version": "0.16.0"
+    },
+    {
+      "artifact_count": 2,
+      "compatible_wheels": [
+        {
+          "file": "hf_gradio-0.4.1-py3-none-any.whl",
+          "sha256": "76b8cb8be6abe62d74c1ad2d35b42f0629db89aa9e1a8d033cecfe7c856eeab3",
+          "size": 4482
+        }
+      ],
+      "license_expression": "MIT",
+      "license_field_excerpt": "",
+      "name": "hf-gradio",
+      "project_urls": {
+        "Homepage": "https://github.com/gradio-app/hf-gradio#"
+      },
+      "released_at": "2026-04-17T19:53:31.827135Z",
+      "version": "0.4.1"
+    },
+    {
+      "artifact_count": 17,
+      "compatible_wheels": [
+        {
+          "file": "hf_xet-1.8.0-cp38-abi3-manylinux2014_x86_64.manylinux_2_17_x86_64.whl",
+          "sha256": "29dab7c904cd1914a0439c6e1306c12c7497c8bd32290fbe563ebf51ca4b6d6d",
+          "size": 4292483
+        }
+      ],
+      "license_expression": "Apache-2.0",
+      "license_field_excerpt": "",
+      "name": "hf-xet",
+      "project_urls": {
+        "Documentation": "https://huggingface.co/docs/hub/xet/index",
+        "Homepage": "https://github.com/huggingface/xet-core",
+        "Issues": "https://github.com/huggingface/xet-core/issues",
+        "Repository": "https://github.com/huggingface/xet-core.git"
+      },
+      "released_at": "2026-10-30T10:04:03.240337Z",
+      "version": "1.8.0"
+    },
+    {
+      "artifact_count": 2,
+      "compatible_wheels": [
+        {
+          "file": "httpcore-1.0.9-py3-none-any.whl",
+          "sha256": "2d400746a40668fc9dec9810239072b40b4484b640a8c38fd654a024c7a1bf55",
+          "size": 78784
+        }
+      ],
+      "license_expression": "BSD-3-Clause",
+      "license_field_excerpt": "",
+      "name": "httpcore",
+      "project_urls": {
+        "Documentation": "https://www.encode.io/httpcore",
+        "Homepage": "https://www.encode.io/httpcore/",
+        "Source": "https://github.com/encode/httpcore"
+      },
+      "released_at": "2025-04-24T22:06:20.566605Z",
+      "version": "1.0.9"
+    },
+    {
+      "artifact_count": 2,
+      "compatible_wheels": [
+        {
+          "file": "httpcore2-2.16.0-py3-none-any.whl",
+          "sha256": "5c4358319f2602d984ad93182c9fee5160f22e9da7babdda870a5e7c4e2dc34f",
+          "size": 85070
+        }
+      ],
+      "license_expression": "BSD-3-Clause",
+      "license_field_excerpt": "",
+      "name": "httpcore2",
+      "project_urls": {
+        "Changelog": "https://github.com/pydantic/httpx2/blob/main/src/httpcore2/CHANGELOG.md",
+        "Homepage": "https://github.com/pydantic/httpx2",
+        "Source": "https://github.com/pydantic/httpx2/blob/main/src/httpcore2"
+      },
+      "released_at": "2026-10-21T07:09:42.802531Z",
+      "version": "2.16.0"
+    },
+    {
+      "artifact_count": 2,
+      "compatible_wheels": [
+        {
+          "file": "httpx-0.28.1-py3-none-any.whl",
+          "sha256": "d909fcccc110f8c7faf814ca82a9a4d816bc5a6dbfea25d6591d6985b8ba59ad",
+          "size": 73517
+        }
+      ],
+      "license_expression": null,
+      "license_field_excerpt": "BSD-3-Clause",
+      "name": "httpx",
+      "project_urls": {
+        "Changelog": "https://github.com/encode/httpx/blob/master/CHANGELOG.md",
+        "Documentation": "https://www.python-httpx.org",
+        "Homepage": "https://github.com/encode/httpx",
+        "Source": "https://github.com/encode/httpx"
+      },
+      "released_at": "2024-12-06T15:37:21.509172Z",
+      "version": "0.28.1"
+    },
+    {
+      "artifact_count": 2,
+      "compatible_wheels": [
+        {
+          "file": "httpx_retries-0.6.0-py3-none-any.whl",
+          "sha256": "d1e52a8f68a5df42de75ab89049d5020b2d0ab2f5f8bceacda008d12aa1257a3",
+          "size": 11776
+        }
+      ],
+      "license_classifiers": [
+        "License :: OSI Approved :: MIT License"
+      ],
+      "license_expression": null,
+      "license_field_excerpt": "",
+      "name": "httpx-retries",
+      "project_urls": {
+        "Changelog": "https://github.com/will-ockmore/httpx-retries/blob/master/CHANGELOG.md",
+        "Documentation": "https://will-ockmore.github.io/httpx-retries",
+        "Homepage": "https://github.com/will-ockmore/httpx-retries",
+        "Source": "https://github.com/will-ockmore/httpx-retries"
+      },
+      "released_at": "2026-07-06T00:52:30.093326Z",
+      "version": "0.6.0"
+    },
+    {
+      "artifact_count": 2,
+      "compatible_wheels": [
+        {
+          "file": "httpx2-2.16.0-py3-none-any.whl",
+          "sha256": "fd2c5d7909e8d86fe92d53020c310ca0e4e431b838c207c5754b9bbf0308d49a",
+          "size": 97880
+        }
+      ],
+      "license_expression": "BSD-3-Clause",
+      "license_field_excerpt": "",
+      "name": "httpx2",
+      "project_urls": {
+        "Changelog": "https://github.com/pydantic/httpx2/blob/main/src/httpx2/CHANGELOG.md",
+        "Homepage": "https://github.com/pydantic/httpx2",
+        "Source": "https://github.com/pydantic/httpx2"
+      },
+      "released_at": "2026-10-21T07:09:44.010669Z",
+      "version": "2.16.0"
+    },
+    {
+      "artifact_count": 2,
+      "compatible_wheels": [
+        {
+          "file": "huggingface_hub-2.4.0-py3-none-any.whl",
+          "sha256": "42ecfd93ede47bdd333daebbf66a32d7bfe2e18752754fe4d2d4f98a0179d801",
+          "size": 857021
+        }
+      ],
+      "license_expression": null,
+      "license_field_excerpt": "Apache-2.0",
+      "name": "huggingface-hub",
+      "project_urls": {
+        "Homepage": "https://github.com/huggingface/huggingface_hub"
+      },
+      "released_at": "2026-10-29T15:30:10.421769Z",
+      "version": "2.4.0"
+    },
+    {
+      "artifact_count": 2,
+      "compatible_wheels": [
+        {
+          "file": "idna-3.20-py3-none-any.whl",
+          "sha256": "ab7ae7122974553370f0bdb919e1a960b2cd1bc1ef0276416d896db81c14582c",
+          "size": 69583
+        }
+      ],
+      "license_expression": "BSD-3-Clause",
+      "license_field_excerpt": "",
+      "name": "idna",
+      "project_urls": {
+        "Changelog": "https://github.com/kjd/idna/blob/master/HISTORY.md",
+        "Issue tracker": "https://github.com/kjd/idna/issues",
+        "Source": "https://github.com/kjd/idna"
+      },
+      "released_at": "2026-09-17T14:11:03.168153Z",
+      "version": "3.20"
+    },
+    {
+      "artifact_count": 1,
+      "compatible_wheels": [],
+      "license_expression": null,
+      "license_field_excerpt": "MIT",
+      "name": "jieba",
+      "project_urls": {
+        "Homepage": "https://github.com/fxsjy/jieba"
+      },
+      "released_at": "2020-01-20T14:27:23.500335Z",
+      "version": "0.42.1"
+    },
+    {
+      "artifact_count": 2,
+      "compatible_wheels": [
+        {
+          "file": "jinja2-3.1.6-py3-none-any.whl",
+          "sha256": "85ece4451f492d0c13c5dd7c13a64681a86afae63a5f347908daf103ce6d2f67",
+          "size": 134899
+        }
+      ],
+      "license_classifiers": [
+        "License :: OSI Approved :: BSD License"
+      ],
+      "license_expression": null,
+      "license_field_excerpt": "",
+      "name": "jinja2",
+      "project_urls": {
+        "Changes": "https://jinja.palletsprojects.com/changes/",
+        "Chat": "https://discord.gg/pallets",
+        "Documentation": "https://jinja.palletsprojects.com/",
+        "Donate": "https://palletsprojects.com/donate",
+        "Source": "https://github.com/pallets/jinja/"
+      },
+      "released_at": "2025-03-05T20:05:00.369721Z",
+      "version": "3.1.6"
+    },
+    {
+      "artifact_count": 119,
+      "compatible_wheels": [
+        {
+          "file": "jiter-0.18.0-cp313-cp313-manylinux_2_17_x86_64.manylinux2014_x86_64.whl",
+          "sha256": "6e3350b7431f7b8315b925d9ca0f29a44e8fb6ed45c1fe552392cb6297966bb9",
+          "size": 335978
+        }
+      ],
+      "license_expression": "MIT",
+      "license_field_excerpt": "",
+      "name": "jiter",
+      "project_urls": {
+        "Homepage": "https://github.com/pydantic/jiter/"
+      },
+      "released_at": "2026-10-23T13:48:38.070514Z",
+      "version": "0.18.0"
+    },
+    {
+      "artifact_count": 2,
+      "compatible_wheels": [
+        {
+          "file": "json_repair-0.64.4-py3-none-any.whl",
+          "sha256": "2ef45e3305171db7be06ea9c234efa9a8a2274145f6fc47c7a517034cf83d33b",
+          "size": 52606
+        }
+      ],
+      "license_expression": "MIT",
+      "license_field_excerpt": "",
+      "name": "json-repair",
+      "project_urls": {
+        "Bug Tracker": "https://github.com/mangiucugna/json_repair/issues",
+        "Homepage": "https://github.com/mangiucugna/json_repair/",
+        "Live demo": "https://mangiucugna.github.io/json_repair/"
+      },
+      "released_at": "2026-11-03T04:05:42.724898Z",
+      "version": "0.64.4"
+    },
+    {
+      "artifact_count": 2,
+      "compatible_wheels": [
+        {
+          "file": "latex2mathml-3.81.1-py3-none-any.whl",
+          "sha256": "c337668441b71c819b6733905a8058ba9a9d767bae11a0c5fdacb3aff31361bd",
+          "size": 79159
+        }
+      ],
+      "license_expression": null,
+      "license_field_excerpt": "MIT",
+      "name": "latex2mathml",
+      "project_urls": {
+        "Donate": "https://www.buymeacoffee.com/roniemartinez",
+        "repository": "https://github.com/roniemartinez/latex2mathml"
+      },
+      "released_at": "2026-09-07T19:55:09.611494Z",
+      "version": "3.81.1"
+    },
+    {
+      "artifact_count": 2,
+      "compatible_wheels": [
+        {
+          "file": "loguru-0.7.3-py3-none-any.whl",
+          "sha256": "31a33c10c8e1e10422bfd431aeb5d351c7cf7fa671e3c4df004162264b28220c",
+          "size": 61595
+        }
+      ],
+      "license_classifiers": [
+        "License :: OSI Approved :: MIT License"
+      ],
+      "license_expression": null,
+      "license_field_excerpt": "",
+      "name": "loguru",
+      "project_urls": {
+        "Changelog": "https://github.com/Delgan/loguru/blob/master/CHANGELOG.rst",
+        "Documentation": "https://loguru.readthedocs.io/en/stable/index.html",
+        "Homepage": "https://github.com/Delgan/loguru"
+      },
+      "released_at": "2024-12-06T11:20:54.538869Z",
+      "version": "0.7.3"
+    },
+    {
+      "artifact_count": 176,
+      "compatible_wheels": [
+        {
+          "file": "lxml-6.1.3-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.whl",
+          "sha256": "b477912f42c5c33405a10c759d22f80cf5af043ae02d95b9d8e5e5bc555739ed",
+          "size": 5093324
+        },
+        {
+          "file": "lxml-6.1.3-cp313-cp313-manylinux_2_26_x86_64.manylinux_2_28_x86_64.whl",
+          "sha256": "d85dfab42dd672f87a7f76e9de7172962aee69fa12044f0d6e1a23cbd53fb80e",
+          "size": 5232385
+        }
+      ],
+      "license_expression": null,
+      "license_field_excerpt": "BSD-3-Clause",
+      "name": "lxml",
+      "project_urls": {
+        "Bug Tracker": "https://bugs.launchpad.net/lxml",
+        "Homepage": "https://lxml.de/",
+        "Source": "https://github.com/lxml/lxml"
+      },
+      "released_at": "2026-09-02T14:46:05.131728Z",
+      "version": "6.1.3"
+    },
+    {
+      "artifact_count": 2,
+      "compatible_wheels": [
+        {
+          "file": "mammoth-1.13.0-py2.py3-none-any.whl",
+          "sha256": "dd7629fa9d0a5e82207b3f481a9dcb8308fb43f6206258e062f11121efba9991",
+          "size": 55228
+        }
+      ],
+      "license_expression": null,
+      "license_field_excerpt": "BSD-2-Clause",
+      "name": "mammoth",
+      "project_urls": {
+        "Homepage": "https://github.com/mwilliamson/python-mammoth"
+      },
+      "released_at": "2026-09-26T22:12:08.265589Z",
+      "version": "1.13.0"
+    },
+    {
+      "artifact_count": 2,
+      "compatible_wheels": [
+        {
+          "file": "markdown_it_py-4.2.0-py3-none-any.whl",
+          "sha256": "9f7ebbcd14fe59494226453aed97c1070d83f8d24b6fc3a3bcf9a38092641c4a",
+          "size": 91687
+        }
+      ],
+      "license_classifiers": [
+        "License :: OSI Approved :: MIT License"
+      ],
+      "license_expression": null,
+      "license_field_excerpt": "",
+      "name": "markdown-it-py",
+      "project_urls": {
+        "Documentation": "https://markdown-it-py.readthedocs.io",
+        "Homepage": "https://github.com/executablebooks/markdown-it-py"
+      },
+      "released_at": "2026-05-07T12:08:27.182789Z",
+      "version": "4.2.0"
+    },
+    {
+      "artifact_count": 151,
+      "compatible_wheels": [
+        {
+          "file": "markupsafe-3.0.4-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl",
+          "sha256": "434139499bb20b502ed3baa1f169e618f924a97e7a777fea1a49446d80106cf6",
+          "size": 23017
+        }
+      ],
+      "license_expression": "BSD-3-Clause",
+      "license_field_excerpt": "",
+      "name": "markupsafe",
+      "project_urls": {
+        "Changes": "https://markupsafe.palletsprojects.com/page/changes/",
+        "Chat": "https://discord.gg/pallets",
+        "Documentation": "https://markupsafe.palletsprojects.com/",
+        "Donate": "https://palletsprojects.com/donate",
+        "Source": "https://github.com/pallets/markupsafe/"
+      },
+      "released_at": "2026-10-02T23:04:20.141728Z",
+      "version": "3.0.4"
+    },
+    {
+      "artifact_count": 2,
+      "compatible_wheels": [
+        {
+          "file": "mathml2omml-0.0.2-py3-none-any.whl",
+          "sha256": "6a2a1a10e90d7d8a672a1b37b6b49a6187e6720439aeb922949d254bb4656f25",
+          "size": 23853
+        }
+      ],
+      "license_classifiers": [
+        "License :: OSI Approved :: MIT License"
+      ],
+      "license_expression": null,
+      "license_field_excerpt": "",
+      "name": "mathml2omml",
+      "project_urls": {
+        "Homepage": "https://github.com/amedama41/mathml2omml"
+      },
+      "released_at": "2019-11-24T07:30:51.486344Z",
+      "version": "0.0.2"
+    },
+    {
+      "artifact_count": 2,
+      "compatible_wheels": [
+        {
+          "file": "mdurl-0.1.2-py3-none-any.whl",
+          "sha256": "84008a41e51615a49fc9966191ff91509e3c40b939176e643fd50a5c2196b8f8",
+          "size": 9979
+        }
+      ],
+      "license_classifiers": [
+        "License :: OSI Approved :: MIT License"
+      ],
+      "license_expression": null,
+      "license_field_excerpt": "",
+      "name": "mdurl",
+      "project_urls": {
+        "Homepage": "https://github.com/executablebooks/mdurl"
+      },
+      "released_at": "2022-08-14T12:40:09.779676Z",
+      "version": "0.1.2"
+    },
+    {
+      "artifact_count": 5,
+      "compatible_wheels": [
+        {
+          "file": "metafile_render-0.4.2-cp311-abi3-manylinux_2_28_x86_64.whl",
+          "sha256": "269faeba770cfd16b0ac43012a67c13a587e7976e0b22661d93a2dd828745e00",
+          "size": 350129
+        }
+      ],
+      "license_expression": "MIT",
+      "license_field_excerpt": "",
+      "name": "metafile-render",
+      "project_urls": {
+        "Issues": "https://github.com/myhloli/metafile-render/issues",
+        "Repository": "https://github.com/myhloli/metafile-render"
+      },
+      "released_at": "2026-11-02T09:13:06.773215Z",
+      "version": "0.4.2"
+    },
+    {
+      "artifact_count": 1,
+      "compatible_wheels": [
+        {
+          "file": "mineru-4.1.6-py3-none-any.whl",
+          "sha256": "a89a4638822f968f7f3dcd1509e774010775db3030d3c7449dfb2d6f09f9f96c",
+          "size": 3837902
+        }
+      ],
+      "license_expression": "LicenseRef-MinerU-Open-Source-License",
+      "license_field_excerpt": "",
+      "name": "mineru",
+      "project_urls": {
+        "License": "https://github.com/opendatalab/MinerU/blob/master/LICENSE.md",
+        "documentation": "https://opendatalab.github.io/MinerU/",
+        "homepage": "https://mineru.net/",
+        "issues": "https://github.com/opendatalab/MinerU/issues",
+        "repository": "https://github.com/opendatalab/MinerU"
+      },
+      "released_at": "2026-11-03T12:08:24.088456Z",
+      "version": "4.1.6"
+    },
+    {
+      "artifact_count": 5,
+      "compatible_wheels": [
+        {
+          "file": "mineru_llama_cpp-0.2.0-cp311-abi3-manylinux_2_28_x86_64.whl",
+          "sha256": "45b73833b2829888ebf2df1a96a264959908052f8f6eb90eecd00ec9f0461820",
+          "size": 21542958
+        }
+      ],
+      "license_expression": null,
+      "license_field_excerpt": "MIT License\n         \n         Copyright (c) 2026 mineru-llama-cpp contributors\n         \n         Permission is hereby granted, free of charge, to any person obtaining a copy\n         of this software and associated documentation files (the \"Software\"), to deal\n         in the Software without restriction, including without limitation the rights\n         to use, copy, modify, merge, publish, distribute, sublicense, and/or sell\n         copies of the Software, and to permit persons to whom the S",
+      "name": "mineru-llama-cpp",
+      "project_urls": {
+        "Issues": "https://github.com/opendatalab/mineru-llama-cpp/issues",
+        "Repository": "https://github.com/opendatalab/mineru-llama-cpp"
+      },
+      "released_at": "2026-10-22T16:49:32.175700Z",
+      "version": "0.2.0"
+    },
+    {
+      "artifact_count": 2,
+      "compatible_wheels": [
+        {
+          "file": "mineru_magika-1.0.3-py3-none-any.whl",
+          "sha256": "1b67e05769f48c28d4d5dda0869ece4f4acce769ec7ab6ed169ed34ee5b58343",
+          "size": 2972220
+        }
+      ],
+      "license_expression": null,
+      "license_field_excerpt": "Apache-2.0",
+      "name": "mineru-magika",
+      "project_urls": {
+        "Changelog": "https://github.com/myhloli/mineru-magika/blob/main/python/CHANGELOG.md",
+        "Documentation": "https://github.com/myhloli/mineru-magika/blob/main/python/README.md",
+        "Homepage": "https://github.com/myhloli/mineru-magika",
+        "Issues": "https://github.com/myhloli/mineru-magika/issues",
+        "Repository": "https://github.com/myhloli/mineru-magika/"
+      },
+      "released_at": "2026-10-17T20:37:59.739947Z",
+      "version": "1.0.3"
+    },
+    {
+      "artifact_count": 2,
+      "compatible_wheels": [
+        {
+          "file": "mineru_vl_utils-2.0.8-py3-none-any.whl",
+          "sha256": "e418c28bfc04a92296569c33a6819f4ca1a00fda8159521b5b9af6f7337c228f",
+          "size": 113706
+        }
+      ],
+      "license_expression": "Apache-2.0",
+      "license_field_excerpt": "",
+      "name": "mineru-vl-utils",
+      "project_urls": {
+        "Homepage": "https://github.com/opendatalab/mineru-vl-utils",
+        "Issues": "https://github.com/opendatalab/mineru-vl-utils/issues"
+      },
+      "released_at": "2026-10-29T09:08:25.951580Z",
+      "version": "2.0.8"
+    },
+    {
+      "artifact_count": 40,
+      "compatible_wheels": [
+        {
+          "file": "ml_dtypes-0.6.0-cp313-cp313-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl",
+          "sha256": "26b1f1fa4f0435a2946859823f6e2bf06796f1e9f10f5a05b08a5e3c8f46ff69",
+          "size": 410169
+        }
+      ],
+      "license_expression": "Apache-2.0",
+      "license_field_excerpt": "",
+      "name": "ml-dtypes",
+      "project_urls": {
+        "homepage": "https://github.com/jax-ml/ml_dtypes",
+        "repository": "https://github.com/jax-ml/ml_dtypes"
+      },
+      "released_at": "2026-08-13T14:13:50.012268Z",
+      "version": "0.6.0"
+    },
+    {
+      "artifact_count": 2,
+      "compatible_wheels": [
+        {
+          "file": "modelscope-1.40.2-py3-none-any.whl",
+          "sha256": "ea03e0ec4a73398a488d3d240cda4f0c5b62390377a134756d4074a3036cb909",
+          "size": 6062299
+        }
+      ],
+      "license_expression": "Apache-2.0",
+      "license_field_excerpt": "",
+      "name": "modelscope",
+      "project_urls": {
+        "Homepage": "https://github.com/modelscope/modelscope"
+      },
+      "released_at": "2026-10-09T09:09:07.486720Z",
+      "version": "1.40.2"
+    },
+    {
+      "artifact_count": 2,
+      "compatible_wheels": [
+        {
+          "file": "modelscope_hub-0.6.1-py3-none-any.whl",
+          "sha256": "b1dfed21d24ae2ec7f9ada2ca12a463ab8a8fadf17b2101fdd14d61b1466788f",
+          "size": 289627
+        }
+      ],
+      "license_expression": null,
+      "license_field_excerpt": "Apache-2.0",
+      "name": "modelscope-hub",
+      "project_urls": {},
+      "released_at": "2026-10-30T06:41:51.646897Z",
+      "version": "0.6.1"
+    },
+    {
+      "artifact_count": 27,
+      "compatible_wheels": [
+        {
+          "file": "nh3-0.3.7-cp38-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl",
+          "sha256": "70f5ac8626e899a4bab0ef74ca2f5bd602f49c7b739e6e5026b4afc6d63dac42",
+          "size": 832161
+        }
+      ],
+      "license_expression": null,
+      "license_field_excerpt": "MIT",
+      "name": "nh3",
+      "project_urls": {
+        "Source Code": "https://github.com/messense/nh3"
+      },
+      "released_at": "2026-08-23T14:25:55.259548Z",
+      "version": "0.3.7"
+    },
+    {
+      "artifact_count": 66,
+      "compatible_wheels": [
+        {
+          "file": "numpy-2.5.4-cp313-cp313-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl",
+          "sha256": "6ffa07666f8da0eef81d149934a626d0d95fbd6838432a33e66245423a9062c0",
+          "size": 16718044
+        }
+      ],
+      "license_expression": "BSD-3-Clause AND 0BSD AND MIT AND Zlib AND CC0-1.0",
+      "license_field_excerpt": "",
+      "name": "numpy",
+      "project_urls": {
+        "documentation": "https://numpy.org/doc/",
+        "download": "https://pypi.org/project/numpy/#files",
+        "homepage": "https://numpy.org",
+        "release notes": "https://numpy.org/doc/stable/release",
+        "source": "https://github.com/numpy/numpy",
+        "tracker": "https://github.com/numpy/numpy/issues"
+      },
+      "released_at": "2026-10-10T20:02:40.843976Z",
+      "version": "2.5.4"
+    },
+    {
+      "artifact_count": 2,
+      "compatible_wheels": [
+        {
+          "file": "olefile-0.47-py2.py3-none-any.whl",
+          "sha256": "543c7da2a7adadf21214938bb79c83ea12b473a4b6ee4ad4bf854e7715e13d1f",
+          "size": 114565
+        }
+      ],
+      "license_expression": null,
+      "license_field_excerpt": "BSD",
+      "name": "olefile",
+      "project_urls": {
+        "Download": "https://github.com/decalage2/olefile/tarball/master",
+        "Homepage": "https://www.decalage.info/python/olefileio"
+      },
+      "released_at": "2023-12-01T16:22:51.518738Z",
+      "version": "0.47"
+    },
+    {
+      "artifact_count": 24,
+      "compatible_wheels": [
+        {
+          "file": "onnx-1.23.2-cp312-abi3-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl",
+          "sha256": "7abf381d278f31ac62487fddedc9dd42da842dce94d5d43536836ee3efdf4a2b",
+          "size": 8881633
+        }
+      ],
+      "license_expression": "Apache-2.0",
+      "license_field_excerpt": "",
+      "name": "onnx",
+      "project_urls": {
+        "Homepage": "https://onnx.ai/",
+        "Repository": "https://github.com/onnx/onnx"
+      },
+      "released_at": "2026-10-06T04:25:10.717273Z",
+      "version": "1.23.2"
+    },
+    {
+      "artifact_count": 24,
+      "compatible_wheels": [
+        {
+          "file": "onnxruntime-1.31.1-cp313-cp313-manylinux_2_28_x86_64.whl",
+          "sha256": "74a6a52994616c4d18b33db1e13c226333a70a6ba07480a5cab9c2a50dff1430",
+          "size": 23760717
+        }
+      ],
+      "license_expression": null,
+      "license_field_excerpt": "MIT License",
+      "name": "onnxruntime",
+      "project_urls": {
+        "Download": "https://github.com/microsoft/onnxruntime/tags",
+        "Homepage": "https://onnxruntime.ai"
+      },
+      "released_at": "2026-10-26T19:26:00.372533Z",
+      "version": "1.31.1"
+    },
+    {
+      "artifact_count": 5,
+      "compatible_wheels": [
+        {
+          "file": "onnxruntime_ep_webgpu-0.5.0-py3-none-manylinux_2_28_x86_64.whl",
+          "sha256": "b6baa3e223d9a679023388b1179e5597b6bc0d282ba72f2afe38d46ef37deeb4",
+          "size": 6935993
+        }
+      ],
+      "license_expression": "MIT",
+      "license_field_excerpt": "",
+      "name": "onnxruntime-ep-webgpu",
+      "project_urls": {
+        "Download": "https://github.com/microsoft/onnxruntime/tags",
+        "Homepage": "https://onnxruntime.ai",
+        "Issues": "https://github.com/microsoft/onnxruntime/issues",
+        "Source": "https://github.com/microsoft/onnxruntime"
+      },
+      "released_at": "2026-10-29T21:04:37.083523Z",
+      "version": "0.5.0"
+    },
+    {
+      "artifact_count": 2,
+      "compatible_wheels": [
+        {
+          "file": "openai-2.54.0-py3-none-any.whl",
+          "sha256": "89089789197ccdb87f173a03145ed1598d00795220c93e96cf712b1cbf5e5f2b",
+          "size": 1660351
+        }
+      ],
+      "license_expression": null,
+      "license_field_excerpt": "Apache-2.0",
+      "name": "openai",
+      "project_urls": {
+        "Homepage": "https://github.com/openai/openai-python",
+        "Repository": "https://github.com/openai/openai-python"
+      },
+      "released_at": "2026-08-11T18:46:56.684151Z",
+      "version": "2.54.0"
+    },
+    {
+      "artifact_count": 2,
+      "compatible_wheels": [
+        {
+          "file": "openpyxl-3.1.5-py2.py3-none-any.whl",
+          "sha256": "5282c12b107bffeef825f4617dc029afaf41d0ea60823bbb665ef3079dc79de2",
+          "size": 250910
+        }
+      ],
+      "license_expression": null,
+      "license_field_excerpt": "MIT",
+      "name": "openpyxl",
+      "project_urls": {
+        "Documentation": "https://openpyxl.readthedocs.io/en/stable/",
+        "Homepage": "https://openpyxl.readthedocs.io",
+        "Source": "https://foss.heptapod.net/openpyxl/openpyxl",
+        "Tracker": "https://foss.heptapod.net/openpyxl/openpyxl/-/issues"
+      },
+      "released_at": "2024-06-28T14:03:41.161372Z",
+      "version": "3.1.5"
+    },
+    {
+      "artifact_count": 2,
+      "compatible_wheels": [
+        {
+          "file": "opentelemetry_api-1.45.2-py3-none-any.whl",
+          "sha256": "2cbd737377e710ee740d261c94e93fa0f08e6d037c18f17513cc0a2d94479a34",
+          "size": 60335
+        }
+      ],
+      "license_expression": "Apache-2.0",
+      "license_field_excerpt": "",
+      "name": "opentelemetry-api",
+      "project_urls": {
+        "Homepage": "https://github.com/open-telemetry/opentelemetry-python/tree/main/opentelemetry-api",
+        "Repository": "https://github.com/open-telemetry/opentelemetry-python"
+      },
+      "released_at": "2026-10-29T17:29:06.955093Z",
+      "version": "1.45.2"
+    },
+    {
+      "artifact_count": 59,
+      "compatible_wheels": [
+        {
+          "file": "orjson-3.13.0-cp313-cp313-manylinux_2_17_x86_64.manylinux2014_x86_64.whl",
+          "sha256": "cbed5f4c4b88d94bcc36115f4c3bb3aa25da1563a5c3328aa3acebce2b083040",
+          "size": 130370
+        }
+      ],
+      "license_expression": "MPL-2.0 AND (Apache-2.0 OR MIT)",
+      "license_field_excerpt": "",
+      "name": "orjson",
+      "project_urls": {
+        "changelog": "https://github.com/ijl/orjson/blob/master/CHANGELOG.md",
+        "documentation": "https://github.com/ijl/orjson",
+        "source": "https://github.com/ijl/orjson"
+      },
+      "released_at": "2026-10-07T14:07:54.539211Z",
+      "version": "3.13.0"
+    },
+    {
+      "artifact_count": 2,
+      "compatible_wheels": [
+        {
+          "file": "packaging-26.3-py3-none-any.whl",
+          "sha256": "d7193f7c8e4e93f444fde0262bf90af30e16fa0ad0ad44cb553c87339b23cd1c",
+          "size": 129956
+        }
+      ],
+      "license_expression": "Apache-2.0 OR BSD-2-Clause",
+      "license_field_excerpt": "",
+      "name": "packaging",
+      "project_urls": {
+        "Documentation": "https://packaging.pypa.io/",
+        "Source": "https://github.com/pypa/packaging"
+      },
+      "released_at": "2026-08-04T18:15:27.159957Z",
+      "version": "26.3"
+    },
+    {
+      "artifact_count": 58,
+      "compatible_wheels": [
+        {
+          "file": "pandas-3.1.0-cp313-cp313-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl",
+          "sha256": "de6d0fc96e8551b83f400bf212611a0b3a2b389594d20a2540dacc61b21e7bce",
+          "size": 11991052
+        }
+      ],
+      "license_expression": "BSD-3-Clause",
+      "license_field_excerpt": "",
+      "name": "pandas",
+      "project_urls": {
+        "changelog": "https://pandas.pydata.org/docs/whatsnew/index.html",
+        "documentation": "https://pandas.pydata.org/docs/",
+        "funding": "https://opencollective.com/pandas",
+        "homepage": "https://pandas.pydata.org",
+        "issues": "https://github.com/pandas-dev/pandas/issues",
+        "source": "https://github.com/pandas-dev/pandas"
+      },
+      "released_at": "2026-10-22T11:54:48.330970Z",
+      "version": "3.1.0"
+    },
+    {
+      "artifact_count": 87,
+      "compatible_wheels": [
+        {
+          "file": "pillow-12.3.0-cp313-cp313-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl",
+          "sha256": "0847a763afefb695bc912d7c131e7e0632d4edc1d8698f58ddabec8e46b8b6d3",
+          "size": 6937129
+        }
+      ],
+      "license_expression": "MIT-CMU",
+      "license_field_excerpt": "",
+      "name": "pillow",
+      "project_urls": {
+        "Changelog": "https://github.com/python-pillow/Pillow/releases",
+        "Documentation": "https://pillow.readthedocs.io",
+        "Funding": "https://tidelift.com/subscription/pkg/pypi-pillow?utm_source=pypi-pillow&utm_medium=pypi",
+        "Homepage": "https://python-pillow.github.io",
+        "Mastodon": "https://fosstodon.org/@pillow",
+        "Release notes": "https://pillow.readthedocs.io/en/stable/releasenotes/index.html",
+        "Source": "https://github.com/python-pillow/Pillow"
+      },
+      "released_at": "2026-07-01T11:53:27.808291Z",
+      "version": "12.3.0"
+    },
+    {
+      "artifact_count": 8,
+      "compatible_wheels": [
+        {
+          "file": "protobuf-7.36.2-cp310-abi3-manylinux2014_x86_64.whl",
+          "sha256": "89f23aa53c24553a2416fd4fd1ec06f74fa42b14b546d8883128813f775bbfd2",
+          "size": 343223
+        },
+        {
+          "file": "protobuf-7.36.2-py3-none-any.whl",
+          "sha256": "bdb3a345d48db958e6ce1f18e508beb0cc981d64f24088427549c866cd039f1e",
+          "size": 179806
+        }
+      ],
+      "license_expression": null,
+      "license_field_excerpt": "3-Clause BSD License",
+      "name": "protobuf",
+      "project_urls": {
+        "Homepage": "https://developers.google.com/protocol-buffers/"
+      },
+      "released_at": "2026-09-17T20:07:51.542208Z",
+      "version": "7.36.2"
+    },
+    {
+      "artifact_count": 36,
+      "compatible_wheels": [
+        {
+          "file": "pyclipper-1.4.0-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.whl",
+          "sha256": "14c8bdb5a72004b721c4e6f448d2c2262d74a7f0c9e3076aeff41e564a92389f",
+          "size": 972142
+        }
+      ],
+      "license_expression": null,
+      "license_field_excerpt": "MIT",
+      "name": "pyclipper",
+      "project_urls": {
+        "Homepage": "https://github.com/fonttools/pyclipper"
+      },
+      "released_at": "2025-12-01T13:14:46.551140Z",
+      "version": "1.4.0"
+    },
+    {
+      "artifact_count": 2,
+      "compatible_wheels": [
+        {
+          "file": "pycparser-3.12-py3-none-any.whl",
+          "sha256": "a076f3f489b39b43ed13563a1dafe42447445bec2e294154ec5c57fcdda4c85e",
+          "size": 62600
+        }
+      ],
+      "license_expression": "BSD-3-Clause",
+      "license_field_excerpt": "",
+      "name": "pycparser",
+      "project_urls": {
+        "Homepage": "https://github.com/eliben/pycparser"
+      },
+      "released_at": "2026-10-22T13:40:02.021539Z",
+      "version": "3.12"
+    },
+    {
+      "artifact_count": 2,
+      "compatible_wheels": [
+        {
+          "file": "pydantic-2.14.2-py3-none-any.whl",
+          "sha256": "7efbf7507b937931cd32a5755acb00ea1cf5ccb1d4e8067a5850d5069e382118",
+          "size": 490403
+        }
+      ],
+      "license_expression": "MIT",
+      "license_field_excerpt": "",
+      "name": "pydantic",
+      "project_urls": {
+        "Changelog": "https://pydantic.dev/docs/validation/latest/get-started/changelog/",
+        "Documentation": "https://pydantic.dev/docs/validation/latest/get-started/",
+        "Funding": "https://github.com/sponsors/samuelcolvin",
+        "Homepage": "https://github.com/pydantic/pydantic",
+        "Source": "https://github.com/pydantic/pydantic"
+      },
+      "released_at": "2026-10-29T16:37:10.181777Z",
+      "version": "2.14.2"
+    },
+    {
+      "artifact_count": 141,
+      "compatible_wheels": [
+        {
+          "file": "pydantic_core-2.50.2-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.whl",
+          "sha256": "31a1fb3ffbd1195b24490f671d12623dd4c9bfa56d6af0a299fa43b516134f5b",
+          "size": 2241760
+        }
+      ],
+      "license_expression": "MIT",
+      "license_field_excerpt": "",
+      "name": "pydantic-core",
+      "project_urls": {
+        "Funding": "https://github.com/sponsors/samuelcolvin",
+        "Homepage": "https://github.com/pydantic",
+        "Source": "https://github.com/pydantic/pydantic/tree/main/pydantic-core"
+      },
+      "released_at": "2026-10-29T16:31:28.258642Z",
+      "version": "2.50.2"
+    },
+    {
+      "artifact_count": 2,
+      "compatible_wheels": [
+        {
+          "file": "pydub-0.25.1-py2.py3-none-any.whl",
+          "sha256": "65617e33033874b59d87db603aa1ed450633288aefead953b30bded59cb599a6",
+          "size": 32327
+        }
+      ],
+      "license_expression": null,
+      "license_field_excerpt": "MIT",
+      "name": "pydub",
+      "project_urls": {
+        "Homepage": "http://pydub.com"
+      },
+      "released_at": "2021-03-10T02:09:53.503020Z",
+      "version": "0.25.1"
+    },
+    {
+      "artifact_count": 2,
+      "compatible_wheels": [
+        {
+          "file": "pygments-2.21.0-py3-none-any.whl",
+          "sha256": "2363c69b61c4a97c838da3b130dcd6468f4848992b21a82f2a63ec34377137d9",
+          "size": 1250147
+        }
+      ],
+      "license_expression": "BSD-2-Clause",
+      "license_field_excerpt": "",
+      "name": "pygments",
+      "project_urls": {
+        "Bug Tracker": "https://github.com/pygments/pygments/issues",
+        "Changelog": "https://github.com/pygments/pygments/blob/master/CHANGES",
+        "Documentation": "https://pygments.org/docs",
+        "Homepage": "https://pygments.org",
+        "Source": "https://github.com/pygments/pygments"
+      },
+      "released_at": "2026-08-17T08:02:44.912148Z",
+      "version": "2.21.0"
+    },
+    {
+      "artifact_count": 2,
+      "compatible_wheels": [
+        {
+          "file": "pylatexenc-2.11-py2.py3-none-any.whl",
+          "sha256": "e78e7391d6c104f1ed150e21cfaa58016cdb50aa54406a2eecb793649ffdfdd0",
+          "size": 137533
+        }
+      ],
+      "license_expression": null,
+      "license_field_excerpt": "MIT",
+      "name": "pylatexenc",
+      "project_urls": {
+        "Homepage": "https://github.com/phfaist/pylatexenc"
+      },
+      "released_at": "2026-07-25T17:26:30.141359Z",
+      "version": "2.11"
+    },
+    {
+      "artifact_count": 2,
+      "compatible_wheels": [
+        {
+          "file": "pypdf-6.21.4-py3-none-any.whl",
+          "sha256": "33e4fb41ca352810eb4e9838aa0d82d6888a5f8bf682f43e99cce5faa666255c",
+          "size": 410430
+        }
+      ],
+      "license_expression": "BSD-3-Clause",
+      "license_field_excerpt": "",
+      "name": "pypdf",
+      "project_urls": {
+        "Bug Reports": "https://github.com/py-pdf/pypdf/issues",
+        "Changelog": "https://pypdf.readthedocs.io/en/latest/meta/CHANGELOG.html",
+        "Documentation": "https://pypdf.readthedocs.io/en/latest/",
+        "Source": "https://github.com/py-pdf/pypdf"
+      },
+      "released_at": "2026-10-28T17:00:53.146109Z",
+      "version": "6.21.4"
+    },
+    {
+      "artifact_count": 23,
+      "compatible_wheels": [
+        {
+          "file": "pypdfium2-5.14.0-py3-none-manylinux_2_17_x86_64.manylinux2014_x86_64.whl",
+          "sha256": "11f281613fa22313d9c7ab89947665e84eccf8ebe40e1198a84a88352305648d",
+          "size": 3799581
+        }
+      ],
+      "license_expression": null,
+      "license_field_excerpt": "BSD-3-Clause, Apache-2.0, dependency licenses",
+      "name": "pypdfium2",
+      "project_urls": {
+        "Changelog": "https://pypdfium2.readthedocs.io/en/stable/changelog.html",
+        "Documentation": "https://pypdfium2.readthedocs.io",
+        "Homepage": "https://github.com/pypdfium2-team/pypdfium2",
+        "Source": "https://github.com/pypdfium2-team/pypdfium2",
+        "Tracker": "https://github.com/pypdfium2-team/pypdfium2/issues"
+      },
+      "released_at": "2026-10-04T15:18:40.790754Z",
+      "version": "5.14.0"
+    },
+    {
+      "artifact_count": 2,
+      "compatible_wheels": [
+        {
+          "file": "pypptx_with_oxml-1.0.3-py3-none-any.whl",
+          "sha256": "4b3ccf51185e0f9e60ebf2884e74153d7fcb00e7e4f0461404e96e0260d7bba1",
+          "size": 493041
+        }
+      ],
+      "license_expression": null,
+      "license_field_excerpt": "MIT",
+      "name": "pypptx-with-oxml",
+      "project_urls": {
+        "Homepage": "https://github.com/Sidney233/python-pptx"
+      },
+      "released_at": "2026-01-30T08:51:25.797661Z",
+      "version": "1.0.3"
+    },
+    {
+      "artifact_count": 2,
+      "compatible_wheels": [
+        {
+          "file": "python_dateutil-4.0.0-py3-none-any.whl",
+          "sha256": "a5e246f79eb80475e691bf93862cead98decd8a498cf53ba0516fcdc0f50dc1c",
+          "size": 92853
+        }
+      ],
+      "license_expression": "BSD-3-Clause",
+      "license_field_excerpt": "",
+      "name": "python-dateutil",
+      "project_urls": {
+        "Documentation": "https://dateutil.readthedocs.io/en/stable/",
+        "Homepage": "https://github.com/dateutil/dateutil",
+        "Source": "https://github.com/dateutil/dateutil"
+      },
+      "released_at": "2026-11-01T07:02:40.797470Z",
+      "version": "4.0.0"
+    },
+    {
+      "artifact_count": 2,
+      "compatible_wheels": [
+        {
+          "file": "python_docx-1.2.0-py3-none-any.whl",
+          "sha256": "3fd478f3250fbbbfd3b94fe1e985955737c145627498896a8a6bf81f4baf66c7",
+          "size": 252987
+        }
+      ],
+      "license_expression": null,
+      "license_field_excerpt": "MIT",
+      "name": "python-docx",
+      "project_urls": {
+        "Changelog": "https://github.com/python-openxml/python-docx/blob/master/HISTORY.rst",
+        "Documentation": "https://python-docx.readthedocs.org/en/latest/",
+        "Homepage": "https://github.com/python-openxml/python-docx",
+        "Repository": "https://github.com/python-openxml/python-docx"
+      },
+      "released_at": "2025-06-16T20:46:22.506016Z",
+      "version": "1.2.0"
+    },
+    {
+      "artifact_count": 2,
+      "compatible_wheels": [
+        {
+          "file": "python_multipart-0.0.33-py3-none-any.whl",
+          "sha256": "8f16c07b36add9da6b2ee87d3efcaf0a45a6de9c3d0a5dd94e9ccf7675a7bc45",
+          "size": 32253
+        }
+      ],
+      "license_expression": "Apache-2.0",
+      "license_field_excerpt": "",
+      "name": "python-multipart",
+      "project_urls": {
+        "Changelog": "https://github.com/Kludex/python-multipart/blob/master/CHANGELOG.md",
+        "Documentation": "https://kludex.github.io/python-multipart/",
+        "Homepage": "https://github.com/Kludex/python-multipart",
+        "Source": "https://github.com/Kludex/python-multipart"
+      },
+      "released_at": "2026-10-31T14:23:46.330089Z",
+      "version": "0.0.33"
+    },
+    {
+      "artifact_count": 2,
+      "compatible_wheels": [
+        {
+          "file": "pytz-2026.6-py2.py3-none-any.whl",
+          "sha256": "7fed3fee8fd6bd4a2b7b75a8d56021d0624127bf69bd5691f115db929ac570b3",
+          "size": 506321
+        }
+      ],
+      "license_expression": null,
+      "license_field_excerpt": "MIT",
+      "name": "pytz",
+      "project_urls": {
+        "Download": "https://pypi.org/project/pytz/",
+        "Homepage": "http://pythonhosted.org/pytz",
+        "Issues": "https://github.com/stub42/pytz/issues",
+        "Source": "https://github.com/stub42/pytz.git"
+      },
+      "released_at": "2026-10-29T09:05:45.140432Z",
+      "version": "2026.6"
+    },
+    {
+      "artifact_count": 73,
+      "compatible_wheels": [
+        {
+          "file": "pyyaml-6.0.3-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl",
+          "sha256": "0f29edc409a6392443abf94b9cf89ce99889a1dd5376d94316ae5145dfedd5d6",
+          "size": 801626
+        }
+      ],
+      "license_expression": null,
+      "license_field_excerpt": "MIT",
+      "name": "pyyaml",
+      "project_urls": {
+        "Bug Tracker": "https://github.com/yaml/pyyaml/issues",
+        "CI": "https://github.com/yaml/pyyaml/actions",
+        "Documentation": "https://pyyaml.org/wiki/PyYAMLDocumentation",
+        "Download": "https://pypi.org/project/PyYAML/",
+        "Homepage": "https://pyyaml.org/",
+        "Mailing lists": "http://lists.sourceforge.net/lists/listinfo/yaml-core",
+        "Source Code": "https://github.com/yaml/pyyaml"
+      },
+      "released_at": "2025-09-25T21:31:46.040932Z",
+      "version": "6.0.3"
+    },
+    {
+      "artifact_count": 2,
+      "compatible_wheels": [
+        {
+          "file": "reportlab-5.1.0-py3-none-any.whl",
+          "sha256": "59fdbaec5efe437095ad1d7292ec9a271c8ca2d3ec75e889c6e61400929b90df",
+          "size": 2018647
+        }
+      ],
+      "license_expression": null,
+      "license_field_excerpt": "BSD license (see license.txt for details), Copyright (c) 2000-2025, ReportLab Inc.",
+      "name": "reportlab",
+      "project_urls": {
+        "Homepage": "https://www.reportlab.com/"
+      },
+      "released_at": "2026-10-22T07:26:40.754265Z",
+      "version": "5.1.0"
+    },
+    {
+      "artifact_count": 2,
+      "compatible_wheels": [
+        {
+          "file": "requests-2.34.2-py3-none-any.whl",
+          "sha256": "2a0d60c172f83ac6ab31e4554906c0f3b3588d37b5cb939b1c061f4907e278e0",
+          "size": 73075
+        }
+      ],
+      "license_expression": null,
+      "license_field_excerpt": "Apache-2.0",
+      "name": "requests",
+      "project_urls": {
+        "Documentation": "https://requests.readthedocs.io",
+        "Source": "https://github.com/psf/requests"
+      },
+      "released_at": "2026-05-14T19:25:26.443000Z",
+      "version": "2.34.2"
+    },
+    {
+      "artifact_count": 58,
+      "compatible_wheels": [
+        {
+          "file": "resvg_py-0.5.0-cp310-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl",
+          "sha256": "84f2378ecc7a8e38b03429efaefc816daec1b1970114909a6f973393b297c91b",
+          "size": 1405807
+        }
+      ],
+      "license_classifiers": [],
+      "license_expression": null,
+      "license_field_excerpt": "",
+      "name": "resvg-py",
+      "project_urls": {
+        "Documentation": "https://resvg-py.readthedocs.io/",
+        "Issues": "https://github.com/baseplate-admin/resvg-py/issues",
+        "Source Code": "https://github.com/baseplate-admin/resvg-py"
+      },
+      "released_at": "2026-08-24T19:42:09.747993Z",
+      "version": "0.5.0"
+    },
+    {
+      "artifact_count": 2,
+      "compatible_wheels": [
+        {
+          "file": "rich-15.0.0-py3-none-any.whl",
+          "sha256": "33bd4ef74232fb73fe9279a257718407f169c09b78a87ad3d296f548e27de0bb",
+          "size": 310654
+        }
+      ],
+      "license_expression": null,
+      "license_field_excerpt": "MIT",
+      "name": "rich",
+      "project_urls": {
+        "Documentation": "https://rich.readthedocs.io/en/latest/",
+        "Homepage": "https://github.com/Textualize/rich"
+      },
+      "released_at": "2026-04-12T08:24:00.750018Z",
+      "version": "15.0.0"
+    },
+    {
+      "artifact_count": 17,
+      "compatible_wheels": [
+        {
+          "file": "rl_accel-0.9.1-cp37-abi3-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl",
+          "sha256": "ce947b8473a075763fe66f53ec91a441a0c5d38cf4dfad952a8ce276e563b8f6",
+          "size": 56165
+        }
+      ],
+      "license_expression": null,
+      "license_field_excerpt": "BSD license (see LICENSE.txt for details), Copyright (c) 2000-2022, ReportLab Inc.",
+      "name": "rl-accel",
+      "project_urls": {
+        "Homepage": "http://www.reportlab.com/"
+      },
+      "released_at": "2025-02-12T16:13:12.884812Z",
+      "version": "0.9.1"
+    },
+    {
+      "artifact_count": 2,
+      "compatible_wheels": [
+        {
+          "file": "safehttpx-0.1.7-py3-none-any.whl",
+          "sha256": "c4f4a162db6993464d7ca3d7cc4af0ffc6515a606dfd220b9f82c6945d869cde",
+          "size": 8959
+        }
+      ],
+      "license_classifiers": [
+        "License :: OSI Approved :: MIT License"
+      ],
+      "license_expression": null,
+      "license_field_excerpt": "",
+      "name": "safehttpx",
+      "project_urls": {
+        "homepage": "https://github.com/gradio-app/safehttpx",
+        "repository": "https://github.com/gradio-app/safehttpx"
+      },
+      "released_at": "2025-10-24T18:30:08.733094Z",
+      "version": "0.1.7"
+    },
+    {
+      "artifact_count": 2,
+      "compatible_wheels": [
+        {
+          "file": "semantic_version-2.10.0-py2.py3-none-any.whl",
+          "sha256": "de78a3b8e0feda74cabc54aab2da702113e33ac9d9eb9d2389bcf1f58b7d9177",
+          "size": 15552
+        }
+      ],
+      "license_expression": null,
+      "license_field_excerpt": "BSD",
+      "name": "semantic-version",
+      "project_urls": {
+        "Homepage": "https://github.com/rbarrois/python-semanticversion"
+      },
+      "released_at": "2022-05-26T13:35:21.206388Z",
+      "version": "2.10.0"
+    },
+    {
+      "artifact_count": 2,
+      "compatible_wheels": [
+        {
+          "file": "setuptools-84.2.1-py3-none-any.whl",
+          "sha256": "ca140b45d5325a9478f880e351484f62fef15f336462e449ca0c03c873d589c2",
+          "size": 876263
+        }
+      ],
+      "license_expression": "MIT",
+      "license_field_excerpt": "",
+      "name": "setuptools",
+      "project_urls": {
+        "Changelog": "https://setuptools.pypa.io/en/stable/history.html",
+        "Documentation": "https://setuptools.pypa.io/",
+        "Source": "https://github.com/pypa/setuptools"
+      },
+      "released_at": "2026-10-20T19:01:35.678013Z",
+      "version": "84.2.1"
+    },
+    {
+      "artifact_count": 64,
+      "compatible_wheels": [
+        {
+          "file": "shapely-2.2.0-cp313-cp313-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl",
+          "sha256": "f340e7f99aaee3df5acd6b247cddf723051a7c93d1e1ef09025b80d84e4c0ded",
+          "size": 2299018
+        }
+      ],
+      "license_expression": "BSD-3-Clause",
+      "license_field_excerpt": "",
+      "name": "shapely",
+      "project_urls": {
+        "Documentation": "https://shapely.readthedocs.io/",
+        "Repository": "https://github.com/shapely/shapely"
+      },
+      "released_at": "2026-10-07T09:15:56.158366Z",
+      "version": "2.2.0"
+    },
+    {
+      "artifact_count": 2,
+      "compatible_wheels": [
+        {
+          "file": "shellingham-1.5.4-py2.py3-none-any.whl",
+          "sha256": "7ecfff8f2fd72616f7481040475a65b2bf8af90a56c89140852d1120324e8686",
+          "size": 9755
+        }
+      ],
+      "license_expression": null,
+      "license_field_excerpt": "ISC License",
+      "name": "shellingham",
+      "project_urls": {
+        "Homepage": "https://github.com/sarugaku/shellingham"
+      },
+      "released_at": "2023-10-24T04:13:38.866125Z",
+      "version": "1.5.4"
+    },
+    {
+      "artifact_count": 2,
+      "compatible_wheels": [
+        {
+          "file": "sniffio-1.3.1-py3-none-any.whl",
+          "sha256": "2f6da418d1f1e0fddd844478f41680e794e6051915791a034ff65e5f100525a2",
+          "size": 10235
+        }
+      ],
+      "license_expression": null,
+      "license_field_excerpt": "MIT OR Apache-2.0",
+      "name": "sniffio",
+      "project_urls": {
+        "Changelog": "https://sniffio.readthedocs.io/en/latest/history.html",
+        "Documentation": "https://sniffio.readthedocs.io/",
+        "Homepage": "https://github.com/python-trio/sniffio"
+      },
+      "released_at": "2024-02-25T23:20:01.196159Z",
+      "version": "1.3.1"
+    },
+    {
+      "artifact_count": 2,
+      "compatible_wheels": [
+        {
+          "file": "soupsieve-4.0-py3-none-any.whl",
+          "sha256": "5e7494bfce90e06676cfb4c5c2cf22243e98e5cf24646bb1ecdda46d318550a0",
+          "size": 50158
+        }
+      ],
+      "license_expression": "MIT",
+      "license_field_excerpt": "",
+      "name": "soupsieve",
+      "project_urls": {
+        "Homepage": "https://github.com/facelessuser/soupsieve"
+      },
+      "released_at": "2026-11-03T14:28:53.988819Z",
+      "version": "4.0"
+    },
+    {
+      "artifact_count": 2,
+      "compatible_wheels": [
+        {
+          "file": "starlette-1.10.0-py3-none-any.whl",
+          "sha256": "478c0ab3b4ced6e82719849c118fa406f0278a3499c1a898cd15cd31bdc38ce4",
+          "size": 80571
+        }
+      ],
+      "license_expression": "BSD-3-Clause",
+      "license_field_excerpt": "",
+      "name": "starlette",
+      "project_urls": {
+        "Changelog": "https://starlette.dev/release-notes/",
+        "Documentation": "https://starlette.dev/",
+        "Funding": "https://github.com/sponsors/Kludex",
+        "Homepage": "https://github.com/Kludex/starlette",
+        "Source": "https://github.com/Kludex/starlette"
+      },
+      "released_at": "2026-10-24T15:04:10.371825Z",
+      "version": "1.10.0"
+    },
+    {
+      "artifact_count": 2,
+      "compatible_wheels": [
+        {
+          "file": "tinycss2-1.5.1-py3-none-any.whl",
+          "sha256": "3415ba0f5839c062696996998176c4a3751d18b7edaaeeb658c9ce21ec150661",
+          "size": 28404
+        }
+      ],
+      "license_classifiers": [
+        "License :: OSI Approved :: BSD License"
+      ],
+      "license_expression": null,
+      "license_field_excerpt": "",
+      "name": "tinycss2",
+      "project_urls": {
+        "Changelog": "https://github.com/Kozea/tinycss2/releases",
+        "Code": "https://github.com/Kozea/tinycss2/",
+        "Documentation": "https://doc.courtbouillon.org/tinycss2/",
+        "Donation": "https://opencollective.com/courtbouillon",
+        "Homepage": "https://www.courtbouillon.org/tinycss2",
+        "Issues": "https://github.com/Kozea/tinycss2/issues"
+      },
+      "released_at": "2025-11-23T10:29:08.676338Z",
+      "version": "1.5.1"
+    },
+    {
+      "artifact_count": 24,
+      "compatible_wheels": [
+        {
+          "file": "tokenizers-0.23.3-cp310-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl",
+          "sha256": "376851d22bcf9d650a5c3090bb83e6cf9e895fbf0595369fa4cd43c1f69b5f87",
+          "size": 3396193
+        }
+      ],
+      "license_classifiers": [
+        "License :: OSI Approved :: Apache Software License"
+      ],
+      "license_expression": null,
+      "license_field_excerpt": "",
+      "name": "tokenizers",
+      "project_urls": {
+        "Homepage": "https://github.com/huggingface/tokenizers",
+        "Source": "https://github.com/huggingface/tokenizers"
+      },
+      "released_at": "2026-10-09T10:00:51.457208Z",
+      "version": "0.23.3"
+    },
+    {
+      "artifact_count": 2,
+      "compatible_wheels": [
+        {
+          "file": "tomlkit-0.14.0-py3-none-any.whl",
+          "sha256": "592064ed85b40fa213469f81ac584f67a4f2992509a7c3ea2d632208623a3680",
+          "size": 39310
+        }
+      ],
+      "license_expression": null,
+      "license_field_excerpt": "MIT",
+      "name": "tomlkit",
+      "project_urls": {
+        "Homepage": "https://github.com/sdispater/tomlkit",
+        "Repository": "https://github.com/sdispater/tomlkit"
+      },
+      "released_at": "2026-01-13T01:14:51.965142Z",
+      "version": "0.14.0"
+    },
+    {
+      "artifact_count": 2,
+      "compatible_wheels": [
+        {
+          "file": "tqdm-4.70.1-py3-none-any.whl",
+          "sha256": "c293e525e6fef9c20e8728fd4612df02a0aa31bb5fe91ecd93e123b1b7bffa73",
+          "size": 80199
+        }
+      ],
+      "license_expression": null,
+      "license_field_excerpt": "MPL-2.0 AND MIT",
+      "name": "tqdm",
+      "project_urls": {
+        "changelog": "https://tqdm.github.io/releases",
+        "homepage": "https://tqdm.github.io",
+        "repository": "https://github.com/tqdm/tqdm",
+        "wiki": "https://github.com/tqdm/tqdm/wiki"
+      },
+      "released_at": "2026-09-11T07:25:14.599062Z",
+      "version": "4.70.1"
+    },
+    {
+      "artifact_count": 2,
+      "compatible_wheels": [
+        {
+          "file": "truststore-0.10.5-py3-none-any.whl",
+          "sha256": "9aaaedaefaf06d8b206278cf8b5012bc897f485a874503501e12d776df78951c",
+          "size": 19017
+        }
+      ],
+      "license_expression": "MIT",
+      "license_field_excerpt": "",
+      "name": "truststore",
+      "project_urls": {
+        "Documentation": "https://truststore.readthedocs.io",
+        "Source": "https://github.com/sethmlarson/truststore"
+      },
+      "released_at": "2026-10-12T22:27:30.377491Z",
+      "version": "0.10.5"
+    },
+    {
+      "artifact_count": 2,
+      "compatible_wheels": [
+        {
+          "file": "typer-0.27.3-py3-none-any.whl",
+          "sha256": "e50022f28b82a86313e54501317a1db64bf8f8d036ff8cfe5ca7e47675454aff",
+          "size": 123312
+        }
+      ],
+      "license_expression": "MIT",
+      "license_field_excerpt": "",
+      "name": "typer",
+      "project_urls": {
+        "Changelog": "https://typer.tiangolo.com/release-notes/",
+        "Documentation": "https://typer.tiangolo.com",
+        "Homepage": "https://github.com/fastapi/typer",
+        "Issues": "https://github.com/fastapi/typer/issues",
+        "Repository": "https://github.com/fastapi/typer"
+      },
+      "released_at": "2026-10-06T17:24:15.054699Z",
+      "version": "0.27.3"
+    },
+    {
+      "artifact_count": 2,
+      "compatible_wheels": [
+        {
+          "file": "typing_extensions-4.16.0-py3-none-any.whl",
+          "sha256": "481caa481374e813c1b176ada14e97f1f67a4539ce9cfeb3f350d78d6370c2e8",
+          "size": 45571
+        }
+      ],
+      "license_expression": "PSF-2.0",
+      "license_field_excerpt": "",
+      "name": "typing-extensions",
+      "project_urls": {
+        "Bug Tracker": "https://github.com/python/typing_extensions/issues",
+        "Changes": "https://github.com/python/typing_extensions/blob/main/CHANGELOG.md",
+        "Documentation": "https://typing-extensions.readthedocs.io/",
+        "Home": "https://github.com/python/typing_extensions",
+        "Q & A": "https://github.com/python/typing/discussions",
+        "Repository": "https://github.com/python/typing_extensions"
+      },
+      "released_at": "2026-07-02T08:40:04.659120Z",
+      "version": "4.16.0"
+    },
+    {
+      "artifact_count": 2,
+      "compatible_wheels": [
+        {
+          "file": "typing_inspection-0.4.4-py3-none-any.whl",
+          "sha256": "65b8397ba37ccbce054456aaccddfc91e6e3083c92824df348d96ca832f3f147",
+          "size": 14750
+        }
+      ],
+      "license_expression": "MIT",
+      "license_field_excerpt": "",
+      "name": "typing-inspection",
+      "project_urls": {
+        "Changelog": "https://github.com/pydantic/typing-inspection/blob/main/HISTORY.md",
+        "Documentation": "https://pydantic.github.io/typing-inspection/dev/",
+        "Homepage": "https://github.com/pydantic/typing-inspection",
+        "Source": "https://github.com/pydantic/typing-inspection"
+      },
+      "released_at": "2026-08-12T12:37:24.648475Z",
+      "version": "0.4.4"
+    },
+    {
+      "artifact_count": 2,
+      "compatible_wheels": [
+        {
+          "file": "tzdata-2026.6-py2.py3-none-any.whl",
+          "sha256": "0a10eec6e13ef16b627fabed9a5f2ba61a62b1c67f327305f4e7e412a70b4aec",
+          "size": 348210
+        }
+      ],
+      "license_expression": null,
+      "license_field_excerpt": "Apache-2.0",
+      "name": "tzdata",
+      "project_urls": {
+        "Bug Reports": "https://github.com/python/tzdata/issues",
+        "Documentation": "https://tzdata.python.org",
+        "Homepage": "https://github.com/python/tzdata",
+        "Source": "https://github.com/python/tzdata"
+      },
+      "released_at": "2026-10-28T09:57:07.276552Z",
+      "version": "2026.6"
+    },
+    {
+      "artifact_count": 2,
+      "compatible_wheels": [
+        {
+          "file": "urllib3-2.8.0-py3-none-any.whl",
+          "sha256": "0cf3cae568d36aa9576b28dfb35f11328f1cb974ca7647d9475ebb86c75ac6e3",
+          "size": 135717
+        }
+      ],
+      "license_expression": "MIT",
+      "license_field_excerpt": "",
+      "name": "urllib3",
+      "project_urls": {
+        "Changelog": "https://github.com/urllib3/urllib3/blob/main/CHANGES.rst",
+        "Code": "https://github.com/urllib3/urllib3",
+        "Documentation": "https://urllib3.readthedocs.io",
+        "Issue tracker": "https://github.com/urllib3/urllib3/issues",
+        "Security policy": "https://urllib3.readthedocs.io/en/latest/security.html"
+      },
+      "released_at": "2026-09-15T19:29:34.577402Z",
+      "version": "2.8.0"
+    },
+    {
+      "artifact_count": 2,
+      "compatible_wheels": [
+        {
+          "file": "uvicorn-0.54.0-py3-none-any.whl",
+          "sha256": "505bdb0f318731d45f1f712071fc781a8981f6847a31c902c9f5e652d4f67faf",
+          "size": 87427
+        }
+      ],
+      "license_expression": "BSD-3-Clause",
+      "license_field_excerpt": "",
+      "name": "uvicorn",
+      "project_urls": {
+        "Changelog": "https://uvicorn.dev/release-notes",
+        "Funding": "https://github.com/sponsors/Kludex",
+        "Homepage": "https://uvicorn.dev/",
+        "Source": "https://github.com/Kludex/uvicorn"
+      },
+      "released_at": "2026-09-25T06:52:35.829563Z",
+      "version": "0.54.0"
+    },
+    {
+      "artifact_count": 33,
+      "compatible_wheels": [
+        {
+          "file": "watchfiles-1.3.0-cp310-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl",
+          "sha256": "b5768b49e426fd5b550b012c866db347cdf15c398ef98dc557b6e6b72fa74cd1",
+          "size": 458353
+        }
+      ],
+      "license_expression": null,
+      "license_field_excerpt": "MIT",
+      "name": "watchfiles",
+      "project_urls": {
+        "Changelog": "https://github.com/samuelcolvin/watchfiles/releases",
+        "Documentation": "https://watchfiles.helpmanual.io",
+        "Funding": "https://github.com/sponsors/samuelcolvin",
+        "Homepage": "https://github.com/samuelcolvin/watchfiles",
+        "Source": "https://github.com/samuelcolvin/watchfiles"
+      },
+      "released_at": "2026-09-21T09:08:13.518274Z",
+      "version": "1.3.0"
+    },
+    {
+      "artifact_count": 29,
+      "compatible_wheels": [
+        {
+          "file": "wcwidth-0.9.4-cp310-abi3-manylinux2014_x86_64.manylinux_2_17_x86_64.whl",
+          "sha256": "b185c8b927b23af2721be1783499d1cfa5c028b098b0858951b4ae224477f1c2",
+          "size": 785946
+        },
+        {
+          "file": "wcwidth-0.9.4-py3-none-any.whl",
+          "sha256": "901eace6d2dd25ebb917d0ce5db18e5c537e1504c905cf32f0d006c12098b05d",
+          "size": 301806
+        }
+      ],
+      "license_classifiers": [
+        "License :: OSI Approved :: MIT License"
+      ],
+      "license_expression": null,
+      "license_field_excerpt": "",
+      "name": "wcwidth",
+      "project_urls": {
+        "Homepage": "https://github.com/jquast/wcwidth"
+      },
+      "released_at": "2026-10-24T18:10:52.651030Z",
+      "version": "0.9.4"
+    },
+    {
+      "artifact_count": 2,
+      "compatible_wheels": [
+        {
+          "file": "webencodings-0.6.1-py3-none-any.whl",
+          "sha256": "7fab6269c8bf237c657876b52058ccb182e861518d1c695c1a9aaa8c1c105d5b",
+          "size": 8745
+        }
+      ],
+      "license_classifiers": [
+        "License :: OSI Approved :: BSD License"
+      ],
+      "license_expression": null,
+      "license_field_excerpt": "",
+      "name": "webencodings",
+      "project_urls": {
+        "Changelog": "https://github.com/CourtBouillon/webencodings/releases",
+        "Code": "https://github.com/CourtBouillon/webencodings",
+        "Documentation": "https://doc.courtbouillon.org/webencodings",
+        "Donation": "https://opencollective.com/courtbouillon",
+        "Homepage": "https://github.com/CourtBouillon/webencodings",
+        "Issues": "https://github.com/CourtBouillon/webencodings/issues"
+      },
+      "released_at": "2026-08-15T14:22:56.310482Z",
+      "version": "0.6.1"
+    },
+    {
+      "artifact_count": 2,
+      "compatible_wheels": [
+        {
+          "file": "xlsxwriter-3.3.1-py3-none-any.whl",
+          "sha256": "8e2c89e59d733fe59e112317218c64fbbc276d90a8c144ebd6f7fa15e7ab184a",
+          "size": 180583
+        }
+      ],
+      "license_expression": "BSD-2-Clause",
+      "license_field_excerpt": "",
+      "name": "xlsxwriter",
+      "project_urls": {
+        "Changelog": "https://github.com/jmcnamara/XlsxWriter/blob/main/Changes",
+        "Documentation": "https://xlsxwriter.readthedocs.io",
+        "Homepage": "https://github.com/jmcnamara/XlsxWriter",
+        "Issues": "https://github.com/jmcnamara/XlsxWriter/issues",
+        "Repository": "https://github.com/jmcnamara/XlsxWriter"
+      },
+      "released_at": "2026-10-28T22:52:45.048756Z",
+      "version": "3.3.1"
+    },
+    {
+      "artifact_count": 2,
+      "compatible_wheels": [
+        {
+          "file": "ziafont-0.11-py3-none-any.whl",
+          "sha256": "b62132be3da9667a80d048ab5498f107e49761722b69965788c2c747a38e7373",
+          "size": 420524
+        }
+      ],
+      "license_expression": null,
+      "license_field_excerpt": "MIT",
+      "name": "ziafont",
+      "project_urls": {
+        "Documentation": "https://ziafont.readthedocs.io",
+        "Homepage": "https://ziafont.readthedocs.io",
+        "Source Code": "https://github.com/cdelker/ziafont"
+      },
+      "released_at": "2025-11-27T02:48:46.266432Z",
+      "version": "0.11"
+    },
+    {
+      "artifact_count": 2,
+      "compatible_wheels": [
+        {
+          "file": "ziamath-0.13-py3-none-any.whl",
+          "sha256": "67a9b9714101fc90c2d6d0328e578f3ac311fb007644f2bbb9314ba2bc1c1459",
+          "size": 856433
+        }
+      ],
+      "license_expression": null,
+      "license_field_excerpt": "MIT",
+      "name": "ziamath",
+      "project_urls": {
+        "Documentation": "https://ziamath.readthedocs.io",
+        "Homepage": "https://ziamath.readthedocs.io",
+        "Source Code": "https://github.com/cdelker/ziamath"
+      },
+      "released_at": "2026-02-06T17:47:09.471176Z",
+      "version": "0.13"
+    }
+  ],
+  "platform": "CPython 3.13 Linux x86_64 current host tags",
+  "source": "PyPI JSON release API, read only"
+}
