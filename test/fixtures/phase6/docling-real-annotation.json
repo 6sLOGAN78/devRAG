@@ -1,0 +1,18 @@
+{
+  "capture_kind": "real_local_service_response",
+  "captured_at_utc": "2026-11-04",
+  "source": "Original one-page PDF generated with ruled table and planted Lighthouse 52, Owner 73, Height 52, Status Ready facts; 600x400 PDF points",
+  "source_sha256": "6025174ed396d39fce7e1a2080c923df4d9c94b2f6fe7aca201af1f59b0feb9a",
+  "response_sha256": "86deb24b60f73541a2c7a74e93724016e8d4c5843aa60f541043ec27fec4d341",
+  "response_bytes": 7438,
+  "service": "Docling Serve CPU in a network-isolated container",
+  "service_version": "1.38.2",
+  "image_manifest_sha256": "7b31b3c2efa17534dfcffb61665b71bbc959ad309b5b7ed82c3bbdcc63cc3d58",
+  "elapsed_seconds": 10.03,
+  "provider_processing_seconds": 7.627771056000029,
+  "memory_peak_bytes": 1727893504,
+  "memory_limit_bytes": 3221225472,
+  "cpu_quota": "200%",
+  "expected_title": "Lighthouse 52",
+  "expected_table_cells": ["Field", "Value", "Owner", "73", "Height", "52", "Status", "Ready"]
+}

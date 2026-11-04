@@ -1,0 +1,40 @@
+{
+  "docling": {
+    "cpu_quota": "200%",
+    "endpoint": "container-loopback:5001/v1/convert/file",
+    "image_manifest_sha256": "7b31b3c2efa17534dfcffb61665b71bbc959ad309b5b7ed82c3bbdcc63cc3d58",
+    "memory_limit_bytes": 3221225472,
+    "source_sha256": "6025174ed396d39fce7e1a2080c923df4d9c94b2f6fe7aca201af1f59b0feb9a",
+    "status": "real_local_parse_and_fixture_adapter_passed",
+    "elapsed_seconds": 10.03,
+    "provider_processing_seconds": 7.627771056000029,
+    "response_sha256": "86deb24b60f73541a2c7a74e93724016e8d4c5843aa60f541043ec27fec4d341",
+    "response_bytes": 7438,
+    "memory_peak_bytes": 1727893504,
+    "oom_events": 0,
+    "submit_count": 1,
+    "submitted_at_utc": "2026-11-04T23:50:32.972533+00:00"
+  },
+  "external_parser_submission_cap": 8,
+  "external_parser_submissions_counted_before_call": 3,
+  "mineru_fixture": "fixed one-page local PDF with Lighthouse 52 and Owner 73",
+  "mineru_fixture_sha256": "dc911b1007e38e0232ca0f1e2e8b17b665bf6465ba0ce7723731c1d9e28093f6",
+  "mineru_4_1_6_basic": {
+    "cpu_quota": "200%",
+    "endpoint": "127.0.0.1:18003/v1/file_parse",
+    "first_elapsed_seconds": 5.66,
+    "first_zip_bytes": 1188,
+    "first_zip_sha256": "882e077e4a6a3d1b226919b50acc2309a021af91d4d972b74e4f02811cc5ef16",
+    "memory_limit_bytes": 3221225472,
+    "memory_peak_bytes": 889327616,
+    "model_revision": "358310b4f64b95f9fefc372ad899356e4111f376",
+    "oom_events": 0,
+    "second_adapter_elapsed_seconds": 0.201,
+    "second_adapter_result_sha256": "a6340bdb5a223fb69607729ce2a098b7627fc9949c973aefbb849491cdbcab65",
+    "second_adapter_submit_counted_at_utc": "2026-11-04T23:42:12.628449+00:00",
+    "status": "real_local_parse_and_adapter_passed",
+    "submit_count": 2,
+    "submitted_at_utc": "2026-11-04T23:40:13Z"
+  },
+  "paid_provider_calls": 0
+}

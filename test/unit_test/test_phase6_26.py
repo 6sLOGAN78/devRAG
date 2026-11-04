@@ -1,4 +1,5 @@
 """Optional PDF backend selection must be finite and backed by distinct adapters."""
+import hashlib
 import io
 import json
 import zipfile
@@ -76,6 +77,29 @@ def test_docling_bottom_left_and_table_provenance_are_converted_once() -> None:
         (1, 40, 20, 180, 60), (1, 40, 110, 200, 170)]
 
 
+def test_docling_recorded_local_service_response_keeps_title_table_and_boxes() -> None:
+    fixtures = Path(__file__).parents[1] / "fixtures/phase6"
+    annotation = json.loads((fixtures / "docling-real-annotation.json").read_text())
+    source = (fixtures / "docling-real-original.pdf").read_bytes()
+    response = (fixtures / "docling-real-response.json").read_bytes()
+    assert hashlib.sha256(source).hexdigest() == annotation["source_sha256"]
+    assert hashlib.sha256(response).hexdigest() == annotation["response_sha256"]
+    assert annotation["capture_kind"] == "real_local_service_response"
+
+    transport = httpx.MockTransport(lambda request: httpx.Response(200, content=response, headers={"content-type": "application/json"}))
+    blocks = docling.parse(source, BackendEndpoint("http://127.0.0.1:5001", "1.38.2"),
+                           {1: (600, 400)}, {1}, transport=transport)
+    assert [block.kind for block in blocks] == ["heading", "text", "table"]
+    assert blocks[0].text == annotation["expected_title"]
+    assert blocks[2].text.splitlines() == annotation["expected_table_cells"]
+    assert all(block.boxes and all(box.page == 1 for box in block.boxes) for block in blocks)
+    title_box, table_box = blocks[0].boxes[0], blocks[2].boxes[0]
+    assert (round(title_box.x0, 2), round(title_box.top, 2)) == (60, 37.08)
+    assert (round(table_box.x0, 2), round(table_box.top, 2), round(table_box.x1, 2), round(table_box.bottom, 2)) == (
+        58.66, 108.72, 540.85, 300.62,
+    )
+
+
 def test_mineru_thousand_unit_coordinates_are_converted_once() -> None:
     blocks = mineru.normalize(MINERU_RESPONSE, {1: (400, 200)}, {1})
     assert [(block.kind, block.text) for block in blocks] == [("heading", "Lighthouse 52"), ("table", "Owner | 73")]
@@ -104,6 +128,28 @@ def test_mineru_v4_wrapper_returns_structured_cpu_blocks_without_legacy_json(mon
     assert [(box.x0, box.top, box.x1, box.bottom) for block in blocks for box in block.boxes] == [
         (40, 20, 180, 60), (40, 100, 200, 160)]
     assert len(seen) == 1
+
+
+def test_mineru_v4_recorded_local_service_response_preserves_source_facts() -> None:
+    fixtures = Path(__file__).parents[1] / "fixtures/phase6"
+    annotation = json.loads((fixtures / "mineru416-real-annotation.json").read_text())
+    content = (fixtures / "mineru416-real-original.pdf").read_bytes()
+    archive = (fixtures / "mineru416-real-response.zip").read_bytes()
+    assert hashlib.sha256(content).hexdigest() == annotation["source_sha256"]
+    assert hashlib.sha256(archive).hexdigest() == annotation["response_sha256"]
+    assert annotation["capture_kind"] == "real_local_service_response"
+
+    endpoint = BackendEndpoint("http://127.0.0.1:18003", "4.1.6")
+    transport = httpx.MockTransport(
+        lambda request: httpx.Response(200, content=archive, headers={"content-type": "application/zip"})
+    )
+    blocks = mineru.parse(content, endpoint, {1: (400, 200)}, {1}, transport=transport)
+    assert [block.text for block in blocks] == annotation["expected_facts"]
+    assert [block.kind for block in blocks] == ["text", "text"]
+    assert [(box.page, *(round(value, 2) for value in (box.x0, box.top, box.x1, box.bottom)))
+            for block in blocks for box in block.boxes] == [
+        (1, 70, 61.2, 148.4, 75.6), (1, 70, 77.4, 126, 90.6),
+    ]
 
 
 def test_mineru_v4_archive_refuses_traversal_and_invalid_geometry() -> None:

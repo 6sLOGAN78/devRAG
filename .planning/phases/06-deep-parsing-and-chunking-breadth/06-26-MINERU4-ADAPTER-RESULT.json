@@ -1,0 +1,72 @@
+{
+  "blocks": [
+    {
+      "assets": [],
+      "audio": null,
+      "boxes": [
+        {
+          "bottom": 75.6,
+          "page": 1,
+          "top": 61.199999999999996,
+          "x0": 70.0,
+          "x1": 148.4
+        }
+      ],
+      "email": null,
+      "heading_level": 0,
+      "image_ids": [],
+      "kind": "text",
+      "layout_label": "Text",
+      "line_range": null,
+      "page_sizes": {
+        "1": [
+          400.0,
+          200.0
+        ]
+      },
+      "record": null,
+      "section": null,
+      "slide": null,
+      "table": null,
+      "text": "Lighthouse 52"
+    },
+    {
+      "assets": [],
+      "audio": null,
+      "boxes": [
+        {
+          "bottom": 90.60000000000001,
+          "page": 1,
+          "top": 77.4,
+          "x0": 70.0,
+          "x1": 126.0
+        }
+      ],
+      "email": null,
+      "heading_level": 0,
+      "image_ids": [],
+      "kind": "text",
+      "layout_label": "Text",
+      "line_range": null,
+      "page_sizes": {
+        "1": [
+          400.0,
+          200.0
+        ]
+      },
+      "record": null,
+      "section": null,
+      "slide": null,
+      "table": null,
+      "text": "Owner 73"
+    }
+  ],
+  "probe_elapsed_seconds": 0.201,
+  "report": {
+    "layout_backend": "mineru",
+    "layout_regions": 2,
+    "pages_total": 1,
+    "pages_without_text": 0
+  },
+  "schema_version": 1
+}
