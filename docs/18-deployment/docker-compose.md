@@ -83,9 +83,10 @@ The `deepdoc` container can forward a selected PDF to an operator-managed Doclin
 | Parser | Required settings | Supported response dialect |
 | :--- | :--- | :--- |
 | Docling | `PDF_BACKEND_DOCLING_URL`, `PDF_BACKEND_DOCLING_VERSION` | Docling Serve `/v1/convert/file` JSON document |
-| MinerU | `PDF_BACKEND_MINERU_URL`, `PDF_BACKEND_MINERU_VERSION` | MinerU 2.x/3.x `/file_parse` content list |
+| MinerU 2.x/3.x | `PDF_BACKEND_MINERU_URL`, `PDF_BACKEND_MINERU_VERSION` | `/file_parse` JSON content list |
+| MinerU 4.1.6 | `PDF_BACKEND_MINERU_URL`, `PDF_BACKEND_MINERU_VERSION` | Separate `mineru-kit file-parse-server` base URL; `/v1/file_parse` ZIP structured content; explicitly requests the Basic tier |
 
-`PDF_BACKEND_DOCLING_TOKEN` and `PDF_BACKEND_MINERU_TOKEN` are optional operator secrets when the corresponding service requires a bearer token. Keep tokens in the local environment file; never put them in a dataset's parser configuration. The app exposes only configured parser names through authenticated `GET /api/v1/parser-backends`. A selected service failure stops parsing and does not switch to DeepDoc. MinerU 4.x uses a different task/result dialect and is not accepted by this adapter.
+`PDF_BACKEND_DOCLING_TOKEN` and `PDF_BACKEND_MINERU_TOKEN` are optional operator secrets when the corresponding service requires a bearer token. Keep tokens in the local environment file; never put them in a dataset's parser configuration. The app exposes only configured parser names through authenticated `GET /api/v1/parser-backends`. A selected service failure stops parsing and does not switch to DeepDoc. MinerU 4.1.6 uses the separate [file-parse wrapper](https://github.com/opendatalab/MinerU/blob/mineru-4.1.6-released/docs/en/usage/file_parse.md), which itself connects to a MinerU 4.1.6 API server; the configured URL must reach the wrapper, not the main API server. Other MinerU 4.x versions are not accepted by this adapter.
 
 The deterministic adapter tests prove transport and coordinate conversion, but they do not count as a real provider run. One approved one-page parse on each configured service remains part of the Phase 6 live gate.
 

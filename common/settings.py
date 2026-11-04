@@ -568,7 +568,7 @@ def _parse_deepdoc(data: dict[str, Any]) -> DeepDocSettings:
         version = _optional(sec, f"{name}_version")
         if bool(backend_url) != bool(version):
             raise ConfigError(f"incomplete deepdoc.{name} backend configuration")
-        if name == "mineru" and version and not version.startswith(("2.", "3.")):
+        if name == "mineru" and version and not (version.startswith(("2.", "3.")) or version == "4.1.6"):
             raise ConfigError("unsupported deepdoc.mineru response version")
         if backend_url:
             try:

@@ -13,3 +13,5 @@ The Docling body-reference structure has a known [upstream OCR omission report](
 The host's `vm.max_map_count` was restored to 262144 for this boot. The operator copied the checked-in file to `/etc/sysctl.d/99-devrag-elasticsearch.conf`; the installed file and live value were both verified as 262144.
 
 Read-only service candidate and host review: [06-26-SERVICE-REVIEW.md](06-26-SERVICE-REVIEW.md). It is not an acquisition approval or a real parser result.
+
+After that review, a separate MinerU 4.1 `file-parse-server` ZIP dialect was added behind a `4.1.x` version setting. A focused RED exposed the previous 2.x/3.x-only guard; then 22 focused unit tests and 155 focused unit/settings tests passed with synthetic ZIP and source boxes. The adapter requests Basic, binds a stable request ID, refuses redirects/non-200/202 responses, validates bounded ZIP entries, and converts normalized `0..1` boxes once. No MinerU 4.1 service or model is installed, so this does not close the real provider gate. The earlier full Python/frontend/Chrome results predate this addition and are not claimed as tests of the new dialect.

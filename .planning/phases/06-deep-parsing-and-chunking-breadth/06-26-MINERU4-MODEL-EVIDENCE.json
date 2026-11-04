@@ -1,0 +1,88 @@
+{
+  "source": "https://huggingface.co/api/models/opendatalab/MinerU-4_models_onnx?blobs=true",
+  "repository": "opendatalab/MinerU-4_models_onnx",
+  "revision": "358310b4f64b95f9fefc372ad899356e4111f376",
+  "card_license": null,
+  "files": [
+    {
+      "path": ".gitattributes",
+      "size": 1519,
+      "lfs_sha256": null
+    },
+    {
+      "path": "Layout/PP-DocLayoutV2/inference.onnx",
+      "size": 213963712,
+      "lfs_sha256": "cd540dc296ff3115fe78efa65b68501e6a8dc74b198acc9834a725ffaa095aac"
+    },
+    {
+      "path": "Layout/PP-DocLayoutV2/inference.yml",
+      "size": 1482,
+      "lfs_sha256": null
+    },
+    {
+      "path": "MFR/pp_formulanet_plus_m/PP-FormulaNet_plus-M.onnx",
+      "size": 591263297,
+      "lfs_sha256": "20a32595c2b30282dcd069e6295e9fad96115697beb66acb9b681b814006d193"
+    },
+    {
+      "path": "MFR/pp_formulanet_plus_m/PP-FormulaNet_plus-M_inference.yml",
+      "size": 2244564,
+      "lfs_sha256": null
+    },
+    {
+      "path": "OCR/paddleocr/ch_PP-OCRv6_small_rec_infer.onnx",
+      "size": 21159378,
+      "lfs_sha256": "5435fd747c9e0efe15a96d0b378d5bd157e9492ed8fd80edf08f30d02fa24634"
+    },
+    {
+      "path": "OCR/paddleocr/ch_PP-OCRv6_small_rec_inference.yml",
+      "size": 150752,
+      "lfs_sha256": null
+    },
+    {
+      "path": "OCR/paddleocr/ch_PP-OCRv6_tiny_det_infer.onnx",
+      "size": 1780590,
+      "lfs_sha256": "193bab7a04fca699a6c82e6abb5b81bdb28177f0abd4062552b04908dafb19f8"
+    },
+    {
+      "path": "OCR/paddleocr/ch_PP-OCRv6_tiny_det_inference.yml",
+      "size": 1068,
+      "lfs_sha256": null
+    },
+    {
+      "path": "OCR/paddleocr/seal_PP-OCRv4_det_infer.onnx",
+      "size": 4769171,
+      "lfs_sha256": "3e190df84542c2756975febe8f73603b587a23c7f7badfdd3fc8a986540d5bc0"
+    },
+    {
+      "path": "OCR/paddleocr/seal_PP-OCRv4_det_inference.yml",
+      "size": 711,
+      "lfs_sha256": null
+    },
+    {
+      "path": "README.md",
+      "size": 1298,
+      "lfs_sha256": null
+    },
+    {
+      "path": "Table/PP-LCNet_x1_0_table_cls.onnx",
+      "size": 6776877,
+      "lfs_sha256": "c84bf1d79c1c74d534b5b12adb14dd12151c42f7ae3e4be4f1042b830f80b949"
+    },
+    {
+      "path": "Table/slanet-plus.onnx",
+      "size": 7758305,
+      "lfs_sha256": "d57a942af6a2f57d6a4a0372573c696a2379bf5857c45e2ac69993f3b334514b"
+    },
+    {
+      "path": "Table/unet.onnx",
+      "size": 8335007,
+      "lfs_sha256": "0ea48d3a17e35ef5c2e498a5e799566073234d39b1079ca21d9f4fafe73c6d20"
+    },
+    {
+      "path": "manifest.json",
+      "size": 12920,
+      "lfs_sha256": null
+    }
+  ]
+}

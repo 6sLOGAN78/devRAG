@@ -1,5 +1,7 @@
 """Optional PDF backend selection must be finite and backed by distinct adapters."""
+import io
 import json
+import zipfile
 from pathlib import Path
 
 import httpx
@@ -48,6 +50,24 @@ MINERU_ITEMS = [
 ]
 MINERU_RESPONSE = {"backend": "pipeline", "version": "2.5.4", "results": {"source.pdf": {"content_list": json.dumps(MINERU_ITEMS)}}}
 
+MINERU_V4_RESPONSE = {
+    "metadata": {"producer": {"name": "mineru", "version": "4.1.6"}},
+    "extensions": {"mineru": {"tier": "basic"}},
+    "pages": [{"page_idx": 0, "blocks": [
+        {"type": "paragraph_title", "content": "Lighthouse 52", "bbox": [0.1, 0.1, 0.45, 0.3]},
+        {"type": "table", "content": "Owner | 73", "bbox": [0.1, 0.5, 0.5, 0.8]},
+    ]}],
+}
+
+
+def _mineru_v4_zip(document: dict, *, extra_name: str | None = None) -> bytes:
+    output = io.BytesIO()
+    with zipfile.ZipFile(output, "w", compression=zipfile.ZIP_DEFLATED) as archive:
+        archive.writestr("structured_content.json", json.dumps(document))
+        if extra_name:
+            archive.writestr(extra_name, b"untrusted")
+    return output.getvalue()
+
 
 def test_docling_bottom_left_and_table_provenance_are_converted_once() -> None:
     blocks = docling.normalize(DOCLING_RESPONSE, {1: (400, 200)}, {1})
@@ -61,6 +81,58 @@ def test_mineru_thousand_unit_coordinates_are_converted_once() -> None:
     assert [(block.kind, block.text) for block in blocks] == [("heading", "Lighthouse 52"), ("table", "Owner | 73")]
     assert [(box.x0, box.top, box.x1, box.bottom) for block in blocks for box in block.boxes] == [
         (40, 20, 180, 60), (40, 100, 200, 160)]
+
+
+def test_mineru_v4_wrapper_returns_structured_cpu_blocks_without_legacy_json(monkeypatch) -> None:
+    from rag.parsers.backend_registry import configured_endpoint
+
+    monkeypatch.setenv("PDF_BACKEND_MINERU_URL", "https://approved.example")
+    monkeypatch.setenv("PDF_BACKEND_MINERU_VERSION", "4.1.6")
+    endpoint = configured_endpoint("mineru")
+    seen = []
+
+    def respond(request: httpx.Request) -> httpx.Response:
+        seen.append(request)
+        assert request.url.path == "/v1/file_parse"
+        assert b'name="file"' in request.content
+        assert b'name="tier"' in request.content and b"basic" in request.content
+        assert b'name="output_formats"' in request.content and b"default" in request.content
+        return httpx.Response(200, content=_mineru_v4_zip(MINERU_V4_RESPONSE), headers={"content-type": "application/zip"})
+
+    blocks = mineru.parse(b"%PDF-1.4 fixture", endpoint, {1: (400, 200)}, {1}, transport=httpx.MockTransport(respond))
+    assert [(block.kind, block.text) for block in blocks] == [("heading", "Lighthouse 52"), ("table", "Owner | 73")]
+    assert [(box.x0, box.top, box.x1, box.bottom) for block in blocks for box in block.boxes] == [
+        (40, 20, 180, 60), (40, 100, 200, 160)]
+    assert len(seen) == 1
+
+
+def test_mineru_v4_archive_refuses_traversal_and_invalid_geometry() -> None:
+    endpoint = BackendEndpoint("https://approved.example", "4.1.6")
+    def respond(body: bytes):
+        return httpx.MockTransport(lambda _: httpx.Response(200, content=body, headers={"content-type": "application/zip"}))
+
+    with pytest.raises(BackendUnavailable):
+        mineru.parse(b"%PDF-1.4 fixture", endpoint, {1: (400, 200)}, {1},
+                     transport=respond(_mineru_v4_zip(MINERU_V4_RESPONSE, extra_name="../escape")))
+
+    invalid = json.loads(json.dumps(MINERU_V4_RESPONSE))
+    invalid["pages"][0]["blocks"][0]["bbox"] = [0.1, 0.1, 1.1, 0.3]
+    with pytest.raises(BackendUnavailable):
+        mineru.parse(b"%PDF-1.4 fixture", endpoint, {1: (400, 200)}, {1},
+                     transport=respond(_mineru_v4_zip(invalid)))
+
+
+def test_mineru_v4_wrapper_wait_and_wrong_version_fail_closed() -> None:
+    endpoint = BackendEndpoint("https://approved.example", "4.1.6")
+    waiting = httpx.MockTransport(lambda _: httpx.Response(202, json={"status": "running"}))
+    with pytest.raises(BackendUnavailable):
+        mineru.parse(b"%PDF-1.4 fixture", endpoint, {1: (400, 200)}, {1}, transport=waiting)
+
+    wrong = json.loads(json.dumps(MINERU_V4_RESPONSE))
+    wrong["metadata"]["producer"]["version"] = "4.1.5"
+    returned = httpx.MockTransport(lambda _: httpx.Response(200, content=_mineru_v4_zip(wrong), headers={"content-type": "application/zip"}))
+    with pytest.raises(BackendUnavailable):
+        mineru.parse(b"%PDF-1.4 fixture", endpoint, {1: (400, 200)}, {1}, transport=returned)
 
 
 @pytest.mark.parametrize("adapter,response,path", [
@@ -144,11 +216,11 @@ def test_selected_backend_requires_operator_endpoint_and_rejects_submitted_url(m
         run_selected("docling", content, {"layout": True, "backend": "docling", "url": "http://untrusted.example"})
 
 
-def test_mineru_new_task_schema_is_not_misread_as_legacy_coordinates(monkeypatch) -> None:
+def test_mineru_unimplemented_four_zero_schema_is_not_misread_as_legacy_coordinates(monkeypatch) -> None:
     from rag.parsers.backend_registry import configured_endpoint
 
     monkeypatch.setenv("PDF_BACKEND_MINERU_URL", "https://approved.example")
-    monkeypatch.setenv("PDF_BACKEND_MINERU_VERSION", "4.1.0")
+    monkeypatch.setenv("PDF_BACKEND_MINERU_VERSION", "4.0.0")
     with pytest.raises(BackendUnavailable):
         configured_endpoint("mineru")
 
@@ -225,11 +297,13 @@ async def test_backend_availability_route_is_authenticated_and_contains_names_on
     resolver = StubPrincipalResolver()
     settings = memory_settings(deepdoc=DeepDocSettings(
         url="http://deepdoc:9390", api_token="unit-only-operator-token-000000",
-        docling_url="https://docling.example", docling_version="1.0.0"))
+        docling_url="https://docling.example", docling_version="1.0.0",
+        mineru_url="https://mineru.example", mineru_version="4.1.6"))
     client = create_app(settings, principal_resolver=resolver).test_client()
     denied = await client.get("/api/v1/parser-backends")
     assert denied.status_code == 401
     allowed = await client.get("/api/v1/parser-backends", headers={"Authorization": f"Bearer {resolver.token}"})
     assert allowed.status_code == 200
-    assert (await allowed.get_json())["data"] == {"available": ["deepdoc", "docling"]}
+    assert (await allowed.get_json())["data"] == {"available": ["deepdoc", "docling", "mineru"]}
     assert "docling.example" not in (await allowed.get_data()).decode()
+    assert "mineru.example" not in (await allowed.get_data()).decode()

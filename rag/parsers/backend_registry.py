@@ -69,6 +69,28 @@ def request_json(endpoint: BackendEndpoint, path: str, content: bytes, fields: d
         raise BackendUnavailable() from None
 
 
+def request_attachment(endpoint: BackendEndpoint, path: str, content: bytes, fields: dict[str, str], *, transport: httpx.BaseTransport | None = None) -> bytes:
+    """Accept one bounded ZIP attachment from a trusted, versioned wrapper."""
+    if not content.startswith(b"%PDF-") or len(content) > 100 * 1024 * 1024:
+        raise BackendUnavailable()
+    headers = {"Accept": "application/zip"}
+    if endpoint.token:
+        headers["Authorization"] = f"Bearer {endpoint.token}"
+    try:
+        with httpx.Client(base_url=endpoint.url, timeout=50, transport=transport, follow_redirects=False, trust_env=False) as client:
+            with client.stream("POST", path, headers=headers, files={"file": ("source.pdf", content, "application/pdf")}, data=fields) as response:
+                if response.status_code != 200 or "application/zip" not in response.headers.get("content-type", ""):
+                    raise BackendUnavailable()
+                payload = bytearray()
+                for chunk in response.iter_bytes():
+                    payload.extend(chunk)
+                    if len(payload) > 32 * 1024 * 1024:
+                        raise BackendUnavailable()
+        return bytes(payload)
+    except (httpx.HTTPError, OSError, ValueError):
+        raise BackendUnavailable() from None
+
+
 def page_box(page: int, values: tuple[float, float, float, float], page_sizes: dict[int, tuple[float, float]]) -> PageBox:
     if type(page) is not int or page not in page_sizes:
         raise BackendUnavailable()
@@ -104,8 +126,8 @@ def configured_endpoint(name: str) -> BackendEndpoint:
     version = os.environ.get(f"{prefix}_VERSION", "")
     if not url or not version:
         raise BackendUnavailable()
-    # MinerU 4 uses a different task/result schema. The V1 content-list dialect is only 2.x/3.x.
-    if name == "mineru" and not version.startswith(("2.", "3.")):
+    # MinerU 4.1.6 uses a distinct wrapper/ZIP dialect; other 4.x versions are not inferred.
+    if name == "mineru" and not (version.startswith(("2.", "3.")) or version == "4.1.6"):
         raise BackendUnavailable()
     try:
         return BackendEndpoint(url, version, os.environ.get(f"{prefix}_TOKEN", ""))
