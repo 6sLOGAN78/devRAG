@@ -1,0 +1,9 @@
+{
+  "status": "approved_for_bounded_acquisition_and_inspection",
+  "decision_source": "user",
+  "human_response": "apptove this exact packet",
+  "approved_at_utc": "2026-11-04T12:35:25Z",
+  "packet": "06-26-SUPPLEMENTAL-ACQUISITION.md",
+  "packet_sha256": "f5f4a33e97f2c260ae1fe7c467224045945a6daacbdbdfa60d3a319234a8c8b2",
+  "scope": "Pinned Docling CPU image, MinerU 4.1.6 package lock, and pinned ONNX model revision for isolated inspection and one-page probes within stated guards; no claim of runtime acceptance or phase completion"
+}
