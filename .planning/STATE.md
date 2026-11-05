@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Phase6 plan26 optional Docling/MinerU adapters locally verified; real provider gate pending
-last_updated: "2026-11-04"
-last_activity: 2026-11-04 -- Plan26 local adapters/API/UI and missing-provider flow verified; real provider URLs pending
+stopped_at: Phase6 plan26 functional journeys verified; final budget deviation and plans27-30 pending
+last_updated: "2026-11-05"
+last_activity: 2026-11-05 -- Plan26 real Docling and MinerU Chrome-to-worker journeys passed; 9/8 local parser budget deviation recorded
 progress:
   total_phases: 8
   completed_phases: 4
   total_plans: 176
-  completed_plans: 171
+  completed_plans: 172
   percent: 97
 ---
 
@@ -21,18 +21,18 @@ progress:
 See: .planning/PROJECT.md (updated 2026-10-05)
 
 **Core value:** A user can upload a document into a knowledge base and get an accurate, cited answer to a question about it, end-to-end through the real pipeline (parse, chunk, embed, index, hybrid retrieve, rerank, generate), with no mocked stages.
-**Current focus:** Phase 6 execution — 06-26 Docling and MinerU backend selection
+**Current focus:** Phase 6 execution — Plan 06-27 after verified Docling and MinerU selection
 
 ## Current Position
 
 Phase: 6 (deep-parsing-and-chunking-breadth) — EXECUTING
-Plan: 26 of 30; plans01–25 complete; optional Docling and MinerU backend selection next
-Status: Plans01–25 complete; R232..256 recorded. Plan26 local Docling/MinerU adapters, backend availability API and UI are implemented with synthetic dialect tests and live missing-provider refusal. Actual Docling/MinerU service URLs and versions are pending; no real adapter parse is claimed. Local ASR3/3 retained; zero external paid calls.
+Plan: 27 of 30; plans01–26 functionally complete; optional PaddleOCR and Mistral OCR selection next
+Status: Plans01–26 complete; R232..257 recorded. Real pinned Docling Serve1.38.2 and MinerU4.1.6 Basic services, recorded responses, configured Chrome-to-worker journeys, indexed facts and completion ledgers passed. The MinerU 202 path has deterministic bounded-poll tests; the pinned wrapper has no cancel route. An integration prerequisite bug caused one unapproved extra local MinerU submit: 9 observed against the approved8, zero paid. The Phase6 final budget gate remains open. Local ASR3/3 retained.
 Prior checks: Phase5 UAT5/6 passed (two user answer judgments and delegated screenshot/Chinese/footprint review). Final Phase5 acceptance remains pending; Phase4 B36 remains separately deferred. Prior paid evidence retained.
-Current checkpoint:26 implementation in progress; see 06-26-CHECKPOINT.md. The supplemental acquisition packet was approved. Exact MinerU 4.1.6 CPU Basic packages/models in an isolated environment produced one real ZIP and a passing direct `run_selected` result. Unused Docker build cache was cleared under operator cleanup authorization, allowing the pinned Docling CPU image to run above the 6 GiB disk reserve. A real one-page Docling response recovered plain text and a detected ownership table; both real dialect fixtures now pass focused Plan26 unit24/24. Total external submits3/8, zero paid; peak memory MinerU889MB, Docling1.73GB under respective3GiB guards. DeepDoc worker/browser journeys and MinerU202 lifecycle remain open. Earlier full Python/frontend/Chrome evidence predates this addition. The two-worker stack passed `scripts/wait_stack.sh --timeout 120` at the last check, but infrastructure containers are currently stopped again and must be restored before E2E. Host vm.max_map_count was last verified at262144.
-Last activity: 2026-11-04
+Current checkpoint:26 summary, acquisition ledger and probe ledger carry exact artifacts and the 9/8 budget exception. Focused Python49, integration1, ordinary browser1, real Docling1, real MinerU1, frontend23 and CI7 passed after current app/DeepDoc rebuilds. No paid call. The Docling image and MinerU scope were stopped after verification; the app/DeepDoc/two-worker stack was healthy at last check. Do not make another external parser submit under the approved packet. Phase6 gate, Phase5 final human acceptance and Phase4 B36 remain open.
+Last activity: 2026-11-05
 
-Progress: 171/176 currently planned execution plans complete (97%); Phase6 25/30 complete.
+Progress: 172/176 currently planned execution plans functionally complete (98%); Phase6 26/30 complete, final budget exception pending.
 
 ## Performance Metrics
 

@@ -6,6 +6,7 @@ import json
 import math
 import os
 import tempfile
+import time
 from dataclasses import asdict, dataclass, replace
 from pathlib import Path
 from typing import Any
@@ -70,25 +71,66 @@ def request_json(endpoint: BackendEndpoint, path: str, content: bytes, fields: d
 
 
 def request_attachment(endpoint: BackendEndpoint, path: str, content: bytes, fields: dict[str, str], *, transport: httpx.BaseTransport | None = None) -> bytes:
-    """Accept one bounded ZIP attachment from a trusted, versioned wrapper."""
+    """Accept a bounded ZIP or poll the pinned wrapper's same-origin result."""
     if not content.startswith(b"%PDF-") or len(content) > 100 * 1024 * 1024:
         raise BackendUnavailable()
     headers = {"Accept": "application/zip"}
     if endpoint.token:
         headers["Authorization"] = f"Bearer {endpoint.token}"
     try:
-        with httpx.Client(base_url=endpoint.url, timeout=50, transport=transport, follow_redirects=False, trust_env=False) as client:
+        deadline = time.monotonic() + 49
+        with httpx.Client(base_url=endpoint.url, timeout=35, transport=transport, follow_redirects=False, trust_env=False) as client:
             with client.stream("POST", path, headers=headers, files={"file": ("source.pdf", content, "application/pdf")}, data=fields) as response:
-                if response.status_code != 200 or "application/zip" not in response.headers.get("content-type", ""):
+                if response.status_code == 200:
+                    return _bounded_zip(response)
+                if response.status_code != 202 or "application/json" not in response.headers.get("content-type", ""):
                     raise BackendUnavailable()
-                payload = bytearray()
-                for chunk in response.iter_bytes():
-                    payload.extend(chunk)
-                    if len(payload) > 32 * 1024 * 1024:
-                        raise BackendUnavailable()
-        return bytes(payload)
-    except (httpx.HTTPError, OSError, ValueError):
+                pending = _bounded_status(response, fields["request_id"])
+            if pending["status"] in {"failed", "canceled", "submission_unknown"}:
+                raise BackendUnavailable()
+            request_id = fields["request_id"]
+            # The wrapper returns absolute status/result links. Construct local paths instead:
+            # a provider response must not choose a new origin for the next request.
+            status_path = f"/v1/file_parse/{request_id}"
+            while time.monotonic() < deadline:
+                with client.stream("GET", status_path, headers=headers, timeout=min(3, max(0.1, deadline - time.monotonic()))) as status:
+                    pending = _bounded_status(status, request_id)
+                if pending["status"] == "completed":
+                    with client.stream("GET", status_path + "/result", headers=headers,
+                                       timeout=min(5, max(0.1, deadline - time.monotonic()))) as result:
+                        return _bounded_zip(result)
+                if pending["status"] in {"failed", "canceled", "submission_unknown"}:
+                    raise BackendUnavailable()
+                time.sleep(min(0.5, max(0, deadline - time.monotonic())))
+            raise BackendUnavailable()
+    except (httpx.HTTPError, OSError, ValueError, KeyError, RecursionError):
         raise BackendUnavailable() from None
+
+
+def _bounded_zip(response: httpx.Response) -> bytes:
+    if response.status_code != 200 or "application/zip" not in response.headers.get("content-type", ""):
+        raise BackendUnavailable()
+    payload = bytearray()
+    for chunk in response.iter_bytes():
+        payload.extend(chunk)
+        if len(payload) > 32 * 1024 * 1024:
+            raise BackendUnavailable()
+    return bytes(payload)
+
+
+def _bounded_status(response: httpx.Response, request_id: str) -> dict[str, Any]:
+    if response.status_code not in {200, 202} or "application/json" not in response.headers.get("content-type", ""):
+        raise BackendUnavailable()
+    payload = bytearray()
+    for chunk in response.iter_bytes():
+        payload.extend(chunk)
+        if len(payload) > 4096:
+            raise BackendUnavailable()
+    value = json.loads(payload)
+    if (not isinstance(value, dict) or value.get("request_id") != request_id
+            or value.get("status") not in {"prepared", "pending", "running", "completed", "failed", "canceled", "submission_unknown"}):
+        raise BackendUnavailable()
+    return value
 
 
 def page_box(page: int, values: tuple[float, float, float, float], page_sizes: dict[int, tuple[float, float]]) -> PageBox:

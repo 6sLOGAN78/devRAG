@@ -1,0 +1,32 @@
+{
+  "plan": "06-26",
+  "status": "functional_slice_verified_with_budget_deviation",
+  "requirements": ["PARSE-22"],
+  "real_services": {
+    "docling": "1.38.2 pinned CPU image; one-page text and table response captured",
+    "mineru": "4.1.6 Basic CPU; one-page ZIP response captured"
+  },
+  "real_journeys": {
+    "docling": "Chrome saved choice, worker indexed source-backed facts, ledger named backend; 1 passed",
+    "mineru": "Chrome saved choice, worker indexed source-backed facts, ledger named backend; 1 passed"
+  },
+  "checks": {
+    "focused_python_unit_regression_records": "49 passed",
+    "full_marked_python_unit": "2661 passed, 8 existing skips, 51 deselected",
+    "deepdoc_integration": "1 passed",
+    "ordinary_browser_availability": "1 passed, 2 live cases deselected",
+    "focused_frontend": "23 passed with installed Node v24.21.0",
+    "full_frontend_unit": "2201 passed in 114 files with installed Node v24.21.0",
+    "app_and_deepdoc_rebuild": "passed; running source hashes matched",
+    "stack_health": "app, DeepDoc, both workers and dependencies healthy; optional service URLs cleared after live probes",
+    "ci": "7/7 passed"
+  },
+  "external_parser_submissions_approved": 8,
+  "external_parser_submissions_observed": 9,
+  "budget_deviation": "one extra local MinerU request caused by test reading docker/.env rather than the active container environment; test fixed; zero paid calls",
+  "paid_provider_calls": 0,
+  "real_202_lifecycle_checked": false,
+  "upstream_cancel_route_available": false,
+  "phase6_final_gate_complete": false,
+  "human_uat_approved": false
+}

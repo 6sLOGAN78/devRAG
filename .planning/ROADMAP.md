@@ -666,7 +666,7 @@ Scope notes: this is the PROJECT.md Core Value. No Phase 6, 7 or 8 work starts u
 - [x] 06-25-PLAN.md — Delete derived results and download authorized artifacts
 **Wave 26** *(blocked on Wave 25 completion and accepted06-01 snapshot)*
 
-- [ ] 06-26-PLAN.md — Select Docling or MinerU parsing
+- [x] 06-26-PLAN.md — Select Docling or MinerU parsing (functional journey verified; 9/8 local parser budget deviation carried to final gate)
 **Wave 27** *(blocked on Wave 26 completion and accepted06-01 snapshot)*
 
 - [ ] 06-27-PLAN.md — Select PaddleOCR or Mistral OCR models

@@ -4,16 +4,28 @@ import io
 import json
 import zipfile
 from pathlib import Path
+from types import SimpleNamespace
 
 import httpx
 import pytest
 
 from api.db.services.parser_config import validate_parser_config
 from api.db.services.service_errors import ServiceError
+from rag.parsers import backend_registry
 from rag.parsers.backend_registry import BackendEndpoint, BackendUnavailable
 from rag.parsers.backends import docling, mineru
 
 pytestmark = pytest.mark.unit
+
+
+@pytest.mark.parametrize("backend", ["docling", "mineru"])
+def test_selected_backend_is_preserved_in_finished_document_ledger(backend: str) -> None:
+    from rag.svr.progress import _counts_dsl, _summarise
+
+    task = SimpleNamespace(progress=1, retry_count=1,
+                           progress_msg=f"[pages] total=1 without_text=0\n[layout] backend={backend} regions=3")
+    ledger = _counts_dsl(_summarise([task]), 2)
+    assert ledger["layout_backend"] == backend and ledger["layout_regions"] == 3
 
 
 def test_docling_and_mineru_have_distinct_backend_modules(repo_root: Path) -> None:
@@ -179,6 +191,56 @@ def test_mineru_v4_wrapper_wait_and_wrong_version_fail_closed() -> None:
     returned = httpx.MockTransport(lambda _: httpx.Response(200, content=_mineru_v4_zip(wrong), headers={"content-type": "application/zip"}))
     with pytest.raises(BackendUnavailable):
         mineru.parse(b"%PDF-1.4 fixture", endpoint, {1: (400, 200)}, {1}, transport=returned)
+
+
+def test_mineru_v4_wrapper_202_polls_same_origin_and_downloads_result() -> None:
+    content = b"%PDF-1.4 fixture"
+    request_id = hashlib.sha256(content + b"\0" + b"4.1.6" + b"\0" + b"1").hexdigest()
+    seen = []
+
+    def respond(request: httpx.Request) -> httpx.Response:
+        seen.append((request.method, request.url.path))
+        if request.method == "POST":
+            return httpx.Response(202, json={"request_id": request_id, "status": "running",
+                                             "status_url": "https://untrusted.example/steal"})
+        if request.url.path.endswith("/result"):
+            return httpx.Response(200, content=_mineru_v4_zip(MINERU_V4_RESPONSE), headers={"content-type": "application/zip"})
+        return httpx.Response(200, json={"request_id": request_id, "status": "completed"})
+
+    blocks = mineru.parse(content, BackendEndpoint("https://approved.example", "4.1.6"), {1: (400, 200)}, {1},
+                          transport=httpx.MockTransport(respond))
+    assert [block.text for block in blocks] == ["Lighthouse 52", "Owner | 73"]
+    assert seen == [("POST", "/v1/file_parse"), ("GET", f"/v1/file_parse/{request_id}"),
+                    ("GET", f"/v1/file_parse/{request_id}/result")]
+
+
+def test_mineru_v4_wrapper_poll_stops_at_deadline(monkeypatch) -> None:
+    class Clock:
+        now = 0.0
+
+        @classmethod
+        def monotonic(cls):
+            cls.now += 10
+            return cls.now
+
+        @classmethod
+        def pause(cls, seconds):
+            cls.now += seconds
+
+    monkeypatch.setattr(backend_registry, "time", SimpleNamespace(monotonic=Clock.monotonic, sleep=Clock.pause))
+    content = b"%PDF-1.4 fixture"
+    request_id = hashlib.sha256(content + b"\0" + b"4.1.6" + b"\0" + b"1").hexdigest()
+    seen = []
+
+    def respond(request: httpx.Request) -> httpx.Response:
+        seen.append(request.method)
+        return httpx.Response(202 if request.method == "POST" else 200,
+                              json={"request_id": request_id, "status": "running"})
+
+    with pytest.raises(BackendUnavailable):
+        mineru.parse(content, BackendEndpoint("https://approved.example", "4.1.6"), {1: (400, 200)}, {1},
+                     transport=httpx.MockTransport(respond))
+    assert seen.count("POST") == 1 and 1 <= seen.count("GET") <= 5
 
 
 @pytest.mark.parametrize("adapter,response,path", [

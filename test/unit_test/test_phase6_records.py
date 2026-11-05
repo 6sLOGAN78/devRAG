@@ -9,10 +9,34 @@ from test.unit_test import test_phase5_records as phase5
 
 pytestmark = pytest.mark.unit
 FIRST_ROW = 232
-LAST_ROW = 256  # Extended by the plan that actually records each decision.
+LAST_ROW = 257  # Extended by the plan that actually records each decision.
 FINAL_ROW = 261
 STATUS = "accepted (auto, not user-reviewed)"
-REQUIRED_TITLES = ["Phase 6 acquisition and admission", "CPU OCR service and native boundary", "Read scanned PDFs through the existing document UI", "Preserve visual reading order and remove page furniture", "Open extracted images and office figures securely", "Inspect reconstructed PDF tables and crops", "Choose whole-document chunks and inspect public pipeline templates", "Ingest Markdown and technical manuals", "Ingest structured JSON, CSV and Q&A pairs", "Read EPUB books in chapter order", "Read academic papers by section", "Read legal structure and normalize Chinese text", "Inspect presentation chunks per slide", "Retrieve table rows with their headers", "Caption pictures with a configured vision model", "Transcribe audio into timestamped chunks", "Read email envelopes and message bodies", "Read structured résumé sections", "Manage tags and produce retrieval rank features", "Apply controlled tags and auto metadata", "Run dataset-wide enrichment jobs safely", "Delete derived results and download authorized artifacts"]
+REQUIRED_TITLES = [
+    "Phase 6 acquisition and admission",
+    "CPU OCR service and native boundary",
+    "Read scanned PDFs through the existing document UI",
+    "Preserve visual reading order and remove page furniture",
+    "Open extracted images and office figures securely",
+    "Inspect reconstructed PDF tables and crops",
+    "Choose whole-document chunks and inspect public pipeline templates",
+    "Ingest Markdown and technical manuals",
+    "Ingest structured JSON, CSV and Q&A pairs",
+    "Read EPUB books in chapter order",
+    "Read academic papers by section",
+    "Read legal structure and normalize Chinese text",
+    "Inspect presentation chunks per slide",
+    "Retrieve table rows with their headers",
+    "Caption pictures with a configured vision model",
+    "Transcribe audio into timestamped chunks",
+    "Read email envelopes and message bodies",
+    "Read structured résumé sections",
+    "Manage tags and produce retrieval rank features",
+    "Apply controlled tags and auto metadata",
+    "Run dataset-wide enrichment jobs safely",
+    "Delete derived results and download authorized artifacts",
+    "Select Docling or MinerU parsing",
+]
 ROW = re.compile(r"^\| R-(\d+) \|")
 
 
@@ -59,7 +83,5 @@ def test_phase6_rows_are_contiguous_unique_and_well_formed(repo_root):
 def test_phase6_excludes_subsequent_phases(repo_root, tmp_path):
     (tmp_path / ".planning").mkdir()
     original = (repo_root / ".planning/DECISIONS.md").read_text()
-    (tmp_path / ".planning/DECISIONS.md").write_text(
-        original + f"\n| R-262 | Future phase | Separate scope | {STATUS} | Fixture |\n"
-    )
+    (tmp_path / ".planning/DECISIONS.md").write_text(original + f"\n| R-262 | Future phase | Separate scope | {STATUS} | Fixture |\n")
     assert _rows(tmp_path) == _rows(repo_root)

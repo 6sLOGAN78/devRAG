@@ -1,24 +1,28 @@
 {
+  "cap_breach": "One unplanned local MinerU submission occurred in the integration missing-provider test: it read docker/.env instead of the active DeepDoc container environment; provider returned 502. No paid call. No further external submits authorized.",
   "docling": {
     "cpu_quota": "200%",
+    "deepdoc_submit_counted_at_utc": "2026-11-04T23:57:22.357023+00:00",
+    "elapsed_seconds": 10.03,
     "endpoint": "container-loopback:5001/v1/convert/file",
     "image_manifest_sha256": "7b31b3c2efa17534dfcffb61665b71bbc959ad309b5b7ed82c3bbdcc63cc3d58",
     "memory_limit_bytes": 3221225472,
-    "source_sha256": "6025174ed396d39fce7e1a2080c923df4d9c94b2f6fe7aca201af1f59b0feb9a",
-    "status": "real_local_parse_and_fixture_adapter_passed",
-    "elapsed_seconds": 10.03,
-    "provider_processing_seconds": 7.627771056000029,
-    "response_sha256": "86deb24b60f73541a2c7a74e93724016e8d4c5843aa60f541043ec27fec4d341",
-    "response_bytes": 7438,
     "memory_peak_bytes": 1727893504,
     "oom_events": 0,
-    "submit_count": 1,
-    "submitted_at_utc": "2026-11-04T23:50:32.972533+00:00"
+    "provider_processing_seconds": 7.627771056000029,
+    "response_bytes": 7438,
+    "response_sha256": "86deb24b60f73541a2c7a74e93724016e8d4c5843aa60f541043ec27fec4d341",
+    "source_sha256": "6025174ed396d39fce7e1a2080c923df4d9c94b2f6fe7aca201af1f59b0feb9a",
+    "status": "real_local_parse_and_fixture_adapter_passed",
+    "submit_count": 5,
+    "submitted_at_utc": "2026-11-04T23:50:32.972533+00:00",
+    "worker_after_progress_fix_counted_at_utc": "2026-11-05T00:04:20.636576+00:00",
+    "worker_retry_counted_at_utc": "2026-11-05T00:01:39.100683+00:00",
+    "worker_submit_counted_at_utc": "2026-11-05T00:00:32.470444+00:00"
   },
   "external_parser_submission_cap": 8,
-  "external_parser_submissions_counted_before_call": 3,
-  "mineru_fixture": "fixed one-page local PDF with Lighthouse 52 and Owner 73",
-  "mineru_fixture_sha256": "dc911b1007e38e0232ca0f1e2e8b17b665bf6465ba0ce7723731c1d9e28093f6",
+  "external_parser_submissions_counted_before_call": 8,
+  "external_parser_submissions_observed": 9,
   "mineru_4_1_6_basic": {
     "cpu_quota": "200%",
     "endpoint": "127.0.0.1:18003/v1/file_parse",
@@ -33,8 +37,12 @@
     "second_adapter_result_sha256": "a6340bdb5a223fb69607729ce2a098b7627fc9949c973aefbb849491cdbcab65",
     "second_adapter_submit_counted_at_utc": "2026-11-04T23:42:12.628449+00:00",
     "status": "real_local_parse_and_adapter_passed",
-    "submit_count": 2,
-    "submitted_at_utc": "2026-11-04T23:40:13Z"
+    "submit_count": 3,
+    "submit_count_observed": 4,
+    "submitted_at_utc": "2026-11-04T23:40:13Z",
+    "worker_submit_counted_at_utc": "2026-11-05T00:23:46.086500+00:00"
   },
+  "mineru_fixture": "fixed one-page local PDF with Lighthouse 52 and Owner 73",
+  "mineru_fixture_sha256": "dc911b1007e38e0232ca0f1e2e8b17b665bf6465ba0ce7723731c1d9e28093f6",
   "paid_provider_calls": 0
 }

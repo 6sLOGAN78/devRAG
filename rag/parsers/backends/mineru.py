@@ -167,7 +167,7 @@ def parse(content: bytes, endpoint: BackendEndpoint, page_sizes: dict[int, tuple
         request_id = hashlib.sha256(content + b"\0" + endpoint.version.encode() + b"\0" + page_range.encode()).hexdigest()
         attachment = request_attachment(endpoint, "/v1/file_parse", content,
                                         {"tier": "basic", "output_formats": "default", "page_range": page_range,
-                                         "wait_timeout": "45", "request_id": request_id}, transport=transport)
+                                         "wait_timeout": "30", "request_id": request_id}, transport=transport)
         return normalize_v4(_structured_content(attachment), page_sizes, selected, endpoint.version)
     payload = request_json(endpoint, "/file_parse", content,
                            {"return_content_list": "true", "return_md": "false", "return_images": "false",

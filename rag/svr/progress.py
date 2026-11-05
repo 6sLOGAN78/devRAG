@@ -44,7 +44,7 @@ RECONCILE_LIMIT = 100
 _MACHINE = re.compile(r"^(?:\d\d:\d\d:\d\d\s+)?\[(?:pages|skipped|layout)\]\s")
 _PAGES = re.compile(r"\[pages\]\s+total=(\d+)\s+without_text=(\d+)")
 _SKIPPED = re.compile(r"\[skipped\]\s+images=(\d+)")
-_LAYOUT = re.compile(r"\[layout\]\s+backend=(deepdoc-onnx)\s+regions=(\d+)")
+_LAYOUT = re.compile(r"\[layout\]\s+backend=(deepdoc-onnx|docling|mineru)\s+regions=(\d+)")
 _STAMP = re.compile(r"^(\d\d:\d\d:\d\d)\s")
 
 

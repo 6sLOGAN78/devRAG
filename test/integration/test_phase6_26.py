@@ -5,6 +5,7 @@ belongs to the separately budgeted live gate when endpoints are configured.
 """
 
 import json
+import subprocess
 
 import httpx
 import pytest
@@ -19,6 +20,13 @@ def test_real_deepdoc_route_authenticates_and_refuses_unconfigured_selected_back
     values = stack_env()
     token = values.get("DEEPDOC_API_TOKEN")
     assert token, "real DeepDoc operator token is required"
+    project = values.get("COMPOSE_PROJECT_NAME", "devrag-stack")
+    inspected = subprocess.run(
+        ["docker", "inspect", "--format", "{{json .Config.Env}}", f"{project}-deepdoc-1"],
+        capture_output=True, text=True, check=False, timeout=10,
+    )
+    assert inspected.returncode == 0, "running DeepDoc container configuration is required"
+    runtime = dict(pair.split("=", 1) for pair in json.loads(inspected.stdout) if "=" in pair)
     content = text_pdf([["Lighthouse 52", "Owner 73"]])
     with httpx.Client(base_url="http://127.0.0.1:9390", timeout=15, trust_env=False) as client:
         assert client.get("/health").status_code == 200
@@ -27,7 +35,7 @@ def test_real_deepdoc_route_authenticates_and_refuses_unconfigured_selected_back
             files = {"file": ("source.pdf", content, "application/pdf")}
             denied = client.post("/v1/parse", files=files, data={"options": json.dumps(options)})
             assert denied.status_code == 401
-            if not values.get(f"PDF_BACKEND_{name.upper()}_URL"):
+            if not runtime.get(f"PDF_BACKEND_{name.upper()}_URL"):
                 unavailable = client.post("/v1/parse", files=files, data={"options": json.dumps(options)},
                                           headers={"Authorization": "Bearer " + token})
                 assert unavailable.status_code == 503

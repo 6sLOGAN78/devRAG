@@ -1,0 +1,102 @@
+{
+  "blocks": [
+    {
+      "assets": [],
+      "audio": null,
+      "boxes": [
+        {
+          "bottom": 53.726,
+          "page": 1,
+          "top": 37.07600000000002,
+          "x0": 60.0,
+          "x1": 182.02200000000005
+        }
+      ],
+      "email": null,
+      "heading_level": 0,
+      "image_ids": [],
+      "kind": "heading",
+      "layout_label": "Title",
+      "line_range": null,
+      "page_sizes": {
+        "1": [
+          600.0,
+          400.0
+        ]
+      },
+      "record": null,
+      "section": null,
+      "slide": null,
+      "table": null,
+      "text": "Lighthouse 52"
+    },
+    {
+      "assets": [],
+      "audio": null,
+      "boxes": [
+        {
+          "bottom": 77.48399999999998,
+          "page": 1,
+          "top": 66.38400000000001,
+          "x0": 60.0,
+          "x1": 308.11200000000014
+        }
+      ],
+      "email": null,
+      "heading_level": 0,
+      "image_ids": [],
+      "kind": "text",
+      "layout_label": "Text",
+      "line_range": null,
+      "page_sizes": {
+        "1": [
+          600.0,
+          400.0
+        ]
+      },
+      "record": null,
+      "section": null,
+      "slide": null,
+      "table": null,
+      "text": "One-page source with a ruled ownership table."
+    },
+    {
+      "assets": [],
+      "audio": null,
+      "boxes": [
+        {
+          "bottom": 300.62213134765625,
+          "page": 1,
+          "top": 108.72203063964844,
+          "x0": 58.658321380615234,
+          "x1": 540.8461303710938
+        }
+      ],
+      "email": null,
+      "heading_level": 0,
+      "image_ids": [],
+      "kind": "table",
+      "layout_label": "Table",
+      "line_range": null,
+      "page_sizes": {
+        "1": [
+          600.0,
+          400.0
+        ]
+      },
+      "record": null,
+      "section": null,
+      "slide": null,
+      "table": null,
+      "text": "Field\nValue\nOwner\n73\nHeight\n52\nStatus\nReady"
+    }
+  ],
+  "probe_elapsed_seconds": 10.431,
+  "report": {
+    "layout_backend": "docling",
+    "layout_regions": 3,
+    "pages_total": 1,
+    "pages_without_text": 0
+  },
+  "schema_version": 1
+}
